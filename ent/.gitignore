@@ -1,0 +1,32 @@
+# could do this as */, *.go, but that would make it easy to lose new files by
+# accident
+
+# generic ent files
+*_create.go
+*_delete.go
+*_update.go
+*_query.go
+client.go
+config.go
+context.go
+ent.go
+entql.go
+# enttest/ has its own excldue file
+hook/
+migrate/
+mutation.go
+predicate/
+privacy/
+runtime/
+runtime.go
+tx.go
+
+# per-entity files
+topic*/
+/topic*.go
+subscription*/
+/subscription*.go
+message*/
+/message*.go
+delivery*/
+/delivery*.go

@@ -1,0 +1,48 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "generate code",
+			"type": "process",
+			"command": "make",
+			"args": [
+				"generate"
+			],
+			"group": "build"
+		},
+		{
+			"label": "build",
+			"type": "process",
+			"command": "make",
+			"args": [
+				"compile"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": "$go"
+		},
+		{
+			"label": "build ps-compat",
+			"type": "process",
+			"command": "pnpm",
+			"args": [
+				"build"
+			],
+			"problemMatcher": "$tsc",
+			"options": {
+				"cwd": "${workspaceFolder}/cmd/ps-compat"
+			}
+		},
+		{
+			"label": "build tools",
+			"type": "process",
+			"command": "make",
+			"args": [
+				"tools"
+			],
+			"group": "build",
+		},
+	]
+}

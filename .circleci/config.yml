@@ -1,0 +1,138 @@
+version: 2.1
+
+jobs:
+  all-in-one:
+    docker:
+      - image: cimg/go:1.16
+      - image: circleci/postgres:9.6-alpine
+        environment:
+          POSTGRES_USER: circle
+          POSTGRES_DB: circle_test
+
+    environment:
+      TEST_RESULTS: /tmp/test-results
+      DATABASE_URL: "postgres://circle@localhost:5432/circle_test?sslmode=disable"
+      GOPRIVATE: "go.6river.tech,github.com/6RiverSystems/"
+
+    steps:
+      - checkout
+      - run:
+          name: Limit cache weekly
+          command: date +%Y%U >/tmp/cache-time-limit
+      - restore_cache:
+          name: Restore module cache
+          keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
+      - restore_cache:
+          name: Restore similar AIO build cache
+          keys:
+            - go-build-aio-v1-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
+            - go-build-aio-v1-{{ checksum "/tmp/cache-time-limit" }}-
+
+      - run:
+          name: Initialize ci_scripts
+          command: |
+            mkdir ci_scripts
+            curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept:application/vnd.github.v3.raw" https://api.github.com/repos/6RiverSystems/ci_scripts/contents/ci_tool.sh > ci_scripts/ci_tool.sh
+            chmod +x ci_scripts/ci_tool.sh
+      - run:
+          name: Determine new version
+          command: ./ci_scripts/ci_tool.sh --run_release
+      - store_artifacts:
+          name: Capture chosen version
+          path: .version
+      - run: make get
+      - run: make install-ci-tools
+      - run: make generate
+
+      - run:
+          name: Compile code
+          command: make -j compile
+
+      - run:
+          name: Prepare for tests
+          command: mkdir -p $TEST_RESULTS
+      - run:
+          name: format check
+          command: |
+            make fmt
+            git diff --exit-code
+      - run:
+          name: vet
+          command: make vet
+      - run:
+          name: lint
+          command: |
+            go run github.com/golangci/golangci-lint/cmd/golangci-lint run --out-format=junit-xml >${TEST_RESULTS}/golangci-lint.xml
+
+      - run:
+          name: Waiting for Postgres to be ready
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+      - run:
+          name: Run tests
+          environment:
+            NODE_ENV: test
+          # while we aren't using the parallel test split here, we still need to
+          # use test-go-ci-split to get junit output and proper coverage file
+          # storage
+          command: |
+            make \
+              TEST_RESULTS="${TEST_RESULTS}" \
+              PACKAGE_NAMES=./... \
+              test-go-ci-split
+
+      - run:
+          name: Start service (service)
+          command: make TEST_RESULTS="${TEST_RESULTS}" test-main-cover-service
+          background: true
+      - run:
+          name: Wait for service to be active (service)
+          command: dockerize -wait tcp://localhost:3001 -timeout 1m
+      - run:
+          name: Validate service is working (service)
+          command: make smoke-test-curl-service
+
+      - run:
+          name: Coverage HTML report
+          command: |
+            go tool cover -html="${TEST_RESULTS}/coverage.out" -o "${TEST_RESULTS}/coverage.html"
+            go tool cover -html="${TEST_RESULTS}/coverage-smoke-service.out" -o "${TEST_RESULTS}/coverage-smoke-service.html"
+      - run:
+          name: Upload coverage
+          command: |
+            bash <( curl -s --fail https://codecov.io/bash ) -s "${TEST_RESULTS}"
+
+      - setup_remote_docker
+      - run:
+          name: Build docker image
+          command: make docker
+      - run:
+          name: Push docker image
+          command: |
+            ./ci_scripts/ci_tool.sh --docker_login
+            make docker-push
+
+      - store_artifacts:
+          name: Capture test result artifacts
+          path: /tmp/test-results
+          destination: raw-test-output
+      - store_test_results:
+          name: Store test results for CircleCI
+          path: /tmp/test-results
+      - save_cache:
+          name: Save module cache
+          key: go-mod-v1-{{ checksum "go.sum" }}
+          paths:
+            - "/home/circleci/go/pkg"
+      - save_cache:
+          name: Save AIO build cache
+          key: go-build-aio-v1-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
+          paths:
+            - ~/.cache/go-build
+
+workflows:
+  version: 2
+  build-workflow:
+    jobs:
+      - all-in-one:
+          context: 6rs-circle

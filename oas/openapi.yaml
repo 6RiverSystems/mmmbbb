@@ -1,0 +1,131 @@
+openapi: 3.0.1
+
+info:
+  title: 6 River Systems pub-sub-ish message bus API
+  description: |
+    This API describes interactions with the 6RS message bus
+  version: 1.x.x
+  contact:
+    name: 6 River Systems
+    url: https://6river.com
+
+tags:
+  - name: Internal
+    description: |
+      This is an internal API used between 6RS components.
+
+paths:
+  # TODO: can we reference common endpoints in a shared OAS subset with $ref?
+
+  /metrics:
+    get:
+      tags:
+        - Prometheus
+        - Metrics
+        - Status
+      summary: Prometheus metrics export
+      description: Retrive current exported Prometheus metrics
+      responses:
+        200:
+          description: Metrics returned in Prometheus text format
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /debug/vars:
+    get:
+      tags:
+        - Debug
+        - Status
+      summary: Retrieve debug expvars
+      description: Retrieve debug expvars in JSON format
+      responses:
+        200:
+          description: Current expvar values
+          content:
+            application/json:
+              schema:
+                type: object
+                description: >
+                  This is a free-form JSON object. The specific keys present
+                  will depend on internal application details.
+
+  /:
+    get:
+      tags:
+        - Status
+      summary: Application uptime
+      description: >
+        Retrieve application uptime and possibly additional application-specific
+        metadata
+      responses:
+        200:
+          description: Application is up
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UptimeResponse"
+
+  /server/shutdown:
+    post:
+      tags:
+        - Control
+      summary: Shutdown the app, gracefully
+      description: >
+        Request a clean app shutdown, with a reasonable amount of time allowed
+        for active requests and background tasks to complete.
+      responses:
+        200:
+          description: Application shutdown has been initiated
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: A witty message
+  /server/kill:
+    post:
+      tags:
+        - Control
+      summary: Shutdown the app, forcefully
+      description: >
+        Request an app shutdown, with a minimal amount of time allowed for
+        active requests and background tasks to complete before forcibly killing
+        the app.
+      responses:
+        200:
+          description: Application kill has been initiated
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: A sad message
+
+components:
+  schemas:
+    UptimeResponse:
+      type: object
+      description: Response object for a successful uptime request
+      additionalProperties: true
+      required:
+        - startTime
+      properties:
+        startTime:
+          type: string
+          format: date-time
+          description: Timestamp of when the application instance started
+
+    ErrorMessage:
+      type: object
+      description: A generic error message object
+      required:
+        - message
+      additionalProperties: true
+      properties:
+        message:
+          type: string
+          description: A human readable error message
+        name:
+          type: string
+          description: >
+            The name of some object or entity which triggered the error

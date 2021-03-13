@@ -1,0 +1,27 @@
+{
+  "name": "@sixriver/srs-gonic-trial-mmmbbb-ts-compat",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/src/index.js",
+  "scripts": {
+    "pretest": "npm run build",
+    "test": "npm run test:smoke",
+    "prestress": "npm run build",
+    "stress": "npm run test:stress",
+    "test:smoke": "node dist/src/smoke",
+    "test:stress": "node dist/src/stress",
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "rebuild": "npm run clean && npm run build",
+    "start": "echo Use test instead ; exit 1"
+  },
+  "author": "Matthew Gabeler-Lee <mgabeler-lee@6river.com>",
+  "license": "PROPRIETARY",
+  "devDependencies": {
+    "@types/node": "^14.14.22",
+    "typescript": "^4.1.3"
+  },
+  "dependencies": {
+    "@google-cloud/pubsub": "^2.8.0"
+  }
+}
