@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"hash/crc32"
 	"math"
 	"sort"
 	"time"
@@ -36,8 +37,9 @@ type SubscriptionMessageDelivery struct {
 	MessageID   uuid.UUID `json:"messageID"`
 	PublishedAt time.Time `json:"publishedAt"`
 	// NumAttempts is approximate
-	NumAttempts   int               `json:"numAttempts"`
-	NextAttemptAt time.Time         `json:"nextAttemptAt"`
+	NumAttempts   int       `json:"numAttempts"`
+	NextAttemptAt time.Time `json:"nextAttemptAt"`
+	fuzzDelay     time.Duration
 	OrderKey      *string           `json:"orderKey,omitempty"`
 	Payload       json.RawMessage   `json:"payload"`
 	Attributes    map[string]string `json:"attributes"`
@@ -398,11 +400,14 @@ func (a *GetSubscriptionMessages) applyResults(
 			continue
 		}
 
+		nominalDelay, fuzzedDelay := NextDelayFor(sub, d.Attempts+1)
+
 		delivery := &SubscriptionMessageDelivery{
 			ID:            d.ID,
 			MessageID:     d.Edges.Message.ID,
 			PublishedAt:   d.Edges.Message.PublishedAt,
-			NextAttemptAt: now.Add(NextDelayFor(sub, d.Attempts+1)),
+			NextAttemptAt: now.Add(nominalDelay),
+			fuzzDelay:     fuzzedDelay - nominalDelay,
 			OrderKey:      d.Edges.Message.OrderKey,
 			NumAttempts:   d.Attempts + 1,
 			Payload:       d.Edges.Message.Payload,
@@ -432,7 +437,7 @@ func (a *GetSubscriptionMessages) applyResults(
 		if err := tx.Delivery.UpdateOneID(d.ID).
 			SetLastAttemptedAt(now).
 			AddAttempts(1).
-			SetAttemptAt(d.NextAttemptAt).
+			SetAttemptAt(d.NextAttemptAt.Add(d.fuzzDelay)).
 			Exec(ctx); err != nil {
 			return err
 		}
@@ -476,7 +481,7 @@ const retryBackoffFactor = 1.1
 // delay after N attempts = floor(max, min * factor^N), AKA after first attempt
 // delay is min, after each further attempt delay *= factor, until delay hits
 // max
-func NextDelayFor(sub *ent.Subscription, attempts int) time.Duration {
+func NextDelayFor(sub *ent.Subscription, attempts int) (nominalDelay, fuzzedDelay time.Duration) {
 	min, max := defaultMinDelay, defaultMaxDelay
 	if sub.MinBackoff != nil && sub.MinBackoff.Duration != nil && *sub.MinBackoff.Duration > 0 {
 		min = *sub.MinBackoff.Duration
@@ -486,7 +491,21 @@ func NextDelayFor(sub *ent.Subscription, attempts int) time.Duration {
 	}
 	delay := math.Pow(retryBackoffFactor, float64(attempts)) * min.Seconds()
 	if delay > max.Seconds() {
-		return max
+		delay = max.Seconds()
 	}
-	return time.Duration(delay * float64(time.Second))
+	var fuzzNanos uint32
+	// add up to 1 second of fuzz if we are doing at least 0.5 seconds of nominal
+	// delay
+	if delay > 0.5 {
+		// be stochastic, but deterministic about fuzz
+		h := crc32.NewIEEE()
+		h.Write(sub.ID[:])
+		attempts32 := int32(attempts)
+		h.Write((*(*[4]byte)(unsafe.Pointer(&attempts32)))[:])
+		fuzzNanos = h.Sum32() % uint32(time.Second)
+	}
+
+	nominalDelay = time.Duration(delay * float64(time.Second))
+	fuzzedDelay = nominalDelay + time.Duration(fuzzNanos)
+	return
 }

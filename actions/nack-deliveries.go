@@ -70,8 +70,9 @@ func (a *NackDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 				return err
 			}
 		}
+		_, fuzzedDelay := NextDelayFor(d.Edges.Subscription, d.Attempts)
 		if err := tx.Delivery.UpdateOne(d).
-			SetAttemptAt(now.Add(NextDelayFor(d.Edges.Subscription, d.Attempts))).
+			SetAttemptAt(now.Add(fuzzedDelay)).
 			Exec(ctx); err != nil {
 			return err
 		}

@@ -615,11 +615,12 @@ func applyPushConfig(mut *ent.SubscriptionUpdateOne, cfg *pubsub.PushConfig) *en
 // Not planned: Seek
 
 func entSubscriptionToGrpc(subscription *ent.Subscription, topicName string) *pubsub.Subscription {
+	nominalDelay, _ := actions.NextDelayFor(subscription, 0)
 	ret := &pubsub.Subscription{
 		Name: subscription.Name,
 		// TODO: this is a fudge, based on the initial retry backoff (pubsub
 		// differentiates ack deadlines vs retry backoffs, we don't)
-		AckDeadlineSeconds: int32(actions.NextDelayFor(subscription, 0).Seconds()),
+		AckDeadlineSeconds: int32(nominalDelay.Seconds()),
 		// we do retain acked messages, but not in the sense or for the purpose that
 		// Google means, esp. not indefinitely
 		RetainAckedMessages:      false,

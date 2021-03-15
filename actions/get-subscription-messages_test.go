@@ -435,8 +435,9 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 					assert.Equal(t, msg.OrderKey, d.OrderKey)
 					assert.Equal(t, msg.PublishedAt, d.PublishedAt)
 					// zone info will likely be different here, we just care that they
-					// represent the same time
-					assert.Equal(t, del.AttemptAt.UnixNano(), d.NextAttemptAt.UnixNano())
+					// represent the same time, within the fuzz boundary
+					assert.GreaterOrEqual(t, del.AttemptAt.UnixNano(), d.NextAttemptAt.UnixNano())
+					assert.LessOrEqual(t, del.AttemptAt.UnixNano(), d.NextAttemptAt.Add(time.Second).UnixNano())
 					assert.Equal(t, del.Attempts, d.NumAttempts)
 					assert.Greater(t, del.Attempts, 0)
 					assert.Greater(t, del.AttemptAt.UnixNano(), time.Now().UnixNano())
