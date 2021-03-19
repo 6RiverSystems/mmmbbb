@@ -4,11 +4,20 @@ import (
 	"github.com/alecthomas/participle/v2"
 )
 
-func NewParser() (*participle.Parser, error) {
-	return participle.Build(
-		&Filter{},
-		participle.UseLookahead(3),
-		// attribute values (or prefixes) need to be unquoted
-		participle.Unquote("String"),
-	)
+var DefaultParserOptions = []participle.Option{
+	// participle.UseLookahead(1),
+	// attribute values (or prefixes) need to be unquoted
+	participle.Unquote("String"),
 }
+
+// func NewParser() (*participle.Parser, error) {
+// 	return participle.Build(
+// 		&Filter{},
+// 		defaultParserOptions...,
+// 	)
+// }
+
+var Parser = participle.MustBuild(
+	&Filter{},
+	DefaultParserOptions...,
+)

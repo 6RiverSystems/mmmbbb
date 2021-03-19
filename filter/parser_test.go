@@ -9,9 +9,6 @@ import (
 )
 
 func TestParserBinding(t *testing.T) {
-	p, err := NewParser()
-	require.NoError(t, err)
-
 	tests := []struct {
 		name, input string
 		want        *Filter
@@ -72,7 +69,7 @@ func TestParserBinding(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ast := &Filter{}
-			require.NoError(t, p.ParseString(tt.name, tt.input, ast))
+			require.NoError(t, Parser.ParseString(tt.name, tt.input, ast))
 			// t.Logf("%#v", ast)
 			j, err := json.MarshalIndent(&ast, "", " ")
 			require.NoError(t, err)

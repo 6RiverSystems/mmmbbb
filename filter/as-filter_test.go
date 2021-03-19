@@ -19,12 +19,9 @@ func TestAsFilterLoop(t *testing.T) {
 		`hasPrefix(attributes:x,"x")`,
 	}
 
-	p, err := NewParser()
-	require.NoError(t, err)
-
 	for _, f := range filters {
 		ast := &Filter{}
-		require.NoError(t, p.ParseString(f, f, ast))
+		require.NoError(t, Parser.ParseString(f, f, ast))
 		ff, err := ast.AsFilter()
 		if assert.NoError(t, err) {
 			assert.Equal(t, f, ff)
