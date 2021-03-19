@@ -2,11 +2,6 @@ package filter
 
 type Filter = Condition
 
-type BasicExpression struct {
-	HasAttribute          *HasAttribute          `parser:"@@" json:",omitempty"`
-	HasAttributePredicate *HasAttributePredicate `parser:"| @@" json:",omitempty"`
-}
-
 type Condition struct {
 	Or []*OrTerm `parser:"@@ (\"OR\" @@)*" json:",omitempty"`
 }
@@ -19,6 +14,11 @@ type AndTerm struct {
 	Not   bool             `parser:"@\"NOT\"?"`
 	Basic *BasicExpression `parser:"( @@" json:",omitempty"`
 	Sub   *Condition       `parser:"| \"(\" @@ \")\" )" json:",omitempty"`
+}
+
+type BasicExpression struct {
+	HasAttribute          *HasAttribute          `parser:"@@" json:",omitempty"`
+	HasAttributePredicate *HasAttributePredicate `parser:"| @@" json:",omitempty"`
 }
 
 type HasAttribute struct {

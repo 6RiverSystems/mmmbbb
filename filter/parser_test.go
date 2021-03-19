@@ -73,7 +73,7 @@ func TestParserBinding(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ast := &Filter{}
 			require.NoError(t, p.ParseString(tt.name, tt.input, ast))
-			t.Logf("%#v", ast)
+			// t.Logf("%#v", ast)
 			j, err := json.MarshalIndent(&ast, "", " ")
 			require.NoError(t, err)
 			if tt.want != nil {
