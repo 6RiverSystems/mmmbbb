@@ -5,6 +5,7 @@ go 1.16
 require (
 	cloud.google.com/go/pubsub v1.10.1
 	entgo.io/ent v0.7.0
+	github.com/alecthomas/participle/v2 v2.0.0-alpha3
 	github.com/getkin/kin-openapi v0.49.0
 	github.com/gin-gonic/gin v1.6.3
 	github.com/golang/protobuf v1.4.3
