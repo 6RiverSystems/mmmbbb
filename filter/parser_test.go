@@ -78,7 +78,12 @@ func TestParserBinding(t *testing.T) {
 		{
 			"quoted attribute",
 			`attributes:"foo\nbar\"yikes"`,
-			&Filter{Term: &Term{false, &BasicExpression{Has: &HasAttribute{"foo\nbar\"yikes"}}, nil}},
+			&Filter{Term: &Term{Basic: &BasicExpression{Has: &HasAttribute{"foo\nbar\"yikes"}}}},
+		},
+		{
+			"unary not",
+			`-attributes:x`,
+			&Filter{Term: &Term{Not: true, Basic: &BasicExpression{Has: &HasAttribute{"x"}}}},
 		},
 	}
 	for _, tt := range tests {

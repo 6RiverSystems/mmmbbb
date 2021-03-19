@@ -9,7 +9,7 @@ type Condition struct {
 }
 
 type Term struct {
-	Not   bool             `parser:"@\"NOT\"?"`
+	Not   bool             `parser:"@(\"NOT\"|\"-\")?"`
 	Basic *BasicExpression `parser:"( @@" json:",omitempty"`
 	Sub   *Condition       `parser:"| \"(\" @@ \")\" )" json:",omitempty"`
 }
