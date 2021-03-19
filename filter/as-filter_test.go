@@ -17,6 +17,10 @@ func TestAsFilterLoop(t *testing.T) {
 		// looped will be compact, so we need to omit all whitespace
 		`attributes:x="x"`,
 		`hasPrefix(attributes:x,"x")`,
+		`attributes:"foo\nbar\"yikes"`,
+		`attributes:"foo bar"`,
+		`hasPrefix(attributes:"foo\nbar\"yikes","x")`,
+		`hasPrefix(attributes:"foo bar","x")`,
 	}
 
 	for _, f := range filters {

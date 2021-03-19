@@ -3,6 +3,7 @@ package filter
 import (
 	"strconv"
 	"strings"
+	"unicode"
 
 	"github.com/pkg/errors"
 )
@@ -77,12 +78,40 @@ func (e *BasicExpression) AsFilter() (string, error) {
 }
 
 func (e *HasAttribute) AsFilter() (string, error) {
+	var b strings.Builder
+	writeAttr(&b, e.Name)
 	if e.OpValue != nil {
-		return "attributes:" + e.Name + string(e.OpValue.Op) + strconv.Quote(e.OpValue.Value), nil
+		b.WriteString(string(e.OpValue.Op))
+		b.WriteString(strconv.Quote(e.OpValue.Value))
 	}
-	return "attributes:" + e.Name, nil
+	return b.String(), nil
 }
 
 func (e *HasAttributePredicate) AsFilter() (string, error) {
-	return string(e.Predicate) + "(attributes:" + e.Name + "," + strconv.Quote(e.Value) + ")", nil
+	var b strings.Builder
+	b.WriteString(string(e.Predicate))
+	b.WriteRune('(')
+	writeAttr(&b, e.Name)
+	b.WriteRune(',')
+	b.WriteString(strconv.Quote(e.Value))
+	b.WriteRune(')')
+	return b.String(), nil
+}
+
+func writeAttr(b *strings.Builder, name string) {
+	b.WriteString("attributes:")
+	isIdent := true
+	for i, ch := range name {
+		// stolen from scanner.Scanner.isIdentRune
+		if !(ch == '_' || unicode.IsLetter(ch) || unicode.IsDigit(ch) && i > 0) {
+			isIdent = false
+			break
+		}
+	}
+	if isIdent {
+		b.WriteString(name)
+	} else {
+		b.WriteString(strconv.Quote(name))
+	}
+
 }

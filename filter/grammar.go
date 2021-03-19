@@ -22,7 +22,7 @@ type BasicExpression struct {
 }
 
 type HasAttribute struct {
-	Name    string   `parser:"\"attributes\" \":\" @Ident"`
+	Name    string   `parser:"\"attributes\" \":\" @(Ident|String)"`
 	OpValue *OpValue `parser:"@@?" json:",omitempty"`
 }
 
@@ -33,7 +33,7 @@ type OpValue struct {
 
 type HasAttributePredicate struct {
 	Predicate AttributePredicate `parser:"@(\"hasPrefix\")\"(\""`
-	Name      string             `parser:"\"attributes\" \":\" @Ident \",\""`
+	Name      string             `parser:"\"attributes\" \":\" @(Ident|String) \",\""`
 	Value     string             `parser:"@String \")\""`
 }
 
