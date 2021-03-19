@@ -31,42 +31,42 @@ func TestEvaluateUnit(t *testing.T) {
 		},
 		{
 			"attrEqual/match",
-			`attributes:x="y"`,
+			`attributes.x="y"`,
 			map[string]string{"x": "y"},
 			true,
 			assert.NoError,
 		},
 		{
 			"attrEqual/no-match",
-			`attributes:x="y"`,
+			`attributes.x="y"`,
 			map[string]string{"x": "z"},
 			false,
 			assert.NoError,
 		},
 		{
 			"attrNotEqual/match",
-			`attributes:x!="y"`,
+			`attributes.x!="y"`,
 			map[string]string{"x": "z"},
 			true,
 			assert.NoError,
 		},
 		{
 			"attrNotEqual/no-match",
-			`attributes:x!="y"`,
+			`attributes.x!="y"`,
 			map[string]string{"x": "y"},
 			false,
 			assert.NoError,
 		},
 		{
 			"hasPrefix/match",
-			`hasPrefix(attributes:x,"y")`,
+			`hasPrefix(attributes.x,"y")`,
 			map[string]string{"x": "yx"},
 			true,
 			assert.NoError,
 		},
 		{
 			"hasPrefix/no-match",
-			`hasPrefix(attributes:x,"y")`,
+			`hasPrefix(attributes.x,"y")`,
 			map[string]string{"x": "xx"},
 			false,
 			assert.NoError,
@@ -119,8 +119,8 @@ func TestEvaluateUnit(t *testing.T) {
 			ast := &Filter{}
 			require.NoError(t, Parser.ParseString(tt.name, tt.filter, ast))
 			gotMatch, gotErr := ast.Evaluate(tt.attrs)
-			assert.Equal(t, tt.wantMatch, gotMatch)
 			tt.wantErr(t, gotErr)
+			assert.Equal(t, tt.wantMatch, gotMatch)
 		})
 	}
 }
@@ -132,27 +132,27 @@ func TestEvaluateComplex(t *testing.T) {
 	}{
 		{
 			"a AND b OR c",
-			"attributes:a AND attributes:b OR attributes:c",
+			"(attributes:a AND attributes:b) OR attributes:c",
 			func(a, b, c bool) bool { return a && b || c },
 		},
 		{
 			"a OR b AND c",
-			"attributes:a OR attributes:b AND attributes:c",
+			"attributes:a OR (attributes:b AND attributes:c)",
 			func(a, b, c bool) bool { return a || b && c },
 		},
 		{
 			"NOT a OR b AND c",
-			"NOT attributes:a OR attributes:b AND attributes:c",
+			"NOT attributes:a OR (attributes:b AND attributes:c)",
 			func(a, b, c bool) bool { return !a || b && c },
 		},
 		{
 			"a OR NOT b AND c",
-			"attributes:a OR NOT attributes:b AND attributes:c",
+			"attributes:a OR (NOT attributes:b AND attributes:c)",
 			func(a, b, c bool) bool { return a || !b && c },
 		},
 		{
 			"a OR b AND NOT c",
-			"attributes:a OR attributes:b AND NOT attributes:c",
+			"attributes:a OR (attributes:b AND NOT attributes:c)",
 			func(a, b, c bool) bool { return a || b && !c },
 		},
 		{

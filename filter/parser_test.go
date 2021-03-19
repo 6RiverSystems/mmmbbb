@@ -13,62 +13,72 @@ func TestParserBinding(t *testing.T) {
 		name, input string
 		want        *Filter
 	}{
-		{"hasAttribute", `attributes:x`, &Filter{[]*OrTerm{{[]*AndTerm{{false, &BasicExpression{&HasAttribute{"x", nil}, nil}, nil}}}}}},
-		{"attrEqual", `attributes:x = "a"`, nil},
-		{"attrEqualEscape", `attributes:x = "\n\u000a"`, &Filter{[]*OrTerm{{[]*AndTerm{{false, &BasicExpression{&HasAttribute{"x", &OpValue{"=", "\n\n"}}, nil}, nil}}}}}},
-		{"attrNotEqual", `attributes:x != "a"`, nil},
-		{"hasPrefix", `hasPrefix(attributes:x, "a")`, nil},
+		{"hasAttribute", `attributes:x`, &Filter{Term: &Term{Basic: &BasicExpression{Has: &HasAttribute{"x"}}}}},
+		{"attrEqual", `attributes.x = "a"`, nil},
+		{"attrEqualEscape", `attributes.x = "\n\u000a"`, &Filter{Term: &Term{Basic: &BasicExpression{Value: &HasAttributeValue{"x", OpEqual, "\n\n"}}}}},
+		{"attrNotEqual", `attributes.x != "a"`, nil},
+		{"hasPrefix", `hasPrefix(attributes.x, "a")`, nil},
 		{
 			"complex ordering",
 			`
-				attributes:x AND attributes:y
+				(attributes:x AND attributes:y)
 				OR
-				attributes:a AND attributes:b
+				(attributes:a AND attributes:b)
 				OR (
-					attributes:q = "x"
-					AND (attributes:p = "z" OR hasPrefix(attributes:n, "\n"))
+					attributes.q = "x"
+					AND (attributes.p = "z" OR hasPrefix(attributes.n, "\n"))
 				)
 			`,
-			&Filter{[]*OrTerm{
-				{[]*AndTerm{
-					{false, &BasicExpression{&HasAttribute{"x", nil}, nil}, nil},
-					{false, &BasicExpression{&HasAttribute{"y", nil}, nil}, nil},
+			&Filter{
+				Term: &Term{Sub: &Condition{
+					Term: &Term{Basic: &BasicExpression{Has: &HasAttribute{"x"}}},
+					And: []*Term{
+						{Basic: &BasicExpression{Has: &HasAttribute{"y"}}},
+					},
 				}},
-				{[]*AndTerm{
-					{false, &BasicExpression{&HasAttribute{"a", nil}, nil}, nil},
-					{false, &BasicExpression{&HasAttribute{"b", nil}, nil}, nil},
-				}},
-				{[]*AndTerm{
-					{Sub: &Condition{[]*OrTerm{{[]*AndTerm{
-						{false, &BasicExpression{&HasAttribute{"q", &OpValue{OpEqual, "x"}}, nil}, nil},
-						{Sub: &Condition{[]*OrTerm{
-							{[]*AndTerm{{false, &BasicExpression{&HasAttribute{"p", &OpValue{OpEqual, "z"}}, nil}, nil}}},
-							{[]*AndTerm{{false, &BasicExpression{nil, &HasAttributePredicate{PredicateHasPrefix, "n", "\n"}}, nil}}},
-						}}},
-					}}}}},
-				}},
-			}},
+				Or: []*Term{
+					{Sub: &Condition{
+						Term: &Term{Basic: &BasicExpression{Has: &HasAttribute{"a"}}},
+						And: []*Term{
+							{Basic: &BasicExpression{Has: &HasAttribute{"b"}}},
+						},
+					}},
+					{Sub: &Condition{
+						Term: &Term{Basic: &BasicExpression{Value: &HasAttributeValue{"q", OpEqual, "x"}}},
+						And: []*Term{{
+							Sub: &Condition{
+								Term: &Term{Basic: &BasicExpression{Value: &HasAttributeValue{"p", OpEqual, "z"}}},
+								Or:   []*Term{{Basic: &BasicExpression{Predicate: &HasAttributePredicate{PredicateHasPrefix, "n", "\n"}}}},
+							},
+						}},
+					}},
+				},
+			},
 		},
 		{
 			"NOT binding vs OR",
 			`NOT attributes:x OR attributes:y`,
-			&Filter{[]*OrTerm{
-				{[]*AndTerm{{true, &BasicExpression{&HasAttribute{"x", nil}, nil}, nil}}},
-				{[]*AndTerm{{false, &BasicExpression{&HasAttribute{"y", nil}, nil}, nil}}},
-			}},
+			&Filter{
+				Term: &Term{Not: true, Basic: &BasicExpression{Has: &HasAttribute{"x"}}},
+				Or: []*Term{
+					{Basic: &BasicExpression{Has: &HasAttribute{"y"}}},
+				}},
 		},
 		{
 			"NOT(OR)",
 			`NOT(attributes:x OR attributes:y)`,
-			&Filter{[]*OrTerm{{[]*AndTerm{{true, nil, &Condition{[]*OrTerm{
-				{[]*AndTerm{{false, &BasicExpression{&HasAttribute{"x", nil}, nil}, nil}}},
-				{[]*AndTerm{{false, &BasicExpression{&HasAttribute{"y", nil}, nil}, nil}}},
-			}}}}}}},
+			&Filter{Term: &Term{
+				Not: true,
+				Sub: &Condition{
+					Term: &Term{Basic: &BasicExpression{Has: &HasAttribute{"x"}}},
+					Or:   []*Term{{Basic: &BasicExpression{Has: &HasAttribute{"y"}}}},
+				},
+			}},
 		},
 		{
 			"quoted attribute",
 			`attributes:"foo\nbar\"yikes"`,
-			&Filter{[]*OrTerm{{[]*AndTerm{{false, &BasicExpression{&HasAttribute{"foo\nbar\"yikes", nil}, nil}, nil}}}}},
+			&Filter{Term: &Term{false, &BasicExpression{Has: &HasAttribute{"foo\nbar\"yikes"}}, nil}},
 		},
 	}
 	for _, tt := range tests {

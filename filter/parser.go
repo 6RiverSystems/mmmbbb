@@ -5,17 +5,10 @@ import (
 )
 
 var DefaultParserOptions = []participle.Option{
-	// participle.UseLookahead(1),
+	participle.UseLookahead(50),
 	// attribute values (or prefixes) need to be unquoted
 	participle.Unquote("String"),
 }
-
-// func NewParser() (*participle.Parser, error) {
-// 	return participle.Build(
-// 		&Filter{},
-// 		defaultParserOptions...,
-// 	)
-// }
 
 var Parser = participle.MustBuild(
 	&Filter{},

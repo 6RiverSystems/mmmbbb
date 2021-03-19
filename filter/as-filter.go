@@ -2,104 +2,145 @@ package filter
 
 import (
 	"strconv"
-	"strings"
 	"unicode"
 
 	"github.com/pkg/errors"
 )
 
+// Writer is a subset of strings.Builder
+type Writer interface {
+	WriteString(string) (int, error)
+	WriteRune(rune) (int, error)
+}
+
 type AsFilter interface {
-	AsFilter() (string, error)
+	AsFilter(Writer) error
 }
 
-func (e *Condition) AsFilter() (string, error) {
-	if len(e.Or) == 0 {
-		return "", errors.New("unpopulated Condition")
+func (e *Condition) AsFilter(w Writer) (err error) {
+	if err = e.Term.AsFilter(w); err != nil {
+		return
 	}
-	b := strings.Builder{}
-	for i, ee := range e.Or {
-		if i > 0 {
-			b.WriteString(" OR ")
-		}
-		s, err := ee.AsFilter()
-		if err != nil {
-			return "", errors.Wrap(err, "error in OrTerm")
-		}
-		b.WriteString(s)
+	switch {
+	case e.And != nil:
+		return appendTerms(w, OpAND, e.And)
+	case e.Or != nil:
+		return appendTerms(w, OpOR, e.Or)
+	default:
+		return
 	}
-	return b.String(), nil
 }
 
-func (e *OrTerm) AsFilter() (string, error) {
-	if len(e.And) == 0 {
-		return "", errors.New("unpopulated OrTerm")
+func appendTerms(w Writer, op BooleanOperator, terms []*Term) error {
+	if len(terms) == 0 {
+		return errors.Errorf("unpopulated %s sequence", op)
 	}
-	b := strings.Builder{}
-	for i, ee := range e.And {
-		if i > 0 {
-			b.WriteString(" AND ")
+	for _, ee := range terms {
+		if _, err := w.WriteRune(' '); err != nil {
+			return err
 		}
-		s, err := ee.AsFilter()
-		if err != nil {
-			return "", errors.Wrap(err, "error in AndTerm")
+		if _, err := w.WriteString(string(op)); err != nil {
+			return err
 		}
-		b.WriteString(s)
+		if _, err := w.WriteRune(' '); err != nil {
+			return err
+		}
+		if err := ee.AsFilter(w); err != nil {
+			return errors.Wrapf(err, "error in %s sequence Term", op)
+		}
 	}
-	return b.String(), nil
+	return nil
 }
 
-func (e *AndTerm) AsFilter() (result string, err error) {
+func (e *Term) AsFilter(w Writer) error {
+	if e.Not {
+		if _, err := w.WriteString("NOT "); err != nil {
+			return err
+		}
+	}
 	switch {
 	case e.Basic != nil:
-		result, err = e.Basic.AsFilter()
+		if err := e.Basic.AsFilter(w); err != nil {
+			return err
+		}
 	case e.Sub != nil:
-		result, err = e.Sub.AsFilter()
-		if err == nil {
-			result = "(" + result + ")"
+		if _, err := w.WriteRune('('); err != nil {
+			return err
+		}
+		if err := e.Sub.AsFilter(w); err != nil {
+			return err
+		}
+		if _, err := w.WriteRune(')'); err != nil {
+			return err
 		}
 	default:
-		return "", errors.New("unpopulated AndTerm")
+		return errors.New("unpopulated Term")
 	}
-	if e.Not && err == nil {
-		result = "NOT " + result
-	}
-	return
+	return nil
 }
 
-func (e *BasicExpression) AsFilter() (string, error) {
+func (e *BasicExpression) AsFilter(w Writer) error {
 	switch {
-	case e.HasAttribute != nil:
-		return e.HasAttribute.AsFilter()
-	case e.HasAttributePredicate != nil:
-		return e.HasAttributePredicate.AsFilter()
+	case e.Has != nil:
+		return e.Has.AsFilter(w)
+	case e.Value != nil:
+		return e.Value.AsFilter(w)
+	case e.Predicate != nil:
+		return e.Predicate.AsFilter(w)
 	default:
-		return "", errors.New("unpopulated BasicExpression")
+		return errors.New("unpopulated BasicExpression")
 	}
 }
 
-func (e *HasAttribute) AsFilter() (string, error) {
-	var b strings.Builder
-	writeAttr(&b, e.Name)
-	if e.OpValue != nil {
-		b.WriteString(string(e.OpValue.Op))
-		b.WriteString(strconv.Quote(e.OpValue.Value))
+func (e *HasAttribute) AsFilter(w Writer) error {
+	if _, err := w.WriteString("attributes:"); err != nil {
+		return err
 	}
-	return b.String(), nil
+	if _, err := w.WriteString(formatAttrName(e.Name)); err != nil {
+		return err
+	}
+	return nil
 }
 
-func (e *HasAttributePredicate) AsFilter() (string, error) {
-	var b strings.Builder
-	b.WriteString(string(e.Predicate))
-	b.WriteRune('(')
-	writeAttr(&b, e.Name)
-	b.WriteRune(',')
-	b.WriteString(strconv.Quote(e.Value))
-	b.WriteRune(')')
-	return b.String(), nil
+func (e *HasAttributeValue) AsFilter(w Writer) error {
+	if _, err := w.WriteString("attributes."); err != nil {
+		return err
+	}
+	if _, err := w.WriteString(formatAttrName(e.Name)); err != nil {
+		return err
+	}
+	if _, err := w.WriteString(string(e.Op)); err != nil {
+		return err
+	}
+	if _, err := w.WriteString(strconv.Quote(e.Value)); err != nil {
+		return err
+	}
+	return nil
 }
 
-func writeAttr(b *strings.Builder, name string) {
-	b.WriteString("attributes:")
+func (e *HasAttributePredicate) AsFilter(w Writer) error {
+	if _, err := w.WriteString(string(e.Predicate)); err != nil {
+		return err
+	}
+	if _, err := w.WriteString("(attributes."); err != nil {
+		return err
+	}
+	if _, err := w.WriteString(formatAttrName(e.Name)); err != nil {
+		return err
+	}
+	if _, err := w.WriteRune(','); err != nil {
+		return err
+	}
+	if _, err := w.WriteString(strconv.Quote(e.Value)); err != nil {
+		return err
+	}
+	if _, err := w.WriteRune(')'); err != nil {
+		return err
+	}
+	return nil
+}
+
+func formatAttrName(name string) string {
 	isIdent := true
 	for i, ch := range name {
 		// stolen from scanner.Scanner.isIdentRune
@@ -109,9 +150,8 @@ func writeAttr(b *strings.Builder, name string) {
 		}
 	}
 	if isIdent {
-		b.WriteString(name)
+		return name
 	} else {
-		b.WriteString(strconv.Quote(name))
+		return strconv.Quote(name)
 	}
-
 }
