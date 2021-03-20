@@ -66,6 +66,7 @@ func TestCreateSubscription_Execute(t *testing.T) {
 				Labels: map[string]string{
 					"xyzzy": "frood",
 				},
+				Filter: "attributes:x",
 			},
 			assert.NoError,
 			&expect{
@@ -78,6 +79,7 @@ func TestCreateSubscription_Execute(t *testing.T) {
 					Labels: map[string]string{
 						"xyzzy": "frood",
 					},
+					MessageFilter: stringPtr("attributes:x"),
 				},
 			},
 		},
@@ -124,7 +126,27 @@ func TestCreateSubscription_Execute(t *testing.T) {
 				MessageTTL: time.Minute,
 			},
 			func(tt assert.TestingT, err error, i ...interface{}) bool {
-				return assert.ErrorIs(t, err, ErrExists)
+				return assert.ErrorIs(t, err, ErrExists, i...)
+			},
+			nil,
+		},
+		{
+			"bad filter",
+			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
+				topic := createTopic(t, ctx, tx, 0)
+				tt.params.TopicName = topic.Name
+				tt.params.Name = t.Name()
+			},
+			CreateSubscriptionParams{
+				TTL:        time.Hour,
+				MessageTTL: time.Minute,
+				Filter:     "attribute:x",
+			},
+			func(tt assert.TestingT, err error, i ...interface{}) bool {
+				if !assert.Error(t, err, i...) {
+					return false
+				}
+				return assert.Regexp(t, `invalid.*filter.*unexpected token.*attribute`, err.Error(), i...)
 			},
 			nil,
 		},
@@ -169,3 +191,5 @@ func TestCreateSubscription_Execute(t *testing.T) {
 		})
 	}
 }
+
+func stringPtr(s string) *string { return &s }

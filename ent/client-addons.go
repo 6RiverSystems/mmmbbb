@@ -3,11 +3,13 @@ package ent
 import (
 	"context"
 	"database/sql"
+	"fmt"
+
+	"errors"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
-	"github.com/pkg/errors"
 
 	entcommon "go.6river.tech/gosix/ent"
 )
@@ -30,7 +32,7 @@ func (c *Client) EntityClient(name string) entcommon.EntityClient {
 	case "Delivery":
 		return c.Delivery
 	default:
-		panic(errors.Errorf("Invalid entity name '%s'", name))
+		panic(fmt.Errorf("Invalid entity name '%s'", name))
 	}
 }
 
@@ -61,7 +63,7 @@ func (c *Client) DoTx(ctx context.Context, opts *sql.TxOptions, inner func(tx *T
 			} else if finalErr == nil {
 				finalErr = err
 			} else {
-				finalErr = errors.Wrapf(finalErr, "%s Failed: %s During: %s", op, err.Error(), finalErr.Error())
+				finalErr = fmt.Errorf("%s Failed: %s During: %w", op, err.Error(), finalErr)
 			}
 		}
 	}()
@@ -112,7 +114,7 @@ func DriverDB(driver dialect.Driver) *sql.DB {
 	case *dialect.DebugDriver:
 		return DriverDB(d.Driver)
 	default:
-		panic(errors.Errorf("Unable to find DB from %T", driver))
+		panic(fmt.Errorf("Unable to find DB from %T", driver))
 	}
 }
 

@@ -2,8 +2,10 @@ package actions
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"time"
+
+	"errors"
 
 	"github.com/google/uuid"
 
@@ -11,6 +13,7 @@ import (
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/subscription"
 	"go.6river.tech/mmmbbb/ent/topic"
+	"go.6river.tech/mmmbbb/filter"
 )
 
 type CreateSubscriptionParams struct {
@@ -22,6 +25,7 @@ type CreateSubscriptionParams struct {
 	Labels                 map[string]string
 	PushEndpoint           string
 	MinBackoff, MaxBackoff time.Duration
+	Filter                 string
 }
 type createSubscriptionResults struct {
 	topicID uuid.UUID
@@ -93,6 +97,15 @@ func (a *CreateSubscription) Execute(ctx context.Context, tx *ent.Tx) error {
 	if a.params.PushEndpoint != "" {
 		pushEndpoint = &a.params.PushEndpoint
 	}
+	var messageFilter *string
+	if a.params.Filter != "" {
+		// validate the filter before we save it
+		var f filter.Filter
+		if err := filter.Parser.ParseString(a.params.Name, a.params.Filter, &f); err != nil {
+			return fmt.Errorf("invalid message filter: %w", err)
+		}
+		messageFilter = &a.params.Filter
+	}
 	s, err := tx.Subscription.Create().
 		SetName(a.params.Name).
 		SetTopic(topic).
@@ -104,6 +117,7 @@ func (a *CreateSubscription) Execute(ctx context.Context, tx *ent.Tx) error {
 		SetNillablePushEndpoint(pushEndpoint).
 		SetMinBackoff(minBackoff).
 		SetMaxBackoff(maxBackoff).
+		SetNillableMessageFilter(messageFilter).
 		Save(ctx)
 	if err != nil {
 		return err

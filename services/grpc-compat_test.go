@@ -497,6 +497,60 @@ func TestGrpcCompat(t *testing.T) {
 			nil,
 			nil, nil, nil,
 		},
+		{
+			"subscription filter",
+			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+				topic, err := psc.CreateTopic(ctx, safeName(t))
+				require.NoError(t, err)
+				tt.topics = []pubsub.Topic{topic}
+			},
+			[]testStep{
+				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+					sub, err := tt.topics[0].CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{
+						Filter:                "attributes:deliver",
+						EnableMessageOrdering: true,
+					})
+					require.NoError(t, err)
+					tt.topics[0].Publish(ctx, &pubsub.RealMessage{
+						Data:        json.RawMessage(`1`),
+						OrderingKey: "x",
+						Attributes:  map[string]string{"deliver": ""},
+					})
+					tt.topics[0].Publish(ctx, &pubsub.RealMessage{
+						Data:        json.RawMessage(`2`),
+						OrderingKey: "x",
+						// Attributes: map[string]string{"skip":""},
+					})
+					tt.topics[0].Publish(ctx, &pubsub.RealMessage{
+						Data:        json.RawMessage(`3`),
+						OrderingKey: "x",
+						Attributes:  map[string]string{"deliver": ""},
+					})
+
+					i := int32(0)
+					rCtx, cancel := context.WithCancel(ctx)
+					err = sub.Receive(rCtx, func(ctx context.Context, m pubsub.Message) {
+						counter := atomic.AddInt32(&i, 1)
+						var expected string
+						// don't expect to get message 2
+						if counter == 1 {
+							expected = "1"
+						} else {
+							assert.Equal(t, int32(2), counter)
+							expected = "3"
+						}
+						assert.Equal(t, ([]byte)(expected), m.RealMessage().Data)
+						defer m.Ack()
+						if counter >= 2 {
+							cancel()
+						}
+					})
+					assert.NoError(t, err)
+				},
+			},
+			nil,
+			nil, nil, nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

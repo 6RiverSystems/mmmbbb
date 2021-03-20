@@ -1,10 +1,11 @@
 package filter
 
 import (
+	"fmt"
 	"strconv"
 	"unicode"
 
-	"github.com/pkg/errors"
+	"errors"
 )
 
 // Writer is a subset of strings.Builder
@@ -33,7 +34,7 @@ func (e *Condition) AsFilter(w Writer) (err error) {
 
 func appendTerms(w Writer, op BooleanOperator, terms []*Term) error {
 	if len(terms) == 0 {
-		return errors.Errorf("unpopulated %s sequence", op)
+		return fmt.Errorf("unpopulated %s sequence", op)
 	}
 	for _, ee := range terms {
 		if _, err := w.WriteRune(' '); err != nil {
@@ -46,7 +47,7 @@ func appendTerms(w Writer, op BooleanOperator, terms []*Term) error {
 			return err
 		}
 		if err := ee.AsFilter(w); err != nil {
-			return errors.Wrapf(err, "error in %s sequence Term", op)
+			return fmt.Errorf("error in %s sequence Term: %w", op, err)
 		}
 	}
 	return nil

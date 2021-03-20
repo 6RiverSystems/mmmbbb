@@ -4,8 +4,9 @@ import (
 	"context"
 	"encoding/json"
 
+	"errors"
+
 	"github.com/google/uuid"
-	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"

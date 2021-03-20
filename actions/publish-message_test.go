@@ -344,6 +344,58 @@ func TestPublishMessage_Execute(t *testing.T) {
 			},
 		},
 		{
+			"filtered sub, match",
+			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
+				topic := createTopic(t, ctx, tx, 0)
+				sub := createSubscription(t, ctx, tx, topic, 0, func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
+					return sc.SetMessageFilter("attributes:deliver")
+				})
+				tt.params.TopicName = topic.Name
+				tt.params.OrderKey = t.Name()
+				tt.expectPublishNotify = append(tt.expectPublishNotify, sub.ID)
+			},
+			PublishMessageParams{
+				Payload:    json.RawMessage(`{}`),
+				Attributes: map[string]string{"deliver": ""},
+			},
+			assert.NoError,
+			&publishMessageResults{
+				numDeliveries: 1,
+			},
+			nil,
+			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
+				messages := expectMessages(t, ctx, tx, 0, 1)
+				deliveries := expectDeliveries(t, ctx, tx, 0, 1)
+				assert.Equal(t, json.RawMessage(`{}`), messages[0].Payload)
+				assert.Equal(t, messages[0].ID, deliveries[0].Edges.Message.ID)
+			},
+		},
+		{
+			"filtered sub, non-match",
+			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
+				topic := createTopic(t, ctx, tx, 0)
+				createSubscription(t, ctx, tx, topic, 0, func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
+					return sc.SetMessageFilter("attributes:deliver")
+				})
+				tt.params.TopicName = topic.Name
+				tt.params.OrderKey = t.Name()
+			},
+			PublishMessageParams{
+				Payload:    json.RawMessage(`{}`),
+				Attributes: map[string]string{"skip": ""},
+			},
+			assert.NoError,
+			&publishMessageResults{
+				numDeliveries: 0,
+			},
+			nil,
+			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
+				messages := expectMessages(t, ctx, tx, 0, 1)
+				expectDeliveries(t, ctx, tx, 0, 0)
+				assert.Equal(t, json.RawMessage(`{}`), messages[0].Payload)
+			},
+		},
+		{
 			// error handling: publish to a topic that doesn't exist, by name
 			"no topic by name",
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
