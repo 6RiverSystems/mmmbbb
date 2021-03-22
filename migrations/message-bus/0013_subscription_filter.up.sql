@@ -1,0 +1,2 @@
+ALTER TABLE subscriptions
+	ADD COLUMN FILTER text NULL;

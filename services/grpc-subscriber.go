@@ -5,8 +5,9 @@ import (
 	"database/sql"
 	"time"
 
+	"errors"
+
 	"github.com/google/uuid"
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -22,6 +23,7 @@ import (
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/predicate"
 	"go.6river.tech/mmmbbb/ent/subscription"
+	"go.6river.tech/mmmbbb/filter"
 	"go.6river.tech/mmmbbb/grpc/pubsub"
 	"go.6river.tech/mmmbbb/parse"
 )
@@ -41,7 +43,7 @@ func (s *subscriberServer) CreateSubscription(ctx context.Context, req *pubsub.S
 		return nil, status.Error(codes.InvalidArgument, "Cannot create detached subscription")
 	}
 
-	if req.PushConfig != nil || req.Filter != "" || req.DeadLetterPolicy != nil {
+	if req.PushConfig != nil || req.DeadLetterPolicy != nil {
 		return nil, status.Error(codes.Unimplemented, "Advanced features not supported")
 	}
 
@@ -52,6 +54,7 @@ func (s *subscriberServer) CreateSubscription(ctx context.Context, req *pubsub.S
 		MessageTTL:      req.MessageRetentionDuration.AsDuration(),
 		OrderedDelivery: req.EnableMessageOrdering,
 		Labels:          req.Labels,
+		Filter:          req.Filter,
 	}
 	if params.TTL == 0 {
 		params.TTL = defaultSubscriptionTTL
@@ -177,7 +180,23 @@ func (s *subscriberServer) UpdateSubscription(ctx context.Context, req *pubsub.U
 					return err
 				}
 				applyPushConfig(subUpdate, req.Subscription.PushConfig)
-			case "ack_deadline_seconds", "retain_acked_messages", "filter", "dead_letter_policy", "detached":
+			case "filter":
+				// NOTE: Google doesn't permit updating sub filters on the fly. This
+				// implementation will only apply the new filter to future messages, any
+				// past deliveries will not be updated to include/exclude based on the
+				// new filter.
+				if req.Subscription.Filter == "" {
+					// clear the filter
+					subUpdate.ClearMessageFilter()
+				} else {
+					// validate the filter
+					var f filter.Filter
+					if err := filter.Parser.ParseString(sub.Name, req.Subscription.Filter, &f); err != nil {
+						return status.Errorf(codes.InvalidArgument, "Invalid filter: %v", err)
+					}
+					subUpdate.SetMessageFilter(req.Subscription.Filter)
+				}
+			case "ack_deadline_seconds", "retain_acked_messages", "dead_letter_policy", "detached":
 				// these are valid paths, we just don't support changing them
 				return status.Errorf(codes.InvalidArgument, "Modifying Subscription.%s is not supported", p)
 			default:
@@ -640,6 +659,9 @@ func entSubscriptionToGrpc(subscription *ent.Subscription, topicName string) *pu
 		if subscription.MaxBackoff.NotNil() {
 			ret.RetryPolicy.MaximumBackoff = durationpb.New(*subscription.MaxBackoff.Duration)
 		}
+	}
+	if subscription.MessageFilter != nil {
+		ret.Filter = *subscription.MessageFilter
 	}
 	if subscription.Edges.Topic != nil {
 		if subscription.Edges.Topic.DeletedAt != nil {

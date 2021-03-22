@@ -1,8 +1,9 @@
 package oas
 
 import (
+	"fmt"
+
 	"github.com/getkin/kin-openapi/openapi3"
-	"github.com/pkg/errors"
 )
 
 // LoadSpec parses the spec resource, as a stand-in for the spec generation from
@@ -10,11 +11,11 @@ import (
 func LoadSpec() (*openapi3.Swagger, error) {
 	yamlBytes, err := OpenAPIFS.ReadFile("openapi.yaml")
 	if err != nil {
-		return nil, errors.Wrap(err, "error loading Swagger")
+		return nil, fmt.Errorf("error loading Swagger: %w", err)
 	}
 	swagger, err := openapi3.NewSwaggerLoader().LoadSwaggerFromData(yamlBytes)
 	if err != nil {
-		return nil, errors.Wrap(err, "error loading Swagger")
+		return nil, fmt.Errorf("error loading Swagger: %w", err)
 	}
 	return swagger, nil
 }

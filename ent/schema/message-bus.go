@@ -223,6 +223,10 @@ func (Subscription) Fields() []ent.Field {
 			StorageKey("push_endpoint").
 			Optional().
 			Nillable(),
+		field.String("messageFilter").
+			StorageKey("filter").
+			Optional().
+			Nillable(),
 	}
 }
 
