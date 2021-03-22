@@ -3,7 +3,7 @@ package schema
 import (
 	"context"
 	"encoding/json"
-	"errors"
+	"fmt"
 	"time"
 
 	"entgo.io/ent"
@@ -331,7 +331,6 @@ func (Delivery) Fields() []ent.Field {
 			SchemaType(timestampTypes).
 			Default(time.Now).
 			Comment("Copy of message.publishedAt for ordered delivery support"),
-		// TODO: possibly a (db-generated) sequenceId for ordering, instead of using publishedAt?
 		field.Time("attemptAt").
 			StorageKey("attempt_at").
 			SchemaType(timestampTypes).
@@ -426,20 +425,20 @@ func checkLiveOrDeleted(ctx context.Context, next ent.Mutator, m ent.Mutation) (
 	}
 
 	if live != nil && !*live {
-		return nil, errors.New("topic.live can only be set to null or true, not false")
+		return nil, fmt.Errorf("%s.live can only be set to null or true, not false", m.Type())
 	}
 	if setDeletedAt && deletedAt != nil && !clearedLive {
-		return nil, errors.New("topic.live must be cleared when setting deletedAt")
+		return nil, fmt.Errorf("%s.live must be cleared when setting deletedAt", m.Type())
 	}
 	if clearedLive && (!setDeletedAt || deletedAt == nil) {
-		return nil, errors.New("topic.deletedAt must be set when clearing live")
+		return nil, fmt.Errorf("%s.deletedAt must be set when clearing live", m.Type())
 	}
 	// clearing deletedAt is not normal, but not prohibited
 	if clearedDeletedAt && (live == nil || !*live) {
-		return nil, errors.New("topic.live must be set true when clearing deletedAt")
+		return nil, fmt.Errorf("%s.live must be set true when clearing deletedAt", m.Type())
 	}
 	if live != nil && *live && !clearedDeletedAt {
-		return nil, errors.New("topic.deletedAt must be cleared when setting live true")
+		return nil, fmt.Errorf("%s.deletedAt must be cleared when setting live true", m.Type())
 	}
 
 	return next.Mutate(ctx, m)

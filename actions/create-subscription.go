@@ -57,8 +57,6 @@ func (a *CreateSubscription) Execute(ctx context.Context, tx *ent.Tx) error {
 	timer := startActionTimer(createSubscriptionsHistogram, tx)
 	defer timer.Ended()
 
-	// TODO: adjust db model so that we don't have a read/modify/update race here
-	// if Tx isn't SERIALIZABLE
 	exists, err := tx.Subscription.Query().
 		Where(
 			subscription.Name(a.params.Name),

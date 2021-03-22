@@ -315,10 +315,7 @@ func (a *GetSubscriptionMessages) buildDeliveryQuery(
 	predicates = append(predicates,
 		delivery.CompletedAtIsNil(),
 		delivery.ExpiresAtGT(now),
-		// this avoids a useless join against the subscriptions table
-		predicate.Delivery(func(s *sql.Selector) {
-			s.Where(sql.EQ(s.C(delivery.SubscriptionColumn), sub.ID))
-		}),
+		delivery.SubscriptionID(sub.ID),
 	)
 
 	return tx.Delivery.Query().Where(predicates...)

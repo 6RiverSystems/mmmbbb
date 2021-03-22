@@ -38,8 +38,6 @@ func (a *CreateTopic) Execute(ctx context.Context, tx *ent.Tx) error {
 	timer := startActionTimer(createTopicsHistogram, tx)
 	defer timer.Ended()
 
-	// TODO: adjust db model so that we don't have a read/modify/update race here
-	// if Tx isn't SERIALIZABLE
 	exists, err := tx.Topic.Query().
 		Where(
 			topic.Name(a.params.Name),
