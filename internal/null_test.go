@@ -6,4 +6,5 @@ package internal
 import (
 	_ "github.com/golangci/golangci-lint/pkg/commands"
 	_ "golang.org/x/tools/imports"
+	_ "gotest.tools/gotestsum/cmd"
 )
