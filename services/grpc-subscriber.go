@@ -181,6 +181,10 @@ func (s *subscriberServer) UpdateSubscription(ctx context.Context, req *pubsub.U
 				}
 				applyPushConfig(subUpdate, req.Subscription.PushConfig)
 			case "filter":
+				// NOTE: Google doesn't permit updating sub filters on the fly. This
+				// implementation will only apply the new filter to future messages, any
+				// past deliveries will not be updated to include/exclude based on the
+				// new filter.
 				if req.Subscription.Filter == "" {
 					// clear the filter
 					subUpdate.ClearMessageFilter()

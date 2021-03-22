@@ -119,9 +119,9 @@ func (a *PublishMessage) Execute(ctx context.Context, tx *ent.Tx) error {
 			// TODO: cache parsed filters
 			var f filter.Filter
 			if err := filter.Parser.ParseString(s.Name, *s.MessageFilter, &f); err != nil {
-				// filter errors should have been caught at subscription update. do not
-				// break delivery because one sub has a broken filter, assume the filter
-				// matches nothing and drop the message.
+				// filter errors should have been caught at subscription create/update.
+				// do not break delivery because one sub has a broken filter, assume the
+				// filter matches nothing and drop the message.
 				// TODO: metric/log this
 				continue
 			} else if match, err := f.Evaluate(a.params.Attributes); err != nil {
