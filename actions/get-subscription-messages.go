@@ -330,12 +330,7 @@ func (a *GetSubscriptionMessages) nextAttempt(
 	sub *ent.Subscription,
 ) (*time.Time, error) {
 	nextAttempt, err := a.buildDeliveryQuery(tx, sub).
-		// TODO: ent.Asc doesn't work right for SQLite here due to the self join,
-		// see: https://github.com/ent/ent/issues/1265
-		// Order(ent.Asc(delivery.FieldAttemptAt)).
-		Order(func(s *sql.Selector, f func(string) bool) {
-			sql.Asc(delivery.Table + "." + delivery.FieldAttemptAt)
-		}).
+		Order(ent.Asc(delivery.FieldAttemptAt)).
 		First(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -344,12 +339,7 @@ func (a *GetSubscriptionMessages) nextAttempt(
 		return nil, err
 	}
 	nextExpires, err := a.buildDeliveryQuery(tx, sub).
-		// TODO: ent.Asc doesn't work right for SQLite here due to the self join,
-		// see: https://github.com/ent/ent/issues/1265
-		// Order(ent.Asc(delivery.FieldAttemptAt)).
-		Order(func(s *sql.Selector, f func(string) bool) {
-			sql.Asc(delivery.Table + "." + delivery.FieldAttemptAt)
-		}).
+		Order(ent.Asc(delivery.FieldAttemptAt)).
 		First(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {

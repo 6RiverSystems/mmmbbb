@@ -59,8 +59,10 @@ $(GENERATE_GRPC) &: ./grpc/generate.go
 	go run golang.org/x/tools/cmd/goimports -l -w $(GOIMPORTSARGS) ./$(dir $^)
 
 # specific additional dependencies (these will share the generation rule)
-./ent/ent.go: ./ent/generate.go $(wildcard ./ent/schema/*.go)
-./oas/oas-types.go: ./oas/generate.go ./oas/openapi.yaml
+# third party generator runs depend on go.mod/sum as that may change the
+# generator version
+./ent/ent.go: ./ent/generate.go $(wildcard ./ent/schema/*.go) go.mod go.sum
+./oas/oas-types.go: ./oas/generate.go ./oas/openapi.yaml go.mod go.sum
 
 ./version/version.go: ./version/generate.go ./version/write-version.sh .git/index .git/refs/tags $(wildcard .version)
 
