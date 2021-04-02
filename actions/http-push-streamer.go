@@ -16,6 +16,8 @@ import (
 	"go.6river.tech/mmmbbb/ent"
 )
 
+// TODO: metrics
+
 type HttpPushStreamer struct {
 	conn *httpPushStreamConn
 	ms   *MessageStreamer
@@ -82,7 +84,7 @@ func newHttpPushConn(
 		panic("empty endpoint")
 	}
 	return &httpPushStreamConn{
-		logger: logging.GetLoggerWith("http-streamer", func(c zerolog.Context) zerolog.Context {
+		logger: logging.GetLoggerWith("actions/http-streamer", func(c zerolog.Context) zerolog.Context {
 			return c.
 				Str("subscriptionName", subscriptionName).
 				Stringer("subscriptionID", subscriptionID).

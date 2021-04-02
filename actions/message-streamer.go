@@ -85,7 +85,7 @@ func (ms *MessageStreamer) Go(ctx context.Context, conn StreamConnection) error 
 		ms.SubscriptionName = s.Name
 	}
 	if ms.Logger == nil {
-		ms.Logger = logging.GetLoggerWith("message-streamer", func(c zerolog.Context) zerolog.Context {
+		ms.Logger = logging.GetLoggerWith("actions/message-streamer", func(c zerolog.Context) zerolog.Context {
 			return c.Str("subscription", ms.SubscriptionName)
 		})
 	}

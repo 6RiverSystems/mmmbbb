@@ -5,9 +5,10 @@ import (
 	"testing"
 
 	"go.6river.tech/gosix/db"
+	"go.6river.tech/mmmbbb/version"
 )
 
 func TestMain(m *testing.M) {
-	db.SetDefaultDbName("mmmbbb")
+	db.SetDefaultDbName(version.AppName)
 	os.Exit(m.Run())
 }

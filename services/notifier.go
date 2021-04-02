@@ -19,20 +19,21 @@ import (
 	"go.6river.tech/gosix/registry"
 	"go.6river.tech/mmmbbb/actions"
 	"go.6river.tech/mmmbbb/ent"
+	"go.6river.tech/mmmbbb/version"
 )
 
 // subPublishedChannelName is the postgres notify/listen channel name to which
 // we send the subscription uuid when a message is published to that
 // subscription
-const subPublishedChannelName = "mmmbbb_published_to_sub"
+const subPublishedChannelName = version.AppName + "_published_to_sub"
 
 // topicModifiedChannelName is the postgres notify/listen channel name to which
 // we send the topic uuid and name when that topic is modified
-const topicModifiedChannelName = "mmmbbb_modified_topic"
+const topicModifiedChannelName = version.AppName + "_modified_topic"
 
 // subModifiedChannelName is the postgres notify/listen channel name to which we
 // send the subscription uuid and name when that subscription is modified
-const subModifiedChannelName = "mmmbbb_modified_sub"
+const subModifiedChannelName = version.AppName + "_modified_sub"
 
 type pgNotifier struct {
 	db     *sql.DB

@@ -7,8 +7,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/prometheus/client_golang/prometheus"
+	"github.com/rs/zerolog"
 
+	"go.6river.tech/gosix/logging"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/delivery"
 	"go.6river.tech/mmmbbb/ent/message"
@@ -43,25 +44,6 @@ func NewPublishMessage(params PublishMessageParams) *PublishMessage {
 	return &PublishMessage{
 		params: params,
 	}
-}
-
-var publishedMessagesCounter, enqueuedDeliveriesCounter prometheus.Counter
-var publishedMessagesHistogram *prometheus.HistogramVec
-
-func init() {
-	var counters []prometheus.Counter
-	counters, publishedMessagesHistogram = actionMetricsMulti(
-		"published_messages",
-		[]struct {
-			subject string
-			verb    string
-		}{
-			{"messages", "published"},
-			{"deliveries", "enqueued"},
-		},
-	)
-	publishedMessagesCounter = counters[0]
-	enqueuedDeliveriesCounter = counters[1]
 }
 
 func (a *PublishMessage) Execute(ctx context.Context, tx *ent.Tx) error {
@@ -122,15 +104,25 @@ func (a *PublishMessage) Execute(ctx context.Context, tx *ent.Tx) error {
 				// filter errors should have been caught at subscription create/update.
 				// do not break delivery because one sub has a broken filter, assume the
 				// filter matches nothing and drop the message.
-				// TODO: metric/log this
+				logging.GetLoggerWith("actions/publish-message", func(c zerolog.Context) zerolog.Context {
+					return c.
+						Str("subscriptionName", s.Name).
+						Stringer("subscriptionID", s.ID)
+				}).Err(err).Msg("skipping delivery due to subscription filter parse error")
+				filterErrorsCounter.Inc()
 				continue
 			} else if match, err := f.Evaluate(a.params.Attributes); err != nil {
 				// same idea
-				// TODO: metric/log this
+				logging.GetLoggerWith("actions/publish-message", func(c zerolog.Context) zerolog.Context {
+					return c.
+						Str("subscriptionName", s.Name).
+						Stringer("subscriptionID", s.ID)
+				}).Err(err).Msg("skipping delivery due to subscription filter evaluation error")
+				filterErrorsCounter.Inc()
 				continue
 			} else if !match {
 				// quietly ignore this one, no logging
-				// TODO: metric this
+				filterNoMatchCounter.Inc()
 				continue
 			}
 		}

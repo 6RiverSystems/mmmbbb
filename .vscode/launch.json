@@ -6,7 +6,7 @@
 			"type": "go",
 			"request": "launch",
 			"mode": "auto",
-			"program": "${workspaceFolder}/cmd/mmmbbb",
+			"program": "${workspaceFolder}/cmd/service",
 			"cwd": "${workspaceFolder}",
 			"env": {
 				"NODE_ENV": "development",
@@ -25,7 +25,7 @@
 			"type": "go",
 			"request": "launch",
 			"mode": "auto",
-			"program": "${workspaceFolder}/cmd/mmmbbb",
+			"program": "${workspaceFolder}/cmd/service",
 			"cwd": "${workspaceFolder}",
 			"env": {
 				"NODE_ENV": "development",
@@ -46,7 +46,7 @@
 			"type": "go",
 			"request": "launch",
 			"mode": "auto",
-			"program": "${workspaceFolder}/cmd/mmmbbb",
+			"program": "${workspaceFolder}/cmd/service",
 			"cwd": "${workspaceFolder}",
 			"env": {
 				"NODE_ENV": "test",
@@ -57,45 +57,27 @@
 			"preLaunchTask": "generate code"
 		},
 		{
-			"name": "Launch mmmbbb test client",
-			"type": "go",
-			"request": "launch",
-			"mode": "auto",
-			"program": "${workspaceFolder}/cmd/mbclient",
-			"cwd": "${workspaceFolder}",
-			"env": {
-				"NODE_ENV": "test",
-				"LOG_LEVEL": "trace",
-				"HSCALE": "false",
-				"MBCLIENT_SUB_METHOD": "ws",
-				"MBCLIENT_PUB_METHOD": "ws",
-				"MBCLIENT_ORDERED": "true"
-			},
-			"args": [],
-			"preLaunchTask": "generate code"
-		},
-		{
 			"name": "Launch mmmbbb ts compat test client",
 			"type": "node",
 			"request": "launch",
-			"cwd": "${workspaceFolder}/cmd/ts-compat",
-			"program": "${workspaceFolder}/cmd/ts-compat/dist/src/index.js",
+			"cwd": "${workspaceFolder}/internal/ts-compat",
+			"program": "${workspaceFolder}/internal/ts-compat/dist/src/index.js",
 			"preLaunchTask": "build ts-compat"
 		},
 		{
 			"name": "Launch mmmbbb ts compat stress client",
 			"type": "node",
 			"request": "launch",
-			"cwd": "${workspaceFolder}/cmd/ts-compat",
-			"program": "${workspaceFolder}/cmd/ts-compat/dist/src/stress.js",
+			"cwd": "${workspaceFolder}/internal/ts-compat",
+			"program": "${workspaceFolder}/internal/ts-compat/dist/src/stress.js",
 			"preLaunchTask": "build ts-compat"
 		},
 		{
 			"name": "Launch mmmbbb go compat stress client",
 			"type": "go",
 			"request": "launch",
-			"cwd": "${workspaceFolder}/cmd/go-compat",
-			"program": "${workspaceFolder}/cmd/go-compat/stress.go"
+			"cwd": "${workspaceFolder}/internal/go-compat",
+			"program": "${workspaceFolder}/internal/go-compat/stress.go"
 		},
 		{
 			"name": "Debug ent generation for mmmbbb",
@@ -103,7 +85,7 @@
 			"request": "launch",
 			"mode": "exec",
 			"program": "${workspaceFolder}/tools/ent",
-			"cwd": "${workspaceFolder}/cmd/mmmbbb/ent",
+			"cwd": "${workspaceFolder}/ent",
 			"args": [
 				"generate",
 				"./schema",
@@ -115,7 +97,7 @@
 			"type": "go",
 			"request": "launch",
 			"mode": "test",
-			"program": "${workspaceFolder}/cmd/mmmbbb/services",
+			"program": "${workspaceFolder}/services",
 			"args": [
 				// "-vet=off",
 				"-test.bench",

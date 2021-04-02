@@ -323,7 +323,7 @@ func TestMessageStreamer_Go(t *testing.T) {
 			}
 			a := &MessageStreamer{
 				Client:           client,
-				Logger:           logging.GetLoggerWith(t.Name(), nil),
+				Logger:           logging.GetLogger(t.Name()),
 				SubscriptionName: tt.params.subscriptionName,
 				AutomaticNack:    tt.params.automaticNack,
 			}

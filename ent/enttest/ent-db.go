@@ -20,6 +20,7 @@ import (
 	"go.6river.tech/gosix/db/postgres"
 	"go.6river.tech/gosix/testutils"
 	"go.6river.tech/mmmbbb/ent"
+	"go.6river.tech/mmmbbb/version"
 )
 
 func ClientForTest(t testing.TB, opts ...ent.Option) *ent.Client {
@@ -34,7 +35,7 @@ func ClientForTest(t testing.TB, opts ...ent.Option) *ent.Client {
 		dialectName = dialect.SQLite
 		// cannot use memory DBs for this app due to
 		// https://github.com/mattn/go-sqlite3/issues/923
-		dsn = db.SQLiteDSN(path.Join(t.TempDir(), "mmmbbb_test"), true, false)
+		dsn = db.SQLiteDSN(path.Join(t.TempDir(), version.AppName+"_test"), true, false)
 	}
 	conn, err := db.Open(driverName, dialectName, dsn)
 	if err != nil {

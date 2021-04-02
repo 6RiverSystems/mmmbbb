@@ -39,7 +39,7 @@ func main() {
 
 func NewApp() *app.App {
 	app := &app.App{
-		Name:    "mmmbbb",
+		Name:    version.AppName,
 		Version: version.SemrelVersion,
 		Port:    defaults.Port,
 		InitDbMigration: func(ctx context.Context, m *migrate.Migrator) error {
@@ -66,7 +66,7 @@ func NewApp() *app.App {
 		OASFS: http.FS(oas.OpenAPIFS),
 		SwaggerUIConfigHandler: swaggerui.CustomConfigHandler(func(config map[string]interface{}) map[string]interface{} {
 			config["urls"] = []map[string]interface{}{
-				{"url": config["url"], "name": "mmmbbb"},
+				{"url": config["url"], "name": version.AppName},
 				{"url": "../oas-grpc/pubsub.swagger.json", "name": "grpc:pubsub"},
 				{"url": "../oas-grpc/schema.swagger.json", "name": "grpc:schema"},
 			}
