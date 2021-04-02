@@ -187,8 +187,9 @@ install-tools-protobuf:
 	if ! protoc --version || [ ! -f /usr/include/google/protobuf/empty.proto ] ; then \
 		sudo apt-get -y install protobuf-compiler libprotobuf-dev ; \
 	fi
-	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest
-	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
+# versions of these packages will be picked up from go.mod
+	go install google.golang.org/protobuf/cmd/protoc-gen-go
+	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
+	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway
+	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2
 .PHONY: install-tools-protobuf
