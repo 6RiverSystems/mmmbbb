@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"sync"
 	"time"
 
@@ -62,11 +63,13 @@ type httpPushStreamConn struct {
 	subscriptionID   uuid.UUID // for logging
 	endpoint         string
 	client           *http.Client
+	wg               sync.WaitGroup
 	fastAckQueue     chan uuid.UUID
 	slowAckQueue     chan uuid.UUID
 	nackQueue        chan uuid.UUID
 	maxBytes         int
 	maxMessages      int
+	failing          bool
 }
 
 var _ StreamConnection = &httpPushStreamConn{}
@@ -103,8 +106,10 @@ func newHttpPushConn(
 }
 
 func (c *httpPushStreamConn) Close() error {
-	// no-op, closing this is not required to interrupt any operations, just
-	// cancelling the context is sufficient
+	// Wait for any in-progress sends to complete. Having canceled the context
+	// should cause them to do so quickly.
+	c.wg.Wait()
+
 	return nil
 }
 
@@ -165,6 +170,14 @@ func (c *httpPushStreamConn) Receive(ctx context.Context) (*MessageStreamRequest
 	}
 }
 
+func (c *httpPushStreamConn) nowFailing(newValue bool) (isChanged bool) {
+	c.mu.Lock()
+	isChanged = c.failing != newValue
+	c.failing = newValue
+	c.mu.Unlock()
+	return
+}
+
 func (c *httpPushStreamConn) Send(ctx context.Context, del *SubscriptionMessageDelivery) error {
 	bodyObject := pubsub.PushRequest{
 		Message: pubsub.PushMessage{
@@ -189,39 +202,51 @@ func (c *httpPushStreamConn) Send(ctx context.Context, del *SubscriptionMessageD
 	if err != nil {
 		return err
 	}
-	start := time.Now()
-	resp, err := c.client.Do(req)
-	dur := time.Since(start)
-	q := c.slowAckQueue
-	if dur < time.Second {
-		q = c.fastAckQueue
-	}
-	if err != nil {
-		// nack, don't fail the sending
-		// TODO: sample this log invocation
-		c.logger.Warn().
-			Err(err).
-			Msg("Failed to contact push endpoint")
-		q = c.nackQueue
-	} else {
-		switch resp.StatusCode {
-		case http.StatusProcessing, http.StatusOK, http.StatusCreated, http.StatusAccepted:
-			// all good, leave q as ack queue
-		case http.StatusNoContent:
-			// also all good, leave q as ack queue
-			// TODO: emulate google's insistence that no-content has no content
-		default:
-			// TODO: sample this log invocation
-			c.logger.Info().
-				Int("code", resp.StatusCode).
-				Msg("HTTP error (nack) from push endpoint")
-			q = c.nackQueue
+
+	c.wg.Add(1)
+	go func() {
+		defer c.wg.Done()
+
+		start := time.Now()
+		resp, err := c.client.Do(req)
+		dur := time.Since(start)
+		q := c.slowAckQueue
+		if dur < time.Second {
+			q = c.fastAckQueue
 		}
-	}
-	select {
-	case q <- del.ID:
-		return nil
-	case <-ctx.Done():
-		return ctx.Err()
-	}
+		if err != nil {
+			// nack, don't fail the sending
+			if c.nowFailing(true) {
+				c.logger.Warn().
+					Err(err).
+					Msg("Failed to contact push endpoint")
+			}
+			httpPushFailures.WithLabelValues("error").Inc()
+			q = c.nackQueue
+		} else {
+			switch resp.StatusCode {
+			case http.StatusProcessing, http.StatusOK, http.StatusCreated, http.StatusAccepted:
+				// all good, leave q as ack queue
+				c.nowFailing(false)
+			case http.StatusNoContent:
+				// also all good, leave q as ack queue
+				// TODO: emulate google's insistence that no-content has no content
+				c.nowFailing(false)
+			default:
+				if c.nowFailing(true) {
+					c.logger.Info().
+						Int("code", resp.StatusCode).
+						Msg("HTTP error (nack) from push endpoint")
+				}
+				httpPushFailures.WithLabelValues(strconv.Itoa(resp.StatusCode)).Inc()
+				q = c.nackQueue
+			}
+		}
+		select {
+		case q <- del.ID:
+		case <-ctx.Done():
+		}
+	}()
+
+	return nil
 }
