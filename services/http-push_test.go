@@ -65,7 +65,7 @@ func TestHttpPush(t *testing.T) {
 					return err
 				}
 				// sadly we just need to delay a bit to know the message went through
-				<-time.After(10 * time.Millisecond)
+				<-time.After(25 * time.Millisecond)
 				if err := client.DoCtxTx(testutils.ContextForTest(t), nil, func(ctx context.Context, tx *ent.Tx) error {
 					sub, err := tx.Subscription.Query().
 						Where(subscription.Name(safeName(t))).
@@ -84,7 +84,7 @@ func TestHttpPush(t *testing.T) {
 					return err
 				}
 				// sadly we just need to delay a bit to know the sub change took effect
-				<-time.After(25 * time.Millisecond)
+				<-time.After(100 * time.Millisecond)
 				// this message should not be received by the push endpoint
 				if err := publishMarker(t, client, 1); err != nil {
 					return err
@@ -277,9 +277,11 @@ func TestHttpPush(t *testing.T) {
 				// and be done with it
 				if mm.Sequence == 10 {
 					// make sure concurrent messages ack
-					time.Sleep(10 * time.Millisecond)
+					time.Sleep(50 * time.Millisecond)
+					w.WriteHeader(http.StatusInternalServerError)
+				} else {
+					w.WriteHeader(http.StatusNoContent)
 				}
-				w.WriteHeader(http.StatusInternalServerError)
 			},
 			func(t *testing.T, msgs chan *pubsub.PushRequest) error {
 				got := map[int]struct{}{}
@@ -299,14 +301,16 @@ func TestHttpPush(t *testing.T) {
 				}
 				assert.Len(t, got, 11)
 				// no call to assertNoMore here, as we aren't interested in re-delivery
-				// of the last message
+				// of the last message; however we do need to delay to ensure the nack
+				// completes
+				time.Sleep(100 * time.Millisecond)
 				return nil
 			},
 			func(t *testing.T, s *httpPusher) {
 				assert.Len(t, s.pushers, 1)
 				for _, p := range s.pushers {
 					fc := p.CurrentFlowControl()
-					assert.Equal(t, 1, fc.MaxMessages)
+					assert.Equal(t, 1, fc.MaxMessages, "flow control should be at minimum after nacks")
 				}
 				// there should be one incomplete delivery on the sub, with attempts=1
 				if del, err := s.client.Delivery.Query().
@@ -348,8 +352,8 @@ func TestHttpPush(t *testing.T) {
 				PushEndpoint: initialEndpoint,
 				TTL:          time.Minute,
 				MessageTTL:   time.Minute,
-				MinBackoff:   100 * time.Millisecond,
-				MaxBackoff:   200 * time.Millisecond,
+				MinBackoff:   1000 * time.Millisecond,
+				MaxBackoff:   2000 * time.Millisecond,
 			}).Execute))
 
 			s := &httpPusher{}
@@ -406,7 +410,12 @@ func newPushReceiver(t testing.TB, responder pushResponder) (*http.Server, *net.
 			} else {
 				w.WriteHeader(http.StatusNoContent)
 			}
-			received <- &m
+			select {
+			case received <- &m:
+				// OK
+			case <-time.After(time.Second):
+				assert.Fail(t, "unable to deliver received message to receiver channel")
+			}
 			wg.Done()
 		}),
 	}
@@ -427,15 +436,19 @@ func newPushReceiver(t testing.TB, responder pushResponder) (*http.Server, *net.
 
 func assertNoMore(t testing.TB, msgs chan *pubsub.PushRequest) {
 	assert.NotNil(t, msgs)
-	select {
-	case msg, ok := <-msgs:
-		if ok {
-			assert.Fail(t, "receive on expected-open-empty channel should not receive a value", msg)
-		} else {
-			assert.Fail(t, "receive on expected-open-empty channel should not confirm closed")
+	for {
+		select {
+		case msg, ok := <-msgs:
+			if ok {
+				assert.Failf(t, "receive on expected-open-empty channel should not receive a value", "got unexpected message: %#v", msg)
+			} else {
+				assert.Fail(t, "receive on expected-open-empty channel should not confirm closed")
+				return
+			}
+		case <-time.After(100 * time.Millisecond):
+			// PASS
+			return
 		}
-	case <-time.After(100 * time.Millisecond):
-		// PASS
 	}
 }
 

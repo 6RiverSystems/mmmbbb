@@ -113,8 +113,18 @@ func (c *httpPushStreamConn) Close() error {
 	return nil
 }
 
+func drainIds(dest *[]uuid.UUID, src <-chan uuid.UUID) {
+	for {
+		select {
+		case id := <-src:
+			*dest = append(*dest, id)
+		default:
+			return
+		}
+	}
+}
+
 func (c *httpPushStreamConn) Receive(ctx context.Context) (*MessageStreamRequest, error) {
-	// TODO: drain channels before returning a result, for efficiency
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()
@@ -125,8 +135,13 @@ func (c *httpPushStreamConn) Receive(ctx context.Context) (*MessageStreamRequest
 		ret := &MessageStreamRequest{
 			Ack: []uuid.UUID{id},
 		}
+		drainIds(&ret.Ack, c.fastAckQueue)
 		if c.maxMessages < 1000 {
-			c.maxMessages++
+			mm := c.maxMessages + len(ret.Ack)
+			if mm > 1000 {
+				mm = 1000
+			}
+			c.maxMessages = mm
 			ret.FlowControl = &FlowControl{
 				MaxMessages: c.maxMessages,
 				MaxBytes:    c.maxBytes,
@@ -140,8 +155,13 @@ func (c *httpPushStreamConn) Receive(ctx context.Context) (*MessageStreamRequest
 		ret := &MessageStreamRequest{
 			Ack: []uuid.UUID{id},
 		}
+		drainIds(&ret.Ack, c.slowAckQueue)
 		if c.maxMessages > 1 {
-			c.maxMessages--
+			mm := c.maxMessages - len(ret.Ack)
+			if mm < 1 {
+				mm = 1
+			}
+			c.maxMessages = mm
 			ret.FlowControl = &FlowControl{
 				MaxMessages: c.maxMessages,
 				MaxBytes:    c.maxBytes,
@@ -153,14 +173,15 @@ func (c *httpPushStreamConn) Receive(ctx context.Context) (*MessageStreamRequest
 		c.mu.Lock()
 		defer c.mu.Unlock()
 		ret := &MessageStreamRequest{
-			Ack: []uuid.UUID{id},
+			Nack: []uuid.UUID{id},
 		}
+		drainIds(&ret.Nack, c.nackQueue)
 		if c.maxMessages > 1 {
-			if c.maxMessages > 10 {
-				c.maxMessages -= 10
-			} else {
-				c.maxMessages--
+			mm := c.maxMessages - 10*len(ret.Nack)
+			if mm < 1 {
+				mm = 1
 			}
+			c.maxMessages = mm
 			ret.FlowControl = &FlowControl{
 				MaxMessages: c.maxMessages,
 				MaxBytes:    c.maxBytes,
