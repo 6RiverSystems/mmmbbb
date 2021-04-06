@@ -45,6 +45,17 @@ func actionMetricsMulti(
 		Namespace: version.AppName,
 		Name:      fmt.Sprintf("%s_duration", name),
 		Help:      fmt.Sprintf("Runtime histogram for %s, by outcome", prettyName),
+		Buckets:   extendedBuckets,
 	}, []string{outcomeLabel})
 	return counters, histogram
+}
+
+// need to initialize this with a function so that init order works correctly
+var extendedBuckets = makeExtendedBuckets()
+
+func makeExtendedBuckets() []float64 {
+	ret := make([]float64, 0, len(prometheus.DefBuckets)+5)
+	ret = append(ret, prometheus.DefBuckets...)
+	ret = append(ret, 30, 60, 120, 300, 600)
+	return ret
 }

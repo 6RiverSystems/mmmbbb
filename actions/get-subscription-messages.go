@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
+	"github.com/prometheus/client_golang/prometheus"
 
 	"go.6river.tech/gosix/db/postgres"
 	"go.6river.tech/mmmbbb/ent"
@@ -72,8 +73,6 @@ func NewGetSubscriptionMessages(params GetSubscriptionMessagesParams) *GetSubscr
 		params: params,
 	}
 }
-
-var getSubscriptionMessagesCounter, getSubscriptionMessagesHistogram = actionMetrics("get_subscription_messages", "messages", "delivered")
 
 // Deprecated: use ExecuteClient instead.
 //
@@ -252,6 +251,8 @@ func (a *GetSubscriptionMessages) acquireLock(
 		return nil
 	}
 
+	timer := prometheus.NewTimer(getSubscriptionMessagesLockTime)
+
 	// use the top 16 and bottom 48 bits (4 & 12 nibbles=hex-chars) of the UUID
 	// as the hash for advisory locks. we have to cast this back down to signed
 	// int64 for compat with pg
@@ -264,6 +265,7 @@ func (a *GetSubscriptionMessages) acquireLock(
 	if _, err := tx.DBTx().ExecContext(ctx, "select pg_advisory_xact_lock($1)", subIDHash); err != nil {
 		return err
 	}
+	timer.ObserveDuration()
 	return nil
 }
 

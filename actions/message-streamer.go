@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/zerolog"
 	"golang.org/x/sync/errgroup"
 
@@ -19,8 +20,6 @@ import (
 
 // TODO: this isn't actually an Action, but it doesn't really have a better
 // place to live right now
-
-// TODO: metrics
 
 type MessageStreamer struct {
 	Client           *ent.Client
@@ -189,6 +188,7 @@ func (ms *MessageStreamer) Go(ctx context.Context, conn StreamConnection) error 
 					break
 				}
 				ms.Logger.Trace().Interface("flowControl", curFc).Msg("Flow control full, waiting for wakeup")
+				waitTimer := prometheus.NewTimer(messageStreamerFlowControlWait)
 				// need to wait for some acks before we can send
 				select {
 				case <-wakeSend:
@@ -196,6 +196,7 @@ func (ms *MessageStreamer) Go(ctx context.Context, conn StreamConnection) error 
 					// notifiers are single-use, so get a new one before we proceed
 					pubNotify = PublishAwaiter(*ms.SubscriptionID)
 				}
+				waitTimer.ObserveDuration()
 			}
 
 			ms.Logger.Trace().Interface("flowControl", curFc).Msg("Flow control ready, fetching messages")
@@ -352,13 +353,13 @@ func (ms *MessageStreamer) Go(ctx context.Context, conn StreamConnection) error 
 					continue
 				}
 
-				// important: compute this _before_ the SQL op which may take time
-				nextAttempt := now.Add(delayAmount)
 				if _, err := ms.doDelay(ctx, ids, delayAmount); err != nil {
 					return err
 				}
+				messageStreamerAutoDelays.Add(float64(len(ids)))
 				// update our in-mem state with the (approximate) next attempt. need to be
 				// aware that some of these may have been acked or nacked in the meantime
+				nextAttempt := now.Add(delayAmount)
 				mu.Lock()
 				// handling the case where some but not all were externally ACKed is
 				// handled in the flow control section

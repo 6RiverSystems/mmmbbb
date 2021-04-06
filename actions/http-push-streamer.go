@@ -10,14 +10,13 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/zerolog"
 
 	"go.6river.tech/gosix/logging"
 	"go.6river.tech/gosix/pubsub"
 	"go.6river.tech/mmmbbb/ent"
 )
-
-// TODO: metrics
 
 type HttpPushStreamer struct {
 	conn *httpPushStreamConn
@@ -245,23 +244,23 @@ func (c *httpPushStreamConn) Send(ctx context.Context, del *SubscriptionMessageD
 			httpPushFailures.WithLabelValues("error").Inc()
 			q = c.nackQueue
 		} else {
+			var metric *prometheus.CounterVec
 			switch resp.StatusCode {
-			case http.StatusProcessing, http.StatusOK, http.StatusCreated, http.StatusAccepted:
+			case http.StatusProcessing, http.StatusOK, http.StatusCreated, http.StatusAccepted, http.StatusNoContent:
 				// all good, leave q as ack queue
-				c.nowFailing(false)
-			case http.StatusNoContent:
-				// also all good, leave q as ack queue
 				// TODO: emulate google's insistence that no-content has no content
 				c.nowFailing(false)
+				metric = httpPushSuccesses
 			default:
 				if c.nowFailing(true) {
 					c.logger.Info().
 						Int("code", resp.StatusCode).
 						Msg("HTTP error (nack) from push endpoint")
 				}
-				httpPushFailures.WithLabelValues(strconv.Itoa(resp.StatusCode)).Inc()
+				metric = httpPushFailures
 				q = c.nackQueue
 			}
+			metric.WithLabelValues(strconv.Itoa(resp.StatusCode)).Inc()
 		}
 		select {
 		case q <- del.ID:

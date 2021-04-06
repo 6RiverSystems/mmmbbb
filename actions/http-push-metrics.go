@@ -14,3 +14,11 @@ var httpPushFailures = promauto.NewCounterVec(
 	},
 	[]string{"status"},
 )
+var httpPushSuccesses = promauto.NewCounterVec(
+	prometheus.CounterOpts{
+		Namespace: version.AppName,
+		Name:      "http_push_streamer_successes",
+		Help:      "Number of attempted HTTP pushes that failed",
+	},
+	[]string{"status"},
+)
