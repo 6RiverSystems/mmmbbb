@@ -324,7 +324,61 @@ func TestHttpPush(t *testing.T) {
 					assert.Greater(t, del.AttemptAt.UnixNano(), time.Now().Add(50*time.Millisecond).UnixNano(), "next attempt should be in the future after NACKs")
 				}
 			},
-		}}
+		},
+		{
+			"nack redlivery",
+			true,
+			func(t *testing.T, client *ent.Client, endpoint string) error {
+				if err := publishMarker(t, client, 0); err != nil {
+					return err
+				}
+				return nil
+			},
+			func(t testing.TB, w http.ResponseWriter, r *http.Request, pr *pubsub.PushRequest) {
+				var mm struct {
+					Sequence int `json:"sequence"`
+				}
+				assert.NoError(t, json.Unmarshal([]byte(pr.Message.Data), &mm))
+				w.WriteHeader(http.StatusInternalServerError)
+			},
+			func(t *testing.T, msgs chan *pubsub.PushRequest) error {
+				for i := 0; i < 2; i++ {
+					m := <-msgs
+					assert.Equal(t, safeName(t), m.Subscription)
+					var mm struct {
+						Sequence int `json:"sequence"`
+					}
+					assert.NoError(t, json.Unmarshal([]byte(m.Message.Data), &mm))
+					assert.Equal(t, mm.Sequence, 0)
+					assert.Empty(t, m.Message.Attributes)
+					assert.Empty(t, m.Message.OrderingKey)
+				}
+				// no call to assertNoMore here, as we aren't interested in re-delivery
+				// of the last message; however we do need to delay to ensure the nack
+				// completes
+				time.Sleep(100 * time.Millisecond)
+				return nil
+			},
+			func(t *testing.T, s *httpPusher) {
+				assert.Len(t, s.pushers, 1)
+				for _, p := range s.pushers {
+					fc := p.CurrentFlowControl()
+					assert.Equal(t, 1, fc.MaxMessages, "flow control should be at minimum after nacks")
+				}
+				// there should be one incomplete delivery on the sub, with attempts=1
+				if del, err := s.client.Delivery.Query().
+					Where(
+						delivery.CompletedAtIsNil(),
+						delivery.HasSubscriptionWith(subscription.Name(safeName(t))),
+					).
+					Only(testutils.ContextForTest(t)); assert.NoError(t, err) {
+					assert.Equal(t, 2, del.Attempts)
+					// should be in the future, too, by at least ~50% of the min backoff
+					assert.Greater(t, del.AttemptAt.UnixNano(), time.Now().Add(50*time.Millisecond).UnixNano(), "next attempt should be in the future after NACKs")
+				}
+			},
+		},
+	}
 	client := enttest.ClientForTest(t)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -352,7 +406,7 @@ func TestHttpPush(t *testing.T) {
 				PushEndpoint: initialEndpoint,
 				TTL:          time.Minute,
 				MessageTTL:   time.Minute,
-				MinBackoff:   1000 * time.Millisecond,
+				MinBackoff:   200 * time.Millisecond,
 				MaxBackoff:   2000 * time.Millisecond,
 			}).Execute))
 
