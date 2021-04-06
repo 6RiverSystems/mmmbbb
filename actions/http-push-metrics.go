@@ -3,6 +3,7 @@ package actions
 import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
+
 	"go.6river.tech/mmmbbb/version"
 )
 

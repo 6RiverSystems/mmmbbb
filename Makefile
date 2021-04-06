@@ -40,7 +40,7 @@ BINARIES_DOCKER_PUSH:=$(patsubst %,docker-push-%,$(BINARY_NAMES))
 # always test with race and coverage, we'll run vet separately.
 TESTARGS:=-vet=off -race -cover -coverpkg=./...
 
-GOIMPORTSARGS:=-local github.com/6RiverSystems
+GOIMPORTSARGS:=-local github.com/6RiverSystems,go.6river.tech
 
 default: compile-code test
 .PHONY: default
