@@ -115,6 +115,21 @@ func (a *GetSubscriptionMessages) execute(
 		}
 	}()
 
+	if err := runTx(func(tx *ent.Tx) error {
+		// verify the subscription and, if valid, update its expiration, in case we
+		// don't get to do so via successful-ish return through applyResults
+		if sub, err := a.verifySub(ctx, tx); err != nil {
+			return err
+		} else if err := tx.Subscription.UpdateOne(sub).
+			SetExpiresAt(time.Now().Add(sub.TTL.Duration)).
+			Exec(ctx); err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
+		return err
+	}
+
 RETRY:
 	for {
 		var sub *ent.Subscription
@@ -125,14 +140,6 @@ RETRY:
 		// this waiter. IMPORTANT: this has to be _before_ we potentially start a
 		// txn, at least for SQLite. Which means we need an extra Tx the first time
 		// around.
-		if a.params.ID == nil {
-			if err := runTx(func(tx *ent.Tx) error {
-				_, err := a.verifySub(ctx, tx)
-				return err
-			}); err != nil {
-				return err
-			}
-		}
 		// cancel old awaiter before we create a new one
 		CancelPublishAwaiter(*a.params.ID, pubAwaiter)
 		pubAwaiter = PublishAwaiter(*a.params.ID)
