@@ -2,11 +2,11 @@ package actions
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/google/uuid"
 
+	"go.6river.tech/gosix/logging"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/subscription"
 )
@@ -18,10 +18,6 @@ type DeleteExpiredSubscriptions struct {
 var _ Action = (*DeleteExpiredSubscriptions)(nil)
 
 func NewDeleteExpiredSubscriptions(params PruneCommonParams) *DeleteExpiredSubscriptions {
-	// this is stricter than the base validation
-	if params.MaxDelete <= 0 {
-		panic(errors.New("MaxDelete must be > 0"))
-	}
 	return &DeleteExpiredSubscriptions{
 		pruneAction: *newPruneAction(params),
 	}
@@ -51,8 +47,13 @@ func (a *DeleteExpiredSubscriptions) Execute(ctx context.Context, tx *ent.Tx) er
 	}
 
 	ids := make([]uuid.UUID, len(subs))
+	logger := logging.GetLogger("actions/delete-expired-subscriptions")
 	for i, s := range subs {
 		ids[i] = s.ID
+		logger.Info().
+			Str("subscriptionName", s.Name).
+			Stringer("subscriptionID", s.ID).
+			Msg("deleting expired subscription")
 	}
 	numDeleted, err := tx.Subscription.Update().
 		Where(subscription.IDIn(ids...)).

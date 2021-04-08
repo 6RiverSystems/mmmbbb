@@ -2,7 +2,6 @@ package actions
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"go.6river.tech/mmmbbb/ent"
@@ -17,10 +16,6 @@ type PruneExpiredDeliveries struct {
 var _ Action = (*PruneExpiredDeliveries)(nil)
 
 func NewPruneExpiredDeliveries(params PruneCommonParams) *PruneExpiredDeliveries {
-	// this is stricter than the base validation
-	if params.MaxDelete <= 0 {
-		panic(errors.New("MaxDelete must be > 0"))
-	}
 	return &PruneExpiredDeliveries{
 		pruneAction: *newPruneAction(params),
 	}

@@ -26,21 +26,16 @@ func (pcd *PruneCompletedDeliveries) Execute(ctx context.Context, tx *ent.Tx) er
 	timer := startActionTimer(pruneCompletedDeliveriesHistogram, tx)
 	defer timer.Ended()
 
-	var del *ent.DeliveryDelete
-	cond := delivery.CompletedAtLTE(time.Now().Add(-pcd.params.MinAge))
-	if pcd.params.MaxDelete == 0 {
-		del = tx.Delivery.Delete().Where(cond)
-	} else {
-		// ent doesn't support limit on delete commands (that may be a PostgreSQL
-		// extension), so have to do a query-then-delete
-		ids, err := tx.Delivery.Query().Where(cond).Limit(pcd.params.MaxDelete).IDs(ctx)
-		if err != nil {
-			return err
-		}
-		del = tx.Delivery.Delete().Where(delivery.IDIn(ids...))
+	// ent doesn't support limit on delete commands (that may be a PostgreSQL
+	// extension), so have to do a query-then-delete
+	ids, err := tx.Delivery.Query().
+		Where(delivery.CompletedAtLTE(time.Now().Add(-pcd.params.MinAge))).
+		Limit(pcd.params.MaxDelete).
+		IDs(ctx)
+	if err != nil {
+		return err
 	}
-
-	numDeleted, err := del.Exec(ctx)
+	numDeleted, err := tx.Delivery.Delete().Where(delivery.IDIn(ids...)).Exec(ctx)
 	if err != nil {
 		return err
 	}

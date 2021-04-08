@@ -4,6 +4,9 @@ import (
 	"context"
 	"time"
 
+	"github.com/google/uuid"
+
+	"go.6river.tech/gosix/logging"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/subscription"
 )
@@ -26,26 +29,30 @@ func (a *PruneDeletedSubscriptions) Execute(ctx context.Context, tx *ent.Tx) err
 	timer := startActionTimer(pruneDeletedSubscriptionsHistogram, tx)
 	defer timer.Ended()
 
-	var del *ent.SubscriptionDelete
-	cond := subscription.And(
-		subscription.DeletedAtLTE(time.Now().Add(-a.params.MinAge)),
-		// we rely on deliveries being pruned to then allow messages to be pruned
-		// TODO: ticket for HasRelationWith efficiency
-		subscription.Not(subscription.HasDeliveries()),
-	)
-	if a.params.MaxDelete == 0 {
-		del = tx.Subscription.Delete().Where(cond)
-	} else {
-		// ent doesn't support limit on delete commands (that may be a PostgreSQL
-		// extension), so have to do a query-then-delete
-		ids, err := tx.Subscription.Query().Where(cond).Limit(a.params.MaxDelete).IDs(ctx)
-		if err != nil {
-			return err
-		}
-		del = tx.Subscription.Delete().Where(subscription.IDIn(ids...))
+	subs, err := tx.Subscription.Query().
+		Where(
+			subscription.DeletedAtLTE(time.Now().Add(-a.params.MinAge)),
+			// we rely on deliveries being pruned to then allow messages to be pruned
+			// TODO: ticket for HasRelationWith efficiency
+			subscription.Not(subscription.HasDeliveries()),
+		).
+		Limit(a.params.MaxDelete).
+		All(ctx)
+	if err != nil {
+		return err
+	}
+	ids := make([]uuid.UUID, len(subs))
+	logger := logging.GetLogger("actions/prune-deleted-subscriptions")
+	for i, s := range subs {
+		ids[i] = s.ID
+		logger.Info().
+			Str("subscriptionName", s.Name).
+			Stringer("subscriptionID", s.ID).
+			Time("deletedAt", *s.DeletedAt).
+			Msg("pruning deleted subscription")
 	}
 
-	numDeleted, err := del.Exec(ctx)
+	numDeleted, err := tx.Subscription.Delete().Where(subscription.IDIn(ids...)).Exec(ctx)
 	if err != nil {
 		return err
 	}

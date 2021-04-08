@@ -4,6 +4,9 @@ import (
 	"context"
 	"time"
 
+	"github.com/google/uuid"
+
+	"go.6river.tech/gosix/logging"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/topic"
 )
@@ -26,26 +29,33 @@ func (a *PruneDeletedTopics) Execute(ctx context.Context, tx *ent.Tx) error {
 	timer := startActionTimer(pruneDeletedTopicsHistogram, tx)
 	defer timer.Ended()
 
-	var del *ent.TopicDelete
-	cond := topic.And(
-		topic.DeletedAtLTE(time.Now().Add(-a.params.MinAge)),
-		// we rely on subscriptions being pruned to then allow topics to be pruned
-		// TODO: ticket for HasRelationWith efficiency
-		topic.Not(topic.HasSubscriptions()),
-	)
-	if a.params.MaxDelete == 0 {
-		del = tx.Topic.Delete().Where(cond)
-	} else {
-		// ent doesn't support limit on delete commands (that may be a PostgreSQL
-		// extension), so have to do a query-then-delete
-		ids, err := tx.Topic.Query().Where(cond).Limit(a.params.MaxDelete).IDs(ctx)
-		if err != nil {
-			return err
-		}
-		del = tx.Topic.Delete().Where(topic.IDIn(ids...))
+	// ent doesn't support limit on delete commands (that may be a PostgreSQL
+	// extension), so have to do a query-then-delete
+	topics, err := tx.Topic.Query().
+		Where(
+			topic.DeletedAtLTE(time.Now().Add(-a.params.MinAge)),
+			// we rely on subscriptions being pruned to then allow topics to be pruned
+			// TODO: ticket for HasRelationWith efficiency
+			topic.Not(topic.HasSubscriptions()),
+		).
+		Limit(a.params.MaxDelete).
+		All(ctx)
+	if err != nil {
+		return err
+	}
+	ids := make([]uuid.UUID, len(topics))
+	logger := logging.GetLogger("actions/prune-deleted-topics")
+	for i, t := range topics {
+		ids[i] = t.ID
+		logger.Info().
+			Str("topicName", t.Name).
+			Stringer("topicID", t.ID).
+			Time("deletedAt", *t.DeletedAt).
+			Msg("pruning deleted topic")
 	}
 
-	numDeleted, err := del.Exec(ctx)
+	numDeleted, err := tx.Topic.Delete().Where(topic.IDIn(ids...)).Exec(ctx)
+
 	if err != nil {
 		return err
 	}

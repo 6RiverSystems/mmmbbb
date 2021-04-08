@@ -27,26 +27,21 @@ func (a *PruneDeletedSubscriptionDeliveries) Execute(ctx context.Context, tx *en
 	timer := startActionTimer(pruneDeletedSubscriptionDeliveriesHistogram, tx)
 	defer timer.Ended()
 
-	var del *ent.DeliveryDelete
-	cond := delivery.And(
-		// TODO: ticket for HasRelationWith efficiency
-		delivery.HasSubscriptionWith(
-			subscription.DeletedAtLTE(time.Now().Add(-a.params.MinAge)),
-		),
-	)
-	if a.params.MaxDelete == 0 {
-		del = tx.Delivery.Delete().Where(cond)
-	} else {
-		// ent doesn't support limit on delete commands (that may be a PostgreSQL
-		// extension), so have to do a query-then-delete
-		ids, err := tx.Delivery.Query().Where(cond).Limit(a.params.MaxDelete).IDs(ctx)
-		if err != nil {
-			return err
-		}
-		del = tx.Delivery.Delete().Where(delivery.IDIn(ids...))
+	// ent doesn't support limit on delete commands (that may be a PostgreSQL
+	// extension), so have to do a query-then-delete
+	ids, err := tx.Delivery.Query().
+		Where(
+			// TODO: ticket for HasRelationWith efficiency
+			delivery.HasSubscriptionWith(
+				subscription.DeletedAtLTE(time.Now().Add(-a.params.MinAge)),
+			),
+		).
+		Limit(a.params.MaxDelete).
+		IDs(ctx)
+	if err != nil {
+		return err
 	}
-
-	numDeleted, err := del.Exec(ctx)
+	numDeleted, err := tx.Delivery.Delete().Where(delivery.IDIn(ids...)).Exec(ctx)
 	if err != nil {
 		return err
 	}
