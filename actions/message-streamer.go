@@ -129,7 +129,7 @@ func (ms *MessageStreamer) Go(ctx context.Context, conn StreamConnection) error 
 			var msg *MessageStreamRequest
 			var err error
 			if msg, err = conn.Receive(ctx); err != nil {
-				// TODO: log
+				// connections ending with an error is normal, no reason to log here
 				return err
 			}
 			if msg.FlowControl != nil {

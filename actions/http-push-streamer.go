@@ -55,6 +55,13 @@ func (p *HttpPushStreamer) CurrentFlowControl() FlowControl {
 	}
 }
 
+func (p *HttpPushStreamer) LogContexter(c zerolog.Context) zerolog.Context {
+	return c.
+		Str("subscriptionName", p.conn.subscriptionName).
+		Stringer("subscriptionID", p.conn.subscriptionID)
+	// TODO: include topic info
+}
+
 type httpPushStreamConn struct {
 	logger           *logging.Logger
 	mu               sync.Mutex

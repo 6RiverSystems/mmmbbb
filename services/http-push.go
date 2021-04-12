@@ -125,12 +125,9 @@ func (s *httpPusher) startPushersOnce(ctx context.Context) error {
 		select {
 		case <-pusherMon.Done():
 			if err := pusherMon.Wait(); err != nil {
-				// TODO: we want to log the topic name too
-				s.logger.Error().Err(err).Stringer("subID", subID).Msg("HTTP pusher died")
+				s.logger.With(pusherMon.LogContexter).Error().Err(err).Msg("HTTP pusher died")
 			} else {
-				// TODO: we don't expect pushers to end without error, and if they did
-				// we wouldn't know as the context wouldn't be canceled
-				s.logger.Debug().Stringer("subID", subID).Msg("HTTP pusher ended")
+				s.logger.With(pusherMon.LogContexter).Debug().Msg("HTTP pusher ended")
 			}
 			// release resources
 			pusherMon.cancel()

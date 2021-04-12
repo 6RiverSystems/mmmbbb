@@ -23,8 +23,6 @@ import (
 	"go.6river.tech/mmmbbb/ent/topic"
 )
 
-// TODO: metrics
-
 // topicMirrorOut manages mirroring mmmbbb topics to google pubsub
 type topicMirrorOut struct {
 	// config
@@ -159,6 +157,7 @@ func (s *topicMirrorOut) startMirrorsOnce(ctx context.Context) error {
 				}
 			} else {
 				s.logger.Info().Str("psTopicName", t.Name).Msg("Created remote mirror topic")
+				createdTopicsCounter.WithLabelValues(directionOutbound).Inc()
 			}
 
 			sn := s.subName(t.Name, t.ID)
@@ -196,6 +195,7 @@ func (s *topicMirrorOut) startMirrorsOnce(ctx context.Context) error {
 	for sn, subMon := range s.subWatchers {
 		select {
 		case <-subMon.Done():
+			watchersEndedCounter.WithLabelValues(directionOutbound).Inc()
 			if err := subMon.Wait(); err != nil {
 				// TODO: we want to log the topic name too
 				s.logger.Error().Err(err).Str("subName", sn).Msg("Mirror subscriber died")
@@ -218,7 +218,11 @@ func (s *topicMirrorOut) startMirrorsOnce(ctx context.Context) error {
 		s.subWatchers[sn] = monitor(ctx, func(subCtx context.Context) error {
 			return s.watchSub(subCtx, sn, ti.name, ti.id)
 		})
+		watchersStartedCounter.WithLabelValues(directionOutbound).Inc()
 	}
+
+	mirroredTopicsGauge.WithLabelValues(directionOutbound).Set(float64(len(s.subWatchers)))
+
 	return nil
 }
 
@@ -302,6 +306,7 @@ func (s *topicMirrorOut) watchSub(ctx context.Context, subName, topicName string
 			}
 			acks[i] = deliveries[i].ID
 		}
+		messagesMirroredCounter.WithLabelValues(directionOutbound).Add(float64(len(pubResults)))
 		ack := actions.NewAckDeliveries(acks...)
 		if err := s.client.DoCtxTx(ctx, nil, ack.Execute); err != nil {
 			return err

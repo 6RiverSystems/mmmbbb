@@ -25,8 +25,6 @@ import (
 	"go.6river.tech/mmmbbb/ent/topic"
 )
 
-// TODO: metrics
-
 // topicMirrorIn manages mirroring google pubsub topics to mmmbbb
 type topicMirrorIn struct {
 	// config
@@ -198,6 +196,7 @@ func (s *topicMirrorIn) startMirrorsOnce(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
+		createdTopicsCounter.WithLabelValues(directionInbound).Inc()
 
 		sn := s.subName(t.ID())
 		subs[sn] = struct{ name string }{t.ID()}
@@ -237,6 +236,7 @@ func (s *topicMirrorIn) startMirrorsOnce(ctx context.Context) error {
 	for sn, subMon := range s.subWatchers {
 		select {
 		case <-subMon.Done():
+			watchersEndedCounter.WithLabelValues(directionInbound).Inc()
 			if err := subMon.Wait(); err != nil {
 				// TODO: we want to log the topic name too
 				s.logger.Error().Err(err).Str("psSubName", sn).Msg("Mirror subscriber died")
@@ -259,7 +259,10 @@ func (s *topicMirrorIn) startMirrorsOnce(ctx context.Context) error {
 		s.subWatchers[sn] = monitor(ctx, func(subCtx context.Context) error {
 			return s.watchSub(subCtx, sn, ti.name)
 		})
+		watchersStartedCounter.WithLabelValues(directionInbound).Inc()
 	}
+
+	mirroredTopicsGauge.WithLabelValues(directionInbound).Set(float64(len(s.subWatchers)))
 
 	return nil
 }
@@ -287,6 +290,7 @@ func (s *topicMirrorIn) watchSub(ctx context.Context, psSubName, psTopicName str
 		// loop avoidance: don't copy any messages that came from topicMirrorOut
 		for _, a := range psMirrorAttrs {
 			if _, ok := m.RealMessage().Attributes[a]; ok {
+				messagesDroppedCounter.WithLabelValues(directionInbound, dropReasonLoop).Inc()
 				m.Ack()
 				return
 			}
@@ -297,6 +301,7 @@ func (s *topicMirrorIn) watchSub(ctx context.Context, psSubName, psTopicName str
 		// decode to a rawmessage just to validate json
 		var mp json.RawMessage
 		if err := json.Unmarshal(m.RealMessage().Data, &mp); err != nil {
+			messagesDroppedCounter.WithLabelValues(directionInbound, dropReasonNotJSON).Inc()
 			logger.Error().Err(err).Str("messageID", m.RealMessage().ID).Msg("Got non-JSON message, dropping it")
 			m.Ack()
 			return
@@ -313,6 +318,7 @@ func (s *topicMirrorIn) watchSub(ctx context.Context, psSubName, psTopicName str
 			m.Nack()
 			return
 		}
+		messagesMirroredCounter.WithLabelValues(directionInbound).Inc()
 
 		m.Ack()
 	})
