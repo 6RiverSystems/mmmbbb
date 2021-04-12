@@ -67,7 +67,7 @@ func (s *subscriberServer) CreateSubscription(ctx context.Context, req *pubsub.S
 	err := s.client.DoCtxTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable}, action.Execute)
 	if err != nil {
 		if errors.Is(err, actions.ErrNotFound) {
-			return nil, status.Error(codes.NotFound, "Topic not found")
+			return nil, status.Errorf(codes.NotFound, "Topic not found: %s", req.Topic)
 		}
 		if errors.Is(err, actions.ErrExists) {
 			return nil, status.Error(codes.AlreadyExists, "Subscription already exists")
@@ -102,7 +102,7 @@ func (s *subscriberServer) GetSubscription(ctx context.Context, req *pubsub.GetS
 	})
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, status.Error(codes.NotFound, "Subscription not found")
+			return nil, status.Errorf(codes.NotFound, "Subscription not found: %s", req.Subscription)
 		}
 		return nil, grpc.AsStatusError(err)
 	}
@@ -125,7 +125,7 @@ func (s *subscriberServer) UpdateSubscription(ctx context.Context, req *pubsub.U
 			Only(ctx)
 		if err != nil {
 			if ent.IsNotFound(err) {
-				return status.Error(codes.NotFound, "Subscription not found")
+				return status.Errorf(codes.NotFound, "Subscription not found: %s", req.Subscription)
 			}
 			return grpc.AsStatusError(err)
 		}
@@ -284,7 +284,7 @@ func (s *subscriberServer) DeleteSubscription(ctx context.Context, req *pubsub.D
 	err := s.client.DoCtxTx(ctx, nil, action.Execute)
 	if err != nil {
 		if ent.IsNotFound(err) || errors.Is(err, actions.ErrNotFound) {
-			return nil, status.Error(codes.NotFound, "Subscription does not exist")
+			return nil, status.Errorf(codes.NotFound, "Subscription does not exist: %s", req.Subscription)
 		}
 		return nil, grpc.AsStatusError(err)
 	}
@@ -370,7 +370,7 @@ func (s *subscriberServer) Pull(ctx context.Context, req *pubsub.PullRequest) (*
 	err := action.ExecuteClient(ctx, s.client)
 	if err != nil {
 		if ent.IsNotFound(err) || errors.Is(err, actions.ErrNotFound) {
-			return nil, status.Error(codes.NotFound, "Subscription not found")
+			return nil, status.Errorf(codes.NotFound, "Subscription not found: %s", req.Subscription)
 		}
 		return nil, grpc.AsStatusError(err)
 	}
@@ -408,7 +408,7 @@ func (s *subscriberServer) StreamingPull(stream pubsub.Subscriber_StreamingPullS
 	})
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return status.Error(codes.NotFound, "Subscription not found")
+			return status.Errorf(codes.NotFound, "Subscription not found: %s", initial.Subscription)
 		}
 		return grpc.AsStatusError(err)
 	}
@@ -584,7 +584,7 @@ func (s *subscriberServer) ModifyPushConfig(ctx context.Context, req *pubsub.Mod
 			Only(ctx)
 		if err != nil {
 			if ent.IsNotFound(err) {
-				return status.Error(codes.NotFound, "Subscription not found")
+				return status.Errorf(codes.NotFound, "Subscription not found: %s", req.Subscription)
 			}
 			return grpc.AsStatusError(err)
 		}
