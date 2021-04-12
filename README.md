@@ -42,6 +42,9 @@ Things that are not implemented:
 - KMS settings
 - The Schema API and any PubSub settings related to it
 - Authentication settings for Push subscriptions
+- Changing message retry backoff settings for a subscription may not fully take
+  effect when actively streaming messages from it (including from an HTTP Push
+  configuration)
 
 Things that are different:
 
@@ -53,6 +56,11 @@ Things that are different:
   active under the hood, even though it will appear disabled in the gRPC API.
 - All published messages must (currently) have a JSON payload, not arbitrary
   binary data. This restriction may be lifted in the future.
+- Some activities the Google emulator considers an error, `mmmbbb` does not. For
+  example, several subscription settings can be modified via the gRPC API after
+  subscription creation in `mmmbbb`, but not in Google's products. Google treats
+  an HTTP Push endpoint that returns content with a 201 No Content response as
+  an error (NACK), `mmmbbb` does not.
 
 ## Database model
 

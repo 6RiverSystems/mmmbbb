@@ -5,7 +5,6 @@
 	"go.buildOnSave": "workspace",
 	"go.autocompleteUnimportedPackages": true,
 	"go.lintTool": "golangci-lint",
-	"go.formatTool": "goreturns",
 	"go.generateTestsFlags": [
 		"-template=testify"
 	],
@@ -24,6 +23,7 @@
 		"dbstats",
 		"dir's",
 		"dockerize",
+		"durationpb",
 		"emptypb",
 		"entc",
 		"entgo",
@@ -56,6 +56,7 @@
 		"sslmode",
 		"stretchr",
 		"swaggerui",
+		"timestamppb",
 		"timestamptz",
 		"unmarshaling",
 		"upgrader",

@@ -35,7 +35,7 @@ func (a *PruneDeletedTopics) Execute(ctx context.Context, tx *ent.Tx) error {
 		Where(
 			topic.DeletedAtLTE(time.Now().Add(-a.params.MinAge)),
 			// we rely on subscriptions being pruned to then allow topics to be pruned
-			// TODO: ticket for HasRelationWith efficiency
+			// UPSTREAM: ticket for HasRelationWith efficiency
 			topic.Not(topic.HasSubscriptions()),
 		).
 		Limit(a.params.MaxDelete).

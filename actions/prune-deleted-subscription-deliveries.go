@@ -31,7 +31,7 @@ func (a *PruneDeletedSubscriptionDeliveries) Execute(ctx context.Context, tx *en
 	// extension), so have to do a query-then-delete
 	ids, err := tx.Delivery.Query().
 		Where(
-			// TODO: ticket for HasRelationWith efficiency
+			// UPSTREAM: ticket for HasRelationWith efficiency
 			delivery.HasSubscriptionWith(
 				subscription.DeletedAtLTE(time.Now().Add(-a.params.MinAge)),
 			),

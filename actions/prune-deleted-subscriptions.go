@@ -33,7 +33,7 @@ func (a *PruneDeletedSubscriptions) Execute(ctx context.Context, tx *ent.Tx) err
 		Where(
 			subscription.DeletedAtLTE(time.Now().Add(-a.params.MinAge)),
 			// we rely on deliveries being pruned to then allow messages to be pruned
-			// TODO: ticket for HasRelationWith efficiency
+			// UPSTREAM: ticket for HasRelationWith efficiency
 			subscription.Not(subscription.HasDeliveries()),
 		).
 		Limit(a.params.MaxDelete).

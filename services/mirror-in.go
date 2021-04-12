@@ -175,7 +175,6 @@ func (s *topicMirrorIn) startMirrorsOnce(ctx context.Context) error {
 				if !errors.Is(err, actions.ErrExists) {
 					return err
 				}
-				// TODO: make this an action
 				_, err := tx.Topic.Query().
 					Where(
 						topic.Name(localTopicName),

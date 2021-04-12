@@ -133,7 +133,7 @@ func (Topic) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("subscriptions", Subscription.Type).
 			Ref("topic"),
-		// TODO: this is a dangerous relation to expose as it will produce enormous
+		// FUTURE: this is a dangerous relation to expose as it will produce enormous
 		// amounts of data
 		edge.From("messages", Message.Type).
 			Ref("topic"),
@@ -299,7 +299,7 @@ func (Message) Edges() []ent.Edge {
 		// making the topic edge required means we can't fully delete a topic until
 		// all messages are deleted, which means that topic delete starts out as a
 		// soft delete.
-		// TODO: we'd like this edge to be immutable, but that's not supported
+		// FUTURE: we'd like this edge to be immutable, but that's not supported
 		edge.To("topic", Topic.Type).
 			Unique().
 			Field("topicID").

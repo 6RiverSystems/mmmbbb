@@ -2,10 +2,8 @@ package services
 
 import (
 	"context"
+	"errors"
 	"time"
-
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
 	"go.6river.tech/gosix/registry"
 	"go.6river.tech/mmmbbb/ent"
@@ -45,17 +43,23 @@ func (s *healthServer) Check(ctx context.Context, req *health.HealthCheckRequest
 			Status: health.HealthCheckResponse_NOT_SERVING,
 		}, nil
 	}
+	var err error
 	if req.GetService() == "" {
-		if err := s.services.WaitAllReady(ctx); err != nil {
-			return &health.HealthCheckResponse{
-				Status: health.HealthCheckResponse_NOT_SERVING,
-			}, nil
-		}
+		err = s.services.WaitAllReady(ctx)
 	} else {
-		// TODO: lookup service by name and check if it's ready
-		return nil, status.Error(codes.Unimplemented, "Health check for specific services not yet implemented")
+		err = s.services.WaitReadyByName(ctx, req.GetService())
 	}
 
+	if err != nil {
+		if errors.Is(err, registry.ServiceNotFoundError) {
+			return &health.HealthCheckResponse{
+				Status: health.HealthCheckResponse_SERVICE_UNKNOWN,
+			}, nil
+		}
+		return &health.HealthCheckResponse{
+			Status: health.HealthCheckResponse_NOT_SERVING,
+		}, nil
+	}
 	return &health.HealthCheckResponse{
 		Status: health.HealthCheckResponse_SERVING,
 	}, nil

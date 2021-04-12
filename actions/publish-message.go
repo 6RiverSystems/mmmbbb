@@ -139,7 +139,7 @@ func (a *PublishMessage) Execute(ctx context.Context, tx *ent.Tx) error {
 					delivery.HasMessageWith(
 						message.OrderKey(a.params.OrderKey),
 						// ent uses a very wide sub-select, this helps narrow it down
-						// TODO: ticket for HasRelationWith efficiency
+						// UPSTREAM: ticket for HasRelationWith efficiency
 						message.TopicID(t.ID),
 					),
 				).

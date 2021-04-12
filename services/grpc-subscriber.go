@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
 
 	"errors"
@@ -386,8 +387,7 @@ func (s *subscriberServer) StreamingPull(stream pubsub.Subscriber_StreamingPullS
 	// we require an initial message before we can start doing anything
 	initial, err := stream.Recv()
 	if err != nil {
-		// TODO: should we wrap or transform this error?
-		return err
+		return fmt.Errorf("Error receiving StreamingPull message: %w", err)
 	}
 
 	if !isValidSubscriptionName(initial.Subscription) {
@@ -395,8 +395,6 @@ func (s *subscriberServer) StreamingPull(stream pubsub.Subscriber_StreamingPullS
 	}
 
 	ctx := stream.Context()
-
-	// TODO: this should share code with the websocket subscriber endpoint
 
 	var sub *ent.Subscription
 	err = s.client.DoTx(ctx, nil, func(tx *ent.Tx) error {

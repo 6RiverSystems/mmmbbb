@@ -34,7 +34,7 @@ func (a *PruneCompletedMessages) Execute(ctx context.Context, tx *ent.Tx) error 
 			// we only get here when all the completions have been pruned
 			message.PublishedAtLTE(time.Now().Add(-a.params.MinAge)),
 			// we rely on deliveries being pruned to then allow messages to be pruned
-			// TODO: ticket for HasRelationWith efficiency
+			// UPSTREAM: ticket for HasRelationWith efficiency
 			message.Not(message.HasDeliveries()),
 		).
 		Limit(a.params.MaxDelete).

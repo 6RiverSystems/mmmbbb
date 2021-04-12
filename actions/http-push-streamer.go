@@ -59,7 +59,7 @@ func (p *HttpPushStreamer) LogContexter(c zerolog.Context) zerolog.Context {
 	return c.
 		Str("subscriptionName", p.conn.subscriptionName).
 		Stringer("subscriptionID", p.conn.subscriptionID)
-	// TODO: include topic info
+	// TODO: include topic info in log context
 }
 
 type httpPushStreamConn struct {
