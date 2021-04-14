@@ -479,10 +479,10 @@ const retryBackoffFactor = 1.1
 // max
 func NextDelayFor(sub *ent.Subscription, attempts int) (nominalDelay, fuzzedDelay time.Duration) {
 	min, max := defaultMinDelay, defaultMaxDelay
-	if sub.MinBackoff != nil && sub.MinBackoff.Duration != nil && *sub.MinBackoff.Duration > 0 {
+	if sub.MinBackoff.NotNil() && *sub.MinBackoff.Duration > 0 {
 		min = *sub.MinBackoff.Duration
 	}
-	if sub.MaxBackoff != nil && sub.MaxBackoff.Duration != nil && *sub.MaxBackoff.Duration > 0 {
+	if sub.MaxBackoff.NotNil() && *sub.MaxBackoff.Duration > 0 {
 		max = *sub.MaxBackoff.Duration
 	}
 	delay := math.Pow(retryBackoffFactor, float64(attempts)) * min.Seconds()

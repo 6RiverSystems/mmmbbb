@@ -140,17 +140,8 @@ func checkSubEqual(t *testing.T, expected, actual *ent.Subscription) {
 	// ignoring Edges
 }
 
-func checkNullableIntervalEqual(t *testing.T, expected, actual *customtypes.IntervalNull) {
-	if expected == nil || expected.Duration == nil {
-		if actual != nil {
-			assert.Nil(t, actual.Duration)
-		}
-	} else {
-		assert.NotNil(t, actual)
-		if actual != nil {
-			assert.Equal(t, expected.Duration, actual.Duration)
-		}
-	}
+func checkNullableIntervalEqual(t *testing.T, expected, actual customtypes.IntervalNull) {
+	assert.Equal(t, expected.Duration, actual.Duration)
 }
 
 func assertClosed(t *testing.T, c <-chan struct{}) {

@@ -83,14 +83,6 @@ func (a *CreateSubscription) Execute(ctx context.Context, tx *ent.Tx) error {
 		return err
 	}
 
-	var minBackoff, maxBackoff customtypes.IntervalNull
-	if a.params.MinBackoff > 0 {
-		minBackoff = customtypes.FromDuration(a.params.MinBackoff).AsNullable()
-	}
-	if a.params.MaxBackoff > 0 {
-		maxBackoff = customtypes.FromDuration(a.params.MaxBackoff).AsNullable()
-	}
-
 	var pushEndpoint *string
 	if a.params.PushEndpoint != "" {
 		pushEndpoint = &a.params.PushEndpoint
@@ -104,7 +96,7 @@ func (a *CreateSubscription) Execute(ctx context.Context, tx *ent.Tx) error {
 		}
 		messageFilter = &a.params.Filter
 	}
-	s, err := tx.Subscription.Create().
+	create := tx.Subscription.Create().
 		SetName(a.params.Name).
 		SetTopic(topic).
 		SetTTL(customtypes.FromDuration(a.params.TTL)).
@@ -113,10 +105,15 @@ func (a *CreateSubscription) Execute(ctx context.Context, tx *ent.Tx) error {
 		SetOrderedDelivery(a.params.OrderedDelivery).
 		SetLabels(a.params.Labels).
 		SetNillablePushEndpoint(pushEndpoint).
-		SetMinBackoff(minBackoff).
-		SetMaxBackoff(maxBackoff).
-		SetNillableMessageFilter(messageFilter).
-		Save(ctx)
+		SetNillableMessageFilter(messageFilter)
+	if a.params.MinBackoff > 0 {
+		create = create.SetMinBackoff(customtypes.FromDuration(a.params.MinBackoff).AsNullable())
+	}
+	if a.params.MaxBackoff > 0 {
+		create = create.SetMaxBackoff(customtypes.FromDuration(a.params.MaxBackoff).AsNullable())
+	}
+
+	s, err := create.Save(ctx)
 	if err != nil {
 		return err
 	}

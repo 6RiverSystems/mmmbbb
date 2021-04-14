@@ -317,7 +317,7 @@ func (ms *MessageStreamer) Go(ctx context.Context, conn StreamConnection) error 
 			var delayAmount time.Duration
 			if s, err := ms.Client.Subscription.Get(ctx, *ms.SubscriptionID); err != nil {
 				return err
-			} else if s.MinBackoff != nil && s.MinBackoff.Duration != nil {
+			} else if s.MinBackoff.NotNil() {
 				delayAmount = *s.MinBackoff.Duration / 2
 			} else {
 				delayAmount = defaultMinDelay / 2

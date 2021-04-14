@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	cloud.google.com/go/pubsub v1.10.1
-	entgo.io/ent v0.7.1-0.20210329140103-4dbe434ce6e8
+	entgo.io/ent v0.8.0
 	github.com/alecthomas/participle/v2 v2.0.0-alpha4
 	github.com/getkin/kin-openapi v0.53.0
 	github.com/gin-gonic/gin v1.7.1
@@ -20,7 +20,7 @@ require (
 	github.com/prometheus/client_golang v1.10.0
 	github.com/rs/zerolog v1.21.0
 	github.com/stretchr/testify v1.7.0
-	go.6river.tech/gosix v0.0.13
+	go.6river.tech/gosix v0.0.14
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/term v0.0.0-20210406210042-72f3dc4e9b72 // indirect
 	golang.org/x/tools v0.1.1-0.20210302220138-2ac05c832e1a
