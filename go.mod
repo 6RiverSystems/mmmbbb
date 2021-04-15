@@ -20,7 +20,7 @@ require (
 	github.com/prometheus/client_golang v1.10.0
 	github.com/rs/zerolog v1.21.0
 	github.com/stretchr/testify v1.7.0
-	go.6river.tech/gosix v0.0.14
+	go.6river.tech/gosix v0.1.0
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/term v0.0.0-20210406210042-72f3dc4e9b72 // indirect
 	golang.org/x/tools v0.1.1-0.20210302220138-2ac05c832e1a

@@ -121,7 +121,7 @@ func (a *GetSubscriptionMessages) execute(
 		if sub, err := a.verifySub(ctx, tx); err != nil {
 			return err
 		} else if err := tx.Subscription.UpdateOne(sub).
-			SetExpiresAt(time.Now().Add(sub.TTL.Duration)).
+			SetExpiresAt(time.Now().Add(time.Duration(sub.TTL))).
 			Exec(ctx); err != nil {
 			return err
 		}
@@ -375,7 +375,7 @@ func (a *GetSubscriptionMessages) applyResults(
 
 	// refresh the subscription expiration
 	err := tx.Subscription.UpdateOne(sub).
-		SetExpiresAt(now.Add(sub.TTL.Duration)).
+		SetExpiresAt(now.Add(time.Duration(sub.TTL))).
 		Exec(ctx)
 	if err != nil {
 		return err
@@ -479,11 +479,11 @@ const retryBackoffFactor = 1.1
 // max
 func NextDelayFor(sub *ent.Subscription, attempts int) (nominalDelay, fuzzedDelay time.Duration) {
 	min, max := defaultMinDelay, defaultMaxDelay
-	if sub.MinBackoff.NotNil() && *sub.MinBackoff.Duration > 0 {
-		min = *sub.MinBackoff.Duration
+	if sub.MinBackoff.NotNull() && sub.MinBackoff.Interval > 0 {
+		min = time.Duration(sub.MinBackoff.Interval)
 	}
-	if sub.MaxBackoff.NotNil() && *sub.MaxBackoff.Duration > 0 {
-		max = *sub.MaxBackoff.Duration
+	if sub.MaxBackoff.NotNull() && sub.MaxBackoff.Interval > 0 {
+		max = time.Duration(sub.MaxBackoff.Interval)
 	}
 	delay := math.Pow(retryBackoffFactor, float64(attempts)) * min.Seconds()
 	if delay > max.Seconds() {

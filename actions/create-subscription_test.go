@@ -45,8 +45,8 @@ func TestCreateSubscription_Execute(t *testing.T) {
 				// topicID set in before
 				subscription: ent.Subscription{
 					// Name set in before
-					TTL:        customtypes.FromDuration(time.Hour),
-					MessageTTL: customtypes.FromDuration(time.Minute),
+					TTL:        customtypes.Interval(time.Hour),
+					MessageTTL: customtypes.Interval(time.Minute),
 				},
 			},
 		},
@@ -73,8 +73,8 @@ func TestCreateSubscription_Execute(t *testing.T) {
 				// topicID set in before
 				subscription: ent.Subscription{
 					// Name set in before
-					TTL:             customtypes.FromDuration(time.Hour),
-					MessageTTL:      customtypes.FromDuration(time.Minute),
+					TTL:             customtypes.Interval(time.Hour),
+					MessageTTL:      customtypes.Interval(time.Minute),
 					OrderedDelivery: true,
 					Labels: map[string]string{
 						"xyzzy": "frood",

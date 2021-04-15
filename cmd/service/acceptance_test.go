@@ -182,6 +182,11 @@ func TestEndpoints(t *testing.T) {
 				assert.Contains(t, bodyObject, "labels")
 				assert.IsType(t, msi{}, bodyObject["labels"])
 				assert.Empty(t, bodyObject["labels"])
+				assert.Contains(t, bodyObject, "expirationPolicy")
+				assert.IsType(t, msi{}, bodyObject["expirationPolicy"])
+				assert.Contains(t, bodyObject["expirationPolicy"], "ttl")
+				assert.IsType(t, "", bodyObject["expirationPolicy"].(msi)["ttl"])
+				assert.Equal(t, fmt.Sprintf("%ds", 60*60*24*30), bodyObject["expirationPolicy"].(msi)["ttl"])
 			},
 		},
 		{
@@ -234,27 +239,28 @@ func TestEndpoints(t *testing.T) {
 				assert.Contains(t, bodyObject, "receivedMessages")
 				require.IsType(t, []interface{}{}, bodyObject["receivedMessages"])
 				msgs := bodyObject["receivedMessages"].([]interface{})
-				assert.Len(t, msgs, 1)
-				assert.IsType(t, msi{}, msgs[0])
-				rMsg := msgs[0].(msi)
-				assert.Contains(t, rMsg, "ackId")
-				assert.IsType(t, "", rMsg["ackId"])
-				ackId, err = uuid.Parse(rMsg["ackId"].(string))
-				assert.NoError(t, err)
-				assert.NotZero(t, ackId)
-				assert.Contains(t, rMsg, "message")
-				assert.IsType(t, msi{}, rMsg["message"])
-				msg := rMsg["message"].(msi)
-				assert.Contains(t, msg, "publishTime")
-				assert.IsType(t, "", msg["publishTime"])
-				_, err = time.Parse(time.RFC3339Nano, msg["publishTime"].(string))
-				assert.NoError(t, err)
-				assert.IsType(t, "", msg["data"])
-				data := mustUnBase64(t, msg["data"].(string))
-				payload := msi{}
-				err = json.Unmarshal(data, &payload)
-				assert.NoError(t, err)
-				assert.Equal(t, payload, msi{"hello": "world"})
+				if assert.Len(t, msgs, 1) {
+					assert.IsType(t, msi{}, msgs[0])
+					rMsg := msgs[0].(msi)
+					assert.Contains(t, rMsg, "ackId")
+					assert.IsType(t, "", rMsg["ackId"])
+					ackId, err = uuid.Parse(rMsg["ackId"].(string))
+					assert.NoError(t, err)
+					assert.NotZero(t, ackId)
+					assert.Contains(t, rMsg, "message")
+					assert.IsType(t, msi{}, rMsg["message"])
+					msg := rMsg["message"].(msi)
+					assert.Contains(t, msg, "publishTime")
+					assert.IsType(t, "", msg["publishTime"])
+					_, err = time.Parse(time.RFC3339Nano, msg["publishTime"].(string))
+					assert.NoError(t, err)
+					assert.IsType(t, "", msg["data"])
+					data := mustUnBase64(t, msg["data"].(string))
+					payload := msi{}
+					err = json.Unmarshal(data, &payload)
+					assert.NoError(t, err)
+					assert.Equal(t, payload, msi{"hello": "world"})
+				}
 			},
 		},
 		{

@@ -129,7 +129,7 @@ func (a *PublishMessage) Execute(ctx context.Context, tx *ent.Tx) error {
 		createDelivery := tx.Delivery.Create().
 			SetMessage(m).
 			SetSubscription(s).
-			SetExpiresAt(now.Add(s.MessageTTL.Duration)).
+			SetExpiresAt(now.Add(time.Duration(s.MessageTTL))).
 			SetPublishedAt(now)
 		if s.OrderedDelivery && a.params.OrderKey != "" {
 			// set the delivery NotBefore the most recent non-expired delivery

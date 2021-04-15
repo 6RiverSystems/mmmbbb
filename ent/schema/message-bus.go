@@ -194,11 +194,11 @@ func (Subscription) Fields() []ent.Field {
 		field.String("ttl").
 			StorageKey("ttl").
 			SchemaType(intervalTypes).
-			GoType(customtypes.Interval{}),
+			GoType(customtypes.Interval(0)),
 		field.String("messageTTL").
 			StorageKey("message_ttl").
 			SchemaType(intervalTypes).
-			GoType(customtypes.Interval{}),
+			GoType(customtypes.Interval(0)),
 		field.Bool("orderedDelivery").
 			StorageKey("ordered_delivery").
 			Optional().
@@ -210,12 +210,12 @@ func (Subscription) Fields() []ent.Field {
 		field.String("minBackoff").
 			StorageKey("min_backoff").
 			SchemaType(intervalTypes).
-			GoType(customtypes.IntervalNull{}).
+			GoType((*customtypes.NullInterval)(nil)).
 			Optional(),
 		field.String("maxBackoff").
 			StorageKey("max_backoff").
 			SchemaType(intervalTypes).
-			GoType(customtypes.IntervalNull{}).
+			GoType((*customtypes.NullInterval)(nil)).
 			Optional(),
 		field.String("pushEndpoint").
 			StorageKey("push_endpoint").

@@ -123,7 +123,17 @@ func (tx *Tx) DialectTx() dialect.Tx {
 }
 
 func (tx *Tx) DBTx() *sql.Tx {
-	return tx.DialectTx().(*entsql.Tx).Tx.(*sql.Tx)
+	etx := tx.DialectTx()
+	for {
+		switch ttx := etx.(type) {
+		case *entsql.Tx:
+			return ttx.Tx.(*sql.Tx)
+		case *dialect.DebugTx:
+			etx = ttx.Tx
+		default:
+			panic(fmt.Errorf("Unrecognized dialect.Tx type %T", etx))
+		}
+	}
 }
 
 func (tx *Tx) Dialect() string {

@@ -57,8 +57,8 @@ func createSubscriptionClient(
 		SetName(nameFor(t, offset)).
 		SetTopic(topic).
 		SetExpiresAt(testutils.DeadlineForTest(t)).
-		SetTTL(customtypes.FromDuration(time.Minute)).
-		SetMessageTTL(customtypes.FromDuration(time.Minute))
+		SetTTL(customtypes.Interval(time.Minute)).
+		SetMessageTTL(customtypes.Interval(time.Minute))
 	for _, o := range opts {
 		sc = o(sc)
 	}
@@ -140,8 +140,12 @@ func checkSubEqual(t *testing.T, expected, actual *ent.Subscription) {
 	// ignoring Edges
 }
 
-func checkNullableIntervalEqual(t *testing.T, expected, actual customtypes.IntervalNull) {
-	assert.Equal(t, expected.Duration, actual.Duration)
+func checkNullableIntervalEqual(t *testing.T, expected, actual *customtypes.NullInterval) bool {
+	if expected.NotNull() && actual.NotNull() {
+		return assert.Equal(t, expected, actual)
+	} else {
+		return assert.Equal(t, expected.NotNull(), actual.NotNull())
+	}
 }
 
 func assertClosed(t *testing.T, c <-chan struct{}) {

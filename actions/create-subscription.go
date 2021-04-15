@@ -99,18 +99,18 @@ func (a *CreateSubscription) Execute(ctx context.Context, tx *ent.Tx) error {
 	create := tx.Subscription.Create().
 		SetName(a.params.Name).
 		SetTopic(topic).
-		SetTTL(customtypes.FromDuration(a.params.TTL)).
+		SetTTL(customtypes.Interval(a.params.TTL)).
 		SetExpiresAt(time.Now().Add(a.params.TTL)).
-		SetMessageTTL(customtypes.FromDuration(a.params.MessageTTL)).
+		SetMessageTTL(customtypes.Interval(a.params.MessageTTL)).
 		SetOrderedDelivery(a.params.OrderedDelivery).
 		SetLabels(a.params.Labels).
 		SetNillablePushEndpoint(pushEndpoint).
 		SetNillableMessageFilter(messageFilter)
 	if a.params.MinBackoff > 0 {
-		create = create.SetMinBackoff(customtypes.FromDuration(a.params.MinBackoff).AsNullable())
+		create = create.SetMinBackoff(customtypes.Interval(a.params.MinBackoff).AsNullable())
 	}
 	if a.params.MaxBackoff > 0 {
-		create = create.SetMaxBackoff(customtypes.FromDuration(a.params.MaxBackoff).AsNullable())
+		create = create.SetMaxBackoff(customtypes.Interval(a.params.MaxBackoff).AsNullable())
 	}
 
 	s, err := create.Save(ctx)

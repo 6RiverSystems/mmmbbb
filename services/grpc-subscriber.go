@@ -150,14 +150,14 @@ func (s *subscriberServer) UpdateSubscription(ctx context.Context, req *pubsub.U
 				if ttl == 0 {
 					ttl = defaultSubscriptionTTL
 				}
-				subUpdate.SetTTL(customtypes.FromDuration(ttl))
+				subUpdate.SetTTL(customtypes.Interval(ttl))
 				subUpdate.SetExpiresAt(time.Now().Add(ttl))
 			case "message_retention_duration":
 				messageTTL := req.Subscription.MessageRetentionDuration.AsDuration()
 				if messageTTL == 0 {
 					messageTTL = defaultSubscriptionMessageTTL
 				}
-				subUpdate.SetMessageTTL(customtypes.FromDuration(messageTTL))
+				subUpdate.SetMessageTTL(customtypes.Interval(messageTTL))
 			case "enable_message_ordering":
 				// NOTE: Google does not support changing this on the fly, even though
 				// we (sort of) do
@@ -167,14 +167,14 @@ func (s *subscriberServer) UpdateSubscription(ctx context.Context, req *pubsub.U
 				min := rp.GetMinimumBackoff()
 				max := rp.GetMaximumBackoff()
 				if min == nil {
-					subUpdate.SetMinBackoff(customtypes.IntervalNull{})
+					subUpdate.ClearMinBackoff()
 				} else {
-					subUpdate.SetMinBackoff(customtypes.FromDuration(min.AsDuration()).AsNullable())
+					subUpdate.SetMinBackoff(customtypes.Interval(min.AsDuration()).AsNullable())
 				}
 				if max == nil {
-					subUpdate.SetMaxBackoff(customtypes.IntervalNull{})
+					subUpdate.ClearMaxBackoff()
 				} else {
-					subUpdate.SetMaxBackoff(customtypes.FromDuration(max.AsDuration()).AsNullable())
+					subUpdate.SetMaxBackoff(customtypes.Interval(max.AsDuration()).AsNullable())
 				}
 			case "push_config":
 				if err := validatePushConfig(req.Subscription.PushConfig); err != nil {
@@ -641,21 +641,21 @@ func entSubscriptionToGrpc(subscription *ent.Subscription, topicName string) *pu
 		// we do retain acked messages, but not in the sense or for the purpose that
 		// Google means, esp. not indefinitely
 		RetainAckedMessages:      false,
-		MessageRetentionDuration: durationpb.New(subscription.MessageTTL.Duration),
+		MessageRetentionDuration: durationpb.New(time.Duration(subscription.MessageTTL)),
 		Labels:                   subscription.Labels,
 		EnableMessageOrdering:    subscription.OrderedDelivery,
 		ExpirationPolicy: &pubsub.ExpirationPolicy{
-			Ttl: durationpb.New(subscription.TTL.Duration),
+			Ttl: durationpb.New(time.Duration(subscription.TTL)),
 		},
 		// not supported: PushConfig, Filter, DeadLetterPolicy, Detached
 	}
-	if subscription.MinBackoff.NotNil() || subscription.MaxBackoff.NotNil() {
+	if subscription.MinBackoff.NotNull() || subscription.MaxBackoff.NotNull() {
 		ret.RetryPolicy = &pubsub.RetryPolicy{}
-		if subscription.MinBackoff.NotNil() {
-			ret.RetryPolicy.MinimumBackoff = durationpb.New(*subscription.MinBackoff.Duration)
+		if subscription.MinBackoff.NotNull() {
+			ret.RetryPolicy.MinimumBackoff = durationpb.New(time.Duration(subscription.MinBackoff.Interval))
 		}
-		if subscription.MaxBackoff.NotNil() {
-			ret.RetryPolicy.MaximumBackoff = durationpb.New(*subscription.MaxBackoff.Duration)
+		if subscription.MaxBackoff.NotNull() {
+			ret.RetryPolicy.MaximumBackoff = durationpb.New(time.Duration(subscription.MaxBackoff.Interval))
 		}
 	}
 	if subscription.MessageFilter != nil {
