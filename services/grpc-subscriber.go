@@ -169,12 +169,12 @@ func (s *subscriberServer) UpdateSubscription(ctx context.Context, req *pubsub.U
 				if min == nil {
 					subUpdate.ClearMinBackoff()
 				} else {
-					subUpdate.SetMinBackoff(customtypes.Interval(min.AsDuration()).AsNullable())
+					subUpdate.SetMinBackoff(customtypes.IntervalPtr(min.AsDuration()))
 				}
 				if max == nil {
 					subUpdate.ClearMaxBackoff()
 				} else {
-					subUpdate.SetMaxBackoff(customtypes.Interval(max.AsDuration()).AsNullable())
+					subUpdate.SetMaxBackoff(customtypes.IntervalPtr(max.AsDuration()))
 				}
 			case "push_config":
 				if err := validatePushConfig(req.Subscription.PushConfig); err != nil {
@@ -649,13 +649,13 @@ func entSubscriptionToGrpc(subscription *ent.Subscription, topicName string) *pu
 		},
 		// not supported: PushConfig, Filter, DeadLetterPolicy, Detached
 	}
-	if subscription.MinBackoff.NotNull() || subscription.MaxBackoff.NotNull() {
+	if subscription.MinBackoff != nil || subscription.MaxBackoff != nil {
 		ret.RetryPolicy = &pubsub.RetryPolicy{}
-		if subscription.MinBackoff.NotNull() {
-			ret.RetryPolicy.MinimumBackoff = durationpb.New(time.Duration(subscription.MinBackoff.Interval))
+		if subscription.MinBackoff != nil {
+			ret.RetryPolicy.MinimumBackoff = durationpb.New(time.Duration(*subscription.MinBackoff))
 		}
-		if subscription.MaxBackoff.NotNull() {
-			ret.RetryPolicy.MaximumBackoff = durationpb.New(time.Duration(subscription.MaxBackoff.Interval))
+		if subscription.MaxBackoff != nil {
+			ret.RetryPolicy.MaximumBackoff = durationpb.New(time.Duration(*subscription.MaxBackoff))
 		}
 	}
 	if subscription.MessageFilter != nil {

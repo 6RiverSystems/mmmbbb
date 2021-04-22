@@ -210,13 +210,15 @@ func (Subscription) Fields() []ent.Field {
 		field.String("minBackoff").
 			StorageKey("min_backoff").
 			SchemaType(intervalTypes).
-			GoType((*customtypes.NullInterval)(nil)).
-			Optional(),
+			GoType((*customtypes.Interval)(nil)).
+			Optional().
+			Nillable(),
 		field.String("maxBackoff").
 			StorageKey("max_backoff").
 			SchemaType(intervalTypes).
-			GoType((*customtypes.NullInterval)(nil)).
-			Optional(),
+			GoType((*customtypes.Interval)(nil)).
+			Optional().
+			Nillable(),
 		field.String("pushEndpoint").
 			StorageKey("push_endpoint").
 			Optional().

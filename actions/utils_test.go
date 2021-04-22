@@ -140,12 +140,8 @@ func checkSubEqual(t *testing.T, expected, actual *ent.Subscription) {
 	// ignoring Edges
 }
 
-func checkNullableIntervalEqual(t *testing.T, expected, actual *customtypes.NullInterval) bool {
-	if expected.NotNull() && actual.NotNull() {
-		return assert.Equal(t, expected, actual)
-	} else {
-		return assert.Equal(t, expected.NotNull(), actual.NotNull())
-	}
+func checkNullableIntervalEqual(t *testing.T, expected, actual *customtypes.Interval) bool {
+	return assert.Equal(t, expected, actual)
 }
 
 func assertClosed(t *testing.T, c <-chan struct{}) {

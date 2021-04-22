@@ -107,10 +107,10 @@ func (a *CreateSubscription) Execute(ctx context.Context, tx *ent.Tx) error {
 		SetNillablePushEndpoint(pushEndpoint).
 		SetNillableMessageFilter(messageFilter)
 	if a.params.MinBackoff > 0 {
-		create = create.SetMinBackoff(customtypes.Interval(a.params.MinBackoff).AsNullable())
+		create = create.SetMinBackoff(customtypes.IntervalPtr(a.params.MinBackoff))
 	}
 	if a.params.MaxBackoff > 0 {
-		create = create.SetMaxBackoff(customtypes.Interval(a.params.MaxBackoff).AsNullable())
+		create = create.SetMaxBackoff(customtypes.IntervalPtr(a.params.MaxBackoff))
 	}
 
 	s, err := create.Save(ctx)
