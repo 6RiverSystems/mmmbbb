@@ -162,6 +162,7 @@ func TestSet_Check_Race(t *testing.T) {
 			map[string][]*Description{
 				"op": {&Description{"op", nil, onFault, 1}},
 			},
+			0,
 		}
 		wg := &sync.WaitGroup{}
 		wg.Add(concurrent)
