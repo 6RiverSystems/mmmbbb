@@ -5,10 +5,11 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.6river.tech/mmmbbb/faults"
-	"go.6river.tech/mmmbbb/oas"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"go.6river.tech/mmmbbb/faults"
+	"go.6river.tech/mmmbbb/oas"
 )
 
 func Test_errorFactory_grpc(t *testing.T) {

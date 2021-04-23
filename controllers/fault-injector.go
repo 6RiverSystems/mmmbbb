@@ -9,13 +9,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/iancoleman/strcase"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"go.6river.tech/gosix/logging"
 	"go.6river.tech/gosix/registry"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/faults"
 	"go.6river.tech/mmmbbb/oas"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type FaultInjectorController struct {
@@ -64,10 +65,12 @@ func (f *FaultInjectorController) AddDescriptor(c *gin.Context) {
 	}
 
 	desc := faults.Description{
-		Operation:  fd.Operation,
-		Parameters: fd.Parameters.AdditionalProperties,
-		Count:      count,
-		OnFault:    errorFactory(fd.Error),
+		Operation: fd.Operation,
+		Count:     count,
+		OnFault:   errorFactory(fd.Error),
+	}
+	if fd.Parameters != nil {
+		desc.Parameters = fd.Parameters.AdditionalProperties
 	}
 	f.faults.Add(desc)
 	c.JSON(http.StatusCreated, toOAS(desc))

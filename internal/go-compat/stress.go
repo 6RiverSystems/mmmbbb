@@ -44,9 +44,14 @@ func main() {
 		defer close(pubs)
 		payload := json.RawMessage(`{"hello":"world"}`)
 		for i := 0; i < numMessages; i++ {
-			pubs <- t.Publish(egCtx, &pubsub.Message{
+			select {
+			case <-egCtx.Done():
+				fmt.Printf("canceled after queueing %d messages\n", i)
+				return egCtx.Err()
+			case pubs <- t.Publish(egCtx, &pubsub.Message{
 				Data: payload,
-			})
+			}):
+			}
 		}
 		return nil
 	})
@@ -55,6 +60,7 @@ func main() {
 		for p := range pubs {
 			_, err := p.Get(egCtx)
 			if err != nil {
+				fmt.Println("error publishing:", err)
 				return err
 			}
 			numSent++
@@ -70,7 +76,7 @@ func main() {
 		numReceived := int32(0)
 		ctx, cancel := context.WithCancel(egCtx)
 		defer cancel()
-		return s.Receive(ctx, func(_ context.Context, m *pubsub.Message) {
+		err := s.Receive(ctx, func(_ context.Context, m *pubsub.Message) {
 			n := atomic.AddInt32(&numReceived, 1)
 			m.Ack()
 			if n >= numMessages {
@@ -80,6 +86,10 @@ func main() {
 				fmt.Println("received", n, float64(time.Since(start))/float64(n)/1e6, "ms/msg")
 			}
 		})
+		if err != nil {
+			fmt.Println("receive error:", err)
+		}
+		return err
 	})
 	panicIf(eg.Wait())
 	duration := time.Since(start)

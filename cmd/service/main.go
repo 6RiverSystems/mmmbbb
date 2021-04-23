@@ -7,6 +7,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc"
 
 	"go.6river.tech/gosix/app"
 	_ "go.6river.tech/gosix/controllers"
@@ -18,7 +19,7 @@ import (
 	_ "go.6river.tech/mmmbbb/controllers"
 	"go.6river.tech/mmmbbb/defaults"
 	"go.6river.tech/mmmbbb/ent"
-	"go.6river.tech/mmmbbb/grpc"
+	mbgrpc "go.6river.tech/mmmbbb/grpc"
 	"go.6river.tech/mmmbbb/migrations"
 	"go.6river.tech/mmmbbb/oas"
 	"go.6river.tech/mmmbbb/services"
@@ -78,7 +79,7 @@ func NewApp() *app.App {
 			return nil
 		},
 		CustomizeRoutes: func(_ context.Context, e *gin.Engine, r *registry.Registry, _ registry.MutableValues) error {
-			e.StaticFS("/oas-grpc", http.FS(grpc.SwaggerFS))
+			e.StaticFS("/oas-grpc", http.FS(mbgrpc.SwaggerFS))
 			controllers.RegisterAll(r)
 			return nil
 		},
@@ -87,6 +88,10 @@ func NewApp() *app.App {
 			Initializer:    services.InitializeGrpcServers,
 			GatewayPaths:   []string{"/v1/projects/*grpcPath"},
 			OnGatewayStart: services.BindGatewayHandlers,
+			ServerOpts: []grpc.ServerOption{
+				grpc.ChainUnaryInterceptor(mbgrpc.UnaryFaultInjection),
+				grpc.ChainStreamInterceptor(mbgrpc.StreamFaultInjection),
+			},
 		},
 	}
 	app.WithDefaults()
