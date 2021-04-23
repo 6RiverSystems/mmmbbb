@@ -8,8 +8,7 @@ import (
 type Set struct {
 	mu sync.RWMutex
 	// faults maps operations to fault descriptors for them
-	faults     map[string][]*Description
-	needsPrune int32
+	faults map[string][]*Description
 }
 
 func (s *Set) match(op string, params Parameters) *Description {
@@ -24,7 +23,7 @@ func (s *Set) match(op string, params Parameters) *Description {
 	return nil
 }
 
-func (s *Set) Prune() {
+func (s *Set) prune() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	for o, l := range s.faults {
@@ -35,6 +34,8 @@ func (s *Set) Prune() {
 					l[d] = l[s]
 				}
 				d++
+			} else {
+				faultsExpired.Inc()
 			}
 		}
 		if d == 0 {
@@ -45,18 +46,10 @@ func (s *Set) Prune() {
 	}
 }
 
-func (s *Set) autoPrune(threshold int32) {
-	need := atomic.LoadInt32(&s.needsPrune)
-	// < 0 case is in case it somehow wrapped around
-	if need > threshold || need < 0 {
-		s.Prune()
-		atomic.CompareAndSwapInt32(&s.needsPrune, need, 0)
-	}
-}
-
 // Check looks for an active fault description and runs it.
 func (s *Set) Check(op string, params Parameters) error {
-	defer s.autoPrune(10)
+	prune := false
+	var ret error
 	for {
 		d := s.match(op, params)
 		if d == nil {
@@ -65,8 +58,7 @@ func (s *Set) Check(op string, params Parameters) error {
 
 		remaining := atomic.AddInt64(&d.Count, -1)
 		if remaining <= 0 {
-			// the description is exhausted, time to prune
-			atomic.AddInt32(&s.needsPrune, 1)
+			prune = true
 			// match will have checked this, but might race with another decrementing
 			// it, so we need to check again here and retry if we lost that race.
 			if remaining < 0 {
@@ -76,10 +68,21 @@ func (s *Set) Check(op string, params Parameters) error {
 			}
 		}
 
+		faultsTriggered.WithLabelValues(d.Operation).Inc()
+
+		// careful copying to avoid data race errors, don't need to copy the fault
+		// func we're about to call
+		dd := Description{d.Operation, d.Parameters, nil, remaining}
 		// we pass the description by value here intentionally so the fault handler
 		// cannot modify it
-		return d.OnFault(*d, params)
+		ret = d.OnFault(dd, params)
+		break
 	}
+	if prune {
+		// don't wait for the prune
+		go s.prune()
+	}
+	return ret
 }
 
 func (s *Set) Add(d Description) {
@@ -92,6 +95,7 @@ func (s *Set) Add(d Description) {
 	} else {
 		s.faults[d.Operation] = append(l, &d)
 	}
+	faultsAdded.Inc()
 }
 
 // Current gets a copy of the currently configured set of faults. Due to
@@ -105,7 +109,7 @@ func (s *Set) Current() map[string][]Description {
 		ll := make([]Description, 0, len(l))
 		for _, d := range l {
 			// make a copy before we look at it
-			dd := *d
+			dd := Description{d.Operation, d.Parameters, d.OnFault, atomic.LoadInt64(&d.Count)}
 			if dd.Count > 0 {
 				ll = append(ll, dd)
 			}

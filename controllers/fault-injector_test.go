@@ -27,7 +27,7 @@ func Test_errorFactory_grpc(t *testing.T) {
 			err := f(faults.Description{Operation: "op_" + c.String()}, nil)
 			// this relies on the grpc Error implementing Is as value equality instead
 			// of pointer equality
-			assert.ErrorIs(t, err, status.Errorf(c, "Injected fault for op_%s()", c))
+			assert.ErrorIs(t, err, status.Errorf(c, "Injected fault matched op_%s()", c))
 			// this will only work if the error is directly a status error, or if grpc
 			// updates status.Code to use errors.As or other unwrapping capabilities.
 			// upstream: https://github.com/grpc/grpc-go/issues/2934

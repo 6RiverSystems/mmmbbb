@@ -52,7 +52,7 @@ func StreamFaultInjection(
 ) error {
 	// check for a fault on the start
 	service, method := splitMethodName(info.FullMethod)
-	if err := faults.Check(method, nil); err != nil {
+	if err := faults.Check(method, faults.Parameters{service: method}); err != nil {
 		return err
 	}
 	fs := &faultingStream{ss, service, method}

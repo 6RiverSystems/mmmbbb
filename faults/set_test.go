@@ -131,6 +131,9 @@ func TestSet_Check(t *testing.T) {
 				mu:     sync.RWMutex{},
 				faults: tt.faults,
 			}
+			// holding an RLock here prevents the automatic Prune from interfering
+			s.mu.RLock()
+			defer s.mu.RUnlock()
 			e := s.Check(tt.args.op, tt.args.params)
 			if tt.assertion(t, e) {
 				tt.post(t, s)
@@ -162,7 +165,6 @@ func TestSet_Check_Race(t *testing.T) {
 			map[string][]*Description{
 				"op": {&Description{"op", nil, onFault, 1}},
 			},
-			0,
 		}
 		wg := &sync.WaitGroup{}
 		wg.Add(concurrent)
@@ -247,7 +249,7 @@ func TestSet_Prune(t *testing.T) {
 				mu:     sync.RWMutex{},
 				faults: tt.faults,
 			}
-			s.Prune()
+			s.prune()
 			assert.Equal(t, tt.want, s.faults)
 		})
 	}

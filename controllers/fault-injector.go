@@ -116,10 +116,10 @@ func errorFactory(errorType oas.ErrorType) func(faults.Description, faults.Param
 			}
 		}
 		return func(d faults.Description, p faults.Parameters) error {
-			if len(p) == 0 {
-				return status.Errorf(c, "Injected fault for %s()", d.Operation)
+			if len(d.Parameters) == 0 {
+				return status.Errorf(c, "Injected fault matched %s()", d.Operation)
 			}
-			return status.Errorf(c, "Injected fault for %s(%v)", d.Operation, p)
+			return status.Errorf(c, "Injected fault matched %s(%v)", d.Operation, d.Parameters)
 		}
 	}
 
@@ -140,6 +140,9 @@ func errorFactory(errorType oas.ErrorType) func(faults.Description, faults.Param
 			}
 			err = ent.NewNotFoundError(label)
 		}
-		return fmt.Errorf("Injected fault for %s(%v): %w", d.Operation, p, err)
+		if len(d.Parameters) == 0 {
+			return fmt.Errorf("Injected fault matched %s(): %w", d.Operation, err)
+		}
+		return fmt.Errorf("Injected fault matched %s(%v): %w", d.Operation, d.Parameters, err)
 	}
 }
