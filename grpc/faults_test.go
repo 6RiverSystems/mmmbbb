@@ -4,8 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"go.6river.tech/mmmbbb/grpc/pubsub"
 	"google.golang.org/grpc"
+
+	"go.6river.tech/mmmbbb/grpc/pubsub"
 )
 
 func unaryNoOp(context.Context, interface{}) (interface{}, error) {
