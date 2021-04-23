@@ -93,17 +93,3 @@ func (s *Set) Add(d Description) {
 		s.faults[d.Operation] = append(l, &d)
 	}
 }
-
-var defaultSet = &Set{}
-
-func Prune() {
-	defaultSet.Prune()
-}
-
-func Check(op string, params Parameters) error {
-	return defaultSet.Check(op, params)
-}
-
-func Add(d Description) {
-	defaultSet.Add(d)
-}
