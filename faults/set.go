@@ -93,3 +93,26 @@ func (s *Set) Add(d Description) {
 		s.faults[d.Operation] = append(l, &d)
 	}
 }
+
+// Current gets a copy of the currently configured set of faults. Due to
+// concurrency considerations, the remaining count on the descriptions may be
+// out of date by the time the value is returned.
+func (s *Set) Current() map[string][]Description {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	ret := make(map[string][]Description, len(s.faults))
+	for o, l := range s.faults {
+		ll := make([]Description, 0, len(l))
+		for _, d := range l {
+			// make a copy before we look at it
+			dd := *d
+			if dd.Count > 0 {
+				ll = append(ll, dd)
+			}
+		}
+		if len(ll) != 0 {
+			ret[o] = ll
+		}
+	}
+	return ret
+}
