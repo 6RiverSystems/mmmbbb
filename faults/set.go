@@ -11,6 +11,13 @@ type Set struct {
 	faults map[string][]*Description
 }
 
+func NewSet() *Set {
+	return &Set{
+		sync.RWMutex{},
+		map[string][]*Description{},
+	}
+}
+
 func (s *Set) match(op string, params Parameters) *Description {
 	s.mu.RLock()
 	defer s.mu.RUnlock()

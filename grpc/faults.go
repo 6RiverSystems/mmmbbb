@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"strings"
+	"sync"
 
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -17,25 +18,45 @@ func UnaryFaultInjection(
 	handler grpc.UnaryHandler,
 ) (resp interface{}, err error) {
 	service, method := splitMethodName(info.FullMethod)
-	if err := faults.Check(method, paramsFromProtoMessage(service, method, req)); err != nil {
+	params := paramsFromProtoMessage(service, method, req)
+	defer paramsPool.Put(params)
+	if err := faults.Check(method, params); err != nil {
 		return nil, err
 	}
 	return handler(ctx, req)
 }
 
+// allocating and freeing lots of maps is expensive, using a pool cuts the
+// runtime of paramsFromProtoMessage by almost two thirds
+var paramsPool = &sync.Pool{
+	New: func() interface{} { return make(faults.Parameters) },
+}
+
 func paramsFromProtoMessage(service, method string, req interface{}) faults.Parameters {
+	params := paramsPool.Get().(faults.Parameters)
+	for k := range params {
+		delete(params, k)
+	}
 	// put service:method as a parameter so any ambiguities can be resolved if
 	// needed
-	params := faults.Parameters{service: method}
+	params[service] = method
 	if pr, ok := req.(protoreflect.ProtoMessage); ok {
 		m := pr.ProtoReflect()
+		params[service] = method
 		m.Range(func(fd protoreflect.FieldDescriptor, v protoreflect.Value) bool {
 			if fd.Kind() == protoreflect.StringKind && fd.Cardinality() != protoreflect.Repeated {
 				sv := v.String()
 				// allow matching by any version of the field name
-				params[fd.TextName()] = sv
-				params[fd.JSONName()] = sv
-				params[string(fd.Name())] = sv
+				tn := fd.TextName()
+				params[tn] = sv
+				// JSONName and Name are usually the same as TextName, equality checks
+				// are faster than map collisions
+				if jn := fd.JSONName(); jn != tn {
+					params[fd.JSONName()] = sv
+				}
+				if nn := string(fd.Name()); nn != tn {
+					params[nn] = sv
+				}
 				params[string(fd.FullName())] = sv
 			}
 			return true
@@ -74,7 +95,9 @@ func (fs *faultingStream) RecvMsg(m interface{}) error {
 		return err
 	}
 	// check for a fault on the received message
-	if err := faults.Check(fs.method+":RecvMsg", paramsFromProtoMessage(fs.service, fs.method, m)); err != nil {
+	params := paramsFromProtoMessage(fs.service, fs.method, m)
+	defer paramsPool.Put(params)
+	if err := faults.Check(fs.method+":RecvMsg", params); err != nil {
 		return err
 	}
 	return nil
@@ -82,7 +105,9 @@ func (fs *faultingStream) RecvMsg(m interface{}) error {
 
 func (fs *faultingStream) SendMsg(m interface{}) error {
 	// check for a fault for sending the message
-	if err := faults.Check(fs.method+":SendMsg", paramsFromProtoMessage(fs.service, fs.method, m)); err != nil {
+	params := paramsFromProtoMessage(fs.service, fs.method, m)
+	defer paramsPool.Put(params)
+	if err := faults.Check(fs.method+":SendMsg", params); err != nil {
 		return err
 	}
 	err := fs.ServerStream.SendMsg(m)

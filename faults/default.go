@@ -1,8 +1,6 @@
 package faults
 
-import "sync"
-
-var defaultSet = &Set{sync.RWMutex{}, map[string][]*Description{}}
+var defaultSet = NewSet()
 
 func DefaultSet() *Set {
 	return defaultSet
