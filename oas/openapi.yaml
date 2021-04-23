@@ -101,6 +101,22 @@ paths:
                 type: string
                 description: A sad message
 
+  /faults/inject:
+    post:
+      tags:
+        - FaultInjection
+      summary: Inject a new diagnostic fault
+      requestBody:
+        required: true
+        description: Description of the fault to inject
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FaultDescription"
+      responses:
+        201:
+          description: Fault has been injected
+
 components:
   schemas:
     UptimeResponse:
@@ -129,3 +145,47 @@ components:
           type: string
           description: >
             The name of some object or entity which triggered the error
+
+    FaultDescription:
+      type: object
+      additionalProperties: false
+      required:
+        - operation
+        - error
+      properties:
+        operation:
+          type: string
+          minLength: 1
+        parameters:
+          type: object
+          additionalProperties:
+            type: string
+        count:
+          type: integer
+          format: int64
+        error:
+          # this has to be a stand-alone schema for oapi-codgen to make
+          # constants for it
+          $ref: "#/components/schemas/ErrorType"
+    ErrorType:
+      type: string
+      enum:
+        - context.Canceled
+        - context.DeadlineExceeded
+        - ent.NotFound
+        - grpc.Canceled
+        - grpc.Unknown
+        - grpc.InvalidArgument
+        - grpc.DeadlineExceeded
+        - grpc.NotFound
+        - grpc.AlreadyExists
+        - grpc.PermissionDenied
+        - grpc.ResourceExhausted
+        - grpc.FailedPrecondition
+        - grpc.Aborted
+        - grpc.OutOfRange
+        - grpc.Unimplemented
+        - grpc.Internal
+        - grpc.Unavailable
+        - grpc.DataLoss
+        - grpc.Unauthenticated
