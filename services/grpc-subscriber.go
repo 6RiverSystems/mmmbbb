@@ -3,7 +3,6 @@ package services
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"time"
 
 	"errors"
@@ -25,6 +24,7 @@ import (
 	"go.6river.tech/mmmbbb/ent/predicate"
 	"go.6river.tech/mmmbbb/ent/subscription"
 	"go.6river.tech/mmmbbb/filter"
+	mbgrpc "go.6river.tech/mmmbbb/grpc"
 	"go.6river.tech/mmmbbb/grpc/pubsub"
 	"go.6river.tech/mmmbbb/parse"
 )
@@ -387,7 +387,7 @@ func (s *subscriberServer) StreamingPull(stream pubsub.Subscriber_StreamingPullS
 	// we require an initial message before we can start doing anything
 	initial, err := stream.Recv()
 	if err != nil {
-		return fmt.Errorf("Error receiving StreamingPull message: %w", err)
+		return mbgrpc.WrapError(err, "Error receiving StreamingPull message")
 	}
 
 	if !isValidSubscriptionName(initial.Subscription) {
