@@ -23,10 +23,10 @@ func Test_healthServer_Check(t *testing.T) {
 	deadClient := enttest.ClientForTest(t)
 	assert.NoError(t, deadClient.Close())
 
-	servicesNoInit := &registry.Registry{}
-	servicesNoStart := &registry.Registry{}
+	servicesNoInit := registry.New(t.Name() + "noInit")
+	servicesNoStart := registry.New(t.Name() + "noStart")
 	assert.NoError(t, servicesNoStart.InitializeServices(testutils.ContextForTest(t), client))
-	servicesRunning := &registry.Registry{}
+	servicesRunning := registry.New(t.Name() + "running")
 	assert.NoError(t, servicesRunning.InitializeServices(testutils.ContextForTest(t), client))
 	assert.NoError(t, servicesRunning.StartServices(testutils.ContextForTest(t)))
 
@@ -120,7 +120,7 @@ func TestGrpc_healthServer_Check(t *testing.T) {
 		{
 			"not init",
 			func(t *testing.T, client *ent.Client, tt *test) {},
-			&registry.Registry{},
+			registry.New(t.Name() + "not-init"),
 			args{},
 			&health.HealthCheckResponse{Status: health.HealthCheckResponse_NOT_SERVING},
 			assert.NoError,
@@ -130,7 +130,7 @@ func TestGrpc_healthServer_Check(t *testing.T) {
 			func(t *testing.T, client *ent.Client, tt *test) {
 				assert.NoError(t, tt.services.InitializeServices(tt.args.ctx, client))
 			},
-			&registry.Registry{},
+			registry.New(t.Name() + "not-started"),
 			args{},
 			&health.HealthCheckResponse{Status: health.HealthCheckResponse_NOT_SERVING},
 			assert.NoError,
@@ -141,7 +141,7 @@ func TestGrpc_healthServer_Check(t *testing.T) {
 				assert.NoError(t, tt.services.InitializeServices(tt.args.ctx, client))
 				assert.NoError(t, tt.services.StartServices(tt.args.ctx))
 			},
-			&registry.Registry{},
+			registry.New(t.Name() + "healthy"),
 			args{},
 			&health.HealthCheckResponse{Status: health.HealthCheckResponse_SERVING},
 			assert.NoError,
@@ -151,7 +151,7 @@ func TestGrpc_healthServer_Check(t *testing.T) {
 			func(t *testing.T, client *ent.Client, tt *test) {
 				require.NoError(t, client.Close())
 			},
-			&registry.Registry{},
+			registry.New(t.Name() + "broken-db"),
 			args{},
 			&health.HealthCheckResponse{Status: health.HealthCheckResponse_NOT_SERVING},
 			assert.NoError,
