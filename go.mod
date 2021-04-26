@@ -3,10 +3,10 @@ module go.6river.tech/mmmbbb
 go 1.16
 
 require (
-	cloud.google.com/go/pubsub v1.10.1
+	cloud.google.com/go/pubsub v1.10.2
 	entgo.io/ent v0.8.0
 	github.com/alecthomas/participle/v2 v2.0.0-alpha4
-	github.com/getkin/kin-openapi v0.53.0
+	github.com/getkin/kin-openapi v0.60.0
 	github.com/gin-gonic/gin v1.7.1
 	github.com/golang/protobuf v1.5.2
 	github.com/golangci/golangci-lint v1.39.0
@@ -21,12 +21,12 @@ require (
 	github.com/prometheus/client_golang v1.10.0
 	github.com/rs/zerolog v1.21.0
 	github.com/stretchr/testify v1.7.0
-	go.6river.tech/gosix v0.1.1
+	go.6river.tech/gosix v0.2.2
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/term v0.0.0-20210406210042-72f3dc4e9b72 // indirect
 	golang.org/x/tools v0.1.1-0.20210302220138-2ac05c832e1a
-	google.golang.org/api v0.44.0
-	google.golang.org/genproto v0.0.0-20210406143921-e86de6bf7a46
+	google.golang.org/api v0.45.0
+	google.golang.org/genproto v0.0.0-20210413151531-c14fb6ef47c3
 	google.golang.org/grpc v1.37.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0
 	google.golang.org/protobuf v1.26.0

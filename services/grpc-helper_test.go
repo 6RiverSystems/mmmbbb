@@ -29,7 +29,7 @@ func safeName(t testing.TB) string {
 }
 
 func initGrpcTest(t testing.TB) (client *ent.Client, psClient pubsub.Client) {
-	return initGrpcService(t, nil), initPubsubClient(t)
+	return initGrpcService(t, registry.New(t.Name())), initPubsubClient(t)
 }
 
 func initGrpcService(t testing.TB, reg *registry.Registry) *ent.Client {

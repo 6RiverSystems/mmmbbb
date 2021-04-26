@@ -7,7 +7,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/gin-gonic/gin"
-	"google.golang.org/grpc"
 
 	"go.6river.tech/gosix/app"
 	_ "go.6river.tech/gosix/controllers"
@@ -88,10 +87,6 @@ func NewApp() *app.App {
 			Initializer:    services.InitializeGrpcServers,
 			GatewayPaths:   []string{"/v1/projects/*grpcPath"},
 			OnGatewayStart: services.BindGatewayHandlers,
-			ServerOpts: []grpc.ServerOption{
-				grpc.ChainUnaryInterceptor(mbgrpc.UnaryFaultInjection),
-				grpc.ChainStreamInterceptor(mbgrpc.StreamFaultInjection),
-			},
 		},
 	}
 	app.WithDefaults()

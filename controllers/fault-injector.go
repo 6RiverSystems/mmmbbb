@@ -12,12 +12,15 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"go.6river.tech/gosix/faults"
 	"go.6river.tech/gosix/logging"
 	"go.6river.tech/gosix/registry"
 	"go.6river.tech/mmmbbb/ent"
-	"go.6river.tech/mmmbbb/faults"
 	"go.6river.tech/mmmbbb/oas"
 )
+
+// TODO: would like to move this to gosix, but that requires generalizing both
+// the ent and oas interactions
 
 type FaultInjectorController struct {
 	logger *logging.Logger
@@ -26,7 +29,7 @@ type FaultInjectorController struct {
 
 func (f *FaultInjectorController) Register(reg *registry.Registry, router gin.IRouter) error {
 	// TODO: allow using a non-default fault set via dependency injection
-	f.faults = faults.DefaultSet()
+	f.faults = reg.Faults()
 	f.logger = logging.GetLogger("controllers/fault-injector")
 
 	reg.RegisterMap(router, "/faults", registry.HandlerMap{
@@ -92,10 +95,10 @@ func toOAS(d faults.Description) oas.ConfiguredFault {
 var errorMap = map[oas.ErrorType]error{
 	// nil entries mean things that get special handling.
 
-	oas.ErrorType_context_Canceled:         context.Canceled,
-	oas.ErrorType_context_DeadlineExceeded: context.DeadlineExceeded,
+	oas.ErrorTypeContextCanceled:         context.Canceled,
+	oas.ErrorTypeContextDeadlineExceeded: context.DeadlineExceeded,
 
-	oas.ErrorType_ent_NotFound: nil,
+	oas.ErrorTypeEntNotFound: nil,
 
 	// grpc errors have extra special handling and don't need to be listed here
 }
@@ -105,7 +108,7 @@ func errorFactory(errorType oas.ErrorType) func(faults.Description, faults.Param
 		// these are generated programatically
 		var c codes.Code
 		// special case
-		if errorType == oas.ErrorType_grpc_Canceled {
+		if errorType == oas.ErrorTypeGrpcCanceled {
 			c = codes.Canceled
 		} else {
 			s := strcase.ToScreamingSnake(strings.TrimPrefix(string(errorType), "grpc."))
@@ -133,7 +136,7 @@ func errorFactory(errorType oas.ErrorType) func(faults.Description, faults.Param
 	return func(d faults.Description, p faults.Parameters) error {
 		err := err
 		switch errorType {
-		case oas.ErrorType_ent_NotFound:
+		case oas.ErrorTypeEntNotFound:
 			label := p["label"]
 			if label == "" {
 				label = "INJECTED_FAKE_ENTITY"
