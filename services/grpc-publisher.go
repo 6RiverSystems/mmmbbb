@@ -124,7 +124,7 @@ func (s *publisherServer) GetTopic(ctx context.Context, req *pubsub.GetTopicRequ
 		return nil
 	})
 	if err != nil {
-		if ent.IsNotFound(err) {
+		if isNotFound(err) {
 			return nil, status.Errorf(codes.NotFound, "Topic not found: %s", req.Topic)
 		}
 		return nil, grpc.AsStatusError(err)
@@ -146,7 +146,7 @@ func (s *publisherServer) UpdateTopic(ctx context.Context, req *pubsub.UpdateTop
 			).
 			Only(ctx)
 		if err != nil {
-			if ent.IsNotFound(err) {
+			if isNotFound(err) {
 				return status.Errorf(codes.NotFound, "Topic not found: %s", req.Topic)
 			}
 			return grpc.AsStatusError(err)
@@ -201,7 +201,7 @@ func (s *publisherServer) DeleteTopic(ctx context.Context, req *pubsub.DeleteTop
 	action := actions.NewDeleteTopic(req.Topic)
 	err := s.client.DoCtxTx(ctx, nil, action.Execute)
 	if err != nil {
-		if ent.IsNotFound(err) || errors.Is(err, actions.ErrNotFound) {
+		if isNotFound(err) {
 			return nil, status.Errorf(codes.NotFound, "Topic not found: %s", req.Topic)
 		}
 		return nil, grpc.AsStatusError(err)
@@ -231,7 +231,7 @@ func (s *publisherServer) ListTopicSubscriptions(
 			).
 			Only(ctx)
 		if err != nil {
-			if ent.IsNotFound(err) {
+			if isNotFound(err) {
 				return status.Errorf(codes.NotFound, "Topic not found: %s", req.Topic)
 			}
 			return grpc.AsStatusError(err)
@@ -290,7 +290,7 @@ func (s *publisherServer) Publish(ctx context.Context, req *pubsub.PublishReques
 			}).
 			Only(ctx)
 		if err != nil {
-			if ent.IsNotFound(err) {
+			if isNotFound(err) {
 				return status.Errorf(codes.NotFound, "Topic not found: %s", req.Topic)
 			}
 			return grpc.AsStatusError(err)
