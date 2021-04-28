@@ -12,7 +12,7 @@ jobs:
     environment:
       TEST_RESULTS: /tmp/test-results
       DATABASE_URL: "postgres://circle@localhost:5432/circle_test?sslmode=disable"
-      GOPRIVATE: "go.6river.tech,github.com/6RiverSystems/"
+      GOPRIVATE: "go.6river.tech/*,github.com/6RiverSystems/*"
 
     steps:
       - checkout
