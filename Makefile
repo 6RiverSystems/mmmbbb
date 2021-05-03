@@ -42,6 +42,9 @@ TESTARGS:=-vet=off -race -cover -coverpkg=./...
 
 GOIMPORTSARGS:=-local github.com/6RiverSystems,go.6river.tech
 
+BUILDARGS:=-tags nomsgpack
+LINTARGS:=$(patsubst -tags,--build-tags,$(BUILDARGS))
+
 default: compile-code test
 .PHONY: default
 
@@ -106,32 +109,32 @@ lint:
 # fgrep -xvf... is used to exclude exact matches from the list of git ignored files
 	! gofmt -l -s . | fgrep -xvf <( git ls-files --exclude-standard --others --ignored ) | grep .
 	! go run golang.org/x/tools/cmd/goimports -l $(GOIMPORTSARGS) . | fgrep -xvf <( git ls-files --exclude-standard --others --ignored ) | grep .
-	go run github.com/golangci/golangci-lint/cmd/golangci-lint run
+	go run github.com/golangci/golangci-lint/cmd/golangci-lint run $(LINTARGS)
 .PHONY: lint
 
 compile: compile-code compile-tests
 compile-code: generate
-	go build -v ./...
+	go build -v $(BUILDARGS) ./...
 # this weird hack makes go compile the tests but not run them. basically this
 # seeds the build cache and gives us any compile errors. unforunately it also
 # prints out test-like output, so we have to hide that with some grep.
 # PIPESTATUS requires bash
 compile-tests : SHELL = /bin/bash
 compile-tests: generate
-	go test $(TESTARGS) -run='^$$' ./... | grep -v '\[no test' ; exit $${PIPESTATUS[0]}
+	go test $(BUILDARGS) $(TESTARGS) -run='^$$' ./... | grep -v '\[no test' ; exit $${PIPESTATUS[0]}
 .PHONY: compile compile-code compile-tests
 
 # paranoid: always test with the race detector
 test: lint vet test-go
 vet:
-	go vet ./...
+	go vet $(BUILDARGS) ./...
 test-go:
-	go test $(TESTARGS) -coverprofile=coverage.out ./...
+	go test $(BUILDARGS) $(TESTARGS) -coverprofile=coverage.out ./...
 test-go-ci-split:
 # this target assumes some variables set on the make command line from the CI
 # run, and also that gotestsum is installed, which is not handled by this
 # makefile, but instead by the CI environment
-	gotestsum --format standard-quiet --junitfile $(TEST_RESULTS)/gotestsum-report.xml -- $(TESTARGS) -coverprofile=${TEST_RESULTS}/coverage.out $(PACKAGE_NAMES)
+	gotestsum --format standard-quiet --junitfile $(TEST_RESULTS)/gotestsum-report.xml -- $(BUILDARGS) $(TESTARGS) -coverprofile=${TEST_RESULTS}/coverage.out $(PACKAGE_NAMES)
 .PHONY: test vet test-go test-go-ci-split
 $(patsubst %,test-main-cover-%,$(BINARY_NAMES)): test-main-cover-%: $(TEST_RESULTS)
 	NODE_ENV=acceptance gotestsum --format standard-quiet --junitfile $(TEST_RESULTS)/gotestsum-smoke-report-$*.xml -- $(TESTARGS) -coverprofile=${TEST_RESULTS}/coverage-smoke-$*.out -v -run TestCoverMain ./cmd/$*/
@@ -147,7 +150,7 @@ binaries: $(BINARIES)
 $(BINARIES): bin/%: ./cmd/%/main.go compile-code
 # we build binaries (meant for docker images & deployment) without CGO, as
 # that's only needed for SQLite in test mode
-	CGO_ENABLED=0 go build -v -o $@ ./cmd/$*
+	CGO_ENABLED=0 go build -v $(BUILDARGS) -o $@ ./cmd/$*
 
 clean-ent:
 # -X says to only remove ignored files, not untracked ones
