@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  sixrs-gke: sixriversystems/sixrs-gke@3
+
 jobs:
   all-in-one:
     docker:
@@ -97,10 +100,7 @@ jobs:
           command: |
             go tool cover -html="${TEST_RESULTS}/coverage.out" -o "${TEST_RESULTS}/coverage.html"
             go tool cover -html="${TEST_RESULTS}/coverage-smoke-service.out" -o "${TEST_RESULTS}/coverage-smoke-service.html"
-      - run:
-          name: Upload coverage
-          command: |
-            bash <( curl -s --fail https://codecov.io/bash ) -s "${TEST_RESULTS}"
+      - sixrs-gke/codecov
 
       - setup_remote_docker
       - run:
