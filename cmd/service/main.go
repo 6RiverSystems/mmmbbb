@@ -60,7 +60,7 @@ func NewApp() *app.App {
 			}
 			return ent.NewClient(opts...), nil
 		},
-		LoadOASSpec: func(ctx context.Context) (*openapi3.Swagger, error) {
+		LoadOASSpec: func(ctx context.Context) (*openapi3.T, error) {
 			return oas.LoadSpec()
 		},
 		OASFS: http.FS(oas.OpenAPIFS),
