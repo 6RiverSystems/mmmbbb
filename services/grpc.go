@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"strings"
 
 	"google.golang.org/grpc"
@@ -11,6 +12,7 @@ import (
 	entcommon "go.6river.tech/gosix/ent"
 	"go.6river.tech/gosix/registry"
 
+	"go.6river.tech/mmmbbb/actions"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/grpc/health"
 	"go.6river.tech/mmmbbb/grpc/pubsub"
@@ -59,4 +61,8 @@ func BindGatewayHandlers(ctx context.Context, mux *runtime.ServeMux, conn *grpc.
 		return err
 	}
 	return nil
+}
+
+func isNotFound(err error) bool {
+	return ent.IsNotFound(err) || errors.Is(err, actions.ErrNotFound)
 }

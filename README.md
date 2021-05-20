@@ -97,3 +97,26 @@ active subscription in the topic. Message ack/nack operations update the
 corresponding row. Like with other entities, completed or expired deliveries are
 not immediately removed, but instead get a "soft" marker, and are deleted later
 by a background pruning process.
+
+## Fault Injection
+
+The application uses the fault injection "framework" from `gosix` to allow any
+of the gRPC calls to have faults (errors) injected. The state of this is queried
+via the `GET /faults` endpoint, and new injections can be added via the
+`POST /faults/inject` endpoint. For more details on this, check the Swagger-UI
+at `/oas-ui/`, or the [gosix
+documentation](https://github.com/6RiverSystems/gosix/blob/main/docs/faults.md)
+on the gRPC fault interceptor.
+
+For example, to cause one call to the subscriber `StreamingPull` API to fail,
+for a specific subscription, you could inject the following fault configuration:
+
+```json
+{
+  "operation": "StreamingPull",
+  "parameters": {
+    "Subscription": "projects/foo/subscriptions/bar"
+  },
+  "count": 1
+}
+```
