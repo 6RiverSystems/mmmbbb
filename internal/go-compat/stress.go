@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -16,15 +18,25 @@ import (
 func main() {
 	ctx := context.Background()
 
+	orderSplit := 0
+	reqOrderSplit := os.Getenv("ORDERED_SPLIT")
+	if reqOrderSplit != "" {
+		var err error
+		orderSplit, err = strconv.Atoi(reqOrderSplit)
+		panicIf(err)
+	}
+
 	os.Setenv("PUBSUB_EMULATOR_HOST", "localhost:8802")
 	psc, err := pubsub.NewClient(ctx, "go-compat")
 	panicIf(err)
 	id := "go-stress-" + uuid.NewString()
 	t, err := psc.CreateTopic(ctx, id)
 	panicIf(err)
+	t.EnableMessageOrdering = orderSplit != 0
 	defer func() { panicIf(t.Delete(ctx)) }()
 	s, err := psc.CreateSubscription(ctx, id, pubsub.SubscriptionConfig{
-		Topic: t,
+		Topic:                 t,
+		EnableMessageOrdering: orderSplit != 0,
 		RetryPolicy: &pubsub.RetryPolicy{
 			MinimumBackoff: time.Second * 3 / 2,
 		},
@@ -44,12 +56,22 @@ func main() {
 		defer close(pubs)
 		payload := json.RawMessage(`{"hello":"world"}`)
 		for i := 0; i < numMessages; i++ {
+			orderKey := ""
+			if orderSplit != 0 {
+				orderKey = strconv.Itoa(i % orderSplit)
+			}
 			select {
 			case <-egCtx.Done():
 				fmt.Printf("canceled after queueing %d messages\n", i)
 				return egCtx.Err()
 			case pubs <- t.Publish(egCtx, &pubsub.Message{
-				Data: payload,
+				Data:        payload,
+				OrderingKey: orderKey,
+				Attributes: map[string]string{
+					// send i+1 so that we can treat 0 as nothing received in the
+					// subscriber checks
+					"i": strconv.Itoa(i + 1),
+				},
 			}):
 			}
 		}
@@ -76,6 +98,8 @@ func main() {
 		numReceived := int32(0)
 		ctx, cancel := context.WithCancel(egCtx)
 		defer cancel()
+		lastReceived := make([]int, orderSplit)
+		lastReceivedMu := make([]sync.Mutex, orderSplit)
 		err := s.Receive(ctx, func(_ context.Context, m *pubsub.Message) {
 			n := atomic.AddInt32(&numReceived, 1)
 			m.Ack()
@@ -84,6 +108,21 @@ func main() {
 				cancel()
 			} else if n%1000 == 0 {
 				fmt.Println("received", n, float64(time.Since(start))/float64(n)/1e6, "ms/msg")
+			}
+			if orderSplit != 0 {
+				if k, err := strconv.Atoi(m.OrderingKey); err != nil {
+					fmt.Println("Bad OrderingKey:", err)
+				} else if i, err := strconv.Atoi(m.Attributes["i"]); err != nil {
+					fmt.Println("Bad Attributes.i:", err)
+				} else {
+					lastReceivedMu[k].Lock()
+					defer lastReceivedMu[k].Unlock()
+					if i <= lastReceived[k] {
+						fmt.Println("Out of Order:", k, lastReceived[k], i)
+					} else {
+						lastReceived[k] = i
+					}
+				}
 			}
 		})
 		if err != nil {
