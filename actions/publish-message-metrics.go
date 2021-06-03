@@ -12,6 +12,8 @@ var publishedMessagesHistogram *prometheus.HistogramVec
 
 var filterErrorsCounter, filterNoMatchCounter prometheus.Counter
 
+var deadLetterDeliveriesCounter prometheus.Counter
+
 func init() {
 	var counters []prometheus.Counter
 	counters, publishedMessagesHistogram = actionMetricsMulti(
@@ -37,4 +39,10 @@ func init() {
 	)
 	filterErrorsCounter = deliverySuppressed.WithLabelValues("filter_error")
 	filterNoMatchCounter = deliverySuppressed.WithLabelValues("filter_skip")
+
+	deadLetterDeliveriesCounter = promauto.NewCounter(prometheus.CounterOpts{
+		Namespace: version.AppName,
+		Name:      "deadletter_deliveries",
+		Help:      "Number of message deliveries redirected to dead letter topic",
+	})
 }

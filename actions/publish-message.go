@@ -97,62 +97,11 @@ func (a *PublishMessage) Execute(ctx context.Context, tx *ent.Tx) error {
 	// add a delivery for each active subscription
 	dc := make([]*ent.DeliveryCreate, 0, len(t.Edges.Subscriptions))
 	for _, s := range t.Edges.Subscriptions {
-		if s.MessageFilter != nil && *s.MessageFilter != "" {
-			// TODO: cache parsed filters
-			var f filter.Filter
-			if err := filter.Parser.ParseString(s.Name, *s.MessageFilter, &f); err != nil {
-				// filter errors should have been caught at subscription create/update.
-				// do not break delivery because one sub has a broken filter, assume the
-				// filter matches nothing and drop the message.
-				logging.GetLoggerWith("actions/publish-message", func(c zerolog.Context) zerolog.Context {
-					return c.
-						Str("subscriptionName", s.Name).
-						Stringer("subscriptionID", s.ID)
-				}).Err(err).Msg("skipping delivery due to subscription filter parse error")
-				filterErrorsCounter.Inc()
-				continue
-			} else if match, err := f.Evaluate(a.params.Attributes); err != nil {
-				// same idea
-				logging.GetLoggerWith("actions/publish-message", func(c zerolog.Context) zerolog.Context {
-					return c.
-						Str("subscriptionName", s.Name).
-						Stringer("subscriptionID", s.ID)
-				}).Err(err).Msg("skipping delivery due to subscription filter evaluation error")
-				filterErrorsCounter.Inc()
-				continue
-			} else if !match {
-				// quietly ignore this one, no logging
-				filterNoMatchCounter.Inc()
-				continue
-			}
+		if createDelivery, err := deliverToSubscription(ctx, tx, s, m, now, "actions/publish-message"); err != nil {
+			return err
+		} else if createDelivery != nil {
+			dc = append(dc, createDelivery)
 		}
-		createDelivery := tx.Delivery.Create().
-			SetMessage(m).
-			SetSubscription(s).
-			SetExpiresAt(now.Add(time.Duration(s.MessageTTL))).
-			SetPublishedAt(now)
-		if s.OrderedDelivery && a.params.OrderKey != "" {
-			// set the delivery NotBefore the most recent non-expired delivery
-			lastDelivery, err := tx.Subscription.QueryDeliveries(s).
-				Where(
-					delivery.ExpiresAtGT(now),
-					delivery.HasMessageWith(
-						message.OrderKey(a.params.OrderKey),
-						// ent uses a very wide sub-select, this helps narrow it down
-						// UPSTREAM: ticket for HasRelationWith efficiency
-						message.TopicID(t.ID),
-					),
-				).
-				Order(ent.Desc(delivery.FieldPublishedAt)).
-				First(ctx)
-			if err == nil {
-				createDelivery.SetNotBefore(lastDelivery)
-			} else if err != nil && !ent.IsNotFound(err) {
-				return err
-			}
-		}
-		dc = append(dc, createDelivery)
-		notifyPublish(tx, s.ID)
 	}
 
 	_, err = tx.Delivery.CreateBulk(dc...).Save(ctx)
@@ -198,4 +147,73 @@ func (a *PublishMessage) Results() map[string]interface{} {
 		"id":            a.results.id,
 		"numDeliveries": a.results.numDeliveries,
 	}
+}
+
+func deliverToSubscription(
+	ctx context.Context,
+	tx *ent.Tx,
+	s *ent.Subscription,
+	m *ent.Message,
+	now time.Time,
+	loggerName string,
+) (*ent.DeliveryCreate, error) {
+	if s.MessageFilter != nil && *s.MessageFilter != "" {
+		// TODO: cache parsed filters
+		var f filter.Filter
+		if err := filter.Parser.ParseString(s.Name, *s.MessageFilter, &f); err != nil {
+			// filter errors should have been caught at subscription create/update.
+			// do not break delivery because one sub has a broken filter, assume the
+			// filter matches nothing and drop the message.
+			logging.GetLoggerWith(loggerName, func(c zerolog.Context) zerolog.Context {
+				return c.
+					Str("subscriptionName", s.Name).
+					Stringer("subscriptionID", s.ID)
+			}).Err(err).Msg("skipping delivery due to subscription filter parse error")
+			filterErrorsCounter.Inc()
+			return nil, nil
+		} else if match, err := f.Evaluate(m.Attributes); err != nil {
+			// same idea
+			logging.GetLoggerWith(loggerName, func(c zerolog.Context) zerolog.Context {
+				return c.
+					Str("subscriptionName", s.Name).
+					Stringer("subscriptionID", s.ID)
+			}).Err(err).Msg("skipping delivery due to subscription filter evaluation error")
+			filterErrorsCounter.Inc()
+			return nil, nil
+		} else if !match {
+			// quietly ignore this one, no logging
+			filterNoMatchCounter.Inc()
+			return nil, nil
+		}
+	}
+	createDelivery := tx.Delivery.Create().
+		SetMessage(m).
+		SetSubscription(s).
+		SetExpiresAt(now.Add(time.Duration(s.MessageTTL))).
+		SetPublishedAt(now)
+	if s.OrderedDelivery && m.OrderKey != nil && *m.OrderKey != "" {
+		// set the delivery NotBefore the most recent non-expired delivery
+		lastDelivery, err := tx.Subscription.QueryDeliveries(s).
+			Where(
+				delivery.ExpiresAtGT(now),
+				delivery.HasMessageWith(
+					message.OrderKey(*m.OrderKey),
+					// ent uses a very wide sub-select, this helps narrow it down
+					// UPSTREAM: ticket for HasRelationWith efficiency
+					// TODO: this won't work correctly if this is a dead letter delivery,
+					// but then dead letter delivery isn't nominally supported for
+					// ordered message delivery
+					message.TopicID(m.TopicID),
+				),
+			).
+			Order(ent.Desc(delivery.FieldPublishedAt)).
+			First(ctx)
+		if err == nil {
+			createDelivery.SetNotBefore(lastDelivery)
+		} else if err != nil && !ent.IsNotFound(err) {
+			return nil, err
+		}
+	}
+	notifyPublish(tx, s.ID)
+	return createDelivery, nil
 }

@@ -28,7 +28,7 @@ func TestNackDeliveries_Execute(t *testing.T) {
 			nil,
 			NackDeliveriesParams{},
 			assert.NoError,
-			&nackDeliveriesResults{0},
+			&nackDeliveriesResults{0, 0},
 		},
 		{
 			"nack one",
