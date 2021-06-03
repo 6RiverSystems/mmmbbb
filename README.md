@@ -45,6 +45,8 @@ Things that are not implemented:
 - Authenticating PUSH delivery
 - The Schema API and any PubSub settings related to it
 - Authentication settings for Push subscriptions
+- Authenticating to the service itself
+- Detaching subscriptions
 - Changing message retry backoff settings for a subscription may not fully take
   effect when actively streaming messages from it (including from an HTTP Push
   configuration)
