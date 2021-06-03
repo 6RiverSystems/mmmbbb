@@ -1,111 +1,108 @@
 {
-	"version": "0.2.0",
-	"configurations": [
-		{
-			"name": "Launch mmmbbb with postgres",
-			"type": "go",
-			"request": "launch",
-			"mode": "auto",
-			"program": "${workspaceFolder}/cmd/service",
-			"cwd": "${workspaceFolder}",
-			"env": {
-				"NODE_ENV": "development",
-				"_NOTDEBUG": "sql",
-				"LOG_LEVEL": "trace",
-				"$MIRROR_OUT_SITE_NAME": "development",
-				"$MIRROR_IN_SITE_NAME": "development",
-				"$MIRROR_TOPIC_REGEX": "^mbtest$",
-				"CREATE_DB_VIA": "postgres"
-			},
-			"args": [],
-			"preLaunchTask": "generate code"
-		},
-		{
-			"name": "Launch mmmbbb as emulator",
-			"type": "go",
-			"request": "launch",
-			"mode": "auto",
-			"program": "${workspaceFolder}/cmd/service",
-			"cwd": "${workspaceFolder}",
-			"env": {
-				"NODE_ENV": "development",
-				"DATABASE_URL": "postgres://6river:6river@localhost:5432/mmmbbb_6mon",
-				"_NOTDEBUG": "sql",
-				"LOG_LEVEL": "trace",
-				"PORT": "8801",
-				"$MIRROR_OUT_SITE_NAME": "development",
-				"$MIRROR_IN_SITE_NAME": "development",
-				"$MIRROR_TOPIC_REGEX": "^mbtest$",
-				"CREATE_DB_VIA": "postgres"
-			},
-			"args": [],
-			"preLaunchTask": "generate code"
-		},
-		{
-			"name": "Launch mmmbbb with sqlite",
-			"type": "go",
-			"request": "launch",
-			"mode": "auto",
-			"program": "${workspaceFolder}/cmd/service",
-			"cwd": "${workspaceFolder}",
-			"env": {
-				"NODE_ENV": "test",
-				"_NOTDEBUG": "sql",
-				"LOG_LEVEL": "trace"
-			},
-			"args": [],
-			"preLaunchTask": "generate code"
-		},
-		{
-			"name": "Launch mmmbbb ts compat test client",
-			"type": "node",
-			"request": "launch",
-			"cwd": "${workspaceFolder}/internal/ts-compat",
-			"program": "${workspaceFolder}/internal/ts-compat/dist/src/index.js",
-			"preLaunchTask": "build ts-compat"
-		},
-		{
-			"name": "Launch mmmbbb ts compat stress client",
-			"type": "node",
-			"request": "launch",
-			"cwd": "${workspaceFolder}/internal/ts-compat",
-			"program": "${workspaceFolder}/internal/ts-compat/dist/src/stress.js",
-			"preLaunchTask": "build ts-compat"
-		},
-		{
-			"name": "Launch mmmbbb go compat stress client",
-			"type": "go",
-			"request": "launch",
-			"cwd": "${workspaceFolder}/internal/go-compat",
-			"program": "${workspaceFolder}/internal/go-compat/stress.go"
-		},
-		{
-			"name": "Debug ent generation for mmmbbb",
-			"type": "go",
-			"request": "launch",
-			"mode": "exec",
-			"program": "${workspaceFolder}/tools/ent",
-			"cwd": "${workspaceFolder}/ent",
-			"args": [
-				"generate",
-				"./schema",
-			],
-			"preLaunchTask": "build tools"
-		},
-		{
-			"name": "Debug throughput benchmarks",
-			"type": "go",
-			"request": "launch",
-			"mode": "test",
-			"program": "${workspaceFolder}/services",
-			"args": [
-				// "-vet=off",
-				"-test.bench",
-				"BenchmarkGrpcThroughput",
-				"-test.benchtime",
-				"30s",
-				"-test.v"
-			]
-		}
-	]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch mmmbbb with postgres",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/cmd/service",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "NODE_ENV": "development",
+        "_NOTDEBUG": "sql",
+        "LOG_LEVEL": "trace",
+        "$MIRROR_OUT_SITE_NAME": "development",
+        "$MIRROR_IN_SITE_NAME": "development",
+        "$MIRROR_TOPIC_REGEX": "^mbtest$",
+        "CREATE_DB_VIA": "postgres"
+      },
+      "args": [],
+      "preLaunchTask": "generate code"
+    },
+    {
+      "name": "Launch mmmbbb as emulator",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/cmd/service",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "NODE_ENV": "development",
+        "DATABASE_URL": "postgres://6river:6river@localhost:5432/mmmbbb_6mon",
+        "_NOTDEBUG": "sql",
+        "LOG_LEVEL": "trace",
+        "PORT": "8801",
+        "$MIRROR_OUT_SITE_NAME": "development",
+        "$MIRROR_IN_SITE_NAME": "development",
+        "$MIRROR_TOPIC_REGEX": "^mbtest$",
+        "CREATE_DB_VIA": "postgres"
+      },
+      "args": [],
+      "preLaunchTask": "generate code"
+    },
+    {
+      "name": "Launch mmmbbb with sqlite",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/cmd/service",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "NODE_ENV": "test",
+        "_NOTDEBUG": "sql",
+        "LOG_LEVEL": "trace"
+      },
+      "args": [],
+      "preLaunchTask": "generate code"
+    },
+    {
+      "name": "Launch mmmbbb ts compat test client",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/internal/ts-compat",
+      "program": "${workspaceFolder}/internal/ts-compat/dist/src/index.js",
+      "preLaunchTask": "build ts-compat"
+    },
+    {
+      "name": "Launch mmmbbb ts compat stress client",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/internal/ts-compat",
+      "program": "${workspaceFolder}/internal/ts-compat/dist/src/stress.js",
+      "preLaunchTask": "build ts-compat"
+    },
+    {
+      "name": "Launch mmmbbb go compat stress client",
+      "type": "go",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/internal/go-compat",
+      "program": "${workspaceFolder}/internal/go-compat/stress.go"
+    },
+    {
+      "name": "Debug ent generation for mmmbbb",
+      "type": "go",
+      "request": "launch",
+      "mode": "exec",
+      "program": "${workspaceFolder}/tools/ent",
+      "cwd": "${workspaceFolder}/ent",
+      "args": ["generate", "./schema"],
+      "preLaunchTask": "build tools"
+    },
+    {
+      "name": "Debug throughput benchmarks",
+      "type": "go",
+      "request": "launch",
+      "mode": "test",
+      "program": "${workspaceFolder}/services",
+      "args": [
+        // "-vet=off",
+        "-test.bench",
+        "BenchmarkGrpcThroughput",
+        "-test.benchtime",
+        "30s",
+        "-test.v"
+      ]
+    }
+  ]
 }
