@@ -32,6 +32,12 @@ func (s *DeadLetterSettings) ApplyDefaults() {
 	if s.MaxDeliveries == 0 {
 		s.MaxDeliveries = dlDefaults.MaxDeliveries
 	}
+	if s.Interval == 0 {
+		s.Interval = dlDefaults.Interval
+	}
+	if s.Backoff == 0 {
+		s.Backoff = dlDefaults.Backoff
+	}
 }
 
 type deadLetter struct {
