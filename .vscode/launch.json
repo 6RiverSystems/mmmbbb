@@ -10,7 +10,7 @@
       "cwd": "${workspaceFolder}",
       "env": {
         "NODE_ENV": "development",
-        "_NOTDEBUG": "sql",
+        "DEBUG": "sql",
         "LOG_LEVEL": "trace",
         "$MIRROR_OUT_SITE_NAME": "development",
         "$MIRROR_IN_SITE_NAME": "development",

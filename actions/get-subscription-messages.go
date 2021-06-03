@@ -401,7 +401,13 @@ func (a *GetSubscriptionMessages) applyResults(
 		// if we missed the nack and this delivery has exceeded its attempt limit,
 		// dead letter it instead of delivering it
 		if hasDeadLettering && d.Attempts >= int(*sub.MaxDeliveryAttempts) {
-			if err = deadLetterDelivery(ctx, tx, sub, d, now, "actions/get-subscription-messages"); err != nil {
+			if err = deadLetterDelivery(
+				ctx,
+				tx,
+				deadLetterDataFromEntities(d, sub),
+				now,
+				"actions/get-subscription-messages",
+			); err != nil {
 				return err
 			}
 			continue

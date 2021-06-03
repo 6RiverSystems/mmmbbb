@@ -88,7 +88,13 @@ func (a *NackDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 	for _, d := range deliveries {
 		sub := subById[d.SubscriptionID]
 		if sub.HasFullDeadLetterConfig() && d.Attempts >= int(*sub.MaxDeliveryAttempts) {
-			if err := deadLetterDelivery(ctx, tx, sub, d, now, "actions/nack-deliveries"); err != nil {
+			if err := deadLetterDelivery(
+				ctx,
+				tx,
+				deadLetterDataFromEntities(d, sub),
+				now,
+				"actions/nack-deliveries",
+			); err != nil {
 				return err
 			}
 			numDeadLettered++

@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	cloud.google.com/go/pubsub v1.10.3
-	entgo.io/ent v0.8.1-0.20210520103905-da20bba97dca
+	entgo.io/ent v0.8.1-0.20210603070748-fe9b0832881b
 	github.com/alecthomas/participle/v2 v2.0.0-alpha4
 	github.com/getkin/kin-openapi v0.61.0
 	github.com/gin-gonic/gin v1.7.1
@@ -24,7 +24,7 @@ require (
 	go.6river.tech/gosix v0.2.15
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/term v0.0.0-20210406210042-72f3dc4e9b72 // indirect
-	golang.org/x/tools v0.1.2-0.20210512205948-8287d5da45e4
+	golang.org/x/tools v0.1.2
 	google.golang.org/api v0.47.0
 	google.golang.org/genproto v0.0.0-20210513213006-bf773b8c8384
 	google.golang.org/grpc v1.38.0

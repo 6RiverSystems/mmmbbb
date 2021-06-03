@@ -46,8 +46,9 @@ func (a *DeadLetterDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 	now := time.Now()
 
 	// find deliveries that have exceeded their delivery limit and are due for a
-	// retry
-	deliveries, err := tx.Delivery.Query().
+	// retry. relies on `sql` tagging of `deadLetterData` matching the query below
+	deliveryData := make([]deadLetterData, 0)
+	err := tx.Delivery.Query().
 		Where(
 			// this big old mess should generate something like:
 			// FROM deliveries JOIN subscriptions
@@ -64,9 +65,11 @@ func (a *DeadLetterDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 				s.Where(sql.And(
 					sql.IsNull(t.C(subscription.FieldDeletedAt)),
 					sql.GT(t.C(subscription.FieldMaxDeliveryAttempts), 0),
-					sql.NotNull(t.C(subscription.DeadLetterTopicColumn)),
+					sql.NotNull(t.C(subscription.FieldDeadLetterTopicID)),
 					sql.ColumnsGTE(s.C(delivery.FieldAttempts), t.C(subscription.FieldMaxDeliveryAttempts)),
 				))
+				// this column alias needs to match the `sql` tag on `deadLetterData`
+				s.AppendSelect(sql.As(t.C(subscription.FieldDeadLetterTopicID), "dead_letter_topic_id"))
 			},
 			delivery.CompletedAtIsNil(),
 			// spec is that we dead-letter messages that fail their delivery counter,
@@ -76,21 +79,18 @@ func (a *DeadLetterDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 			// if it's blocked on ordering, and anyways dead-lettering is not fully
 			// supported in that case
 		).
-		// TODO: this is a wasteful, all `deadLetterDelivery` needs is the topic ID,
-		// but it's hard right now to get "an entity plus a column" out of ent
-		WithSubscription().
 		Limit(a.params.MaxDeliveries).
-		All(ctx)
+		Select(delivery.FieldID, delivery.FieldMessageID).
+		Scan(ctx, &deliveryData)
 	if err != nil {
 		return err
 	}
 
-	for _, delivery := range deliveries {
+	for _, datum := range deliveryData {
 		if err = deadLetterDelivery(
 			ctx,
 			tx,
-			delivery.Edges.Subscription,
-			delivery,
+			datum,
 			now,
 			"actions/dead-letter-deliveries",
 		); err != nil {
@@ -100,7 +100,7 @@ func (a *DeadLetterDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 	}
 
 	a.results = &DeadLetterDeliveriesResults{
-		numDeadLettered: len(deliveries),
+		numDeadLettered: len(deliveryData),
 	}
 
 	return nil

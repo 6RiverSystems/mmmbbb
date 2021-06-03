@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/rs/zerolog"
 
 	"go.6river.tech/gosix/logging"
@@ -84,11 +85,28 @@ func deliverToSubscription(
 	return createDelivery, nil
 }
 
+// SQL tags here need to match entities/queries used in this package
+type deadLetterData struct {
+	DeliveryID        uuid.UUID `sql:"id"`
+	DeliveryMessageID uuid.UUID `sql:"message_id"`
+	DeadLetterTopicID uuid.UUID `sql:"dead_letter_topic_id"`
+}
+
+func deadLetterDataFromEntities(delivery *ent.Delivery, sub *ent.Subscription) deadLetterData {
+	if sub == nil && delivery.Edges.Subscription != nil {
+		sub = delivery.Edges.Subscription
+	}
+	return deadLetterData{
+		DeliveryID:        delivery.ID,
+		DeliveryMessageID: delivery.MessageID,
+		DeadLetterTopicID: *sub.DeadLetterTopicID,
+	}
+}
+
 func deadLetterDelivery(
 	ctx context.Context,
 	tx *ent.Tx,
-	sub *ent.Subscription,
-	delivery *ent.Delivery,
+	x deadLetterData,
 	now time.Time,
 	loggerName string,
 ) error {
@@ -99,8 +117,11 @@ func deadLetterDelivery(
 	// we don't need the topic to do the dead letter delivery, but structuring
 	// the query this way helps ignore deleted topics _and_ deleted
 	// subscriptions.
-	dlTopic, err := tx.Subscription.QueryTopic(sub).
-		Where(topic.DeletedAtIsNil()).
+	dlTopic, err := tx.Topic.Query().
+		Where(
+			topic.ID(x.DeadLetterTopicID),
+			topic.DeletedAtIsNil(),
+		).
 		WithSubscriptions(func(sq *ent.SubscriptionQuery) {
 			sq.Where(subscription.DeletedAtIsNil())
 		}).
@@ -110,12 +131,9 @@ func deadLetterDelivery(
 		return err
 	}
 	if dlTopic != nil && len(dlTopic.Edges.Subscriptions) != 0 {
-		m := delivery.Edges.Message
-		if m == nil {
-			m, err = tx.Delivery.QueryMessage(delivery).Only(ctx)
-			if err != nil {
-				return err
-			}
+		m, err := tx.Message.Get(ctx, x.DeliveryMessageID)
+		if err != nil {
+			return err
 		}
 		var dlc []*ent.DeliveryCreate
 		for _, s := range dlTopic.Edges.Subscriptions {
@@ -132,7 +150,7 @@ func deadLetterDelivery(
 	}
 
 	// and delete the original delivery
-	if err := tx.Delivery.DeleteOne(delivery).
+	if err := tx.Delivery.DeleteOneID(x.DeliveryID).
 		Exec(ctx); err != nil {
 		return err
 	}
