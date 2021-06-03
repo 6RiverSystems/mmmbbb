@@ -100,7 +100,8 @@ jobs:
           command: |
             go tool cover -html="${TEST_RESULTS}/coverage.out" -o "${TEST_RESULTS}/coverage.html"
             go tool cover -html="${TEST_RESULTS}/coverage-smoke-service.out" -o "${TEST_RESULTS}/coverage-smoke-service.html"
-      - sixrs-gke/codecov
+      - sixrs-gke/codecov:
+          codecov-params: "-s ${TEST_RESULTS}"
 
       - setup_remote_docker
       - run:
