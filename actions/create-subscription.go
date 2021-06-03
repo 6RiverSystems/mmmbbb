@@ -26,6 +26,10 @@ type CreateSubscriptionParams struct {
 	PushEndpoint           string
 	MinBackoff, MaxBackoff time.Duration
 	Filter                 string
+
+	// these two normally should both be present, or not
+	MaxDeliveryAttempts int32
+	DeadLetterTopic     string
 }
 type createSubscriptionResults struct {
 	topicID uuid.UUID
@@ -45,6 +49,12 @@ func NewCreateSubscription(params CreateSubscriptionParams) *CreateSubscription 
 	}
 	if params.MessageTTL <= 0 {
 		panic(errors.New("messageTTL must be > 0"))
+	}
+	if params.MaxDeliveryAttempts < 0 {
+		panic(errors.New("MaxDeliveryAttempts must be >= 0"))
+	}
+	if (params.MaxDeliveryAttempts != 0) != (params.DeadLetterTopic != "") {
+		panic(errors.New("must set both or neither of MaxDeliveryAttempts and DeadLetterTopic"))
 	}
 	return &CreateSubscription{
 		params: params,
@@ -70,16 +80,8 @@ func (a *CreateSubscription) Execute(ctx context.Context, tx *ent.Tx) error {
 		return ErrExists
 	}
 
-	topic, err := tx.Topic.Query().
-		Where(
-			topic.Name(a.params.TopicName),
-			topic.DeletedAtIsNil(),
-		).
-		Only(ctx)
+	topic, err := findTopic(ctx, tx, a.params.TopicName)
 	if err != nil {
-		if ent.IsNotFound(err) {
-			return ErrNotFound
-		}
 		return err
 	}
 
@@ -112,6 +114,16 @@ func (a *CreateSubscription) Execute(ctx context.Context, tx *ent.Tx) error {
 	if a.params.MaxBackoff > 0 {
 		create = create.SetMaxBackoff(customtypes.IntervalPtr(a.params.MaxBackoff))
 	}
+	if a.params.MaxDeliveryAttempts != 0 {
+		create = create.SetMaxDeliveryAttempts(a.params.MaxDeliveryAttempts)
+	}
+	if a.params.DeadLetterTopic != "" {
+		dlTopic, err := findTopic(ctx, tx, a.params.DeadLetterTopic)
+		if err != nil {
+			return err
+		}
+		create = create.SetDeadLetterTopic(dlTopic)
+	}
 
 	s, err := create.Save(ctx)
 	if err != nil {
@@ -129,6 +141,22 @@ func (a *CreateSubscription) Execute(ctx context.Context, tx *ent.Tx) error {
 	timer.Succeeded(func() { createSubscriptionsCounter.Inc() })
 
 	return nil
+}
+
+func findTopic(ctx context.Context, tx *ent.Tx, name string) (*ent.Topic, error) {
+	topic, err := tx.Topic.Query().
+		Where(
+			topic.Name(name),
+			topic.DeletedAtIsNil(),
+		).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, ErrNotFound
+		}
+		return nil, err
+	}
+	return topic, nil
 }
 
 func (a *CreateSubscription) TopicID() uuid.UUID {

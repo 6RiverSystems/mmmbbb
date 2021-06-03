@@ -227,6 +227,14 @@ func (Subscription) Fields() []ent.Field {
 			StorageKey("filter").
 			Optional().
 			Nillable(),
+		field.Int32("maxDeliveryAttempts").
+			StorageKey("max_delivery_attempts").
+			Optional().
+			Nillable(),
+		field.UUID("deadLetterTopicID", uuid.UUID{}).
+			StorageKey("dead_letter_topic_id").
+			Optional().
+			Nillable(),
 	}
 }
 
@@ -242,6 +250,10 @@ func (Subscription) Edges() []ent.Edge {
 			StorageKey(edge.Column("topic_id")),
 		edge.From("deliveries", Delivery.Type).
 			Ref("subscription"),
+		edge.To("deadLetterTopic", Topic.Type).
+			Unique().
+			Field("deadLetterTopicID").
+			StorageKey(edge.Column("dead_letter_topic_id")),
 	}
 }
 

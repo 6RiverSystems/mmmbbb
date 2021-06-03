@@ -23,6 +23,7 @@ import (
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/predicate"
 	"go.6river.tech/mmmbbb/ent/subscription"
+	"go.6river.tech/mmmbbb/ent/topic"
 	"go.6river.tech/mmmbbb/filter"
 	mbgrpc "go.6river.tech/mmmbbb/grpc"
 	"go.6river.tech/mmmbbb/grpc/pubsub"
@@ -44,7 +45,7 @@ func (s *subscriberServer) CreateSubscription(ctx context.Context, req *pubsub.S
 		return nil, status.Error(codes.InvalidArgument, "Cannot create detached subscription")
 	}
 
-	if req.PushConfig != nil || req.DeadLetterPolicy != nil {
+	if req.PushConfig != nil {
 		return nil, status.Error(codes.Unimplemented, "Advanced features not supported")
 	}
 
@@ -62,6 +63,10 @@ func (s *subscriberServer) CreateSubscription(ctx context.Context, req *pubsub.S
 	}
 	if params.MessageTTL == 0 {
 		params.MessageTTL = defaultSubscriptionMessageTTL
+	}
+	if req.DeadLetterPolicy != nil {
+		params.MaxDeliveryAttempts = req.DeadLetterPolicy.MaxDeliveryAttempts
+		params.DeadLetterTopic = req.DeadLetterPolicy.DeadLetterTopic
 	}
 	action := actions.NewCreateSubscription(params)
 	err := s.client.DoCtxTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable}, action.Execute)
@@ -197,7 +202,29 @@ func (s *subscriberServer) UpdateSubscription(ctx context.Context, req *pubsub.U
 					}
 					subUpdate.SetMessageFilter(req.Subscription.Filter)
 				}
-			case "ack_deadline_seconds", "retain_acked_messages", "dead_letter_policy", "detached":
+			case "dead_letter_policy":
+				dlp := req.Subscription.GetDeadLetterPolicy()
+				if dlp.MaxDeliveryAttempts <= 0 {
+					subUpdate.ClearMaxDeliveryAttempts()
+				} else {
+					subUpdate.SetMaxDeliveryAttempts(dlp.MaxDeliveryAttempts)
+				}
+				if dlp.DeadLetterTopic == "" {
+					subUpdate.ClearDeadLetterTopicID()
+				} else {
+					dlt, err := tx.Topic.Query().
+						Where(topic.Name(dlp.DeadLetterTopic),
+							topic.DeletedAtIsNil()).
+						Only(ctx)
+					if err != nil {
+						if isNotFound(err) {
+							return status.Errorf(codes.NotFound, "Dead letter topic not found: %s", dlp.DeadLetterTopic)
+						}
+						return grpc.AsStatusError(err)
+					}
+					subUpdate.SetDeadLetterTopic(dlt)
+				}
+			case "ack_deadline_seconds", "retain_acked_messages", "detached":
 				// these are valid paths, we just don't support changing them
 				return status.Errorf(codes.InvalidArgument, "Modifying Subscription.%s is not supported", p)
 			default:
