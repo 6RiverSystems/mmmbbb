@@ -99,7 +99,7 @@ func deadLetterDelivery(
 	// we don't need the topic to do the dead letter delivery, but structuring
 	// the query this way helps ignore deleted topics _and_ deleted
 	// subscriptions.
-	dlTopic, err := sub.QueryTopic().
+	dlTopic, err := tx.Subscription.QueryTopic(sub).
 		Where(topic.DeletedAtIsNil()).
 		WithSubscriptions(func(sq *ent.SubscriptionQuery) {
 			sq.Where(subscription.DeletedAtIsNil())
@@ -112,7 +112,7 @@ func deadLetterDelivery(
 	if dlTopic != nil && len(dlTopic.Edges.Subscriptions) != 0 {
 		m := delivery.Edges.Message
 		if m == nil {
-			m, err = delivery.QueryMessage().Only(ctx)
+			m, err = tx.Delivery.QueryMessage(delivery).Only(ctx)
 			if err != nil {
 				return err
 			}
