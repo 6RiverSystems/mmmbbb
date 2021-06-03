@@ -76,6 +76,8 @@ func (a *DeadLetterDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 			// if it's blocked on ordering, and anyways dead-lettering is not fully
 			// supported in that case
 		).
+		// TODO: this is a wasteful, all `deadLetterDelivery` needs is the topic ID,
+		// but it's hard right now to get "an entity plus a column" out of ent
 		WithSubscription().
 		Limit(a.params.MaxDeliveries).
 		All(ctx)
