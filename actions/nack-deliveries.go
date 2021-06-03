@@ -88,53 +88,11 @@ func (a *NackDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 	numDeadLettered := 0
 	for _, d := range deliveries {
 		sub := subById[d.SubscriptionID]
-		if sub.MaxDeliveryAttempts != nil &&
-			sub.DeadLetterTopicID != nil &&
-			*sub.MaxDeliveryAttempts > 0 &&
-			d.Attempts >= int(*sub.MaxDeliveryAttempts) {
-			// send to dead letter instead: make new deliveries in the dead letter
-			// subscriptions for the original message, avoids duplicating the message
-			// itself.
-
-			// we don't need the topic to do the dead letter delivery, but structuring
-			// the query this way helps ignore deleted topics _and_ deleted
-			// subscriptions.
-			dlTopic, err := sub.QueryTopic().
-				Where(topic.DeletedAtIsNil()).
-				WithSubscriptions(func(sq *ent.SubscriptionQuery) {
-					sq.Where(subscription.DeletedAtIsNil())
-				}).
-				Only(ctx)
-			// ignore not found here, just means the topic was deleted
-			if err != nil && !ent.IsNotFound(err) {
-				return err
-			}
-			if dlTopic != nil && len(dlTopic.Edges.Subscriptions) != 0 {
-				m, err := d.QueryMessage().Only(ctx)
-				if err != nil {
-					return err
-				}
-				var dlc []*ent.DeliveryCreate
-				for _, s := range dlTopic.Edges.Subscriptions {
-					if dc, err := deliverToSubscription(ctx, tx, s, m, now, "actions/nack-deliveries"); err != nil {
-						return err
-					} else if dc != nil {
-						dlc = append(dlc, dc)
-					}
-				}
-				_, err = tx.Delivery.CreateBulk(dlc...).Save(ctx)
-				if err != nil {
-					return err
-				}
-			}
-
-			// and delete the original delivery
-			if err := tx.Delivery.DeleteOne(d).
-				Exec(ctx); err != nil {
+		if sub.HasFullDeadLetterConfig() && d.Attempts >= int(*sub.MaxDeliveryAttempts) {
+			if err := deadLetterDelivery(ctx, tx, sub, d, now, "actions/nack-deliveries"); err != nil {
 				return err
 			}
 			numDeadLettered++
-			deadLetterDeliveriesCounter.Inc()
 		} else {
 			_, fuzzedDelay := NextDelayFor(sub, d.Attempts)
 			if err := tx.Delivery.UpdateOne(d).
@@ -177,4 +135,60 @@ func (a *NackDeliveries) Results() map[string]interface{} {
 		"numNacked":       a.results.numNacked,
 		"numDeadLettered": a.results.numDeadLettered,
 	}
+}
+
+func deadLetterDelivery(
+	ctx context.Context,
+	tx *ent.Tx,
+	sub *ent.Subscription,
+	delivery *ent.Delivery,
+	now time.Time,
+	loggerName string,
+) error {
+	// send to dead letter instead: make new deliveries in the dead letter
+	// subscriptions for the original message, avoids duplicating the message
+	// itself.
+
+	// we don't need the topic to do the dead letter delivery, but structuring
+	// the query this way helps ignore deleted topics _and_ deleted
+	// subscriptions.
+	dlTopic, err := sub.QueryTopic().
+		Where(topic.DeletedAtIsNil()).
+		WithSubscriptions(func(sq *ent.SubscriptionQuery) {
+			sq.Where(subscription.DeletedAtIsNil())
+		}).
+		Only(ctx)
+	// ignore not found here, just means the topic was deleted
+	if err != nil && !ent.IsNotFound(err) {
+		return err
+	}
+	if dlTopic != nil && len(dlTopic.Edges.Subscriptions) != 0 {
+		m := delivery.Edges.Message
+		if m == nil {
+			m, err = delivery.QueryMessage().Only(ctx)
+			if err != nil {
+				return err
+			}
+		}
+		var dlc []*ent.DeliveryCreate
+		for _, s := range dlTopic.Edges.Subscriptions {
+			if dc, err := deliverToSubscription(ctx, tx, s, m, now, loggerName); err != nil {
+				return err
+			} else if dc != nil {
+				dlc = append(dlc, dc)
+			}
+		}
+		_, err = tx.Delivery.CreateBulk(dlc...).Save(ctx)
+		if err != nil {
+			return err
+		}
+	}
+
+	// and delete the original delivery
+	if err := tx.Delivery.DeleteOne(delivery).
+		Exec(ctx); err != nil {
+		return err
+	}
+	deadLetterDeliveriesCounter.Inc()
+	return nil
 }
