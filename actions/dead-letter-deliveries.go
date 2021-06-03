@@ -65,7 +65,7 @@ func (a *DeadLetterDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 					sql.IsNull(t.C(subscription.FieldDeletedAt)),
 					sql.GT(t.C(subscription.FieldMaxDeliveryAttempts), 0),
 					sql.NotNull(t.C(subscription.DeadLetterTopicColumn)),
-					sql.GTE(s.C(delivery.FieldAttempts), t.C(subscription.FieldMaxDeliveryAttempts)),
+					sql.ColumnsGTE(s.C(delivery.FieldAttempts), t.C(subscription.FieldMaxDeliveryAttempts)),
 				))
 			},
 			delivery.CompletedAtIsNil(),
