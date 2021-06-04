@@ -48,6 +48,11 @@ func createSubscription(
 ) *ent.Subscription {
 	return createSubscriptionClient(t, ctx, tx.Client(), topic, offset, opts...)
 }
+func withDeadLetter(dlTopic *ent.Topic, maxAttempts int32) func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
+	return func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
+		return sc.SetDeadLetterTopic(dlTopic).SetMaxDeliveryAttempts(maxAttempts)
+	}
+}
 func createSubscriptionClient(
 	t *testing.T, ctx context.Context, client *ent.Client, topic *ent.Topic, offset int,
 	opts ...func(*ent.SubscriptionCreate) *ent.SubscriptionCreate,

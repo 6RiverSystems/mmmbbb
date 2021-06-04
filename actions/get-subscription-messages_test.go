@@ -13,6 +13,7 @@ import (
 
 	"go.6river.tech/gosix/testutils"
 	"go.6river.tech/mmmbbb/ent"
+	"go.6river.tech/mmmbbb/ent/delivery"
 	"go.6river.tech/mmmbbb/ent/enttest"
 )
 
@@ -393,6 +394,46 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 				d := r.deliveries[0]
 				assert.Equal(t, xID(t, &ent.Delivery{}, 1), d.ID)
 				// most checking of the delivery is in common code
+			},
+		},
+		{
+			"deadletter",
+			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test) {
+				topic := createTopicClient(t, ctx, client, 0)
+				dlTopic := createTopicClient(t, ctx, client, 1)
+				sub := createSubscriptionClient(t, ctx, client, topic, 0, withDeadLetter(dlTopic, 1))
+				createSubscriptionClient(t, ctx, client, dlTopic, 1)
+				msg := createMessageClient(t, ctx, client, topic, 0)
+				createDeliveryClient(t, ctx, client, sub, msg, 0, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
+					return dc.SetAttempts(1)
+				})
+			},
+			GetSubscriptionMessagesParams{
+				// Name will be auto-filled
+				MaxMessages: 1,
+				MaxBytes:    1,
+				MaxWait:     time.Nanosecond, // 0 is a "use default", not "instantaneous"
+			},
+			nil,
+			assert.NoError,
+			0,
+			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, r *getSubscriptionMessagesResults) {
+				assert.Equal(t, 1, r.numDeadLettered)
+
+				origDelivery, err := client.Delivery.Get(ctx, xID(t, &ent.Delivery{}, 0))
+				require.NoError(t, err)
+
+				dlDelivery, err := client.Delivery.Query().
+					Where(delivery.SubscriptionID(xID(t, &ent.Subscription{}, 1))).
+					Only(ctx)
+				require.NoError(t, err)
+
+				assert.Equal(t, origDelivery.MessageID, dlDelivery.MessageID)
+				assert.Nil(t, dlDelivery.CompletedAt)
+				if assert.NotNil(t, origDelivery.CompletedAt) {
+					assert.GreaterOrEqual(t, dlDelivery.AttemptAt.UnixNano(), origDelivery.CompletedAt.UnixNano())
+				}
+				assert.LessOrEqual(t, dlDelivery.AttemptAt.UnixNano(), time.Now().UnixNano())
 			},
 		},
 	}

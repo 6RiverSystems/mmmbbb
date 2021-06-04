@@ -23,6 +23,7 @@ import (
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/predicate"
 	"go.6river.tech/mmmbbb/ent/subscription"
+	"go.6river.tech/mmmbbb/ent/topic"
 	"go.6river.tech/mmmbbb/filter"
 	mbgrpc "go.6river.tech/mmmbbb/grpc"
 	"go.6river.tech/mmmbbb/grpc/pubsub"
@@ -44,7 +45,7 @@ func (s *subscriberServer) CreateSubscription(ctx context.Context, req *pubsub.S
 		return nil, status.Error(codes.InvalidArgument, "Cannot create detached subscription")
 	}
 
-	if req.PushConfig != nil || req.DeadLetterPolicy != nil {
+	if req.PushConfig != nil {
 		return nil, status.Error(codes.Unimplemented, "Advanced features not supported")
 	}
 
@@ -63,6 +64,13 @@ func (s *subscriberServer) CreateSubscription(ctx context.Context, req *pubsub.S
 	if params.MessageTTL == 0 {
 		params.MessageTTL = defaultSubscriptionMessageTTL
 	}
+	if req.DeadLetterPolicy != nil {
+		params.MaxDeliveryAttempts = req.DeadLetterPolicy.MaxDeliveryAttempts
+		if params.MaxDeliveryAttempts == 0 {
+			params.MaxDeliveryAttempts = defaultDeadLetterMaxAttempts
+		}
+		params.DeadLetterTopic = req.DeadLetterPolicy.DeadLetterTopic
+	}
 	action := actions.NewCreateSubscription(params)
 	err := s.client.DoCtxTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable}, action.Execute)
 	if err != nil {
@@ -77,7 +85,7 @@ func (s *subscriberServer) CreateSubscription(ctx context.Context, req *pubsub.S
 		}
 		return nil, grpc.AsStatusError(err)
 	}
-	return entSubscriptionToGrpc(action.Subscription(), params.TopicName), nil
+	return entSubscriptionToGrpc(action.Subscription(), params.TopicName, params.DeadLetterTopic), nil
 }
 
 func (s *subscriberServer) GetSubscription(ctx context.Context, req *pubsub.GetSubscriptionRequest) (*pubsub.Subscription, error) {
@@ -93,11 +101,12 @@ func (s *subscriberServer) GetSubscription(ctx context.Context, req *pubsub.GetS
 				subscription.DeletedAtIsNil(),
 			).
 			WithTopic().
+			WithDeadLetterTopic().
 			Only(ctx)
 		if err != nil {
 			return err
 		}
-		resp = entSubscriptionToGrpc(s, "")
+		resp = entSubscriptionToGrpc(s, "", "")
 		return nil
 	})
 	if err != nil {
@@ -122,6 +131,7 @@ func (s *subscriberServer) UpdateSubscription(ctx context.Context, req *pubsub.U
 				subscription.DeletedAtIsNil(),
 			).
 			WithTopic().
+			WithDeadLetterTopic().
 			Only(ctx)
 		if err != nil {
 			if isNotFound(err) {
@@ -129,8 +139,13 @@ func (s *subscriberServer) UpdateSubscription(ctx context.Context, req *pubsub.U
 			}
 			return grpc.AsStatusError(err)
 		}
-		// getting the saved sub is going to lose the topic edge, so cache that here
+		// getting the saved sub is going to lose cached edges, so cache values from
+		// them here
 		topicName := sub.Edges.Topic.Name
+		deadLetterTopicName := ""
+		if sub.Edges.DeadLetterTopic != nil {
+			deadLetterTopicName = sub.Edges.DeadLetterTopic.Name
+		}
 
 		subUpdate := tx.Subscription.UpdateOne(sub)
 		for _, p := range req.UpdateMask.GetPaths() {
@@ -197,7 +212,31 @@ func (s *subscriberServer) UpdateSubscription(ctx context.Context, req *pubsub.U
 					}
 					subUpdate.SetMessageFilter(req.Subscription.Filter)
 				}
-			case "ack_deadline_seconds", "retain_acked_messages", "dead_letter_policy", "detached":
+			case "dead_letter_policy":
+				dlp := req.Subscription.GetDeadLetterPolicy()
+				if dlp.DeadLetterTopic == "" {
+					subUpdate.ClearDeadLetterTopicID().ClearMaxDeliveryAttempts()
+					deadLetterTopicName = ""
+				} else {
+					dlt, err := tx.Topic.Query().
+						Where(topic.Name(dlp.DeadLetterTopic),
+							topic.DeletedAtIsNil()).
+						Only(ctx)
+					if err != nil {
+						if isNotFound(err) {
+							return status.Errorf(codes.NotFound, "Dead letter topic not found: %s", dlp.DeadLetterTopic)
+						}
+						return grpc.AsStatusError(err)
+					}
+					subUpdate.SetDeadLetterTopic(dlt)
+					deadLetterTopicName = dlt.Name
+					if dlp.MaxDeliveryAttempts != 0 {
+						subUpdate.SetMaxDeliveryAttempts(dlp.MaxDeliveryAttempts)
+					} else {
+						subUpdate.SetMaxDeliveryAttempts(defaultDeadLetterMaxAttempts)
+					}
+				}
+			case "ack_deadline_seconds", "retain_acked_messages", "detached":
 				// these are valid paths, we just don't support changing them
 				return status.Errorf(codes.InvalidArgument, "Modifying Subscription.%s is not supported", p)
 			default:
@@ -218,7 +257,7 @@ func (s *subscriberServer) UpdateSubscription(ctx context.Context, req *pubsub.U
 
 		actions.NotifyModifySubscription(tx, sub.ID, sub.Name)
 
-		resp = entSubscriptionToGrpc(sub, topicName)
+		resp = entSubscriptionToGrpc(sub, topicName, deadLetterTopicName)
 
 		return nil
 	})
@@ -251,6 +290,7 @@ func (s *subscriberServer) ListSubscriptions(ctx context.Context, req *pubsub.Li
 		subs, err := tx.Subscription.Query().
 			Where(predicates...).
 			WithTopic().
+			WithDeadLetterTopic().
 			Order(ent.Asc(subscription.FieldID)).
 			Limit(int(pageSize)).
 			All(ctx)
@@ -259,7 +299,7 @@ func (s *subscriberServer) ListSubscriptions(ctx context.Context, req *pubsub.Li
 		}
 		grpcSubscriptions := make([]*pubsub.Subscription, len(subs))
 		for i, sub := range subs {
-			grpcSubscriptions[i] = entSubscriptionToGrpc(sub, "")
+			grpcSubscriptions[i] = entSubscriptionToGrpc(sub, "", "")
 		}
 		var nextPageToken string
 		if len(subs) >= int(pageSize) {
@@ -631,7 +671,7 @@ func applyPushConfig(mut *ent.SubscriptionUpdateOne, cfg *pubsub.PushConfig) *en
 // Not planned: DeleteSnapshot
 // Not planned: Seek
 
-func entSubscriptionToGrpc(subscription *ent.Subscription, topicName string) *pubsub.Subscription {
+func entSubscriptionToGrpc(subscription *ent.Subscription, topicName, deadLetterTopicName string) *pubsub.Subscription {
 	nominalDelay, _ := actions.NextDelayFor(subscription, 0)
 	ret := &pubsub.Subscription{
 		Name: subscription.Name,
@@ -647,7 +687,21 @@ func entSubscriptionToGrpc(subscription *ent.Subscription, topicName string) *pu
 		ExpirationPolicy: &pubsub.ExpirationPolicy{
 			Ttl: durationpb.New(time.Duration(subscription.TTL)),
 		},
-		// not supported: PushConfig, Filter, DeadLetterPolicy, Detached
+		// not supported: PushConfig, Filter, Detached
+	}
+	if subscription.DeadLetterTopicID != nil {
+		ret.DeadLetterPolicy = &pubsub.DeadLetterPolicy{}
+		if subscription.Edges.DeadLetterTopic != nil {
+			if subscription.Edges.DeadLetterTopic.DeletedAt != nil {
+				deadLetterTopicName = deletedTopicName
+			} else {
+				deadLetterTopicName = subscription.Edges.DeadLetterTopic.Name
+			}
+		}
+		ret.DeadLetterPolicy.DeadLetterTopic = deadLetterTopicName
+		if subscription.MaxDeliveryAttempts != nil {
+			ret.DeadLetterPolicy.MaxDeliveryAttempts = *subscription.MaxDeliveryAttempts
+		}
 	}
 	if subscription.MinBackoff != nil || subscription.MaxBackoff != nil {
 		ret.RetryPolicy = &pubsub.RetryPolicy{}
@@ -663,7 +717,7 @@ func entSubscriptionToGrpc(subscription *ent.Subscription, topicName string) *pu
 	}
 	if subscription.Edges.Topic != nil {
 		if subscription.Edges.Topic.DeletedAt != nil {
-			ret.Topic = "_deleted-topic_"
+			ret.Topic = deletedTopicName
 		} else {
 			ret.Topic = subscription.Edges.Topic.Name
 		}
@@ -711,3 +765,6 @@ func effectiveFlowControl(maxMessages, maxBytes int64) actions.FlowControl {
 
 const defaultSubscriptionTTL = 30 * 24 * time.Hour
 const defaultSubscriptionMessageTTL = 7 * 24 * time.Hour
+
+const deletedTopicName = "_deleted-topic_"
+const defaultDeadLetterMaxAttempts = 5

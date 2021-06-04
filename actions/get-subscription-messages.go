@@ -46,7 +46,8 @@ type SubscriptionMessageDelivery struct {
 	Attributes    map[string]string `json:"attributes"`
 }
 type getSubscriptionMessagesResults struct {
-	deliveries []*SubscriptionMessageDelivery
+	deliveries      []*SubscriptionMessageDelivery
+	numDeadLettered int
 }
 type GetSubscriptionMessages struct {
 	params  GetSubscriptionMessagesParams
@@ -385,6 +386,8 @@ func (a *GetSubscriptionMessages) applyResults(
 		deliveries: make([]*SubscriptionMessageDelivery, 0, len(deliveries)),
 	}
 
+	hasDeadLettering := sub.HasFullDeadLetterConfig()
+
 	// can't do a bulk update of the deliveries, because their nextAttempt
 	// computations will be different, so we have to update them one by one
 	for i, d := range deliveries {
@@ -393,6 +396,22 @@ func (a *GetSubscriptionMessages) applyResults(
 		if (a.params.MaxBytesStrict || i > 0) &&
 			bytes+len(d.Edges.Message.Payload) > a.params.MaxBytes {
 			// keep trying other messages, maybe they will fit within the budget
+			continue
+		}
+
+		// if we missed the nack and this delivery has exceeded its attempt limit,
+		// dead letter it instead of delivering it
+		if hasDeadLettering && d.Attempts >= int(*sub.MaxDeliveryAttempts) {
+			if err = deadLetterDelivery(
+				ctx,
+				tx,
+				deadLetterDataFromEntities(d, sub),
+				now,
+				"actions/get-subscription-messages",
+			); err != nil {
+				return err
+			}
+			results.numDeadLettered++
 			continue
 		}
 

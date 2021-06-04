@@ -33,20 +33,36 @@ To select a backend: TODO
 
 ## What is and isn't implemented
 
-The bulk of the gRPC API is implemented. If your app works with the Google
-emulator, it should work with this one too.
+The bulk of the gRPC API is implemented. If your application only sends JSON
+payloads, and works with the emulator Google provides as part of the Google
+Cloud SDK as of June 2021, it should work with this one too.
 
-Things that are not implemented:
+### Supported Features Beyond Google's Emulator
+
+Several features are supported here that Google's emulator does not support (as
+of June 2021):
+
+- Server driven delivery backoff (but see note below on how this differs from
+  Google's production implementation)
+- Subscription filters
+- Dead letter topics for subscriptions
+
+### Features that are not implemented
 
 - Region settings
 - KMS settings
+- Custom ACK deadlines
+- ACK'd message retention
+- Authenticating PUSH delivery
 - The Schema API and any PubSub settings related to it
 - Authentication settings for Push subscriptions
+- Authenticating to the service itself
+- Detaching subscriptions
 - Changing message retry backoff settings for a subscription may not fully take
   effect when actively streaming messages from it (including from an HTTP Push
   configuration)
 
-Things that are different:
+### Features that are different
 
 - Some default timeouts & expiration delays may have different defaults from the
   Google ones, though they should all still be suitable for development purposes
@@ -61,6 +77,11 @@ Things that are different:
   subscription creation in `mmmbbb`, but not in Google's products. Google treats
   an HTTP Push endpoint that returns content with a 201 No Content response as
   an error (NACK), `mmmbbb` does not.
+- This is a clean room implementation, based only on _documented_ behavior. As
+  such, some corner cases where Google does not describe what their system does
+  in their API documentation may be have differently with this implementation.
+  - Example: Google does not currently document what happens if you delete a
+    topic that is referenced as the dead letter topic for some Subscription.
 
 ## Database model
 
