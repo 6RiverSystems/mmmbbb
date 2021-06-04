@@ -27,7 +27,7 @@ func main() {
 	}
 
 	os.Setenv("PUBSUB_EMULATOR_HOST", "localhost:8802")
-	psc, err := pubsub.NewClient(ctx, "go-compat")
+	psc, err := pubsub.NewClient(ctx, "go-compat-stress")
 	panicIf(err)
 	id := "go-stress-" + uuid.NewString()
 	t, err := psc.CreateTopic(ctx, id)
