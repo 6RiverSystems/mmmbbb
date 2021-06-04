@@ -46,7 +46,8 @@ type SubscriptionMessageDelivery struct {
 	Attributes    map[string]string `json:"attributes"`
 }
 type getSubscriptionMessagesResults struct {
-	deliveries []*SubscriptionMessageDelivery
+	deliveries      []*SubscriptionMessageDelivery
+	numDeadLettered int
 }
 type GetSubscriptionMessages struct {
 	params  GetSubscriptionMessagesParams
@@ -410,6 +411,7 @@ func (a *GetSubscriptionMessages) applyResults(
 			); err != nil {
 				return err
 			}
+			results.numDeadLettered++
 			continue
 		}
 
