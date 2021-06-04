@@ -80,7 +80,7 @@ func (a *DeadLetterDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 			// supported in that case
 		).
 		Limit(a.params.MaxDeliveries).
-		Select(delivery.FieldID, delivery.FieldMessageID).
+		Select(delivery.FieldID, delivery.FieldMessageID, delivery.FieldSubscriptionID).
 		Scan(ctx, &deliveryData)
 	if err != nil {
 		return err

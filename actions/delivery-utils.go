@@ -87,9 +87,10 @@ func deliverToSubscription(
 
 // SQL tags here need to match entities/queries used in this package
 type deadLetterData struct {
-	DeliveryID        uuid.UUID `sql:"id"`
-	DeliveryMessageID uuid.UUID `sql:"message_id"`
-	DeadLetterTopicID uuid.UUID `sql:"dead_letter_topic_id"`
+	DeliveryID             uuid.UUID `sql:"id"`
+	DeliverySubscriptionID uuid.UUID `sql:"subscription_id"`
+	DeliveryMessageID      uuid.UUID `sql:"message_id"`
+	DeadLetterTopicID      uuid.UUID `sql:"dead_letter_topic_id"`
 }
 
 func deadLetterDataFromEntities(delivery *ent.Delivery, sub *ent.Subscription) deadLetterData {
@@ -97,16 +98,17 @@ func deadLetterDataFromEntities(delivery *ent.Delivery, sub *ent.Subscription) d
 		sub = delivery.Edges.Subscription
 	}
 	return deadLetterData{
-		DeliveryID:        delivery.ID,
-		DeliveryMessageID: delivery.MessageID,
-		DeadLetterTopicID: *sub.DeadLetterTopicID,
+		DeliveryID:             delivery.ID,
+		DeliverySubscriptionID: delivery.SubscriptionID,
+		DeliveryMessageID:      delivery.MessageID,
+		DeadLetterTopicID:      *sub.DeadLetterTopicID,
 	}
 }
 
 func deadLetterDelivery(
 	ctx context.Context,
 	tx *ent.Tx,
-	x deadLetterData,
+	data deadLetterData,
 	now time.Time,
 	loggerName string,
 ) error {
@@ -119,7 +121,7 @@ func deadLetterDelivery(
 	// subscriptions.
 	dlTopic, err := tx.Topic.Query().
 		Where(
-			topic.ID(x.DeadLetterTopicID),
+			topic.ID(data.DeadLetterTopicID),
 			topic.DeletedAtIsNil(),
 		).
 		WithSubscriptions(func(sq *ent.SubscriptionQuery) {
@@ -131,7 +133,7 @@ func deadLetterDelivery(
 		return err
 	}
 	if dlTopic != nil && len(dlTopic.Edges.Subscriptions) != 0 {
-		m, err := tx.Message.Get(ctx, x.DeliveryMessageID)
+		m, err := tx.Message.Get(ctx, data.DeliveryMessageID)
 		if err != nil {
 			return err
 		}
@@ -149,11 +151,25 @@ func deadLetterDelivery(
 		}
 	}
 
-	// and delete the original delivery
-	if err := tx.Delivery.DeleteOneID(x.DeliveryID).
+	// mark the original delivery complete
+	if err := tx.Delivery.UpdateOneID(data.DeliveryID).
+		SetCompletedAt(now).
 		Exec(ctx); err != nil {
 		return err
 	}
 	deadLetterDeliveriesCounter.Inc()
+
+	// and wake any subscribers, in case this dead-lettered delivery was blocking
+	// another delivery
+	tx.OnCommit(func(c ent.Committer) ent.Committer {
+		return ent.CommitFunc(func(ctx context.Context, tx *ent.Tx) error {
+			if err := c.Commit(ctx, tx); err != nil {
+				return err
+			}
+			WakePublishListeners(false, data.DeliverySubscriptionID)
+			return nil
+		})
+	})
+
 	return nil
 }
