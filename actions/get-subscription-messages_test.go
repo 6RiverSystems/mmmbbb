@@ -401,19 +401,12 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test) {
 				topic := createTopicClient(t, ctx, client, 0)
 				dlTopic := createTopicClient(t, ctx, client, 1)
-				sub := createSubscriptionClient(t, ctx, client, topic, 0)
-				_, err := sub.Update().
-					SetMaxDeliveryAttempts(1).
-					SetDeadLetterTopic(dlTopic).
-					Save(ctx)
+				sub := createSubscriptionClient(t, ctx, client, topic, 0, withDeadLetter(dlTopic, 1))
 				createSubscriptionClient(t, ctx, client, dlTopic, 1)
-				assert.NoError(t, err)
 				msg := createMessageClient(t, ctx, client, topic, 0)
-				del := createDeliveryClient(t, ctx, client, sub, msg, 0)
-				_, err = del.Update().
-					SetAttempts(1).
-					Save(ctx)
-				assert.NoError(t, err)
+				createDeliveryClient(t, ctx, client, sub, msg, 0, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
+					return dc.SetAttempts(1)
+				})
 			},
 			GetSubscriptionMessagesParams{
 				// Name will be auto-filled

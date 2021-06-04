@@ -71,10 +71,13 @@ func (a *DeadLetterDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 				// this column alias needs to match the `sql` tag on `deadLetterData`
 				s.AppendSelect(sql.As(t.C(subscription.FieldDeadLetterTopicID), "dead_letter_topic_id"))
 			},
+			// ignore completed deliveries, of course
 			delivery.CompletedAtIsNil(),
 			// spec is that we dead-letter messages that fail their delivery counter,
 			// not those that expire
 			delivery.ExpiresAtGT(now),
+			// must not deadletter things on their last attempt until that has expired
+			delivery.AttemptAtLTE(now),
 			// we ignore ordering constraints here, since we shouldn't get any matches
 			// if it's blocked on ordering, and anyways dead-lettering is not fully
 			// supported in that case

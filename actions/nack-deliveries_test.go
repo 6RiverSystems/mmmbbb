@@ -74,19 +74,12 @@ func TestNackDeliveries_Execute(t *testing.T) {
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
 				topic := createTopic(t, ctx, tx, 0)
 				dlTopic := createTopic(t, ctx, tx, 1)
-				sub := createSubscription(t, ctx, tx, topic, 0)
-				sub, err := tx.Subscription.UpdateOne(sub).
-					SetDeadLetterTopicID(dlTopic.ID).
-					SetMaxDeliveryAttempts(1).
-					Save(ctx)
-				assert.NoError(t, err)
+				sub := createSubscription(t, ctx, tx, topic, 0, withDeadLetter(dlTopic, 1))
 				createSubscription(t, ctx, tx, dlTopic, 1)
 				msg := createMessage(t, ctx, tx, topic, 0)
-				delivery := createDelivery(t, ctx, tx, sub, msg, 0)
-				delivery, err = tx.Delivery.UpdateOne(delivery).
-					SetAttempts(1).
-					Save(ctx)
-				assert.NoError(t, err)
+				delivery := createDelivery(t, ctx, tx, sub, msg, 0, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
+					return dc.SetAttempts(1)
+				})
 				tt.params = NackDeliveriesParams{
 					[]uuid.UUID{delivery.ID},
 				}
