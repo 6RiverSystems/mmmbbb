@@ -42,8 +42,9 @@ func main() {
 			MinimumBackoff: time.Second * 3 / 2,
 		},
 		DeadLetterPolicy: &pubsub.DeadLetterPolicy{
-			DeadLetterTopic:     deadletterTopic.String(),
-			MaxDeliveryAttempts: 1,
+			DeadLetterTopic: deadletterTopic.String(),
+			// 5 is the minimum google allows, mmmbbb permits as low as 1
+			MaxDeliveryAttempts: 5,
 		},
 	})
 	panicIf(err)

@@ -66,6 +66,9 @@ func (s *subscriberServer) CreateSubscription(ctx context.Context, req *pubsub.S
 	}
 	if req.DeadLetterPolicy != nil {
 		params.MaxDeliveryAttempts = req.DeadLetterPolicy.MaxDeliveryAttempts
+		if params.MaxDeliveryAttempts == 0 {
+			params.MaxDeliveryAttempts = defaultDeadLetterMaxAttempts
+		}
 		params.DeadLetterTopic = req.DeadLetterPolicy.DeadLetterTopic
 	}
 	action := actions.NewCreateSubscription(params)
@@ -211,13 +214,8 @@ func (s *subscriberServer) UpdateSubscription(ctx context.Context, req *pubsub.U
 				}
 			case "dead_letter_policy":
 				dlp := req.Subscription.GetDeadLetterPolicy()
-				if dlp.MaxDeliveryAttempts <= 0 {
-					subUpdate.ClearMaxDeliveryAttempts()
-				} else {
-					subUpdate.SetMaxDeliveryAttempts(dlp.MaxDeliveryAttempts)
-				}
 				if dlp.DeadLetterTopic == "" {
-					subUpdate.ClearDeadLetterTopicID()
+					subUpdate.ClearDeadLetterTopicID().ClearMaxDeliveryAttempts()
 					deadLetterTopicName = ""
 				} else {
 					dlt, err := tx.Topic.Query().
@@ -232,6 +230,11 @@ func (s *subscriberServer) UpdateSubscription(ctx context.Context, req *pubsub.U
 					}
 					subUpdate.SetDeadLetterTopic(dlt)
 					deadLetterTopicName = dlt.Name
+					if dlp.MaxDeliveryAttempts != 0 {
+						subUpdate.SetMaxDeliveryAttempts(dlp.MaxDeliveryAttempts)
+					} else {
+						subUpdate.SetMaxDeliveryAttempts(defaultDeadLetterMaxAttempts)
+					}
 				}
 			case "ack_deadline_seconds", "retain_acked_messages", "detached":
 				// these are valid paths, we just don't support changing them
@@ -764,3 +767,4 @@ const defaultSubscriptionTTL = 30 * 24 * time.Hour
 const defaultSubscriptionMessageTTL = 7 * 24 * time.Hour
 
 const deletedTopicName = "_deleted-topic_"
+const defaultDeadLetterMaxAttempts = 5
