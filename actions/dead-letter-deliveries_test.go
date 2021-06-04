@@ -199,6 +199,7 @@ func TestDeadLetterDeliveries_Execute(t *testing.T) {
 						delivery.SubscriptionIDNEQ(subID),
 						delivery.CompletedAtIsNil(),
 					).Count(ctx)
+				assert.NoError(t, err)
 				if tt.results != nil {
 					assert.Equal(t, tt.results.numDeadLettered*countDLSubs, countDLDeliveries)
 				} else {
