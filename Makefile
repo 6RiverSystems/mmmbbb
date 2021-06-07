@@ -75,14 +75,11 @@ $(GENERATE_GRPC) &: ./grpc/generate.go
 	gofmt -l -s -w ./common/swagger-ui
 	go run golang.org/x/tools/cmd/goimports -l -w $(GOIMPORTSARGS) ./common/swagger-ui
 
+# this requires at least go 1.16.5 to avoid mucking up go.mod/go.sum
 get:
-# go mod download mucks up go.sum since 1.16
-# see: https://github.com/golang/go/issues/43994
-	td=$$(mktemp -d) && cp go.sum $$td/ && go mod download -x && cp -f $$td/go.sum ./ && rm -rf $$td/
-# `go list -test -deps ./...`  is more like what we want, and also downloads
-# less than `go mod download`, but it doesn't work when we haven't run code gen
-# yet
+	go mod download -x
 	go mod verify
+
 install-ci-tools: install-tools-protobuf
 # tools only needed in CI
 	go install gotest.tools/gotestsum
