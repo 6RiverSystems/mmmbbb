@@ -47,9 +47,6 @@ cloud.google.com/go/storage v1.8.0/go.mod h1:Wv1Oy7z6Yz3DshWRJFhqM/UCfaWIRTdp0RX
 cloud.google.com/go/storage v1.10.0/go.mod h1:FLPqc6j+Ki4BU591ie1oL6qBQGu2Bl/tZ9ullr3+Kg0=
 contrib.go.opencensus.io/exporter/stackdriver v0.13.4/go.mod h1:aXENhDJ1Y4lIg4EUaVTwzvYETVNZk10Pu26tevFKLUc=
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
-entgo.io/ent v0.8.1-0.20210520103905-da20bba97dca/go.mod h1:ip4404vuyzWgDtvSQLNHSIf7U+EplCqJ77vKELUq8KA=
-entgo.io/ent v0.8.1-0.20210603070748-fe9b0832881b h1:biAk7MFVEgo9W8QvohBzgpuKEbAzpfLRiSkPxs5/kjw=
-entgo.io/ent v0.8.1-0.20210603070748-fe9b0832881b/go.mod h1:dXzdz3vYexlQYKhqj6448m/eJWc2D349kGoYD3Xei9U=
 github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
@@ -682,6 +679,8 @@ github.com/matttproud/golang_protobuf_extensions v1.0.1 h1:4hp9jkHxhMHkqkrB3Ix0j
 github.com/matttproud/golang_protobuf_extensions v1.0.1/go.mod h1:D8He9yQNgCq6Z5Ld7szi9bcBfOoFv/3dc6xSMkL2PC0=
 github.com/mbilski/exhaustivestruct v1.2.0 h1:wCBmUnSYufAHO6J4AVWY6ff+oxWxsVFrwgOdMUQePUo=
 github.com/mbilski/exhaustivestruct v1.2.0/go.mod h1:OeTBVxQWoEmB2J2JCHmXWPJ0aksxSUOUy+nvtVEfzXc=
+github.com/mgabeler-lee-6rs/ent v0.6.1-0.20210608205917-a8b5cf09ec25 h1:CdgSl8k0XAht/zD6C54347BgC28FCoO9bQpW1pQRQV0=
+github.com/mgabeler-lee-6rs/ent v0.6.1-0.20210608205917-a8b5cf09ec25/go.mod h1:dXzdz3vYexlQYKhqj6448m/eJWc2D349kGoYD3Xei9U=
 github.com/mgechev/dots v0.0.0-20190921121421-c36f7dcfbb81 h1:QASJXOGm2RZ5Ardbc86qNFvby9AqkLDibfChMtAg5QM=
 github.com/mgechev/dots v0.0.0-20190921121421-c36f7dcfbb81/go.mod h1:KQ7+USdGKfpPjXk4Ga+5XxQM4Lm4e3gAogrreFAYpOg=
 github.com/mgechev/revive v1.0.6 h1:MgRQ3ys2uQCyVjelaDhVs8oSvOPYInzGA/nNGMa+MNU=
