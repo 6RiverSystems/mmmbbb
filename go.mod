@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	cloud.google.com/go/pubsub v1.10.3
-	entgo.io/ent v0.8.1-0.20210603070748-fe9b0832881b
+	entgo.io/ent v0.8.1-0.20210609055611-110073c98219
 	github.com/alecthomas/participle/v2 v2.0.0-alpha4
 	github.com/getkin/kin-openapi v0.61.0
 	github.com/gin-gonic/gin v1.7.1
@@ -32,5 +32,3 @@ require (
 	google.golang.org/protobuf v1.26.0
 	gotest.tools/gotestsum v1.6.3
 )
-
-replace entgo.io/ent => github.com/mgabeler-lee-6rs/ent v0.6.1-0.20210608205917-a8b5cf09ec25
