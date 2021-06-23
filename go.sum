@@ -49,7 +49,6 @@ cloud.google.com/go/storage v1.8.0/go.mod h1:Wv1Oy7z6Yz3DshWRJFhqM/UCfaWIRTdp0RX
 cloud.google.com/go/storage v1.10.0/go.mod h1:FLPqc6j+Ki4BU591ie1oL6qBQGu2Bl/tZ9ullr3+Kg0=
 contrib.go.opencensus.io/exporter/stackdriver v0.13.4/go.mod h1:aXENhDJ1Y4lIg4EUaVTwzvYETVNZk10Pu26tevFKLUc=
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
-entgo.io/ent v0.8.1-0.20210520103905-da20bba97dca/go.mod h1:ip4404vuyzWgDtvSQLNHSIf7U+EplCqJ77vKELUq8KA=
 entgo.io/ent v0.8.1-0.20210621145950-50042656660b h1:T0JW4nZUGI/FAE9Giqj/4tPtL8n2NN+dDwyo7EwEKuY=
 entgo.io/ent v0.8.1-0.20210621145950-50042656660b/go.mod h1:SJjBmzwzo8UJo2bMoMw1bAstexzGcwfnIHeB+Rzr4p8=
 github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ=
@@ -1026,8 +1025,8 @@ github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9de
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
 github.com/zenazn/goji v0.9.0/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxtB1Q=
-go.6river.tech/gosix v0.2.22 h1:Ms8fhrPiktjyfPfCra9+7kY7CvfOpsbdbZhJOy08bcw=
-go.6river.tech/gosix v0.2.22/go.mod h1:ubuIEN1fnFb0zmUb1zoEdFLBt01CXhL0JpZX1jlZlFY=
+go.6river.tech/gosix v0.2.23 h1:lNmiXK87RsbhvEKCFHZPJqmH4Py+iSqlAbC6jOf8G+0=
+go.6river.tech/gosix v0.2.23/go.mod h1:5mNSBJccZ138PXYE81ogR7SZoYGVwnaYWqwvUhZqIvY=
 go.etcd.io/bbolt v1.3.2/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.etcd.io/bbolt v1.3.3/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.etcd.io/bbolt v1.3.4/go.mod h1:G5EMThwa9y8QZGBClrRx5EY+Yw9kAhnjy3bSjsnlVTQ=
