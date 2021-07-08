@@ -551,6 +551,48 @@ func TestGrpcCompat(t *testing.T) {
 			nil,
 			nil, nil, nil,
 		},
+		{
+			"sub purge via seek",
+			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+				topic, err := psc.CreateTopic(ctx, safeName(t))
+				require.NoError(t, err)
+				sub, err := topic.CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{})
+				require.NoError(t, err)
+				// this should make it use the non-streaming pull endpoint
+				sub.ReceiveSettings().Synchronous = true
+				// avoid wasting a lot of time spinning up extra gRPC connections
+				sub.ReceiveSettings().NumGoroutines = 1
+				tt.topics = []pubsub.Topic{topic}
+				tt.subs = []pubsub.Subscription{sub}
+
+				// send some messages that we're gonna purge
+				for i := 0; i < 10; i++ {
+					_, err := topic.Publish(ctx, &pubsub.RealMessage{
+						Data: json.RawMessage(strconv.Itoa(i)),
+					}).Get(ctx)
+					assert.NoError(t, err)
+				}
+			},
+			[]testStep{
+				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+					// seek the sub to now to purge everything we published
+					err := tt.subs[0].SeekToTime(ctx, time.Now())
+					assert.NoError(t, err)
+
+					// do a synchronous pull and verify there are no messages
+					timeoutCtx, cancel := context.WithTimeout(ctx, time.Second)
+					defer cancel()
+					err = tt.subs[0].Receive(timeoutCtx, func(ctx context.Context, m pubsub.Message) {
+						assert.Fail(t, "should not have received a message")
+						m.Ack()
+						cancel()
+					})
+					assert.NoError(t, err)
+				},
+			},
+			nil,
+			nil, nil, nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

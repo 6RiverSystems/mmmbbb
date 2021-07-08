@@ -137,9 +137,17 @@ func TestSeekSubscriptionToTime_Execute(t *testing.T) {
 				a := NewSeekSubscriptionToTime(tt.params)
 				tt.assertion(t, a.Execute(ctx, tx))
 				assert.Equal(t, tt.results, a.results)
+				jsonParams := a.Parameters()
+				assert.Equal(t, &tt.sub.ID, jsonParams["id"])
+				assert.Equal(t, tt.sub.Name, jsonParams["name"])
+				assert.Equal(t, tt.params.Time, jsonParams["time"])
+				assert.Equal(t, tt.results != nil, a.HasResults())
 				if tt.results != nil && a.results != nil {
 					assert.Equal(t, tt.results.numAcked, a.NumAcked())
 					assert.Equal(t, tt.results.numDeAcked, a.NumDeAcked())
+					jsonResults := a.Results()
+					assert.Equal(t, tt.results.numAcked, jsonResults["numAcked"])
+					assert.Equal(t, tt.results.numDeAcked, jsonResults["numDeAcked"])
 				}
 				expectAckState(t, ctx, tx, tt.expectAcked, true)
 				expectAckState(t, ctx, tx, tt.expectNotAcked, false)
