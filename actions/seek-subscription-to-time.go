@@ -96,7 +96,9 @@ func (a *SeekSubscriptionToTime) Execute(ctx context.Context, tx *ent.Tx) error 
 		return err
 	}
 
-	// we modified any deliveries, wake up any listeners
+	// we modified any deliveries, wake up any listeners. obviously we need to do
+	// so if we de-acked some, but acking might also wake a listener, if any of
+	// those were blocking later deliveries in an ordered subscription
 	if numAcked != 0 || numDeAcked != 0 {
 		notifyPublish(tx, sub.ID)
 	}

@@ -72,6 +72,51 @@ func TestSeekSubscriptionToTime_Execute(t *testing.T) {
 			uuid.UUID{},
 			nil, nil, nil, nil,
 		},
+		{
+			"no-op purge",
+			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
+				tt.params.ID = &tt.sub.ID
+				// don't set tt.expectPublishNotify -- we expect no changes, so we don't
+				// expect any notifications
+				for i := 0; i < 10; i++ {
+					m := createMessage(t, ctx, tx, tt.topic, i)
+					d := createDelivery(t, ctx, tx, tt.sub, m, i, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
+						return dc.SetCompletedAt(time.Now())
+					})
+					tt.expectAcked = append(tt.expectAcked, d.ID)
+				}
+				// need to refresh this so it's >= our deliveries
+				tt.params.Time = time.Now()
+			},
+			// lots of details here will be filled in by the before hook
+			SeekSubscriptionToTimeParams{},
+			assert.NoError,
+			&seekSubscriptionToTimeResults{numAcked: 0, numDeAcked: 0},
+			uuid.UUID{},
+			nil, nil, nil, nil,
+		},
+		{
+			"no-op replay",
+			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
+				begin := time.Now()
+				tt.params.ID = &tt.sub.ID
+				// don't set tt.expectPublishNotify -- we expect no changes, so we don't
+				// expect any notifications
+				for i := 0; i < 10; i++ {
+					m := createMessage(t, ctx, tx, tt.topic, i)
+					d := createDelivery(t, ctx, tx, tt.sub, m, i)
+					tt.expectNotAcked = append(tt.expectNotAcked, d.ID)
+				}
+				// need to ensure this is strictly before all our deliveries
+				tt.params.Time = begin.Add(-time.Millisecond)
+			},
+			// lots of details here will be filled in by the before hook
+			SeekSubscriptionToTimeParams{},
+			assert.NoError,
+			&seekSubscriptionToTimeResults{numAcked: 0, numDeAcked: 0},
+			uuid.UUID{},
+			nil, nil, nil, nil,
+		},
 	}
 	client := enttest.ClientForTest(t)
 	for _, tt := range tests {
