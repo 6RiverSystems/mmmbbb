@@ -423,6 +423,37 @@ func (s *subscriberServer) Pull(ctx context.Context, req *pubsub.PullRequest) (*
 	return &pubsub.PullResponse{ReceivedMessages: msgs}, nil
 }
 
+func (s *subscriberServer) Seek(ctx context.Context, req *pubsub.SeekRequest) (*pubsub.SeekResponse, error) {
+	if !isValidSubscriptionName(req.Subscription) {
+		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / subscription path %s", req.Subscription)
+	}
+
+	switch target := req.Target.(type) {
+	case *pubsub.SeekRequest_Time:
+		// FUTURE: do we want to bound how far in the future or past the target can be?
+		action := actions.NewSeekSubscriptionToTime(actions.SeekSubscriptionToTimeParams{
+			Name: req.Subscription,
+			Time: target.Time.AsTime(),
+		})
+		if err := s.client.DoCtxTxRetry(
+			ctx,
+			nil,
+			action.Execute,
+			postgres.RetryOnErrorCode(postgres.DeadlockDetected),
+		); err != nil {
+			if isNotFound(err) {
+				return nil, status.Errorf(codes.NotFound, "Subscription not found: %s", req.Subscription)
+			}
+			return nil, grpc.AsStatusError(err)
+		}
+		return &pubsub.SeekResponse{}, nil
+	case *pubsub.SeekRequest_Snapshot:
+		return nil, status.Errorf(codes.Unimplemented, "Snapshots are not supported")
+	default:
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid type for SeekRequest.Target")
+	}
+}
+
 func (s *subscriberServer) StreamingPull(stream pubsub.Subscriber_StreamingPullServer) error {
 	// we require an initial message before we can start doing anything
 	initial, err := stream.Recv()
