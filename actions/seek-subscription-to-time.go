@@ -20,7 +20,8 @@ type SeekSubscriptionToTimeParams struct {
 }
 
 type seekSubscriptionToTimeResults struct {
-	numDeliveries int
+	numAcked   int
+	numDeAcked int
 }
 
 type SeekSubscriptionToTime struct {
@@ -63,11 +64,29 @@ func (a *SeekSubscriptionToTime) Execute(ctx context.Context, tx *ent.Tx) error 
 	// save resolved ID & Name so Parameters() can report it
 	a.params.ID, a.params.Name = &sub.ID, sub.Name
 	now := time.Now()
-	numUpdated, err := tx.Delivery.Update().
+
+	// the rule for seek to time is that everything published before the given
+	// time is marked as acknowledged, and everything published after that time is
+	// marked as un-acknowledged
+
+	numAcked, err := tx.Delivery.Update().
 		Where(
 			delivery.SubscriptionID(sub.ID),
 			delivery.ExpiresAtGTE(now),
-			delivery.CompletedAtGTE(a.params.Time),
+			delivery.PublishedAtLTE(a.params.Time),
+			delivery.CompletedAtIsNil(),
+		).
+		SetCompletedAt(now).
+		Save(ctx)
+	if err != nil {
+		return err
+	}
+	numDeAcked, err := tx.Delivery.Update().
+		Where(
+			delivery.SubscriptionID(sub.ID),
+			delivery.ExpiresAtGTE(now),
+			delivery.PublishedAtGT(a.params.Time),
+			delivery.CompletedAtNotNil(),
 		).
 		ClearCompletedAt().
 		SetExpiresAt(now.Add(time.Duration(sub.MessageTTL))).
@@ -77,13 +96,14 @@ func (a *SeekSubscriptionToTime) Execute(ctx context.Context, tx *ent.Tx) error 
 		return err
 	}
 
-	// we just un-ack'd some deliveries, so wake up any listeners
-	if numUpdated != 0 {
+	// we modified any deliveries, wake up any listeners
+	if numAcked != 0 || numDeAcked != 0 {
 		notifyPublish(tx, sub.ID)
 	}
 
 	a.results = &seekSubscriptionToTimeResults{
-		numDeliveries: numUpdated,
+		numAcked:   numAcked,
+		numDeAcked: numDeAcked,
 	}
 
 	return nil
@@ -101,12 +121,16 @@ func (a *SeekSubscriptionToTime) HasResults() bool {
 	return a.results != nil
 }
 
-func (a *SeekSubscriptionToTime) NumDeliveries() int {
-	return a.results.numDeliveries
+func (a *SeekSubscriptionToTime) NumAcked() int {
+	return a.results.numAcked
+}
+func (a *SeekSubscriptionToTime) NumDeAcked() int {
+	return a.results.numDeAcked
 }
 
 func (a *SeekSubscriptionToTime) Results() map[string]interface{} {
 	return map[string]interface{}{
-		"numDeliveries": a.results.numDeliveries,
+		"numAcked":   a.results.numAcked,
+		"numDeAcked": a.results.numDeAcked,
 	}
 }
