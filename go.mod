@@ -12,7 +12,7 @@ require (
 	github.com/google/addlicense v0.0.0-20210428195630-6d92264d7170
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.5.0
-	github.com/iancoleman/strcase v0.1.3
+	github.com/iancoleman/strcase v0.2.0
 	github.com/jackc/pgconn v1.9.0
 	github.com/jackc/pgx/v4 v4.12.0
 	github.com/mattn/go-sqlite3 v1.14.7
