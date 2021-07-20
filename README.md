@@ -95,6 +95,7 @@ of June 2021):
   Google's production implementation)
 * Subscription filters
 * Dead letter topics for subscriptions
+* Ordered message delivery to subscriptions
 
 ### Features that are not implemented
 
