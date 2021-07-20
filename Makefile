@@ -107,6 +107,7 @@ lint:
 	! gofmt -l -s . | fgrep -xvf <( git ls-files --exclude-standard --others --ignored ) | grep .
 	! go run golang.org/x/tools/cmd/goimports -l $(GOIMPORTSARGS) . | fgrep -xvf <( git ls-files --exclude-standard --others --ignored ) | grep .
 	go run github.com/golangci/golangci-lint/cmd/golangci-lint run $(LINTARGS)
+	go run github.com/google/addlicense -c '6 River Systems' -l mit -skip css -skip js -skip yml -skip html -skip version.go -check .
 .PHONY: lint
 
 compile: compile-code compile-tests
