@@ -11,16 +11,14 @@
 #
 name: "CodeQL"
 
-# disabled for now, it doesn't work until we address repo access
-on: {}
-# on:
-#   push:
-#     branches: [main]
-#   pull_request:
-#     # The branches below must be a subset of the branches above
-#     branches: [main]
-#   schedule:
-#     - cron: "53 19 * * 2"
+on:
+  push:
+    branches: [main]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [main]
+  schedule:
+    - cron: "53 19 * * 2"
 
 jobs:
   analyze:
