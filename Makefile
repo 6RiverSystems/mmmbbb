@@ -146,9 +146,7 @@ binaries: $(BINARIES)
 .PHONY: binaries
 
 $(BINARIES): bin/%: ./cmd/%/main.go compile-code
-# we build binaries (meant for docker images & deployment) without CGO, as
-# that's only needed for SQLite in test mode
-	CGO_ENABLED=0 go build -v $(BUILDARGS) -o $@ ./cmd/$*
+	go build -v $(BUILDARGS) -o $@ ./cmd/$*
 
 clean-ent:
 # -X says to only remove ignored files, not untracked ones
@@ -172,12 +170,22 @@ $(BINARIES_DOCKER): docker-%: bin/% Dockerfile .dockerignore $(wildcard .docker-
 docker-push: $(BINARIES_DOCKER_PUSH)
 # TODO: integrate this better with ci_tool.sh
 GCRNAME:=gcr.io/plasma-column-128721
+HUBNAME:=6river
 $(BINARIES_DOCKER_PUSH): docker-push-%: .version
 	docker tag $(REPONAME)-$*:$(file <.version) $(GCRNAME)/$(REPONAME)-$*:$(file <.version)
 	docker push $(GCRNAME)/$(REPONAME)-$*:$(file <.version)
 ifeq ($(CIRCLE_BRANCH),main)
 	docker tag $(REPONAME)-$*:$(file <.version) $(GCRNAME)/$(REPONAME)-$*:latest
 	docker push $(GCRNAME)/$(REPONAME)-$*:latest
+# only publish to public docker hub account on `main`, and if we have the perms
+# to do so
+ifneq ($(DOCKERHUB_USER),)
+	echo "$$DOCKERHUB_PASSWORD" | docker login --username "$$DOCKERHUB_USER" --password-stdin
+	docker tag $(REPONAME)-$*:$(file <.version) $(HUBNAME)/$(REPONAME)-$*:$(file <.version)
+	docker tag $(REPONAME)-$*:$(file <.version) $(HUBNAME)/$(REPONAME)-$*:latest
+	docker push $(HUBNAME)/$(REPONAME)-$*:$(file <.version)
+	docker push $(HUBNAME)/$(REPONAME)-$*:latest
+endif
 endif
 .PHONY: docker docker-dev-version $(BINARIES_DOCKER)
 
