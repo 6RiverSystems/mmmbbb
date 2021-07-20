@@ -30,9 +30,16 @@ RUN \
 
 # TODO: don't use NODE_ENV for non-NodeJS code
 ENV NODE_ENV=production
-# Apps will need DATABASE_URL set externally to a useful value
+# default to an in-container SQLite database to simplify usage as a drop-in
+# TODO: add all the needed parameters in code instead of requiring them here
+ENV DATABASE_URL=sqlite:///data/mmmbbb.sqlite?_fk=true&_journal_mode=wal&cache=private&_busy_timeout=10000&_txlock=immediate
+# base port 8084 for HTTP results in the gRPC using 8085 for compatibility with
+# the google emulator's defaults
+ENV PORT=8084
+EXPOSE 8084/tcp 8085/tcp
 
-RUN mkdir -p /app
+RUN mkdir -p /app /data
+VOLUME ["/data"]
 WORKDIR /app
 
 COPY .docker-deps/entrypoint.sh /app/
