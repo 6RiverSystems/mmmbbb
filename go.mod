@@ -28,5 +28,5 @@ require (
 	google.golang.org/grpc v1.39.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0
 	google.golang.org/protobuf v1.27.1
-	gotest.tools/gotestsum v1.6.4
+	gotest.tools/gotestsum v1.7.0
 )
