@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go/pubsub v1.13.0
 	entgo.io/ent v0.8.1-0.20210621145950-50042656660b
 	github.com/alecthomas/participle/v2 v2.0.0-alpha6
-	github.com/getkin/kin-openapi v0.66.0
+	github.com/getkin/kin-openapi v0.67.0
 	github.com/gin-gonic/gin v1.7.2
 	github.com/golangci/golangci-lint v1.41.1
 	github.com/google/addlicense v0.0.0-20210428195630-6d92264d7170
