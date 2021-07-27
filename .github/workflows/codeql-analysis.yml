@@ -67,3 +67,5 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v1
+        env:
+          CODEQL_EXTRACTOR_GO_BUILD_COMMAND: "make compile"
