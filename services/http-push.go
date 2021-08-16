@@ -111,23 +111,29 @@ func (s *httpPusher) Start(ctx context.Context, ready chan<- struct{}) error {
 func (s *httpPusher) monitorSubs(ctx context.Context, ready chan<- struct{}) error {
 	var subAwaiter actions.AnySubModifiedNotifier
 	defer func() { actions.CancelAnySubModifiedAwaiter(subAwaiter) }()
+LOOP:
 	for {
 		// get a fresh notifier every loop, before we query, so that there isn't a
 		// race from a change between query and notifier setup
 		actions.CancelAnySubModifiedAwaiter(subAwaiter)
 		subAwaiter = actions.AnySubModifiedAwaiter()
 		if err := s.startPushersOnce(ctx); err != nil {
-			if ready != nil {
-				close(ready)
+			s.logger.Error().Err(err).Msg("error starting pushers, will retry")
+			// don't retry instantly, causes spam
+			retryDelay := time.After(time.Second)
+			select {
+			case <-retryDelay:
+				continue LOOP
+			case <-ctx.Done():
+				return nil
 			}
-			return err
 		}
 		if ready != nil {
 			close(ready)
 			ready = nil
 		}
 		if r := waitPusherMonitors(ctx, time.Minute, subAwaiter, s.pushers); r == waitMonitorContextDone {
-			return ctx.Err()
+			return nil
 		}
 	}
 }
@@ -135,7 +141,7 @@ func (s *httpPusher) monitorSubs(ctx context.Context, ready chan<- struct{}) err
 func (s *httpPusher) startPushersOnce(ctx context.Context) error {
 	select {
 	case <-ctx.Done():
-		return ctx.Err()
+		return nil
 	default:
 	}
 

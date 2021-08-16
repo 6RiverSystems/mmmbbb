@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"net"
 	"strings"
+	"time"
 
 	"entgo.io/ent/dialect"
 	"github.com/google/uuid"
@@ -123,6 +124,7 @@ func (n *pgNotifier) Start(ctx context.Context, ready chan<- struct{}) error {
 
 	// connection retry loop
 	eg.Go(func() error {
+	LOOP:
 		for {
 			if err := n.runOnce(egCtx, &ready); err != nil {
 				if isContextError(err, egCtx) {
@@ -130,6 +132,14 @@ func (n *pgNotifier) Start(ctx context.Context, ready chan<- struct{}) error {
 					return nil
 				}
 				n.logger.Warn().Err(err).Msg("pg connection failed, retrying")
+				// don't retry instantly, causes spam
+				retryDelay := time.After(time.Second)
+				select {
+				case <-retryDelay:
+					continue LOOP
+				case <-egCtx.Done():
+					return nil
+				}
 			}
 		}
 	})
@@ -238,6 +248,10 @@ func (n *pgNotifier) runOnce(ctx context.Context, ready *chan<- struct{}) error 
 				}
 			}()
 		}
+
+		// once we wire up all the PG listeners, we need to wake up all the internal
+		// listeners, as we don't know what we might have missed
+		actions.WakeAllInternal()
 
 		received := make(chan *pgconn.Notification, 1)
 		eg, egCtx := errgroup.WithContext(ctx)
