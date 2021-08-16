@@ -45,6 +45,7 @@ GOIMPORTSARGS:=-local github.com/6RiverSystems,go.6river.tech
 BUILDARGS:=-tags nomsgpack
 LINTARGS:=$(patsubst -tags,--build-tags,$(BUILDARGS))
 
+# default `make` invocation is to run the full generate/build/lint/test sequence
 default: compile-code test
 .PHONY: default
 
@@ -107,7 +108,7 @@ lint:
 	! gofmt -l -s . | fgrep -xvf <( git ls-files --exclude-standard --others --ignored ) | grep .
 	! go run golang.org/x/tools/cmd/goimports -l $(GOIMPORTSARGS) . | fgrep -xvf <( git ls-files --exclude-standard --others --ignored ) | grep .
 	go run github.com/golangci/golangci-lint/cmd/golangci-lint run $(LINTARGS)
-	go run github.com/google/addlicense -c '6 River Systems' -l mit -skip css -skip js -skip yml -skip html -skip version.go -check .
+	go run github.com/google/addlicense -c '6 River Systems' -l mit -skip css -skip js -skip yml -skip html -ignore version/version.go -check .
 .PHONY: lint
 
 compile: compile-code compile-tests
