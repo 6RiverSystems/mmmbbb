@@ -3,7 +3,7 @@ module go.6river.tech/mmmbbb
 go 1.16
 
 require (
-	cloud.google.com/go/pubsub v1.13.0
+	cloud.google.com/go/pubsub v1.15.0
 	entgo.io/ent v0.9.0
 	github.com/alecthomas/participle/v2 v2.0.0-alpha6
 	github.com/getkin/kin-openapi v0.69.0
@@ -26,8 +26,8 @@ require (
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/term v0.0.0-20210615171337-6886f2dfbf5b // indirect
 	golang.org/x/tools v0.1.5
-	google.golang.org/api v0.52.0
-	google.golang.org/genproto v0.0.0-20210809142519-0135a39c2737
+	google.golang.org/api v0.54.0
+	google.golang.org/genproto v0.0.0-20210813162853-db860fec028c
 	google.golang.org/grpc v1.39.1
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0
 	google.golang.org/protobuf v1.27.1
