@@ -17,7 +17,9 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-FROM debian:stable-slim
+# stable-slim is temporarily broken with the bullseye release:
+# https://github.com/debuerreotype/docker-debian-artifacts/issues/134
+FROM debian:bullseye-slim
 LABEL MAINTAINER="Matthew Gabeler-Lee <mgabeler-lee@6river.com>"
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--", "/app/entrypoint.sh"]
