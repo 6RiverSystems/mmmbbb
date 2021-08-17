@@ -448,7 +448,8 @@ func TestHttpPush(t *testing.T) {
 				return tt.receiver(t, msgs)
 			})
 
-			assert.Equal(t, context.Canceled, eg.Wait())
+			// OK to either return cancellation error or nil
+			assert.Contains(t, []error{nil, context.Canceled}, eg.Wait())
 			receiver.Close()
 			serverWG.Wait()
 			close(msgs)

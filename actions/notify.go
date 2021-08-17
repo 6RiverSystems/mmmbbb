@@ -266,6 +266,37 @@ func wakeModifyListeners(
 	}
 }
 
+func WakeAllInternal() {
+	nmu.Lock()
+	defer nmu.Unlock()
+
+	for subID, waitSet := range pubWaiters {
+		for c := range waitSet {
+			close(c)
+			// don't need to remove from the waitSet because we're going to remove the
+			// whole waitSet
+		}
+		delete(pubWaiters, subID)
+	}
+
+	for _, waitSetSet := range []map[modifyKey]notifySet{topicModifyWaiters, subModifyWaiters} {
+		for id, waitSet := range waitSetSet {
+			for c := range waitSet {
+				close(c)
+				// don't need to remove from the waitSet because we're going to remove
+				// the whole waitSet
+			}
+			delete(waitSetSet, id)
+		}
+	}
+	for _, waitSet := range []notifySet{anyTopicModifiedWaiters, anySubModifiedWaiters} {
+		for c := range waitSet {
+			close(c)
+			delete(waitSet, c)
+		}
+	}
+}
+
 // this has to return a two-way channel so that it can be passed to cancelAwaiter
 func PublishAwaiter(subID uuid.UUID) PublishNotifier {
 	c := make(PublishNotifier)
