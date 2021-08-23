@@ -6,7 +6,7 @@ orbs:
 jobs:
   all-in-one:
     docker:
-      - image: cimg/go:1.16
+      - image: cimg/go:1.17
       - image: circleci/postgres:9.6-alpine
         environment:
           POSTGRES_USER: circle

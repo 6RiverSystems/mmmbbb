@@ -18,6 +18,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 // this isn't part of the actual code build
+//go:build generate
 // +build generate
 
 package ent

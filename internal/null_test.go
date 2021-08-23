@@ -17,7 +17,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-//+build xyzzy
+//go:build xyzzy
+// +build xyzzy
 
 // this file just exists so that our linting-related dependencies won't get
 // tidied out of go.mod. Some of these things aren't actually importable
@@ -30,4 +31,8 @@ import (
 	_ "github.com/google/addlicense"
 	_ "golang.org/x/tools/imports"
 	_ "gotest.tools/gotestsum/cmd"
+
+	_ "github.com/deepmap/oapi-codegen/pkg/codegen"
+	// needed for golangci-lint
+	_ "github.com/quasilyte/go-ruleguard/dsl"
 )
