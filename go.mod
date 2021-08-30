@@ -3,7 +3,7 @@ module go.6river.tech/mmmbbb
 go 1.17
 
 require (
-	cloud.google.com/go/pubsub v1.15.0
+	cloud.google.com/go/pubsub v1.16.0
 	entgo.io/ent v0.9.1
 	github.com/alecthomas/participle/v2 v2.0.0-alpha7
 	github.com/deepmap/oapi-codegen v1.8.2
