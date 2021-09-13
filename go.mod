@@ -3,7 +3,7 @@ module go.6river.tech/mmmbbb
 go 1.17
 
 require (
-	cloud.google.com/go/pubsub v1.16.0
+	cloud.google.com/go/pubsub v1.17.0
 	entgo.io/ent v0.9.1
 	github.com/alecthomas/participle/v2 v2.0.0-alpha7
 	github.com/deepmap/oapi-codegen v1.8.2
@@ -13,7 +13,7 @@ require (
 	github.com/golangci/golangci-lint v1.42.1
 	github.com/google/addlicense v1.0.0
 	github.com/google/uuid v1.3.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.5.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.6.0
 	github.com/iancoleman/strcase v0.2.0
 	github.com/jackc/pgconn v1.10.0
 	github.com/jackc/pgx/v4 v4.13.0
@@ -22,13 +22,13 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.11.0
 	github.com/quasilyte/go-ruleguard/dsl v0.3.6
-	github.com/rs/zerolog v1.24.0
+	github.com/rs/zerolog v1.25.0
 	github.com/stretchr/testify v1.7.0
-	go.6river.tech/gosix v0.3.16
+	go.6river.tech/gosix v0.3.19
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/tools v0.1.5
 	google.golang.org/api v0.56.0
-	google.golang.org/genproto v0.0.0-20210903162649-d08c68adba83
+	google.golang.org/genproto v0.0.0-20210909211513-a8c4777a87af
 	google.golang.org/grpc v1.40.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0
 	google.golang.org/protobuf v1.27.1
@@ -82,6 +82,7 @@ require (
 	github.com/go-toolsmith/astequal v1.0.0 // indirect
 	github.com/go-toolsmith/astfmt v1.0.0 // indirect
 	github.com/go-toolsmith/astp v1.0.0 // indirect
+	github.com/go-toolsmith/pkgload v1.0.1 // indirect
 	github.com/go-toolsmith/strparse v1.0.0 // indirect
 	github.com/go-toolsmith/typep v1.0.2 // indirect
 	github.com/go-xmlfmt/xmlfmt v0.0.0-20191208150333-d5b6f63a941b // indirect
@@ -105,7 +106,7 @@ require (
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/gostaticanalysis/analysisutil v0.7.1 // indirect
 	github.com/gostaticanalysis/comment v1.4.2 // indirect
-	github.com/gostaticanalysis/forcetypeassert v0.0.0-20200621232751-01d4955beaa5 // indirect
+	github.com/gostaticanalysis/forcetypeassert v0.1.0 // indirect
 	github.com/gostaticanalysis/nilerr v0.1.1 // indirect
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
@@ -124,7 +125,7 @@ require (
 	github.com/jmoiron/sqlx v1.3.4 // indirect
 	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
-	github.com/json-iterator/go v1.1.11 // indirect
+	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/julz/importas v0.0.0-20210419104244-841f0c0fe66d // indirect
 	github.com/kisielk/errcheck v1.6.0 // indirect
 	github.com/kisielk/gotool v1.0.0 // indirect
@@ -150,7 +151,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
-	github.com/modern-go/reflect2 v1.0.1 // indirect
+	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/moricho/tparallel v0.2.1 // indirect
 	github.com/nakabonne/nestif v0.3.0 // indirect
 	github.com/nbutton23/zxcvbn-go v0.0.0-20210217022336-fa2cb2858354 // indirect
@@ -199,9 +200,9 @@ require (
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5 // indirect
 	golang.org/x/mod v0.5.0 // indirect
-	golang.org/x/net v0.0.0-20210903162142-ad29c8ab022f // indirect
+	golang.org/x/net v0.0.0-20210908191846-a5e095526f91 // indirect
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f // indirect
-	golang.org/x/sys v0.0.0-20210906170528-6f6e22806c34 // indirect
+	golang.org/x/sys v0.0.0-20210910150752-751e447fb3d0 // indirect
 	golang.org/x/term v0.0.0-20210615171337-6886f2dfbf5b // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
