@@ -87,9 +87,10 @@ func (f *FaultInjectorController) AddDescriptor(c *gin.Context) {
 	}
 
 	desc := faults.Description{
-		Operation: fd.Operation,
-		Count:     count,
-		OnFault:   errorFactory(fd.Error),
+		Operation:        fd.Operation,
+		Count:            count,
+		OnFault:          errorFactory(fd.Error),
+		FaultDescription: string(fd.Error),
 	}
 	if fd.Parameters != nil {
 		desc.Parameters = fd.Parameters.AdditionalProperties
@@ -100,8 +101,9 @@ func (f *FaultInjectorController) AddDescriptor(c *gin.Context) {
 
 func toOAS(d faults.Description) oas.ConfiguredFault {
 	ret := oas.ConfiguredFault{
-		Operation: d.Operation,
-		Count:     d.Count,
+		Operation:        d.Operation,
+		Count:            d.Count,
+		FaultDescription: &d.FaultDescription,
 	}
 	if len(d.Parameters) != 0 {
 		ret.Parameters = &oas.ConfiguredFault_Parameters{

@@ -1076,6 +1076,7 @@ github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1
 github.com/zenazn/goji v0.9.0/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxtB1Q=
 go.6river.tech/gosix v0.3.19 h1:r2b34aJCkYwNGlRGtXfpr+zJ79iqOlU3n4V53ukjLeY=
 go.6river.tech/gosix v0.3.19/go.mod h1:u7VfUWAQAfQ/guPOTDwJj5Chvwwpji/MWO11oivgrBg=
+go.6river.tech/gosix v0.3.20/go.mod h1:u7VfUWAQAfQ/guPOTDwJj5Chvwwpji/MWO11oivgrBg=
 go.etcd.io/bbolt v1.3.2/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.etcd.io/bbolt v1.3.3/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.etcd.io/bbolt v1.3.4/go.mod h1:G5EMThwa9y8QZGBClrRx5EY+Yw9kAhnjy3bSjsnlVTQ=

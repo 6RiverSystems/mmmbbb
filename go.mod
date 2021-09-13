@@ -216,3 +216,6 @@ require (
 	mvdan.cc/lint v0.0.0-20170908181259-adc824a0674b // indirect
 	mvdan.cc/unparam v0.0.0-20210701114405-894c3c7ee6a6 // indirect
 )
+
+// FIXME: Remove local redirect when gosix merges to main!g
+replace go.6river.tech/gosix => ../gosix
