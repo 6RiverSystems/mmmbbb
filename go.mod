@@ -24,7 +24,7 @@ require (
 	github.com/quasilyte/go-ruleguard/dsl v0.3.6
 	github.com/rs/zerolog v1.25.0
 	github.com/stretchr/testify v1.7.0
-	go.6river.tech/gosix v0.3.19
+	go.6river.tech/gosix v0.3.21
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/tools v0.1.5
 	google.golang.org/api v0.56.0
@@ -216,6 +216,3 @@ require (
 	mvdan.cc/lint v0.0.0-20170908181259-adc824a0674b // indirect
 	mvdan.cc/unparam v0.0.0-20210701114405-894c3c7ee6a6 // indirect
 )
-
-// FIXME: Remove local redirect when gosix merges to main!g
-replace go.6river.tech/gosix => ../gosix
