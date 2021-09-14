@@ -245,3 +245,5 @@ components:
         count:
           type: integer
           format: int64
+        faultDescription:
+          type: string

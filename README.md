@@ -187,15 +187,30 @@ at `/oas-ui/`, or the [gosix
 documentation](https://github.com/6RiverSystems/gosix/blob/main/docs/faults.md)
 on the gRPC fault interceptor.
 
-For example, to cause one call to the subscriber `StreamingPull` API to fail,
+#### Examples:
+To cause one call to the subscriber `StreamingPull` API to fail,
 for a specific subscription, you could inject the following fault configuration:
 
 ```json
 {
   "operation": "StreamingPull",
   "parameters": {
-    "Subscription": "projects/foo/subscriptions/bar"
+    "subscription": "projects/foo/subscriptions/bar"
   },
   "count": 1
 }
 ```
+
+To cause one call to the `Publish` API to fail, for a specific topic, 
+you could inject the following fault configuration:
+
+```json
+{
+  "operation": "Publish",
+  "parameters": {
+    "topic": "projects/foo/topics/bar"
+  },
+  "count": 1
+}
+```
+
