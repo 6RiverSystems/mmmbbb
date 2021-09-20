@@ -131,6 +131,15 @@ jobs:
           paths:
             - ~/.cache/go-build
 
+      # post to slack if `main` fails to build
+      - when:
+          condition:
+            equal: [main, << pipeline.git.branch >>]
+          steps:
+            - sixrs-gke/status:
+                channel: "#eng_mmmbbb"
+                fail_only: true
+
 workflows:
   version: 2
   build-workflow:
