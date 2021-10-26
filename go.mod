@@ -7,7 +7,7 @@ require (
 	entgo.io/ent v0.9.1
 	github.com/alecthomas/participle/v2 v2.0.0-alpha7
 	github.com/deepmap/oapi-codegen v1.8.3
-	github.com/getkin/kin-openapi v0.79.0
+	github.com/getkin/kin-openapi v0.80.0
 	github.com/gin-gonic/gin v1.7.4
 	github.com/golangci/golangci-lint v1.42.1
 	github.com/google/addlicense v1.0.0
