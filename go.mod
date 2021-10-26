@@ -22,10 +22,10 @@ require (
 	github.com/quasilyte/go-ruleguard/dsl v0.3.10
 	github.com/rs/zerolog v1.25.0
 	github.com/stretchr/testify v1.7.0
-	go.6river.tech/gosix v0.3.30
+	go.6river.tech/gosix v0.3.31
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/tools v0.1.7
-	google.golang.org/api v0.58.0
+	google.golang.org/api v0.59.0
 	google.golang.org/grpc v1.41.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0
 	google.golang.org/protobuf v1.27.1
@@ -201,7 +201,7 @@ require (
 	golang.org/x/mod v0.5.0 // indirect
 	golang.org/x/net v0.0.0-20210908191846-a5e095526f91 // indirect
 	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1 // indirect
-	golang.org/x/sys v0.0.0-20210917161153-d61c044b1678 // indirect
+	golang.org/x/sys v0.0.0-20211007075335-d3039528d8ac // indirect
 	golang.org/x/term v0.0.0-20210615171337-6886f2dfbf5b // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
