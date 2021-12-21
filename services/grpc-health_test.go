@@ -27,6 +27,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"go.6river.tech/gosix/registry"
 	"go.6river.tech/gosix/server"
@@ -178,7 +179,7 @@ func TestGrpc_healthServer_Check(t *testing.T) {
 	}
 
 	opts := []grpc.DialOption{
-		grpc.WithInsecure(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		// retry if we get connection refused, as this proxy might start before
 		// the grpc server starts ... this doesn't really seem to work however
 		grpc.FailOnNonTempDialError(false),
