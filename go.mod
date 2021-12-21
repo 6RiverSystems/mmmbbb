@@ -22,7 +22,7 @@ require (
 	github.com/quasilyte/go-ruleguard/dsl v0.3.10
 	github.com/rs/zerolog v1.26.1
 	github.com/stretchr/testify v1.7.0
-	go.6river.tech/gosix v0.3.40
+	go.6river.tech/gosix v0.3.41
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/tools v0.1.8
 	google.golang.org/api v0.63.0
@@ -74,7 +74,7 @@ require (
 	github.com/fzipp/gocyclo v0.3.1 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/gin-contrib/expvar v0.0.1 // indirect
-	github.com/gin-contrib/gzip v0.0.3 // indirect
+	github.com/gin-contrib/gzip v0.0.5 // indirect
 	github.com/gin-contrib/location v0.0.2 // indirect
 	github.com/gin-contrib/logger v0.2.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
