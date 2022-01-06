@@ -35,4 +35,7 @@ import (
 	_ "github.com/deepmap/oapi-codegen/pkg/codegen"
 	// needed for golangci-lint
 	_ "github.com/quasilyte/go-ruleguard/dsl"
+
+	// prevents dependabot from moving this module dependency to indirect
+	_ "github.com/golang/protobuf/ptypes/empty"
 )
