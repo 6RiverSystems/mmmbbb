@@ -20,7 +20,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.10
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/prometheus/client_golang v1.11.0
-	github.com/quasilyte/go-ruleguard/dsl v0.3.12
+	github.com/quasilyte/go-ruleguard/dsl v0.3.13
 	github.com/rs/zerolog v1.26.1
 	github.com/stretchr/testify v1.7.0
 	go.6river.tech/gosix v0.3.43
