@@ -28,7 +28,7 @@ require (
 	golang.org/x/tools v0.1.9-0.20211216111533-8d383106f7e7
 	google.golang.org/api v0.65.0
 	google.golang.org/genproto v0.0.0-20220118154757-00ab72f36ad5
-	google.golang.org/grpc v1.43.0
+	google.golang.org/grpc v1.44.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.2.0
 	google.golang.org/protobuf v1.27.1
 	gotest.tools/gotestsum v1.7.0
