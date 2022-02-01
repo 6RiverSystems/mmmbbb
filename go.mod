@@ -17,7 +17,7 @@ require (
 	github.com/iancoleman/strcase v0.2.0
 	github.com/jackc/pgconn v1.10.1
 	github.com/jackc/pgx/v4 v4.14.1
-	github.com/mattn/go-sqlite3 v1.14.10
+	github.com/mattn/go-sqlite3 v1.14.11
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/prometheus/client_golang v1.12.0
 	github.com/quasilyte/go-ruleguard/dsl v0.3.15
