@@ -68,17 +68,32 @@ with startup.
 
 Both PostgreSQL and SQLite are supported backends. With SQLite, only file-based
 storage is currently supported, not memory-based storage, due to issues with
-concurrency, locking, and some implementation issues with the Go SQLite driver.
+concurrency, locking, and some implementation issues with the Go SQLite drivers.
+
+Which SQLite driver is used depends on whether `mmmbbb` was compiled with CGo
+enabled or not. When enabled, `github.com/mattn/go-sqlite3` is used. When CGo is
+disabled, `modernc.org/sqlite` is used.
 
 To select a backend, set the `DATABASE_URL` appropriately (see above on
 environment variables).
 
 SQLite as a backend currently requires explicitly specifying several extra
-parameters in the `DATABASE_URL`:
+parameters in the `DATABASE_URL`.
+
+CGo enabled (`mattn` driver):
 
 ```text
 ?_fk=true&_journal_mode=wal&cache=private&_busy_timeout=10000&_txlock=immediate
 ```
+
+CGo disabled (`modernc` driver):
+
+```text
+?_pragma=foreign_keys(1)&_pragma=journal_mode(wal)&_pragma=busy_timeout(10000)&_txlock=immediate
+```
+
+In both cases, shell escaping is almost certainly needed when entering these
+values!
 
 ## What is and isn't implemented
 
@@ -187,7 +202,8 @@ at `/oas-ui/`, or the [gosix
 documentation](https://github.com/6RiverSystems/gosix/blob/main/docs/faults.md)
 on the gRPC fault interceptor.
 
-#### Examples:
+### Examples
+
 To cause one call to the subscriber `StreamingPull` API to fail,
 for a specific subscription, you could inject the following fault configuration:
 
@@ -201,7 +217,7 @@ for a specific subscription, you could inject the following fault configuration:
 }
 ```
 
-To cause one call to the `Publish` API to fail, for a specific topic, 
+To cause one call to the `Publish` API to fail, for a specific topic,
 you could inject the following fault configuration:
 
 ```json
@@ -213,4 +229,3 @@ you could inject the following fault configuration:
   "count": 1
 }
 ```
-
