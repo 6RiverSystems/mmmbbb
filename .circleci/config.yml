@@ -5,9 +5,14 @@ orbs:
 
 jobs:
   all-in-one:
+    parameters:
+      pgimg:
+        type: string
+      cgo:
+        type: string
     docker:
       - image: cimg/go:1.17
-      - image: circleci/postgres:9.6-alpine
+      - image: << parameters.pgimg >>
         environment:
           POSTGRES_USER: circle
           POSTGRES_DB: circle_test
@@ -16,6 +21,7 @@ jobs:
       TEST_RESULTS: /tmp/test-results
       DATABASE_URL: "postgres://circle@localhost:5432/circle_test?sslmode=disable"
       GOPRIVATE: "go.6river.tech/*,github.com/6RiverSystems/*"
+      CGO_ENABLED: << parameters.cgo >>
 
     steps:
       - checkout
@@ -29,8 +35,8 @@ jobs:
       - restore_cache:
           name: Restore similar AIO build cache
           keys:
-            - go-build-aio-v1-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
-            - go-build-aio-v1-{{ checksum "/tmp/cache-time-limit" }}-
+            - go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
+            - go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-
 
       - run:
           name: Initialize ci_scripts
@@ -38,9 +44,19 @@ jobs:
             mkdir ci_scripts
             curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept:application/vnd.github.v3.raw" https://api.github.com/repos/6RiverSystems/ci_scripts/contents/ci_tool.sh > ci_scripts/ci_tool.sh
             chmod +x ci_scripts/ci_tool.sh
-      - run:
-          name: Determine new version
-          command: ./ci_scripts/ci_tool.sh --run_release
+      - when:
+          condition:
+            # for Go modules, we only need version numbers on `main`, as Go can
+            # pull any other git commit by hash. We do need a version tag for
+            # docker for this package however, just don't need it to be a git
+            # tag, and we only need it for the matrix config we are using to
+            # generate that image.
+            and:
+              - equal: ["main", << pipeline.git.branch >>]
+              - equal: ["1", << parameters.cgo >>]
+              - equal: ["cimg/postgres:9.6", << parameters.pgimg >>]
+          steps:
+            - sixrs-gke/run-release
       - store_artifacts:
           name: Capture chosen version
           path: .version
@@ -103,15 +119,26 @@ jobs:
       - sixrs-gke/codecov:
           codecov-params: "-s ${TEST_RESULTS}"
 
-      - setup_remote_docker
-      - run:
-          name: Build docker image
-          command: make docker
-      - run:
-          name: Push docker image
-          command: |
-            ./ci_scripts/ci_tool.sh --docker_login
-            make docker-push
+      - when:
+          condition:
+            # only build docker image from one of our matrix configs
+            and:
+              - equal: ["1", << parameters.cgo >>]
+              - equal: ["cimg/postgres:9.6", << parameters.pgimg >>]
+          steps:
+            - setup_remote_docker
+            - run:
+                name: Build docker image
+                command: |
+                  if [ ! -f .version ]; then
+                    make docker-dev-version
+                  fi
+                  make docker
+            - run:
+                name: Push docker image
+                command: |
+                  ./ci_scripts/ci_tool.sh --docker_login
+                  make docker-push
 
       - store_artifacts:
           name: Capture test result artifacts
@@ -127,7 +154,7 @@ jobs:
             - "/home/circleci/go/pkg"
       - save_cache:
           name: Save AIO build cache
-          key: go-build-aio-v1-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
+          key: go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
           paths:
             - ~/.cache/go-build
 
@@ -146,3 +173,12 @@ workflows:
     jobs:
       - all-in-one:
           context: 6rs-circle
+          matrix:
+            parameters:
+              pgimg:
+                - cimg/postgres:9.6
+                # - cimg/postgres:13.5
+                - cimg/postgres:14.1
+              cgo:
+                - "1"
+                - "0"

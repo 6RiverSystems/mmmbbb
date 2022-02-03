@@ -30,10 +30,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	_ "github.com/mattn/go-sqlite3"
-
-	// would like to support the modernc driver for some use cases, but it is far
-	// from ready for us
-	// _ "modernc.org/sqlite"
+	_ "modernc.org/sqlite"
 
 	"go.6river.tech/gosix/db"
 	"go.6river.tech/gosix/db/postgres"
@@ -49,8 +46,7 @@ func ClientForTest(t testing.TB, opts ...ent.Option) *ent.Client {
 		dialectName = dialect.Postgres
 		dsn = db.PostgreSQLDSN("acceptance")
 	} else {
-		driverName = dialect.SQLite
-		// driverName = "sqlite" // for modernc driver, in the future
+		driverName = db.SQLiteDriverName
 		dialectName = dialect.SQLite
 		// cannot use memory DBs for this app due to
 		// https://github.com/mattn/go-sqlite3/issues/923

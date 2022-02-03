@@ -39,6 +39,10 @@ BINARIES_DOCKER_PUSH:=$(patsubst %,docker-push-%,$(BINARY_NAMES))
 
 # always test with race and coverage, we'll run vet separately.
 TESTARGS:=-vet=off -race -cover -coverpkg=./...
+# ... unless CGO is disabled, and race is not available
+ifeq ($(CGO_ENABLED),0)
+TESTARGS:=$(filter-out -race,$(TESTARGS))
+endif
 
 GOIMPORTSARGS:=-local github.com/6RiverSystems,go.6river.tech
 
