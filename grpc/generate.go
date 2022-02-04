@@ -33,10 +33,10 @@ import (
 
 //go:generate sh -c "rm -rf googleapis.tgz grpc-proto.tgz google/ grpc/ *.pb*.go *-types.go"
 
-//go:generate curl -s --location --fail -o googleapis.tgz https://github.com/googleapis/googleapis/archive/master.tar.gz
+//go:generate curl -s --location --fail -o googleapis.tgz https://github.com/googleapis/googleapis/archive/5d7f6a21bd6ba77472ece6f1a0e51c0342631cdd.tar.gz
 //go:generate curl -s --location --fail -o grpc-proto.tgz https://github.com/grpc/grpc-proto/archive/master.tar.gz
 
-//go:generate tar -zxf googleapis.tgz --strip-components=1 googleapis-master/google/
+//go:generate tar -zxf googleapis.tgz --strip-components=1 googleapis-5d7f6a21bd6ba77472ece6f1a0e51c0342631cdd/google/
 //go:generate tar -zxf grpc-proto.tgz --strip-components=1 grpc-proto-master/grpc/
 
 //go:generate protoc --go_out=. --go-grpc_out=. --grpc-gateway_out=. --openapiv2_out=. --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative --grpc-gateway_opt paths=source_relative google/pubsub/v1/pubsub.proto google/pubsub/v1/schema.proto grpc/health/v1/health.proto
