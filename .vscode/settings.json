@@ -5,7 +5,9 @@
   "go.buildOnSave": "workspace",
   "go.autocompleteUnimportedPackages": true,
   "go.lintTool": "golangci-lint",
-  "go.generateTestsFlags": ["-template=testify"],
+  "go.generateTestsFlags": [
+    "-template=testify"
+  ],
   "cSpell.flagWords": [],
   "cSpell.words": [
     "Acks",
@@ -61,5 +63,9 @@
     "xargs",
     "xkcd"
   ],
-  "go.buildTags": "nomsgpack"
+  "go.buildTags": "nomsgpack",
+  "go.toolsEnvVars": {
+    "GOPRIVATE": "go.6river.tech/*,github.com/6RiverSystems/*",
+    // "CGO_ENABLED": "0"
+  },
 }

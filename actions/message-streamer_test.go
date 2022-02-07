@@ -21,6 +21,7 @@ package actions
 
 import (
 	"context"
+	"errors"
 	"net"
 	"testing"
 	"time"
@@ -29,6 +30,8 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sync/errgroup"
+	"modernc.org/sqlite"
+	sqlite3 "modernc.org/sqlite/lib"
 
 	"go.6river.tech/gosix/logging"
 	"go.6river.tech/gosix/testutils"
@@ -145,6 +148,12 @@ func TestMessageStreamer_Go(t *testing.T) {
 				cancel()
 			},
 			func(tt assert.TestingT, err error, i ...interface{}) bool {
+				var se *sqlite.Error
+				if errors.As(err, &se) {
+					// TODO: this is a temporary bodge until discussions with
+					// modernc.org/sqlite are sorted out
+					return assert.Equal(t, sqlite3.SQLITE_INTERRUPT, se.Code())
+				}
 				return assert.ErrorIs(t, err, context.Canceled)
 			},
 			nil,

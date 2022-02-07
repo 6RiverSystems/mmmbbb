@@ -44,9 +44,6 @@ import (
 	_ "go.6river.tech/mmmbbb/services"
 	"go.6river.tech/mmmbbb/version"
 
-	_ "github.com/jackc/pgx/v4"
-	_ "github.com/mattn/go-sqlite3"
-
 	_ "go.6river.tech/mmmbbb/ent/runtime"
 )
 
