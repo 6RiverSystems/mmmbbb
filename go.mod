@@ -3,7 +3,7 @@ module go.6river.tech/mmmbbb
 go 1.17
 
 require (
-	cloud.google.com/go/pubsub v1.17.1
+	cloud.google.com/go/pubsub v1.18.0
 	entgo.io/ent v0.10.0
 	github.com/alecthomas/participle/v2 v2.0.0-alpha7
 	github.com/deepmap/oapi-codegen v1.9.1
@@ -23,11 +23,11 @@ require (
 	github.com/quasilyte/go-ruleguard/dsl v0.3.16
 	github.com/rs/zerolog v1.26.1
 	github.com/stretchr/testify v1.7.1-0.20210427113832-6241f9ab9942
-	go.6river.tech/gosix v0.4.2
+	go.6river.tech/gosix v0.4.3
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/tools v0.1.9
-	google.golang.org/api v0.67.0
-	google.golang.org/genproto v0.0.0-20220126215142-9970aeb2e350
+	google.golang.org/api v0.68.0
+	google.golang.org/genproto v0.0.0-20220207164111-0872dc986b00
 	google.golang.org/grpc v1.44.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.2.0
 	google.golang.org/protobuf v1.27.1
@@ -39,7 +39,7 @@ require (
 	4d63.com/gochecknoglobals v0.1.0 // indirect
 	ariga.io/atlas v0.3.2-0.20220120225051-c3fac7d636dd // indirect
 	cloud.google.com/go v0.100.2 // indirect
-	cloud.google.com/go/compute v0.1.0 // indirect
+	cloud.google.com/go/compute v1.2.0 // indirect
 	cloud.google.com/go/iam v0.1.0 // indirect
 	github.com/Antonboom/errname v0.1.5 // indirect
 	github.com/Antonboom/nilnil v0.1.0 // indirect
