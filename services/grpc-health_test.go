@@ -28,6 +28,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	health "google.golang.org/grpc/health/grpc_health_v1"
 
 	"go.6river.tech/gosix/registry"
 	"go.6river.tech/gosix/server"
@@ -35,7 +36,6 @@ import (
 	"go.6river.tech/mmmbbb/defaults"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/enttest"
-	"go.6river.tech/mmmbbb/grpc/health"
 )
 
 func Test_healthServer_Check(t *testing.T) {

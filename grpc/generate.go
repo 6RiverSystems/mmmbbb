@@ -39,17 +39,15 @@ import (
 //go:generate tar -zxf googleapis.tgz --strip-components=1 googleapis-5d7f6a21bd6ba77472ece6f1a0e51c0342631cdd/google/
 //go:generate tar -zxf grpc-proto.tgz --strip-components=1 grpc-proto-master/grpc/
 
-//go:generate protoc --go_out=. --go-grpc_out=. --grpc-gateway_out=. --openapiv2_out=. --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative --grpc-gateway_opt paths=source_relative google/pubsub/v1/pubsub.proto google/pubsub/v1/schema.proto grpc/health/v1/health.proto
+//go:generate protoc --go_out=. --go-grpc_out=. --grpc-gateway_out=. --openapiv2_out=. --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative --grpc-gateway_opt paths=source_relative google/pubsub/v1/pubsub.proto google/pubsub/v1/schema.proto
 
-//go:generate mkdir -p pubsub health
+//go:generate mkdir -p pubsub
 //go:generate cp -a -v -f google/pubsub/v1/pubsub_grpc.pb.go google/pubsub/v1/pubsub.pb.gw.go pubsub/
 //go:generate cp -a -v -f google/pubsub/v1/schema_grpc.pb.go google/pubsub/v1/schema.pb.gw.go pubsub/
 
-// health has no http gateway defined, and needs to use its own types as there is no "upstream" from which to source them
-//go:generate cp -a -v -f grpc/health/v1/health_grpc.pb.go grpc/health/v1/health.pb.go health/
-//go:generate cp -a -v -f google/pubsub/v1/pubsub.swagger.json google/pubsub/v1/schema.swagger.json grpc/health/v1/health.swagger.json .
-// it also needs its package header fixed
-//go:generate sed -i "s/^package grpc_health_v1$/package health/" health/health_grpc.pb.go health/health.pb.go
+// we can use upstream types/codegen for the health service, and it has no HTTP swagger types
+
+//go:generate cp -a -v -f google/pubsub/v1/pubsub.swagger.json google/pubsub/v1/schema.swagger.json .
 
 //go:generate ./gen-types.sh pubsub google.golang.org/genproto/googleapis/pubsub/v1 google/pubsub/v1/pubsub.pb.go pubsub/pubsub-types.go
 //go:generate ./gen-types.sh pubsub google.golang.org/genproto/googleapis/pubsub/v1 google/pubsub/v1/schema.pb.go pubsub/schema-types.go

@@ -24,9 +24,10 @@ import (
 	"errors"
 	"time"
 
+	health "google.golang.org/grpc/health/grpc_health_v1"
+
 	"go.6river.tech/gosix/registry"
 	"go.6river.tech/mmmbbb/ent"
-	"go.6river.tech/mmmbbb/grpc/health"
 )
 
 // TODO: this could be moved to common and implemented in terms of the generic

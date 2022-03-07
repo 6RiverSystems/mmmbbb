@@ -101,7 +101,7 @@ func NewApp() *app.App {
 		Grpc: &app.AppGrpc{
 			PortOffset:     defaults.GRPCOffset,
 			Initializer:    services.InitializeGrpcServers,
-			GatewayPaths:   []string{"/v1/projects/*grpcPath"},
+			GatewayPaths:   []string{"/v1/projects/*grpcPath", "/healthz"},
 			OnGatewayStart: services.BindGatewayHandlers,
 		},
 	}

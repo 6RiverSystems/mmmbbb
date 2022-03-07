@@ -27,13 +27,13 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	health "google.golang.org/grpc/health/grpc_health_v1"
 
 	entcommon "go.6river.tech/gosix/ent"
 	"go.6river.tech/gosix/registry"
 
 	"go.6river.tech/mmmbbb/actions"
 	"go.6river.tech/mmmbbb/ent"
-	"go.6river.tech/mmmbbb/grpc/health"
 	"go.6river.tech/mmmbbb/grpc/pubsub"
 )
 
@@ -73,12 +73,15 @@ func InitializeGrpcServers(_ context.Context, server *grpc.Server, services *reg
 }
 
 func BindGatewayHandlers(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	// TODO: it would be preferable to directly use the server objects here, but
+	// that requires some more complex changes to the base gosix setup
 	if err := pubsub.RegisterSubscriberHandler(ctx, mux, conn); err != nil {
 		return err
 	}
 	if err := pubsub.RegisterPublisherHandler(ctx, mux, conn); err != nil {
 		return err
 	}
+	runtime.WithHealthzEndpoint(health.NewHealthClient(conn))(mux)
 	return nil
 }
 

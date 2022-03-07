@@ -12,9 +12,6 @@ GENERATE_GRPC:=\
 	./grpc/pubsub/schema.pb.gw.go \
 	./grpc/pubsub/schema-types.go \
 	./grpc/schema.swagger.json \
-	./grpc/health/health_grpc.pb.go \
-	./grpc/health/health.pb.go \
-	./grpc/health.swagger.json \
 	$(NULL)
 GENERATE_SPECIAL:=\
 	$(NULL)
