@@ -32,7 +32,7 @@ require (
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.2.0
 	google.golang.org/protobuf v1.27.1
 	gotest.tools/gotestsum v1.7.0
-	modernc.org/sqlite v1.14.7
+	modernc.org/sqlite v1.14.8
 )
 
 require (
@@ -239,9 +239,8 @@ require (
 	honnef.co/go/tools v0.2.2 // indirect
 	lukechampine.com/uint128 v1.2.0 // indirect
 	modernc.org/cc/v3 v3.35.22 // indirect
-	modernc.org/ccgo/v3 v3.15.13 // indirect
-	modernc.org/ccorpus v1.11.6 // indirect
-	modernc.org/libc v1.14.5 // indirect
+	modernc.org/ccgo/v3 v3.15.14 // indirect
+	modernc.org/libc v1.14.6 // indirect
 	modernc.org/mathutil v1.4.1 // indirect
 	modernc.org/memory v1.0.5 // indirect
 	modernc.org/opt v0.1.1 // indirect
