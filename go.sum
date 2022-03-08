@@ -290,8 +290,9 @@ github.com/fzipp/gocyclo v0.3.1/go.mod h1:DJHO6AUmbdqj2ET4Z9iArSuwWgYDRryYt2wASx
 github.com/fzipp/gocyclo v0.4.0 h1:IykTnjwh2YLyYkGa0y92iTTEQcnyAz0r9zOo15EbJ7k=
 github.com/fzipp/gocyclo v0.4.0/go.mod h1:rXPyn8fnlpa0R2csP/31uerbiVBugk5whMdlyaLkLoA=
 github.com/getkin/kin-openapi v0.87.0/go.mod h1:660oXbgy5JFMKreazJaQTw7o+X00qeSyhcnluiMv+Xg=
-github.com/getkin/kin-openapi v0.90.0 h1:k0MeVmRSdKDjqJbyYghK3GkVL59s6bow46s2rNLD9d4=
 github.com/getkin/kin-openapi v0.90.0/go.mod h1:660oXbgy5JFMKreazJaQTw7o+X00qeSyhcnluiMv+Xg=
+github.com/getkin/kin-openapi v0.91.0 h1:mOSAljTAQONM0YVtI3+LvIQaa0zPwa3SH6UuiyEnbYQ=
+github.com/getkin/kin-openapi v0.91.0/go.mod h1:660oXbgy5JFMKreazJaQTw7o+X00qeSyhcnluiMv+Xg=
 github.com/ghodss/yaml v1.0.0 h1:wQHKEahhL6wmXdzwWG11gIVCkOv05bNOh+Rxn0yngAk=
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/gin-contrib/expvar v0.0.1 h1:IuU5ArEgihz50vG8Onrwz22kJr7Mcvgv9xSSpfU5g+w=
