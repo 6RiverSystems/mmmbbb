@@ -55,5 +55,7 @@ ENV BINARYNAME ${BINARYNAME}
 # right thing with the runtime value of BINARYNAME
 CMD ["/app/${BINARYNAME}"]
 
+ARG TARGETARCH
+
 # this uses the build-time arg/env
-COPY bin/${BINARYNAME} /app/${BINARYNAME}
+COPY bin/${BINARYNAME}-${TARGETARCH} /app/${BINARYNAME}

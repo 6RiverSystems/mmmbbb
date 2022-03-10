@@ -126,19 +126,20 @@ jobs:
               - equal: ["1", << parameters.cgo >>]
               - equal: ["cimg/postgres:9.6", << parameters.pgimg >>]
           steps:
-            - setup_remote_docker
+            - setup_remote_docker:
+                version: 20.10.11
             - run:
                 name: Build docker image
                 command: |
                   if [ ! -f .version ]; then
                     make docker-dev-version
                   fi
-                  make docker
+                  make docker-multiarch
             - run:
                 name: Push docker image
                 command: |
                   ./ci_scripts/ci_tool.sh --docker_login
-                  make docker-push
+                  make docker-push-multiarch
 
       - store_artifacts:
           name: Capture test result artifacts
