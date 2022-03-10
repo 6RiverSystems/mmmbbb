@@ -64,7 +64,7 @@
     "xargs",
     "xkcd"
   ],
-  "go.buildTags": "nomsgpack",
+  "go.buildTags": "nomsgpack,mage",
   "go.toolsEnvVars": {
     "GOPRIVATE": "go.6river.tech/*,github.com/6RiverSystems/*",
     // "CGO_ENABLED": "0"

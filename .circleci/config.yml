@@ -16,6 +16,7 @@ jobs:
         environment:
           POSTGRES_USER: circle
           POSTGRES_DB: circle_test
+    resource_class: large
 
     environment:
       TEST_RESULTS: /tmp/test-results
@@ -38,35 +39,13 @@ jobs:
             - go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
             - go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-
 
-      - run:
-          name: Initialize ci_scripts
-          command: |
-            mkdir ci_scripts
-            curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept:application/vnd.github.v3.raw" https://api.github.com/repos/6RiverSystems/ci_scripts/contents/ci_tool.sh > ci_scripts/ci_tool.sh
-            chmod +x ci_scripts/ci_tool.sh
-      - when:
-          condition:
-            # for Go modules, we only need version numbers on `main`, as Go can
-            # pull any other git commit by hash. We do need a version tag for
-            # docker for this package however, just don't need it to be a git
-            # tag, and we only need it for the matrix config we are using to
-            # generate that image.
-            and:
-              - equal: ["main", << pipeline.git.branch >>]
-              - equal: ["1", << parameters.cgo >>]
-              - equal: ["cimg/postgres:9.6", << parameters.pgimg >>]
-          steps:
-            - sixrs-gke/run-release
-      - store_artifacts:
-          name: Capture chosen version
-          path: .version
-      - run: make get
-      - run: make install-ci-tools
-      - run: make generate
+      - run: ./mage -v get
+      - run: ./mage -v installCITools
+      - run: ./mage -v generate:force
 
       - run:
           name: Compile code
-          command: make -j compile
+          command: ./mage -v compile
 
       - run:
           name: Prepare for tests
@@ -74,16 +53,24 @@ jobs:
       - run:
           name: format check
           command: |
-            make fmt
+            ./mage -v format
             git diff --exit-code
-      - run:
-          name: vet
-          command: make vet
-      - run:
-          name: lint
-          command: |
-            go run github.com/golangci/golangci-lint/cmd/golangci-lint run --out-format=junit-xml >${TEST_RESULTS}/golangci-lint.xml
-
+      # we only need to run lint on one pg version
+      - when:
+          condition:
+            equal: ["cimg/postgres:9.6", << parameters.pgimg >>]
+          steps:
+            - restore_cache:
+                name: Restore golangci-lint cache
+                keys:
+                  - go-lint-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
+                  - go-lint-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-
+            - run: ./mage -v lint:ci
+            - save_cache:
+                name: Save golangci-lint cache
+                key: go-lint-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
+                paths:
+                  - ~/.cache/golangci-lint
       - run:
           name: Waiting for Postgres to be ready
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
@@ -94,22 +81,11 @@ jobs:
           # while we aren't using the parallel test split here, we still need to
           # use test-go-ci-split to get junit output and proper coverage file
           # storage
-          command: |
-            make \
-              TEST_RESULTS="${TEST_RESULTS}" \
-              PACKAGE_NAMES=./... \
-              test-go-ci-split
+          command: ./mage -v testGoCISplit
 
       - run:
-          name: Start service (service)
-          command: make TEST_RESULTS="${TEST_RESULTS}" test-main-cover-service
-          background: true
-      - run:
-          name: Wait for service to be active (service)
-          command: dockerize -wait tcp://localhost:3001 -timeout 1m
-      - run:
           name: Validate service is working (service)
-          command: make smoke-test-curl-service
+          command: ./mage -v testSmoke service localhost:3001
 
       - run:
           name: Coverage HTML report
@@ -118,28 +94,6 @@ jobs:
             go tool cover -html="${TEST_RESULTS}/coverage-smoke-service.out" -o "${TEST_RESULTS}/coverage-smoke-service.html"
       - sixrs-gke/codecov:
           codecov-params: "-s ${TEST_RESULTS}"
-
-      - when:
-          condition:
-            # only build docker image from one of our matrix configs
-            and:
-              - equal: ["1", << parameters.cgo >>]
-              - equal: ["cimg/postgres:9.6", << parameters.pgimg >>]
-          steps:
-            - setup_remote_docker
-            - run:
-                name: Build docker image
-                command: |
-                  if [ ! -f .version ]; then
-                    make docker-dev-version
-                  fi
-                  make docker
-            - run:
-                name: Push docker image
-                command: |
-                  ./ci_scripts/ci_tool.sh --docker_login
-                  make docker-push
-
       - store_artifacts:
           name: Capture test result artifacts
           path: /tmp/test-results
@@ -167,6 +121,72 @@ jobs:
                 channel: "#eng_mmmbbb"
                 fail_only: true
 
+  publish-docker-multiarch:
+    docker:
+      - image: cimg/go:1.17
+    resource_class: large
+    environment:
+      GOPRIVATE: "go.6river.tech/*,github.com/6RiverSystems/*"
+    steps:
+      - checkout
+      - run:
+          name: Limit cache weekly
+          command: date +%Y%U >/tmp/cache-time-limit
+      - restore_cache:
+          name: Restore module cache
+          keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
+      - restore_cache:
+          name: Restore similar multiarch build cache
+          keys:
+            - go-build-multiarch-v1-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
+            - go-build-multiarch-v1-{{ checksum "/tmp/cache-time-limit" }}-
+        # for Go modules, we only need version numbers on `main`, as Go can
+        # pull any other git commit by hash. We do need a version tag for
+        # docker for this package however, just don't need it to be a git
+        # tag.
+      - when:
+          condition:
+            equal: ["main", << pipeline.git.branch >>]
+          steps:
+            - sixrs-gke/run-release
+      - unless:
+          condition:
+            equal: ["main", << pipeline.git.branch >>]
+          steps:
+            - run:
+                name: Select dev version
+                command: ./mage -v generate:devVersion
+      - store_artifacts:
+          name: Capture chosen version
+          path: .version
+      - run: ./mage -v get
+      - run: ./mage -v installCITools
+      - run: ./mage -v generate:force
+      - setup_remote_docker:
+          version: 20.10.11
+      - sixrs-gke/docker-login
+      - run:
+          name: Initialize docker buildx
+          command: |
+            docker run --privileged --rm tonistiigi/binfmt --install all
+            docker context create multiarch-context
+            docker buildx create --name mmmbbb-multiarch --driver docker-container --bootstrap --use multiarch-context
+      - run:
+          name: Build multiarch binaries
+          command: ./mage -v releaseBinaries
+      - run:
+          name: Build multiarch docker images
+          command: ./mage -v docker:multiarchBuildAll
+      - run:
+          name: Push multiarch docker images
+          command: ./mage -v docker:multiarchPushAll
+      - save_cache:
+          name: Save multiarch build cache
+          key: go-build-multiarch-v1-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
+          paths:
+            - ~/.cache/go-build
+
 workflows:
   version: 2
   build-workflow:
@@ -182,3 +202,7 @@ workflows:
               cgo:
                 - "1"
                 - "0"
+      - publish-docker-multiarch:
+          context: 6rs-circle
+          requires:
+            - all-in-one
