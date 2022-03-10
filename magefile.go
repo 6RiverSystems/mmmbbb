@@ -310,8 +310,6 @@ func FormatGenerated(ctx context.Context) error {
 			files = append(files, l)
 		}
 	}
-	fmt.Printf("Have %d files to format\n", len(files))
-
 	if err := sh.Run("gofmt", append([]string{"-l", "-s", "-w", "."}, files...)...); err != nil {
 		return err
 	}
