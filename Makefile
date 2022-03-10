@@ -33,10 +33,6 @@ BINARY_NAMES:=\
 BINARIES:=$(patsubst %,bin/%,$(BINARY_NAMES))
 BINARIES_DOCKER:=$(patsubst %,docker-%,$(BINARY_NAMES))
 BINARIES_DOCKER_PUSH:=$(patsubst %,docker-push-%,$(BINARY_NAMES))
-MULTI_ARCHS:=amd64 arm64
-# FIXME: patsubst across two vars?
-BINARIES_MULTIARCH:=$(patsubst %,bin/service-%,$(MULTI_ARCHS))
-BINARIES_DOCKER_MULTIARCH:=$(patsubst %,docker-multiarch-%,$(BINARY_NAMES))
 
 # always test with race and coverage, we'll run vet separately.
 TESTARGS:=-vet=off -race -cover -coverpkg=./...
@@ -49,9 +45,6 @@ GOIMPORTSARGS:=-local github.com/6RiverSystems,go.6river.tech
 
 BUILDARGS:=-tags nomsgpack
 LINTARGS:=$(patsubst -tags,--build-tags,$(BUILDARGS))
-
-comma:=,
-space:=$(NULL) $(NULL)
 
 # default `make` invocation is to run the full generate/build/lint/test sequence
 default: compile-code test
@@ -152,15 +145,10 @@ smoke-test-curl-service:
 .PHONY: test-main-cover-% $(patsubst %,test-main-cover-%,$(BINARY_NAMES)) $(patsubst %,smoke-test-curl-%,$(BINARY_NAMES))
 
 binaries: $(BINARIES)
-binaries-multiarch: $(BINARIES_MULTIARCH)
-.PHONY: binaries binaries-multiarch
+.PHONY: binaries
 
 $(BINARIES): bin/%: ./cmd/%/main.go compile-code
 	go build -v $(BUILDARGS) -o $@ ./cmd/$*
-# FIXME: multiple wildcards
-$(BINARIES_MULTIARCH): bin/service-%: ./cmd/service/main.go
-# we can't strip foreign arch binaries, so we build them stripped instead
-	GOARCH=$* go build -v $(BUILDARGS) -ldflags "-w -s" -o $@ ./cmd/service
 
 clean-ent:
 # -X says to only remove ignored files, not untracked ones
@@ -171,13 +159,6 @@ clean: clean-ent
 .PHONY: clean clean-ent
 
 docker: binaries $(BINARIES_DOCKER)
-
-docker-multiarch: binaries-multiarch $(BINARIES_DOCKER_MULTIARCH)
-# FIXME: multiple wildcards
-$(BINARIES_DOCKER_MULTIARCH): docker-multiarch-%: $(patsubst %,bin/service-%,$(MULTI_ARCHS)) Dockerfile .dockerignore $(wildcard .docker-deps/*) .version
-	docker buildx inspect mmmbbb-multiarch || docker buildx create --name mmmbbb-multiarch --bootstrap
-	BINARYNAME=$* docker buildx build --builder mmmbbb-multiarch --platform $(subst $(space),$(comma),$(patsubst %,linux/%,$(MULTI_ARCHS))) -t $(REPONAME)-$*:$(file <.version) --build-arg BINARYNAME=$* .
-
 # NOTE that the .version file is not automatically created by this Makefile,
 # only by the CI process or human action. However this target for manually
 # creating it from git data, like version.go is created, is provided for testing
@@ -208,7 +189,7 @@ ifneq ($(DOCKERHUB_USER),)
 	docker push $(HUBNAME)/$(REPONAME)-$*:latest
 endif
 endif
-.PHONY: docker docker-multiarch docker-dev-version $(BINARIES_DOCKER) $(BINARIES_DOCKER_MULTIARCH)
+.PHONY: docker docker-dev-version $(BINARIES_DOCKER)
 
 install-tools-protobuf:
 # CI needs apt-get update before packages can be installed, assume humans don't
