@@ -173,7 +173,12 @@ jobs:
           name: Initialize docker buildx
           command: |
             docker run --privileged --rm tonistiigi/binfmt --install all
-            docker buildx create mmmbbb-multiarch --bootstrap
+            docker context ls
+            docker context create multiarch-context
+            docker buildx create --name mmmbbb-multiarch --driver docker-container --bootstrap --use multiarch-context
+            docker context ls
+            docker buildx ls
+            docker buildx inspect mmmbbb-multiarch
       - run:
           name: Build multiarch docker images
           command: ./.docker-deps/build-multiarch.sh
