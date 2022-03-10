@@ -144,7 +144,22 @@ jobs:
           keys:
             - go-build-multiarch-v1-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
             - go-build-multiarch-v1-{{ checksum "/tmp/cache-time-limit" }}-
-      - sixrs-gke/run-release
+        # for Go modules, we only need version numbers on `main`, as Go can
+        # pull any other git commit by hash. We do need a version tag for
+        # docker for this package however, just don't need it to be a git
+        # tag.
+      - when:
+          condition:
+            equal: ["main", << pipeline.git.branch >>]
+          steps:
+            - sixrs-gke/run-release
+      - unless:
+          condition:
+            equal: ["main", << pipeline.git.branch >>]
+          steps:
+            - run:
+                name: Select dev version
+                command: make docker-dev-version
       - store_artifacts:
           name: Capture chosen version
           path: .version
@@ -155,12 +170,14 @@ jobs:
           version: 20.10.11
       - sixrs-gke/docker-login
       - run:
-          name: Build multiarch docker images
+          name: Initialize docker buildx
           command: |
-            if [ ! -f .version ]; then
-              make docker-dev-version
-            fi
-            ./.docker-deps/build-multiarch.sh
+            docker run --privileged --rm tonistiigi/binfmt --install all
+            docker context create mmmbbb-multiarch
+            docker buildx create mmmbbb-multiarch --bootstrap
+      - run:
+          name: Build multiarch docker images
+          command: ./.docker-deps/build-multiarch.sh
       - save_cache:
           name: Save multiarch build cache
           key: go-build-multiarch-v1-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
