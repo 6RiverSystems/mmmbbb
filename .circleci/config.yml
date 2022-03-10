@@ -16,6 +16,7 @@ jobs:
         environment:
           POSTGRES_USER: circle
           POSTGRES_DB: circle_test
+    resource_class: large
 
     environment:
       TEST_RESULTS: /tmp/test-results
@@ -126,6 +127,7 @@ jobs:
   publish-docker-multiarch:
     docker:
       - image: cimg/go:1.17
+    resource_class: large
     environment:
       GOPRIVATE: "go.6river.tech/*,github.com/6RiverSystems/*"
     steps:
