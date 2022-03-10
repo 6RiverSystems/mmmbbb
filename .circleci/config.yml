@@ -55,7 +55,22 @@ jobs:
           command: |
             ./mage -v format
             git diff --exit-code
-      - run: ./mage -v lint:ci
+      # we only need to run lint on one pg version
+      - when:
+          condition:
+            equal: ["cimg/postgres:9.6", << parameters.pgimg >>]
+          steps:
+            - restore_cache:
+                name: Restore golangci-lint cache
+                keys:
+                  - go-lint-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
+                  - go-lint-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-
+            - run: ./mage -v lint:ci
+            - save_cache:
+                name: Save golangci-lint cache
+                key: go-lint-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
+                paths:
+                  - ~/.cache/golangci-lint
       - run:
           name: Waiting for Postgres to be ready
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
@@ -163,6 +178,9 @@ jobs:
       - run:
           name: Build multiarch docker images
           command: ./mage -v docker:multiarchBuildAll
+      - run:
+          name: Push multiarch docker images
+          command: ./mage -v docker:multiarchPushAll
       - save_cache:
           name: Save multiarch build cache
           key: go-build-multiarch-v1-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}

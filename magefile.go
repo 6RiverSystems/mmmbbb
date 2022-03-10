@@ -688,6 +688,9 @@ func (Docker) MultiarchBuildAll(ctx context.Context) error {
 	return nil
 }
 
+// MultiarchPushAll pushes all the multi-arch docker images. It actually has to
+// rebuild them, so it relies on the docker build cache working well to be
+// efficient.
 func (Docker) MultiarchPushAll(ctx context.Context) error {
 	var fns []interface{}
 	for _, cmd := range cmds {
