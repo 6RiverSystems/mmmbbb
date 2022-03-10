@@ -34,6 +34,10 @@ for arch in "${ARCHS[@]}" ; do
 done
 platforms="${platforms[*]}"
 platforms="${platforms// /,}"
+builderargs=(--builder mmmbbb-multiarch)
+if [ "${CI}" ]; then
+	builderargs+=(--context mmmbbb-multiarch)
+fi
 for bin in "${BINARY_NAMES}" ; do
 	basetag="mmmbbb-${bin}:$(<.version)"
 	tagargs=(-t "$basetag")
@@ -45,7 +49,7 @@ for bin in "${BINARY_NAMES}" ; do
 		tagargs+=(-t "6river/${basetag}")
 	fi
 	BINARYNAME=bin docker buildx build \
-		--builder mmmbbb-multiarch \
+		"${builderargs[@]}" \
 		--platform "${platforms}" \
 		"${tagargs[@]}" \
 		--build-arg "BINARYNAME=${bin}" \
