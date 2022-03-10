@@ -56,7 +56,7 @@ platforms="${platforms// /,}"
 builderargs=(--builder mmmbbb-multiarch)
 ctxargs=()
 if [ "${CI}" ]; then
-	ctxargs+=(--context mmmbbb-multiarch)
+	ctxargs+=(--context multiarch-context)
 fi
 for bin in "${BINARY_NAMES}" ; do
 	basetag="mmmbbb-${bin}:$(<.version)"
