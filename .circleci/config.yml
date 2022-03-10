@@ -39,9 +39,9 @@ jobs:
             - go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
             - go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-
 
-      - run: ./mage get
-      - run: ./mage installCITools
-      - run: ./mage generate:force
+      - run: ./mage -v get
+      - run: ./mage -v installCITools
+      - run: ./mage -v generate:force
 
       - run:
           name: Compile code
@@ -156,7 +156,7 @@ jobs:
           steps:
             - run:
                 name: Select dev version
-                command: ./mage generate:devVersion
+                command: ./mage -v generate:devVersion
       - store_artifacts:
           name: Capture chosen version
           path: .version
