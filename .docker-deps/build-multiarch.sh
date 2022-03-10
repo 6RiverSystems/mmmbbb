@@ -35,10 +35,6 @@ done
 platforms="${platforms[*]}"
 platforms="${platforms// /,}"
 builderargs=(--builder mmmbbb-multiarch)
-ctxargs=()
-if [ "${CI}" ]; then
-	ctxargs+=(--context mmmbbb-multiarch)
-fi
 for bin in "${BINARY_NAMES}" ; do
 	basetag="mmmbbb-${bin}:$(<.version)"
 	tagargs=(-t "$basetag")
@@ -50,7 +46,6 @@ for bin in "${BINARY_NAMES}" ; do
 		tagargs+=(-t "6river/${basetag}")
 	fi
 	BINARYNAME=bin docker \
-		"${ctxargs[@]}" \
 		buildx build \
 		"${builderargs[@]}" \
 		--platform "${platforms}" \
