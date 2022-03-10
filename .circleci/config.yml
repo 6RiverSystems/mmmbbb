@@ -69,15 +69,8 @@ jobs:
           command: ./mage -v testGoCISplit
 
       - run:
-          name: Start service (service)
-          command: make TEST_RESULTS="${TEST_RESULTS}" test-main-cover-service
-          background: true
-      - run:
-          name: Wait for service to be active (service)
-          command: dockerize -wait tcp://localhost:3001 -timeout 1m
-      - run:
           name: Validate service is working (service)
-          command: make smoke-test-curl-service
+          command: ./mage -v testSmoke service localhost:3001
 
       - run:
           name: Coverage HTML report
@@ -148,7 +141,7 @@ jobs:
           steps:
             - run:
                 name: Select dev version
-                command: make docker-dev-version
+                command: ./mage generate:devVersion
       - store_artifacts:
           name: Capture chosen version
           path: .version
@@ -162,15 +155,14 @@ jobs:
           name: Initialize docker buildx
           command: |
             docker run --privileged --rm tonistiigi/binfmt --install all
-            docker context ls
             docker context create multiarch-context
             docker buildx create --name mmmbbb-multiarch --driver docker-container --bootstrap --use multiarch-context
-            docker context ls
-            docker buildx ls
-            docker buildx inspect mmmbbb-multiarch
+      - run:
+          name: Build multiarch binaries
+          command: ./mage -v releaseBinaries
       - run:
           name: Build multiarch docker images
-          command: ./.docker-deps/build-multiarch.sh
+          command: ./mage -v docker:multiarchBuildAll
       - save_cache:
           name: Save multiarch build cache
           key: go-build-multiarch-v1-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}

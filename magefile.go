@@ -28,10 +28,15 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
+	"net/http"
+	"net/url"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -39,6 +44,7 @@ import (
 
 	// tools this needs, to keep `go mod tidy` from deleting lines
 	_ "github.com/golangci/golangci-lint/pkg/commands"
+	"golang.org/x/sync/errgroup"
 	_ "golang.org/x/tools/imports"
 )
 
@@ -61,6 +67,22 @@ var goLintArgs = []string{"--build-tags", "nomsgpack"}
 var goTestArgs = []string{"-vet=off", "-cover", "-coverpkg=./..."}
 var cmds = []string{"service"}
 var goArches = []string{"amd64", "arm64"}
+
+var generatedSimple = []string{
+	"./ent/ent.go",
+	"./oas/oas-types.go",
+	"./version/version.go",
+}
+var generatedGrpc = []string{
+	"./grpc/pubsub/pubsub_grpc.pb.go",
+	"./grpc/pubsub/pubsub.pb.gw.go",
+	"./grpc/pubsub/pubsub-types.go",
+	"./grpc/pubsub.swagger.json",
+	"./grpc/pubsub/schema_grpc.pb.go",
+	"./grpc/pubsub/schema.pb.gw.go",
+	"./grpc/pubsub/schema-types.go",
+	"./grpc/schema.swagger.json",
+}
 
 //cspell:ignore Deps
 
@@ -165,19 +187,21 @@ func (Generate) Version(ctx context.Context) error {
 	return nil
 }
 
-func (Generate) Grpc(ctx context.Context) error {
-	outputs := []string{
-		"./grpc/pubsub/pubsub_grpc.pb.go",
-		"./grpc/pubsub/pubsub.pb.gw.go",
-		"./grpc/pubsub/pubsub-types.go",
-		"./grpc/pubsub.swagger.json",
-		"./grpc/pubsub/schema_grpc.pb.go",
-		"./grpc/pubsub/schema.pb.gw.go",
-		"./grpc/pubsub/schema-types.go",
-		"./grpc/schema.swagger.json",
+func (Generate) DevVersion(ctx context.Context) error {
+	out, err := sh.Output("git", "describe", "--tags", "--long", "--dirty", "--broken")
+	if err != nil {
+		return err
 	}
+	out = strings.TrimSpace(out)
+	// trim the leading `v`
+	out = out[1:]
+	fmt.Printf("Generated(dev .version): %s\n", out)
+	return os.WriteFile(".version", []byte(out+"\n"), 0644)
+}
+
+func (Generate) Grpc(ctx context.Context) error {
 	dirty := false
-	for _, out := range outputs {
+	for _, out := range generatedGrpc {
 		var err error
 		if dirty, err = target.Path(out, "./grpc/generate.go"); err != nil {
 			return err
@@ -498,6 +522,79 @@ func TestGoCISplit(ctx context.Context) error {
 	return sh.Run("gotestsum", args...)
 }
 
+func TestSmoke(ctx context.Context, cmd, hostPort string) error {
+	resultsDir := os.Getenv("TEST_RESULTS")
+	if resultsDir == "" {
+		return fmt.Errorf("missing TEST_RESULTS env var")
+	}
+
+	eg, ctx := errgroup.WithContext(ctx)
+	// start the test run in the background
+	eg.Go(func() error {
+		args := []string{
+			"--format", "standard-quiet",
+			"--junitfile", filepath.Join(resultsDir, "gotestsum-smoke-report-"+cmd+".xml"),
+			"--",
+		}
+		args = append(args, goTestArgs...)
+		args = append(args,
+			"-coverprofile="+filepath.Join(resultsDir, "coverage-smoke-"+cmd+".out"),
+			"-v",
+			"-run", "TestCoverMain",
+			"./"+filepath.Join("cmd", cmd),
+		)
+		// have to use normal exec so the context can terminate this
+		cmd := exec.CommandContext(ctx, "gotestsum", args...)
+		cmd.Env = append([]string{}, os.Environ()...)
+		cmd.Env = append(cmd.Env, "NODE_ENV=acceptance")
+		return cmd.Run()
+	})
+	eg.Go(func() error {
+		// wait for the app to get running
+		if mg.Verbose() {
+			fmt.Printf("Waiting for app(%s) at %s...\n", cmd, hostPort)
+		}
+		for {
+			conn, err := net.DialTimeout("tcp", hostPort, time.Minute)
+			if err != nil {
+				time.Sleep(50 * time.Millisecond)
+			}
+			if conn != nil {
+				conn.Close()
+				break
+			}
+		}
+		// run a couple quick HTTP checks
+		// TODO: these should be input specs too
+		tryURL := func(m string, u *url.URL) error {
+			if mg.Verbose() {
+				fmt.Printf("Trying %s %s ...\n", m, u)
+			}
+			if req, err := http.NewRequestWithContext(ctx, m, u.String(), nil); err != nil {
+				return err
+			} else if resp, err := http.DefaultClient.Do(req); err != nil {
+				return err
+			} else {
+				if resp.Body != nil {
+					defer resp.Body.Close()
+				}
+				if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+					return fmt.Errorf("failed %s %s: %d %s", m, u, resp.StatusCode, resp.Status)
+				}
+			}
+			return nil
+		}
+		if err := tryURL(http.MethodGet, &url.URL{Scheme: "http", Host: hostPort, Path: "/"}); err != nil {
+			return err
+		}
+		if err := tryURL(http.MethodPost, &url.URL{Scheme: "http", Host: hostPort, Path: "/server/shutdown"}); err != nil {
+			return err
+		}
+		return nil
+	})
+	return eg.Wait()
+}
+
 func CompileAndTest(ctx context.Context) error {
 	mg.CtxDeps(ctx, CompileDefault, Test)
 	return nil
@@ -511,10 +608,38 @@ func CleanEnt(ctx context.Context) error {
 
 func Clean(ctx context.Context) error {
 	mg.CtxDeps(ctx, CleanEnt)
-	// TODO:
-	// rm -rf $(GENERATED_FILES) bin/ coverage.out coverage.html gonic.sqlite3* .version
-	// -rmdir --ignore-fail-on-non-empty grpc/pubsub/ grpc/health/
-	return fmt.Errorf("not implemented")
+	for _, f := range generatedSimple {
+		if err := sh.Rm(f); err != nil {
+			return err
+		}
+	}
+	for _, f := range generatedGrpc {
+		if err := sh.Rm(f); err != nil {
+			return err
+		}
+	}
+	for _, f := range []string{"bin", "coverage.out", "coverage.html", ".version"} {
+		if err := sh.Rm(f); err != nil {
+			return err
+		}
+	}
+	if m, err := filepath.Glob("gonic.sqlite3*"); err != nil {
+		return err
+	} else {
+		for _, f := range m {
+			if err := sh.Rm(f); err != nil {
+				return err
+			}
+		}
+	}
+	for _, d := range []string{"grpc/pubsub", "grpc/health"} {
+		// just rmdir here, and ignore both doesn't exist and isn't empty
+		if err := os.Remove(d); err != nil && !os.IsNotExist(err) && !os.IsExist(err) {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // TODO: docker-dev-version
@@ -541,4 +666,96 @@ func ReleaseBinaries(ctx context.Context) error {
 	}
 	mg.CtxDeps(ctx, fns...)
 	return nil
+}
+
+type Docker mg.Namespace
+
+const multiArchBuilderName = "mmmbbb-multiarch"
+
+func (Docker) MultiarchInitLocal(ctx context.Context) error {
+	// this is for initializing a local machine for dev, CI needs a different flow
+	// that's in the config there
+	return sh.Run("docker", "buildx", "create", "--name", multiArchBuilderName, "--bootstrap")
+}
+
+func (Docker) MultiarchBuildAll(ctx context.Context) error {
+	var fns []interface{}
+	for _, cmd := range cmds {
+		fns = append(fns, mg.F(Docker{}.MultiarchBuild, cmd))
+	}
+	// paralleling these just makes the output confusing
+	mg.SerialCtxDeps(ctx, fns...)
+	return nil
+}
+
+func (Docker) MultiarchPushAll(ctx context.Context) error {
+	var fns []interface{}
+	for _, cmd := range cmds {
+		fns = append(fns, mg.F(Docker{}.MultiarchPush, cmd))
+	}
+	// paralleling these just makes the output confusing
+	mg.SerialCtxDeps(ctx, fns...)
+	return nil
+}
+
+func (Docker) MultiarchBuild(ctx context.Context, cmd string) error {
+	fmt.Printf("Docker-MultiArch(%s)...\n", cmd)
+	return dockerRunMultiArch(ctx, cmd, false)
+}
+func (Docker) MultiarchPush(ctx context.Context, cmd string) error {
+	fmt.Printf("Docker-MultiArchPush(%s)...\n", cmd)
+	return dockerRunMultiArch(ctx, cmd, true)
+}
+
+func dockerRunMultiArch(ctx context.Context, cmd string, push bool) error {
+	var args []string
+	if os.Getenv("CI") != "" {
+		args = append(args, "--context", "multiarch-context")
+	}
+	args = append(args, "buildx", "build", "--builder", multiArchBuilderName)
+	var platforms []string
+	for _, arch := range goArches {
+		platforms = append(platforms, runtime.GOOS+"/"+arch)
+	}
+	args = append(args, "--platform", strings.Join(platforms, ","))
+	var version string
+	if content, err := os.ReadFile(".version"); err != nil {
+		return err
+	} else {
+		version = strings.TrimSpace(string(content))
+	}
+	baseTag := "mmmbbb-" + cmd + ":" + version
+	args = append(args, "-t", baseTag)
+	if os.Getenv("CIRCLE_BRANCH") == "main" {
+		args = append(args, "-t", "gcr.io/plasma-column-128721/"+baseTag)
+	}
+	if os.Getenv("DOCKERHUB_USER") != "" {
+		mg.CtxDeps(ctx, Docker{}.HubLogin)
+		args = append(args, "-t", "6river/"+baseTag)
+	}
+	args = append(args, "--build-arg", "BINARYNAME="+cmd)
+	if push {
+		args = append(args, "--push")
+	}
+	args = append(args, ".")
+	return sh.RunWithV(
+		// TODO: not sure we need this
+		map[string]string{"BINARYNAME": cmd},
+		"docker", args...,
+	)
+}
+
+func (Docker) HubLogin(ctx context.Context) error {
+	user, password := os.Getenv("DOCKERHUB_USER"), os.Getenv("DOCKERHUB_PASSWORD")
+	if user == "" || password == "" {
+		return fmt.Errorf("missing DOCKERHUB_USER and/or DOCKERHUB_PASSWORD")
+	}
+	// have to use raw exec to set stdin
+	cmd := exec.CommandContext(ctx, "docker", "login", "--username", user, "--password-stdin")
+	cmd.Stdin = strings.NewReader(password)
+	if mg.Verbose() {
+		cmd.Stdout = os.Stdout
+	}
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
 }
