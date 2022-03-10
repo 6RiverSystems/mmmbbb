@@ -217,9 +217,11 @@ func (Generate) Grpc(ctx context.Context) error {
 }
 
 func Get(ctx context.Context) error {
+	fmt.Println("Downloading dependencies...")
 	if err := sh.Run("go", "mod", "download", "-x"); err != nil {
 		return err
 	}
+	fmt.Println("Verifying dependencies...")
 	if err := sh.Run("go", "mod", "verify"); err != nil {
 		return err
 	}
@@ -728,7 +730,10 @@ func dockerRunMultiArch(ctx context.Context, cmd string, push bool) error {
 		version = strings.TrimSpace(string(content))
 	}
 	baseTag := "mmmbbb-" + cmd + ":" + version
-	args = append(args, "-t", baseTag)
+	if !push {
+		// base tag is not valid to push
+		args = append(args, "-t", baseTag)
+	}
 	if os.Getenv("CIRCLE_BRANCH") == "main" {
 		args = append(args, "-t", "gcr.io/plasma-column-128721/"+baseTag)
 	}
