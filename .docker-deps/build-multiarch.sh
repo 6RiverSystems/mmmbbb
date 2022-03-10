@@ -35,8 +35,9 @@ done
 platforms="${platforms[*]}"
 platforms="${platforms// /,}"
 builderargs=(--builder mmmbbb-multiarch)
+ctxargs=()
 if [ "${CI}" ]; then
-	builderargs+=(--context mmmbbb-multiarch)
+	ctxargs+=(--context mmmbbb-multiarch)
 fi
 for bin in "${BINARY_NAMES}" ; do
 	basetag="mmmbbb-${bin}:$(<.version)"
@@ -48,7 +49,9 @@ for bin in "${BINARY_NAMES}" ; do
 		docker login --username "$DOCKERHUB_USER" --password-stdin <<< "$DOCKERHUB_PASSWORD"
 		tagargs+=(-t "6river/${basetag}")
 	fi
-	BINARYNAME=bin docker buildx build \
+	BINARYNAME=bin docker \
+		"${ctxargs[@]}" \
+		buildx build \
 		"${builderargs[@]}" \
 		--platform "${platforms}" \
 		"${tagargs[@]}" \
