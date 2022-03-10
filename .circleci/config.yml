@@ -174,7 +174,7 @@ jobs:
           command: |
             docker run --privileged --rm tonistiigi/binfmt --install all
             docker context create mmmbbb-multiarch
-            docker buildx create mmmbbb-multiarch --bootstrap
+            docker --context mmmbbb-multiarch buildx create mmmbbb-multiarch --bootstrap
       - run:
           name: Build multiarch docker images
           command: ./.docker-deps/build-multiarch.sh
