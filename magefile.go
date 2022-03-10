@@ -727,17 +727,25 @@ func dockerRunMultiArch(ctx context.Context, cmd string, push bool) error {
 	} else {
 		version = strings.TrimSpace(string(content))
 	}
-	baseTag := "mmmbbb-" + cmd + ":" + version
-	if !push {
-		// base tag is not valid to push
+	baseImage := "mmmbbb-" + cmd
+	baseTag := baseImage + ":" + version
+	if push {
+		const gcrBase = "gcr.io/plasma-column-128721/"
+		// push everything to gcr
+		args = append(args, "-t", gcrBase+baseTag)
+		if os.Getenv("CIRCLE_BRANCH") == "main" {
+			// push latest tag on main
+			args = append(args, "-t", gcrBase+baseTag+":latest")
+			// also push to docker hub for builds on main
+			if os.Getenv("DOCKERHUB_USER") != "" {
+				mg.CtxDeps(ctx, Docker{}.HubLogin)
+				args = append(args, "-t", "6river/"+baseTag)
+			}
+		}
+	} else {
+		// base tag is not valid to push, but a useful local thing to use for the
+		// only-build mode
 		args = append(args, "-t", baseTag)
-	}
-	if os.Getenv("CIRCLE_BRANCH") == "main" {
-		args = append(args, "-t", "gcr.io/plasma-column-128721/"+baseTag)
-	}
-	if os.Getenv("DOCKERHUB_USER") != "" {
-		mg.CtxDeps(ctx, Docker{}.HubLogin)
-		args = append(args, "-t", "6river/"+baseTag)
 	}
 	args = append(args, "--build-arg", "BINARYNAME="+cmd)
 	if push {
