@@ -738,11 +738,12 @@ func dockerRunMultiArch(ctx context.Context, cmd string, push bool) error {
 		args = append(args, "-t", gcrBase+baseTag)
 		if os.Getenv("CIRCLE_BRANCH") == "main" {
 			// push latest tag on main
-			args = append(args, "-t", gcrBase+baseTag+":latest")
+			args = append(args, "-t", gcrBase+baseImage+":latest")
 			// also push to docker hub for builds on main
 			if os.Getenv("DOCKERHUB_USER") != "" {
 				mg.CtxDeps(ctx, Docker{}.HubLogin)
 				args = append(args, "-t", "6river/"+baseTag)
+				args = append(args, "-t", "6river/"+baseImage+":latest")
 			}
 		}
 	} else {
