@@ -39,13 +39,13 @@ jobs:
             - go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
             - go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-
 
-      - run: make get
-      - run: make install-ci-tools
-      - run: make generate
+      - run: ./mage get
+      - run: ./mage installCITools
+      - run: ./mage generate:force
 
       - run:
           name: Compile code
-          command: make -j compile
+          command: ./mage -v compile
 
       - run:
           name: Prepare for tests
@@ -53,16 +53,9 @@ jobs:
       - run:
           name: format check
           command: |
-            make fmt
+            ./mage -v format
             git diff --exit-code
-      - run:
-          name: vet
-          command: make vet
-      - run:
-          name: lint
-          command: |
-            go run github.com/golangci/golangci-lint/cmd/golangci-lint run --out-format=junit-xml >${TEST_RESULTS}/golangci-lint.xml
-
+      - run: ./mage -v lint:ci
       - run:
           name: Waiting for Postgres to be ready
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
@@ -73,11 +66,7 @@ jobs:
           # while we aren't using the parallel test split here, we still need to
           # use test-go-ci-split to get junit output and proper coverage file
           # storage
-          command: |
-            make \
-              TEST_RESULTS="${TEST_RESULTS}" \
-              PACKAGE_NAMES=./... \
-              test-go-ci-split
+          command: ./mage -v testGoCISplit
 
       - run:
           name: Start service (service)
@@ -163,9 +152,9 @@ jobs:
       - store_artifacts:
           name: Capture chosen version
           path: .version
-      - run: make get
-      - run: make install-ci-tools
-      - run: make generate
+      - run: ./mage -v get
+      - run: ./mage -v installCITools
+      - run: ./mage -v generate:force
       - setup_remote_docker:
           version: 20.10.11
       - sixrs-gke/docker-login

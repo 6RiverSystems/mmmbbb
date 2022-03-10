@@ -71,12 +71,6 @@ $(GENERATE_GRPC) &: ./grpc/generate.go
 
 ./version/version.go: ./version/generate.go ./version/write-version.sh .git/index .git/refs/tags $(wildcard .version)
 
-# special rules
-./common/swagger-ui/ui/swagger-ui-bundle.js: ./common/swagger-ui/generate.go ./common/swagger-ui/get-ui/get-swagger-ui.go
-	go generate -x ./common/swagger-ui
-	gofmt -l -s -w ./common/swagger-ui
-	go run golang.org/x/tools/cmd/goimports -l -w $(GOIMPORTSARGS) ./common/swagger-ui
-
 # this requires at least go 1.16.5 to avoid mucking up go.mod/go.sum
 get:
 	go mod download -x
