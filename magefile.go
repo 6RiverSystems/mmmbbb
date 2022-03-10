@@ -523,6 +523,8 @@ func TestGoCISplit(ctx context.Context) error {
 }
 
 func TestSmoke(ctx context.Context, cmd, hostPort string) error {
+	// TODO: this should just be a normal Go test
+
 	resultsDir := os.Getenv("TEST_RESULTS")
 	if resultsDir == "" {
 		return fmt.Errorf("missing TEST_RESULTS env var")
@@ -587,6 +589,7 @@ func TestSmoke(ctx context.Context, cmd, hostPort string) error {
 		if err := tryURL(http.MethodGet, &url.URL{Scheme: "http", Host: hostPort, Path: "/"}); err != nil {
 			return err
 		}
+		// TODO: poke some gRPC gateway endpoints
 		if err := tryURL(http.MethodPost, &url.URL{Scheme: "http", Host: hostPort, Path: "/server/shutdown"}); err != nil {
 			return err
 		}
