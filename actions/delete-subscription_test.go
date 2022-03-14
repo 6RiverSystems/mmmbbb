@@ -86,8 +86,9 @@ func TestDeleteSubscription_Execute(t *testing.T) {
 				tt.assertion(t, a.Execute(ctx, tx))
 				assert.Equal(t, tt.expect, a.results)
 				if tt.expect != nil {
-					assert.True(t, a.HasResults())
-					assert.Equal(t, tt.expect.numDeleted, a.NumDeleted())
+					if assert.True(t, a.HasResults()) {
+						assert.Equal(t, tt.expect.numDeleted, a.NumDeleted())
+					}
 				} else {
 					assert.Nil(t, a.results)
 				}

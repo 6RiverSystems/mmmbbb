@@ -166,8 +166,9 @@ func TestPrunedExpiredDeliveries_Execute(t *testing.T) {
 				tt.assertion(t, a.Execute(ctx, tx))
 				assert.Equal(t, tt.expect, a.results)
 				if tt.expect != nil {
-					assert.True(t, a.HasResults())
-					assert.Equal(t, tt.expect.NumDeleted, a.NumDeleted())
+					if assert.True(t, a.HasResults()) {
+						assert.Equal(t, tt.expect.NumDeleted, a.NumDeleted())
+					}
 				}
 
 				numRemaining, err := tx.Delivery.Query().Count(ctx)

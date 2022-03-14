@@ -481,28 +481,28 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 			assert.NoError(t, eg.Wait())
 			tt.assertion(t, err)
 			if err == nil {
-				assert.True(t, a.HasResults())
-				assert.NotNil(t, a.results)
-				assert.Equal(t, a.results.deliveries, a.Deliveries())
-				for _, d := range a.Deliveries() {
-					del, err := client.Delivery.Get(ctx, d.ID)
-					require.NoError(t, err)
-					msg, err := del.QueryMessage().Only(ctx)
-					require.NoError(t, err)
-					assert.Equal(t, msg.Attributes, d.Attributes)
-					assert.Equal(t, msg.ID, d.MessageID)
-					assert.Equal(t, msg.Payload, d.Payload)
-					assert.Equal(t, msg.OrderKey, d.OrderKey)
-					assert.Equal(t, msg.PublishedAt, d.PublishedAt)
-					// zone info will likely be different here, we just care that they
-					// represent the same time, within the fuzz boundary
-					assert.GreaterOrEqual(t, del.AttemptAt.UnixNano(), d.NextAttemptAt.UnixNano())
-					assert.LessOrEqual(t, del.AttemptAt.UnixNano(), d.NextAttemptAt.Add(time.Second).UnixNano())
-					assert.Equal(t, del.Attempts, d.NumAttempts)
-					assert.Greater(t, del.Attempts, 0)
-					assert.Greater(t, del.AttemptAt.UnixNano(), time.Now().UnixNano())
+				if assert.True(t, a.HasResults()) {
+					assert.Equal(t, a.results.deliveries, a.Deliveries())
+					for _, d := range a.Deliveries() {
+						del, err := client.Delivery.Get(ctx, d.ID)
+						require.NoError(t, err)
+						msg, err := del.QueryMessage().Only(ctx)
+						require.NoError(t, err)
+						assert.Equal(t, msg.Attributes, d.Attributes)
+						assert.Equal(t, msg.ID, d.MessageID)
+						assert.Equal(t, msg.Payload, d.Payload)
+						assert.Equal(t, msg.OrderKey, d.OrderKey)
+						assert.Equal(t, msg.PublishedAt, d.PublishedAt)
+						// zone info will likely be different here, we just care that they
+						// represent the same time, within the fuzz boundary
+						assert.GreaterOrEqual(t, del.AttemptAt.UnixNano(), d.NextAttemptAt.UnixNano())
+						assert.LessOrEqual(t, del.AttemptAt.UnixNano(), d.NextAttemptAt.Add(time.Second).UnixNano())
+						assert.Equal(t, del.Attempts, d.NumAttempts)
+						assert.Greater(t, del.Attempts, 0)
+						assert.Greater(t, del.AttemptAt.UnixNano(), time.Now().UnixNano())
+					}
+					require.Len(t, a.Deliveries(), tt.numExpected)
 				}
-				require.Len(t, a.Deliveries(), tt.numExpected)
 			} else {
 				assert.False(t, a.HasResults())
 				require.Nil(t, a.results)

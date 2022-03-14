@@ -100,8 +100,7 @@ func TestDelayDeliveries_Execute(t *testing.T) {
 				tt.assertion(t, a.Execute(ctx, tx))
 				assert.Equal(t, tt.results, a.results)
 				if tt.results != nil {
-					assert.True(t, a.HasResults())
-					if a.results != nil {
+					if assert.True(t, a.HasResults()) {
 						assert.Equal(t, tt.results.numDelayed, a.NumDelayed())
 					}
 				}

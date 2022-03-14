@@ -124,8 +124,9 @@ func TestDeleteExpiredSubscriptions_Execute(t *testing.T) {
 				tt.assertion(t, a.Execute(ctx, tx))
 				assert.Equal(t, tt.expect, a.results)
 				if tt.expect != nil {
-					assert.True(t, a.HasResults())
-					assert.Equal(t, tt.expect.NumDeleted, a.NumDeleted())
+					if assert.True(t, a.HasResults()) {
+						assert.Equal(t, tt.expect.NumDeleted, a.NumDeleted())
+					}
 
 					// deleted subs should match the result expectation
 					deleted, err := tx.Subscription.Query().Where(subscription.DeletedAtNotNil()).All(ctx)
