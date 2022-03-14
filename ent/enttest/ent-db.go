@@ -96,7 +96,7 @@ func ResetTables(t testing.TB, client *ent.Client) {
 	ctx := testutils.ContextForTest(t)
 	for _, d := range deletes {
 		if _, err := d(ctx); err != nil {
-			t.Fatalf("Failed to cleanup old test data: %v", err)
+			t.Fatalf("Failed to cleanup old test data: (%T) %[1]v", err)
 		}
 	}
 }
