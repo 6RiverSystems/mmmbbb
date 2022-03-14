@@ -514,7 +514,7 @@ func TestGoCISplit(ctx context.Context) error {
 	if len(packageNames) == 0 || packageNames[0] == "" {
 		packageNames = []string{"./..."}
 	}
-	args := []string{"--format", "standard-quiet", "--junitfile", filepath.Join(resultsDir, "gotestsum-report.xml"), "--"}
+	args := []string{"--format", "standard-verbose", "--junitfile", filepath.Join(resultsDir, "gotestsum-report.xml"), "--"}
 	args = append(args, goBuildArgs...)
 	args = append(args, goTestArgs...)
 	args = append(args, "-coverprofile="+filepath.Join(resultsDir, "coverage.out"))
@@ -534,7 +534,7 @@ func TestSmoke(ctx context.Context, cmd, hostPort string) error {
 	// start the test run in the background
 	eg.Go(func() error {
 		args := []string{
-			"--format", "standard-quiet",
+			"--format", "standard-verbose",
 			"--junitfile", filepath.Join(resultsDir, "gotestsum-smoke-report-"+cmd+".xml"),
 			"--",
 		}
