@@ -26,6 +26,7 @@
     "frob",
     "frood",
     "gofmt",
+    "gofumpt",
     "goimports",
     "golangci",
     "gonic",
