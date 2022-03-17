@@ -34,6 +34,7 @@ var httpPushFailures = promauto.NewCounterVec(
 	},
 	[]string{"status"},
 )
+
 var httpPushSuccesses = promauto.NewCounterVec(
 	prometheus.CounterOpts{
 		Namespace: version.AppName,

@@ -333,9 +333,11 @@ func (s *topicMirrorOut) watchSub(ctx context.Context, subName, topicName string
 	}
 }
 
-const psAttrMirroredFrom = "mirroredFrom"
-const psAttrMirroredVia = "mirroredVia"
-const psAttrMirroredThrough = "mirroredThrough"
+const (
+	psAttrMirroredFrom    = "mirroredFrom"
+	psAttrMirroredVia     = "mirroredVia"
+	psAttrMirroredThrough = "mirroredThrough"
+)
 
 // psMirrorAttrs is the list of out of band attributes attached to google pubsub
 // messages sent from topicMirrorOut, to help identifying such messages if they

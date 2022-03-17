@@ -26,8 +26,10 @@ import (
 	"go.6river.tech/mmmbbb/version"
 )
 
-var publishedMessagesCounter, enqueuedDeliveriesCounter prometheus.Counter
-var publishedMessagesHistogram *prometheus.HistogramVec
+var (
+	publishedMessagesCounter, enqueuedDeliveriesCounter prometheus.Counter
+	publishedMessagesHistogram                          *prometheus.HistogramVec
+)
 
 var filterErrorsCounter, filterNoMatchCounter prometheus.Counter
 

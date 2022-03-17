@@ -22,7 +22,6 @@ package services
 import (
 	"context"
 	"encoding/json"
-
 	"errors"
 
 	"github.com/google/uuid"

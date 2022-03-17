@@ -48,6 +48,7 @@ func (s *wrappedService) Initialize(ctx context.Context, services *registry.Regi
 func (s *wrappedService) Start(ctx context.Context, ready chan<- struct{}) error {
 	return s.mmmbbbService.Start(ctx, ready)
 }
+
 func (s *wrappedService) Cleanup(ctx context.Context, reg *registry.Registry) error {
 	return s.mmmbbbService.Cleanup(ctx, reg)
 }

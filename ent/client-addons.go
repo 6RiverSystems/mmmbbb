@@ -22,9 +22,8 @@ package ent
 import (
 	"context"
 	"database/sql"
-	"fmt"
-
 	"errors"
+	"fmt"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"

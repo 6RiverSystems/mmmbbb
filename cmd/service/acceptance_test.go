@@ -67,6 +67,7 @@ func mustJSON(t *testing.T, value interface{}) []byte {
 func mustBase64(t *testing.T, value []byte) string {
 	return base64.StdEncoding.EncodeToString(value)
 }
+
 func mustUnBase64(t *testing.T, encoded string) []byte {
 	value, err := base64.StdEncoding.DecodeString(encoded)
 	require.NoError(t, err)
@@ -87,7 +88,7 @@ func TestEndpoints(t *testing.T) {
 	eg.Go(app.Main)
 
 	client := http.DefaultClient
-	var baseUrl = "http://localhost:" + strconv.Itoa(server.ResolvePort(defaults.Port, 0))
+	baseUrl := "http://localhost:" + strconv.Itoa(server.ResolvePort(defaults.Port, 0))
 
 	// wait for app to start
 	for {

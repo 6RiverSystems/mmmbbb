@@ -31,6 +31,7 @@ import (
 	_ "github.com/google/addlicense"
 	_ "golang.org/x/tools/imports"
 	_ "gotest.tools/gotestsum/cmd"
+	_ "mvdan.cc/gofumpt"
 
 	_ "github.com/deepmap/oapi-codegen/pkg/codegen"
 	// needed for golangci-lint

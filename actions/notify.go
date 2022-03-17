@@ -32,8 +32,10 @@ import (
 // this stuff only works in-process, but it helps latency a LOT there
 // for h-scale, other retry timers dominate
 
-type publishHook func(uuid.UUID)
-type PublishHookHandle *publishHook
+type (
+	publishHook       func(uuid.UUID)
+	PublishHookHandle *publishHook
+)
 
 type modifyHook func(uuid.UUID, string)
 
@@ -42,35 +44,48 @@ type modifyHook func(uuid.UUID, string)
 // promote type safety for the semantic differences between subscription and
 // topic modify hooks, despite their signatures being the same
 type modifyHookHandle = *modifyHook
-type TopicModifyHookHandle *modifyHook
-type SubscriptionModifyHookHandle *modifyHook
+
+type (
+	TopicModifyHookHandle        *modifyHook
+	SubscriptionModifyHookHandle *modifyHook
+)
 
 var nmu sync.Mutex
 
-type notifier = chan struct{}
-type notifySet = map[notifier]struct{}
+type (
+	notifier  = chan struct{}
+	notifySet = map[notifier]struct{}
+)
 
-type PublishNotifier notifier
-type SubModifiedNotifier notifier
-type AnySubModifiedNotifier notifier
-type TopicModifiedNotifier notifier
-type AnyTopicModifiedNotifier notifier
+type (
+	PublishNotifier          notifier
+	SubModifiedNotifier      notifier
+	AnySubModifiedNotifier   notifier
+	TopicModifiedNotifier    notifier
+	AnyTopicModifiedNotifier notifier
+)
 
-var pubNotifyHooks = map[PublishHookHandle]struct{}{}
-var pubWaiters = map[uuid.UUID]map[PublishNotifier]struct{}{}
+var (
+	pubNotifyHooks = map[PublishHookHandle]struct{}{}
+	pubWaiters     = map[uuid.UUID]map[PublishNotifier]struct{}{}
+)
 
 type modifyKey struct {
 	id   uuid.UUID
 	name string
 }
 
-var topicModifyHooks = map[modifyHookHandle]struct{}{}
-var topicModifyWaiters = map[modifyKey]notifySet{}
-var anyTopicModifiedWaiters = notifySet{}
+var (
+	topicModifyHooks        = map[modifyHookHandle]struct{}{}
+	topicModifyWaiters      = map[modifyKey]notifySet{}
+	anyTopicModifiedWaiters = notifySet{}
+)
 
-var subModifyHooks = map[modifyHookHandle]struct{}{}
-var subModifyWaiters = map[modifyKey]notifySet{}
-var anySubModifiedWaiters = notifySet{}
+var (
+	subModifyHooks        = map[modifyHookHandle]struct{}{}
+	subModifyWaiters      = map[modifyKey]notifySet{}
+	anySubModifiedWaiters = notifySet{}
+)
 
 func AddPublishHook(hook publishHook) PublishHookHandle {
 	if hook == nil {

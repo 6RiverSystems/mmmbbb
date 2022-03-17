@@ -489,7 +489,7 @@ func TestPublishMessage_Execute(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			enttest.ResetTables(t, client)
-			var pubNotifies = map[uuid.UUID]chan struct{}{}
+			pubNotifies := map[uuid.UUID]chan struct{}{}
 			// have to make this indirect as the expected notify may be generated in
 			// before
 			defer func() {

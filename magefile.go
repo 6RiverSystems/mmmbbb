@@ -48,31 +48,37 @@ import (
 	_ "golang.org/x/tools/imports"
 )
 
-var Default = CompileAndTest
-var Aliases = map[string]interface{}{
-	"generate": GenerateDefault,
-	"fmt":      Format,
-	"compile":  CompileDefault,
-	"lint":     LintDefault,
-}
+var (
+	Default = CompileAndTest
+	Aliases = map[string]interface{}{
+		"generate": GenerateDefault,
+		"fmt":      Format,
+		"compile":  CompileDefault,
+		"lint":     LintDefault,
+	}
+)
 
 var goImportsFlags = []string{"-local", "github.com/6RiverSystems,go.6river.tech"}
 
-//cSpell:ignore nomsgpack
+// cSpell:ignore nomsgpack
 var goBuildArgs = []string{"-tags", "nomsgpack"}
 var goLintArgs = []string{"--build-tags", "nomsgpack"}
 
 // always test with race and coverage, we'll run vet separately.
 // unless CGO is disabled, and race is not available
 var goTestArgs = []string{"-vet=off", "-cover", "-coverpkg=./..."}
-var cmds = []string{"service"}
-var goArches = []string{"amd64", "arm64"}
+
+var (
+	cmds     = []string{"service"}
+	goArches = []string{"amd64", "arm64"}
+)
 
 var generatedSimple = []string{
 	"./ent/ent.go",
 	"./oas/oas-types.go",
 	"./version/version.go",
 }
+
 var generatedGrpc = []string{
 	"./grpc/pubsub/pubsub_grpc.pb.go",
 	"./grpc/pubsub/pubsub.pb.gw.go",
@@ -196,7 +202,7 @@ func (Generate) DevVersion(ctx context.Context) error {
 	// trim the leading `v`
 	out = out[1:]
 	fmt.Printf("Generated(dev .version): %s\n", out)
-	return os.WriteFile(".version", []byte(out+"\n"), 0644)
+	return os.WriteFile(".version", []byte(out+"\n"), 0o644)
 }
 
 func (Generate) Grpc(ctx context.Context) error {
@@ -285,7 +291,7 @@ func Format(ctx context.Context) error {
 
 func FormatDir(ctx context.Context, dir string) error {
 	fmt.Printf("Formatting(%s)...\n", dir)
-	if err := sh.Run("gofmt", "-l", "-s", "-w", dir); err != nil {
+	if err := sh.Run("go", "run", "mvdan.cc/gofumpt", "-l", "-w", dir); err != nil {
 		return err
 	}
 	goImportsArgs := []string{"run", "golang.org/x/tools/cmd/goimports", "-l", "-w"}
@@ -310,7 +316,7 @@ func FormatGenerated(ctx context.Context) error {
 			files = append(files, l)
 		}
 	}
-	if err := sh.Run("gofmt", append([]string{"-l", "-s", "-w", "."}, files...)...); err != nil {
+	if err := sh.Run("go", append([]string{"run", "mvdan.cc/gofumpt", "-l", "-w", "."}, files...)...); err != nil {
 		return err
 	}
 	goImportsArgs := []string{"run", "golang.org/x/tools/cmd/goimports", "-l", "-w"}
@@ -353,8 +359,8 @@ func (Lint) Vet(ctx context.Context) error {
 
 // Format checks that all Go source code follows formatting rules
 func (Lint) Format(ctx context.Context) error {
-	fmt.Println("Linting(gofmt)...")
-	outStr, err := runAndCapture("gofmt", "-l", "-s", ".")
+	fmt.Println("Linting(gofumpt)...")
+	outStr, err := runAndCapture("go", "run", "mvdan.cc/gofumpt", "-l", ".")
 	if err != nil {
 		return err
 	}
@@ -435,7 +441,7 @@ func (Lint) golangci(ctx context.Context, junit bool) error {
 			return fmt.Errorf("missing TEST_RESULTS env var")
 		}
 		outFileName := filepath.Join(resultsDir, "golangci-lint.xml")
-		outFile, err = os.OpenFile(outFileName, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
+		outFile, err = os.OpenFile(outFileName, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o644)
 		if err != nil {
 			return err
 		}
@@ -708,6 +714,7 @@ func (Docker) MultiarchBuild(ctx context.Context, cmd string) error {
 	fmt.Printf("Docker-MultiArch(%s)...\n", cmd)
 	return dockerRunMultiArch(ctx, cmd, false)
 }
+
 func (Docker) MultiarchPush(ctx context.Context, cmd string) error {
 	fmt.Printf("Docker-MultiArchPush(%s)...\n", cmd)
 	return dockerRunMultiArch(ctx, cmd, true)

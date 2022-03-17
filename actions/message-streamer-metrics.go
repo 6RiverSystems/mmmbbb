@@ -32,6 +32,7 @@ var messageStreamerFlowControlWait = promauto.NewHistogram(prometheus.HistogramO
 	Help:      "histogram of time message streamer spends waiting on flow control",
 	Buckets:   extendedBuckets,
 })
+
 var messageStreamerAutoDelays = promauto.NewCounter(prometheus.CounterOpts{
 	Namespace: version.AppName,
 	Name:      "message_streamer_auto_delays",

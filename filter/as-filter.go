@@ -20,11 +20,10 @@
 package filter
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"unicode"
-
-	"errors"
 )
 
 // Writer is a subset of strings.Builder

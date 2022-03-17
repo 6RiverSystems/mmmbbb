@@ -22,9 +22,8 @@ package services
 import (
 	"context"
 	"database/sql"
-	"time"
-
 	"errors"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
@@ -326,7 +325,6 @@ func (s *subscriberServer) ListSubscriptions(ctx context.Context, req *pubsub.Li
 		}
 		resp = &pubsub.ListSubscriptionsResponse{Subscriptions: grpcSubscriptions, NextPageToken: nextPageToken}
 		return nil
-
 	})
 	if err != nil {
 		return nil, err
@@ -813,8 +811,12 @@ func effectiveFlowControl(maxMessages, maxBytes int64) actions.FlowControl {
 	return fc
 }
 
-const defaultSubscriptionTTL = 30 * 24 * time.Hour
-const defaultSubscriptionMessageTTL = 7 * 24 * time.Hour
+const (
+	defaultSubscriptionTTL        = 30 * 24 * time.Hour
+	defaultSubscriptionMessageTTL = 7 * 24 * time.Hour
+)
 
-const deletedTopicName = "_deleted-topic_"
-const defaultDeadLetterMaxAttempts = 5
+const (
+	deletedTopicName             = "_deleted-topic_"
+	defaultDeadLetterMaxAttempts = 5
+)

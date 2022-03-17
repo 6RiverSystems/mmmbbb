@@ -145,6 +145,7 @@ func (a *SeekSubscriptionToTime) HasResults() bool {
 func (a *SeekSubscriptionToTime) NumAcked() int {
 	return a.results.numAcked
 }
+
 func (a *SeekSubscriptionToTime) NumDeAcked() int {
 	return a.results.numDeAcked
 }

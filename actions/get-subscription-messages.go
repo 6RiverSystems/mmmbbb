@@ -509,8 +509,11 @@ func (a *GetSubscriptionMessages) Results() map[string]interface{} {
 // will immediately modack everything it receives up to that, so there's no
 // point in having it set lower here.
 const defaultMinDelay = 10 * time.Second
-const defaultMaxDelay = 10 * time.Minute
-const retryBackoffFactor = 1.1
+
+const (
+	defaultMaxDelay    = 10 * time.Minute
+	retryBackoffFactor = 1.1
+)
 
 // delay after N attempts = floor(max, min * factor^N), AKA after first attempt
 // delay is min, after each further attempt delay *= factor, until delay hits

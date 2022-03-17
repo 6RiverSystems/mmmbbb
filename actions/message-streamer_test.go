@@ -59,6 +59,7 @@ func (c *mockConn) Close() error {
 	c.outboundErrors <- net.ErrClosed
 	return c.closeError
 }
+
 func (c *mockConn) Receive(ctx context.Context) (*MessageStreamRequest, error) {
 	select {
 	case <-ctx.Done():
@@ -67,6 +68,7 @@ func (c *mockConn) Receive(ctx context.Context) (*MessageStreamRequest, error) {
 		return i.req, i.err
 	}
 }
+
 func (c *mockConn) Send(ctx context.Context, del *SubscriptionMessageDelivery) error {
 	select {
 	case <-ctx.Done():

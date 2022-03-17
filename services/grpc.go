@@ -40,6 +40,7 @@ import (
 func projectTopicPrefix(project string) string {
 	return project + "/topics/"
 }
+
 func projectSubscriptionPrefix(project string) string {
 	return project + "/subscriptions/"
 }

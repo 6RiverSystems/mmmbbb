@@ -81,7 +81,8 @@ func TestParserBinding(t *testing.T) {
 				Term: &Term{Not: true, Basic: &BasicExpression{Has: &HasAttribute{"x"}}},
 				Or: []*Term{
 					{Basic: &BasicExpression{Has: &HasAttribute{"y"}}},
-				}},
+				},
+			},
 		},
 		{
 			"NOT(OR)",

@@ -69,4 +69,5 @@
     "GOPRIVATE": "go.6river.tech/*,github.com/6RiverSystems/*",
     // "CGO_ENABLED": "0"
   },
+  "go.formatTool": "gofumpt",
 }

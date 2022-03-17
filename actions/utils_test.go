@@ -47,6 +47,7 @@ func createTopic(
 ) *ent.Topic {
 	return createTopicClient(t, ctx, tx.Client(), offset, opts...)
 }
+
 func createTopicClient(
 	t *testing.T, ctx context.Context, client *ent.Client, offset int,
 	opts ...func(*ent.TopicCreate) *ent.TopicCreate,
@@ -61,17 +62,20 @@ func createTopicClient(
 	require.NoError(t, err)
 	return topic
 }
+
 func createSubscription(
 	t *testing.T, ctx context.Context, tx *ent.Tx, topic *ent.Topic, offset int,
 	opts ...func(*ent.SubscriptionCreate) *ent.SubscriptionCreate,
 ) *ent.Subscription {
 	return createSubscriptionClient(t, ctx, tx.Client(), topic, offset, opts...)
 }
+
 func withDeadLetter(dlTopic *ent.Topic, maxAttempts int32) func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
 	return func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
 		return sc.SetDeadLetterTopic(dlTopic).SetMaxDeliveryAttempts(maxAttempts)
 	}
 }
+
 func createSubscriptionClient(
 	t *testing.T, ctx context.Context, client *ent.Client, topic *ent.Topic, offset int,
 	opts ...func(*ent.SubscriptionCreate) *ent.SubscriptionCreate,
@@ -90,12 +94,14 @@ func createSubscriptionClient(
 	require.NoError(t, err)
 	return subscription
 }
+
 func createMessage(
 	t *testing.T, ctx context.Context, tx *ent.Tx, topic *ent.Topic, offset int,
 	opts ...func(*ent.MessageCreate) *ent.MessageCreate,
 ) *ent.Message {
 	return createMessageClient(t, ctx, tx.Client(), topic, offset, opts...)
 }
+
 func createMessageClient(
 	t *testing.T, ctx context.Context, client *ent.Client, topic *ent.Topic, offset int,
 	opts ...func(*ent.MessageCreate) *ent.MessageCreate,
@@ -113,12 +119,14 @@ func createMessageClient(
 	require.NoError(t, err)
 	return msg
 }
+
 func createDelivery(
 	t *testing.T, ctx context.Context, tx *ent.Tx, sub *ent.Subscription, msg *ent.Message, offset int,
 	opts ...func(*ent.DeliveryCreate) *ent.DeliveryCreate,
 ) *ent.Delivery {
 	return createDeliveryClient(t, ctx, tx.Client(), sub, msg, offset, opts...)
 }
+
 func createDeliveryClient(
 	t *testing.T, ctx context.Context, client *ent.Client, sub *ent.Subscription, msg *ent.Message, offset int,
 	opts ...func(*ent.DeliveryCreate) *ent.DeliveryCreate,
@@ -177,6 +185,7 @@ func assertClosed(t *testing.T, c <-chan struct{}) {
 		assert.Fail(t, "unable to receive on expected-closed channel")
 	}
 }
+
 func assertOpenEmpty(t *testing.T, c <-chan struct{}) {
 	assert.NotNil(t, c)
 	select {

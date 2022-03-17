@@ -52,6 +52,7 @@ var watchersStartedCounter = promauto.NewCounterVec(prometheus.CounterOpts{
 	Subsystem: mirrorSubsystem,
 	Name:      "watchers_started",
 }, mirrorLabels)
+
 var watchersEndedCounter = promauto.NewCounterVec(prometheus.CounterOpts{
 	Namespace: version.AppName,
 	Subsystem: mirrorSubsystem,

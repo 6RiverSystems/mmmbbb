@@ -74,7 +74,6 @@ func (a *PruneDeletedTopics) Execute(ctx context.Context, tx *ent.Tx) error {
 	}
 
 	numDeleted, err := tx.Topic.Delete().Where(topic.IDIn(ids...)).Exec(ctx)
-
 	if err != nil {
 		return err
 	}
