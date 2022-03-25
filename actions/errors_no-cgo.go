@@ -30,9 +30,8 @@ import (
 )
 
 func isSqliteDuplicateKeyError(err error) bool {
-	// TODO: modernc version doesn't support the extended error codes yet
 	var se *sqlite.Error
-	if errors.As(err, &se) && se.Code() == msqlite3.SQLITE_CONSTRAINT {
+	if errors.As(err, &se) && se.Code() == msqlite3.SQLITE_CONSTRAINT_UNIQUE {
 		return true
 	}
 	return false
