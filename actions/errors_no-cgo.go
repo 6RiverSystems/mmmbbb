@@ -35,4 +35,5 @@ func isSqliteDuplicateKeyError(err error) bool {
 	if errors.As(err, &se) && se.Code() == msqlite3.SQLITE_CONSTRAINT {
 		return true
 	}
+	return false
 }
