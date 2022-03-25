@@ -145,6 +145,10 @@ func (a *CreateSubscription) Execute(ctx context.Context, tx *ent.Tx) error {
 
 	s, err := create.Save(ctx)
 	if err != nil {
+		// in case two creates raced
+		if isSqlDuplicateKeyError(err) {
+			return ErrExists
+		}
 		return err
 	}
 

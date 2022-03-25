@@ -76,6 +76,10 @@ func (a *CreateTopic) Execute(ctx context.Context, tx *ent.Tx) error {
 		SetLive(true).
 		Save(ctx)
 	if err != nil {
+		// in case two creates raced
+		if isSqlDuplicateKeyError(err) {
+			return ErrExists
+		}
 		return err
 	}
 

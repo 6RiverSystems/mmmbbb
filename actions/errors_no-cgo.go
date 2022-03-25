@@ -1,4 +1,4 @@
-// Copyright (c) 2021 6 River Systems
+// Copyright (c) 2022 6 River Systems
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
@@ -17,25 +17,22 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+//go:build !cgo
+// +build !cgo
+
 package actions
 
 import (
 	"errors"
 
-	"github.com/jackc/pgconn"
+	"modernc.org/sqlite"
+	msqlite3 "modernc.org/sqlite/lib"
 )
 
-var ErrExists = errors.New("Already exists")
-
-var ErrNotFound = errors.New("Not found")
-
-func isSqlDuplicateKeyError(err error) bool {
-	var pgErr *pgconn.PgError
-	if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+func isSqliteDuplicateKeyError(err error) bool {
+	// TODO: modernc version doesn't support the extended error codes yet
+	var se *sqlite.Error
+	if errors.As(err, &se) && se.Code() == msqlite3.SQLITE_CONSTRAINT {
 		return true
 	}
-	if isSqliteDuplicateKeyError(err) {
-		return true
-	}
-	return false
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2021 6 River Systems
+// Copyright (c) 2022 6 River Systems
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
@@ -17,24 +17,20 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+//go:build cgo
+// +build cgo
+
 package actions
 
 import (
 	"errors"
 
-	"github.com/jackc/pgconn"
+	"github.com/mattn/go-sqlite3"
 )
 
-var ErrExists = errors.New("Already exists")
-
-var ErrNotFound = errors.New("Not found")
-
-func isSqlDuplicateKeyError(err error) bool {
-	var pgErr *pgconn.PgError
-	if errors.As(err, &pgErr) && pgErr.Code == "23505" {
-		return true
-	}
-	if isSqliteDuplicateKeyError(err) {
+func isSqliteDuplicateKeyError(err error) bool {
+	var se *sqlite3.Error
+	if errors.As(err, &se) && se.Code == sqlite3.ErrConstraint && se.ExtendedCode == sqlite3.ErrConstraintUnique {
 		return true
 	}
 	return false
