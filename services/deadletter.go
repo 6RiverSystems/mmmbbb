@@ -35,11 +35,13 @@ import (
 type DeadLetterSettings struct {
 	actions.DeadLetterDeliveriesParams
 	Interval time.Duration
+	Fuzz     time.Duration
 	Backoff  time.Duration
 }
 
 var dlDefaults = DeadLetterSettings{
 	Interval: time.Minute,
+	Fuzz:     10 * time.Second,
 	Backoff:  100 * time.Millisecond,
 	// TODO: should action param defaults be here or there?
 	DeadLetterDeliveriesParams: actions.DeadLetterDeliveriesParams{
@@ -53,6 +55,9 @@ func (s *DeadLetterSettings) ApplyDefaults() {
 	}
 	if s.Interval == 0 {
 		s.Interval = dlDefaults.Interval
+	}
+	if s.Fuzz == 0 {
+		s.Fuzz = dlDefaults.Fuzz
 	}
 	if s.Backoff == 0 {
 		s.Backoff = dlDefaults.Backoff
@@ -111,10 +116,10 @@ LOOP:
 				s.logger.Error().Err(err).Msgf("Error dead-lettering")
 				// apply a bit of fuzz to the interval here so that colliding services
 				// separate out
-				ticker.Reset(s.settings.Interval + time.Duration(rand.Intn(10000))*time.Millisecond)
+				ticker.Reset(s.settings.Interval + time.Duration(rand.Int63n(int64(s.settings.Fuzz))))
 			} else if n <= 0 {
-				// we have caught up, restore normal timing
-				ticker.Reset(s.settings.Interval)
+				// we have caught up, restore normal timing, with some fuzz
+				ticker.Reset(s.settings.Interval + time.Duration(rand.Int63n(int64(s.settings.Fuzz))))
 			} else if n >= s.settings.MaxDeliveries {
 				// we are "behind", run again sooner than normal
 				ticker.Reset(s.settings.Backoff)

@@ -33,11 +33,13 @@ import (
 type PruneCommonSettings struct {
 	actions.PruneCommonParams
 	Interval time.Duration
+	Fuzz     time.Duration
 	Backoff  time.Duration
 }
 
 var pcDefaults = PruneCommonSettings{
 	Interval: time.Minute,
+	Fuzz:     10 * time.Second,
 	Backoff:  100 * time.Millisecond,
 	// TODO: should action param defaults be here or there?
 	PruneCommonParams: actions.PruneCommonParams{
@@ -55,6 +57,9 @@ func (s *PruneCommonSettings) ApplyDefaults() {
 	}
 	if s.Interval == 0 {
 		s.Interval = pcDefaults.Interval
+	}
+	if s.Fuzz == 0 {
+		s.Fuzz = pcDefaults.Fuzz
 	}
 	if s.Backoff == 0 {
 		s.Backoff = pcDefaults.Backoff
@@ -126,10 +131,10 @@ LOOP:
 				s.logger.Error().Err(err).Msgf("Error pruning %s", s.name)
 				// apply a bit of fuzz to the interval here so that colliding services
 				// separate out
-				ticker.Reset(s.settings.Interval + time.Duration(rand.Intn(10000))*time.Millisecond)
+				ticker.Reset(s.settings.Interval + time.Duration(rand.Int63n(int64(s.settings.Fuzz))))
 			} else if n <= 0 {
-				// we have caught up, restore normal timing
-				ticker.Reset(s.settings.Interval)
+				// we have caught up, restore normal timing, with some fuzz
+				ticker.Reset(s.settings.Interval + time.Duration(rand.Int63n(int64(s.settings.Fuzz))))
 			} else if n >= s.settings.MaxDelete {
 				// we are "behind", run again sooner than normal
 				ticker.Reset(s.settings.Backoff)
