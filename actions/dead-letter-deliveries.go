@@ -118,12 +118,13 @@ func (a *DeadLetterDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 		); err != nil {
 			return err
 		}
-		deadLetterDeliveriesActionCounter.Inc()
 	}
 
 	a.results = &DeadLetterDeliveriesResults{
 		numDeadLettered: len(deliveryData),
 	}
+
+	timer.Succeeded(func() { deadLetterDeliveriesActionCounter.Add(float64(len(deliveryData))) })
 
 	return nil
 }
