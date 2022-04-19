@@ -24,7 +24,7 @@ require (
 	github.com/quasilyte/go-ruleguard/dsl v0.3.19
 	github.com/rs/zerolog v1.26.1
 	github.com/stretchr/testify v1.7.1
-	go.6river.tech/gosix v0.5.7
+	go.6river.tech/gosix v0.5.9
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/tools v0.1.10
 	google.golang.org/api v0.74.0
@@ -137,7 +137,7 @@ require (
 	github.com/jgautheron/goconst v1.5.1 // indirect
 	github.com/jingyugao/rowserrcheck v1.1.1 // indirect
 	github.com/jirfag/go-printf-func-name v0.0.0-20200119135958-7558a9eaa5af // indirect
-	github.com/jmoiron/sqlx v1.3.4 // indirect
+	github.com/jmoiron/sqlx v1.3.5 // indirect
 	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
