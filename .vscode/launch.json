@@ -29,7 +29,7 @@
       "cwd": "${workspaceFolder}",
       "env": {
         "NODE_ENV": "development",
-        "DATABASE_URL": "postgres://6river:6river@localhost:5432/mmmbbb_6mon",
+        "DATABASE_URL": "postgres://6river:6river@host.docker.internal:5432/mmmbbb_6mon",
         "_NOTDEBUG": "sql",
         "LOG_LEVEL": "trace",
         "PORT": "8801",
@@ -86,7 +86,10 @@
       "mode": "exec",
       "program": "${workspaceFolder}/tools/ent",
       "cwd": "${workspaceFolder}/ent",
-      "args": ["generate", "./schema"],
+      "args": [
+        "generate",
+        "./schema"
+      ],
       "preLaunchTask": "build tools"
     },
     {

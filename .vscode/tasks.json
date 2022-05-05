@@ -4,7 +4,7 @@
 		{
 			"label": "generate code",
 			"type": "process",
-			"command": "make",
+			"command": "${workspaceFolder}/mage",
 			"args": [
 				"generate"
 			],
@@ -34,15 +34,6 @@
 			"options": {
 				"cwd": "${workspaceFolder}/cmd/ps-compat"
 			}
-		},
-		{
-			"label": "build tools",
-			"type": "process",
-			"command": "make",
-			"args": [
-				"tools"
-			],
-			"group": "build",
 		},
 	]
 }
