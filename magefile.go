@@ -33,6 +33,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -237,22 +238,54 @@ func Get(ctx context.Context) error {
 func InstallProtobufTools(ctx context.Context) error {
 	// CI needs apt-get update before packages can be installed, assume humans don't
 	if os.Getenv("CI") != "" {
-		if err := sh.Run("sudo", "apt-get", "update"); err != nil {
-			return err
+		switch runtime.GOOS {
+		case "linux":
+			if err := sh.Run("sudo", "apt-get", "update"); err != nil {
+				return err
+			}
+		case "darwin":
+			if err := sh.Run("brew", "update"); err != nil {
+				return err
+			}
+		default:
+			return fmt.Errorf("unsupported GOOS %s", runtime.GOOS)
 		}
 	}
+
+	var includePath string
+	switch runtime.GOOS {
+	case "linux":
+		includePath = "/usr/include"
+	case "darwin":
+		includePath = "/usr/local/include"
+	default:
+		return fmt.Errorf("unsupported GOOS %s", runtime.GOOS)
+	}
+
 	// avoid sudo prompts if it's already installed
 	needInstall := false
-	if _, err := os.Stat("/usr/include/google/protobuf/empty.proto"); err != nil {
+	if _, err := os.Stat(path.Join(includePath, "google/protobuf/empty.proto")); err != nil {
 		needInstall = true
 	} else if err := sh.Run("protoc", "--version"); err != nil {
 		needInstall = true
 	}
 	if needInstall {
-		if err := sh.Run("sudo", "apt-get", "-y", "install", "protobuf-compiler", "libprotobuf-dev"); err != nil {
-			return err
+		switch runtime.GOOS {
+		case "linux":
+			if err := sh.Run("sudo", "apt-get", "-y", "install", "protobuf-compiler", "libprotobuf-dev"); err != nil {
+				return err
+			}
+		case "darwin":
+			if err := sh.Run("brew", "install", "protobuf"); err != nil {
+				return err
+			}
+		default:
+			return fmt.Errorf("unsupported GOOS %s", runtime.GOOS)
 		}
 	}
+
+	// rest of this is go install and doesn't need anything platform specific
+
 	// versions of these packages will be picked up from go.mod
 	if err := sh.Run("go", "install", "google.golang.org/protobuf/cmd/protoc-gen-go"); err != nil {
 		return err
