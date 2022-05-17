@@ -20,7 +20,7 @@ require (
 	github.com/magefile/mage v1.13.0
 	github.com/mattn/go-sqlite3 v1.14.13
 	github.com/olekukonko/tablewriter v0.0.5
-	github.com/prometheus/client_golang v1.12.1
+	github.com/prometheus/client_golang v1.12.2
 	github.com/quasilyte/go-ruleguard/dsl v0.3.19
 	github.com/rs/zerolog v1.26.1
 	github.com/stretchr/testify v1.7.1
