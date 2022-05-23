@@ -19,4 +19,4 @@
 
 package oas
 
-//go:generate go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen -package $GOPACKAGE -o oas-types.go -generate types openapi.yaml
+//go:generate go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen -config oapi-codegen.yaml -package $GOPACKAGE openapi.yaml

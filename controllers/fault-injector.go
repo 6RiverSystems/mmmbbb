@@ -116,10 +116,10 @@ func toOAS(d faults.Description) oas.ConfiguredFault {
 var errorMap = map[oas.ErrorType]error{
 	// nil entries mean things that get special handling.
 
-	oas.ErrorTypeContextCanceled:         context.Canceled,
-	oas.ErrorTypeContextDeadlineExceeded: context.DeadlineExceeded,
+	oas.ContextCanceled:         context.Canceled,
+	oas.ContextDeadlineExceeded: context.DeadlineExceeded,
 
-	oas.ErrorTypeEntNotFound: nil,
+	oas.EntNotFound: nil,
 
 	// grpc errors have extra special handling and don't need to be listed here
 }
@@ -129,7 +129,7 @@ func errorFactory(errorType oas.ErrorType) func(faults.Description, faults.Param
 		// these are generated programatically
 		var c codes.Code
 		// special case
-		if errorType == oas.ErrorTypeGrpcCanceled {
+		if errorType == oas.GrpcCanceled {
 			c = codes.Canceled
 		} else {
 			s := strcase.ToScreamingSnake(strings.TrimPrefix(string(errorType), "grpc."))
@@ -157,7 +157,7 @@ func errorFactory(errorType oas.ErrorType) func(faults.Description, faults.Param
 	return func(d faults.Description, p faults.Parameters) error {
 		err := err
 		switch errorType {
-		case oas.ErrorTypeEntNotFound:
+		case oas.EntNotFound:
 			label := p["label"]
 			if label == "" {
 				label = "INJECTED_FAKE_ENTITY"
