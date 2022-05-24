@@ -5,7 +5,7 @@ go 1.18
 require (
 	cloud.google.com/go/pubsub v1.21.1
 	entgo.io/ent v0.10.1
-	github.com/alecthomas/participle/v2 v2.0.0-alpha8
+	github.com/alecthomas/participle/v2 v2.0.0-alpha9
 	github.com/deepmap/oapi-codegen v1.11.0
 	github.com/getkin/kin-openapi v0.94.0
 	github.com/gin-gonic/gin v1.7.7
