@@ -1107,8 +1107,8 @@ github.com/zclconf/go-cty-debug v0.0.0-20191215020915-b22d67c1ba0b/go.mod h1:ZRK
 github.com/zenazn/goji v0.9.0/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxtB1Q=
 gitlab.com/bosi/decorder v0.2.1 h1:ehqZe8hI4w7O4b1vgsDZw1YU1PE7iJXrQWFMsocbQ1w=
 gitlab.com/bosi/decorder v0.2.1/go.mod h1:6C/nhLSbF6qZbYD8bRmISBwc6vcWdNsiIBkRvjJFrH0=
-go.6river.tech/gosix v0.5.16 h1:O1uT4m6noTQDswUsbt33Izsj+ca1LdJKUgqDPwulkik=
-go.6river.tech/gosix v0.5.16/go.mod h1:Jn2Q2K1tJKcPXtH9h9Uq+Qd0T5A7qESywZsLMfSH820=
+go.6river.tech/gosix v0.5.17 h1:tWUxFwV9e9iaZlZ9P5trRFY54VMdUdSTy4jBmUXLdUA=
+go.6river.tech/gosix v0.5.17/go.mod h1:AEpiCGA/yhqfh3DZ0CGlVA2IuVZHM+5N2+4Qhetvu1U=
 go.etcd.io/bbolt v1.3.3/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.etcd.io/bbolt v1.3.4/go.mod h1:G5EMThwa9y8QZGBClrRx5EY+Yw9kAhnjy3bSjsnlVTQ=
 go.etcd.io/etcd v0.0.0-20200513171258-e048e166ab9c/go.mod h1:xCI7ZzBfRuGgBXyXO6yfWfDmlWd35khcWpUa4L0xI/k=
