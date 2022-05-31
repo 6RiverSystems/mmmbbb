@@ -8,7 +8,7 @@ require (
 	github.com/alecthomas/participle/v2 v2.0.0-alpha9
 	github.com/deepmap/oapi-codegen v1.11.0
 	github.com/getkin/kin-openapi v0.94.0
-	github.com/gin-gonic/gin v1.7.7
+	github.com/gin-gonic/gin v1.8.0
 	github.com/golang/protobuf v1.5.2
 	github.com/golangci/golangci-lint v1.46.2
 	github.com/google/addlicense v1.0.0
@@ -102,6 +102,7 @@ require (
 	github.com/go-toolsmith/typep v1.0.2 // indirect
 	github.com/go-xmlfmt/xmlfmt v0.0.0-20220206211657-0a94163c4677 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
+	github.com/goccy/go-json v0.9.7 // indirect
 	github.com/gofrs/flock v0.8.1 // indirect
 	github.com/golang/glog v1.0.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
@@ -179,7 +180,7 @@ require (
 	github.com/nishanths/exhaustive v0.7.11 // indirect
 	github.com/nishanths/predeclared v0.2.2 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
-	github.com/pelletier/go-toml/v2 v2.0.0 // indirect
+	github.com/pelletier/go-toml/v2 v2.0.1 // indirect
 	github.com/phayes/checkstyle v0.0.0-20170904204023-bfd46e6a821d // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
