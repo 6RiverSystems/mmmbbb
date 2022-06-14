@@ -5,7 +5,7 @@ go 1.18
 require (
 	cloud.google.com/go/pubsub v1.22.2
 	entgo.io/ent v0.10.1
-	github.com/alecthomas/participle/v2 v2.0.0-alpha9
+	github.com/alecthomas/participle/v2 v2.0.0-alpha11
 	github.com/deepmap/oapi-codegen v1.11.0
 	github.com/getkin/kin-openapi v0.96.0
 	github.com/gin-gonic/gin v1.8.1
@@ -53,7 +53,6 @@ require (
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/OpenPeeDeeP/depguard v1.1.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
-	github.com/alecthomas/repr v0.0.0-20220113201626-b1b626ac65ae // indirect
 	github.com/alexkohler/prealloc v1.0.0 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/ashanbrown/forbidigo v1.3.0 // indirect
