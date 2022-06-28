@@ -3,7 +3,7 @@ module go.6river.tech/mmmbbb
 go 1.18
 
 require (
-	cloud.google.com/go/pubsub v1.22.2
+	cloud.google.com/go/pubsub v1.23.0
 	entgo.io/ent v0.10.1
 	github.com/alecthomas/participle/v2 v2.0.0-alpha11
 	github.com/deepmap/oapi-codegen v1.11.0
@@ -29,7 +29,7 @@ require (
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f
 	golang.org/x/tools v0.1.11-0.20220316014157-77aa08bb151a
 	google.golang.org/api v0.84.0
-	google.golang.org/genproto v0.0.0-20220608133413-ed9918b62aac
+	google.golang.org/genproto v0.0.0-20220617124728-180714bec0ad
 	google.golang.org/grpc v1.47.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.2.0
 	google.golang.org/protobuf v1.28.0
@@ -41,7 +41,7 @@ require (
 require (
 	4d63.com/gochecknoglobals v0.1.0 // indirect
 	ariga.io/atlas v0.3.7-0.20220303204946-787354f533c3 // indirect
-	cloud.google.com/go v0.102.0 // indirect
+	cloud.google.com/go v0.102.1 // indirect
 	cloud.google.com/go/compute v1.6.1 // indirect
 	cloud.google.com/go/iam v0.3.0 // indirect
 	github.com/Antonboom/errname v0.1.6 // indirect
