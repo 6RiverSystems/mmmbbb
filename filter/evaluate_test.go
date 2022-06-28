@@ -135,8 +135,8 @@ func TestEvaluateUnit(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ast := &Filter{}
-			require.NoError(t, Parser.ParseString(tt.name, tt.filter, ast))
+			ast, err := Parser.ParseString(tt.name, tt.filter)
+			require.NoError(t, err)
 			gotMatch, gotErr := ast.Evaluate(tt.attrs)
 			tt.wantErr(t, gotErr)
 			assert.Equal(t, tt.wantMatch, gotMatch)
@@ -199,8 +199,8 @@ func TestEvaluateComplex(t *testing.T) {
 					t.Run(
 						tt.name+"/"+shortBool(a)+shortBool(b)+shortBool(c)+"="+shortBool(want),
 						func(t *testing.T) {
-							ast := &Filter{}
-							require.NoError(t, Parser.ParseString(tt.name, tt.filter, ast))
+							ast, err := Parser.ParseString(tt.name, tt.filter)
+							require.NoError(t, err)
 							got, err := ast.Evaluate(attrs)
 							if assert.NoError(t, err) {
 								assert.Equal(t, want, got)

@@ -45,8 +45,7 @@ func deliverToSubscription(
 ) (*ent.DeliveryCreate, error) {
 	if s.MessageFilter != nil && *s.MessageFilter != "" {
 		// TODO: cache parsed filters
-		var f filter.Filter
-		if err := filter.Parser.ParseString(s.Name, *s.MessageFilter, &f); err != nil {
+		if f, err := filter.Parser.ParseString(s.Name, *s.MessageFilter); err != nil {
 			// filter errors should have been caught at subscription create/update.
 			// do not break delivery because one sub has a broken filter, assume the
 			// filter matches nothing and drop the message.

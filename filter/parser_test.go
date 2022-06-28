@@ -108,8 +108,8 @@ func TestParserBinding(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ast := &Filter{}
-			require.NoError(t, Parser.ParseString(tt.name, tt.input, ast))
+			ast, err := Parser.ParseString(tt.name, tt.input)
+			require.NoError(t, err)
 			// t.Logf("%#v", ast)
 			j, err := json.MarshalIndent(&ast, "", " ")
 			require.NoError(t, err)

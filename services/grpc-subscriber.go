@@ -224,8 +224,7 @@ func (s *subscriberServer) UpdateSubscription(ctx context.Context, req *pubsub.U
 					subUpdate.ClearMessageFilter()
 				} else {
 					// validate the filter
-					var f filter.Filter
-					if err := filter.Parser.ParseString(sub.Name, req.Subscription.Filter, &f); err != nil {
+					if _, err := filter.Parser.ParseString(sub.Name, req.Subscription.Filter); err != nil {
 						return status.Errorf(codes.InvalidArgument, "Invalid filter: %v", err)
 					}
 					subUpdate.SetMessageFilter(req.Subscription.Filter)

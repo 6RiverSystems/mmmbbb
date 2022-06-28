@@ -29,7 +29,6 @@ var DefaultParserOptions = []participle.Option{
 	participle.Unquote("String"),
 }
 
-var Parser = participle.MustBuild(
-	&Filter{},
+var Parser = participle.MustBuild[Filter](
 	DefaultParserOptions...,
 )

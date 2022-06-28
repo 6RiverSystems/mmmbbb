@@ -110,11 +110,11 @@ func (a *CreateSubscription) Execute(ctx context.Context, tx *ent.Tx) error {
 	var messageFilter *string
 	if a.params.Filter != "" {
 		// validate the filter before we save it
-		var f filter.Filter
-		if err := filter.Parser.ParseString(a.params.Name, a.params.Filter, &f); err != nil {
+		if _, err := filter.Parser.ParseString(a.params.Name, a.params.Filter); err != nil {
 			return fmt.Errorf("invalid message filter: %w", err)
+		} else {
+			messageFilter = &a.params.Filter
 		}
-		messageFilter = &a.params.Filter
 	}
 	create := tx.Subscription.Create().
 		SetName(a.params.Name).

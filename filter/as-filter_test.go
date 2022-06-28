@@ -44,10 +44,10 @@ func TestAsFilterLoop(t *testing.T) {
 	}
 
 	for _, f := range filters {
-		ast := &Filter{}
-		require.NoError(t, Parser.ParseString(f, f, ast))
+		ast, err := Parser.ParseString(f, f)
+		require.NoError(t, err)
 		var b strings.Builder
-		err := ast.AsFilter(&b)
+		err = ast.AsFilter(&b)
 		if assert.NoError(t, err) {
 			assert.Equal(t, f, b.String())
 		}
