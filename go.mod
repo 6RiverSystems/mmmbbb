@@ -3,7 +3,7 @@ module go.6river.tech/mmmbbb
 go 1.18
 
 require (
-	cloud.google.com/go/pubsub v1.23.0
+	cloud.google.com/go/pubsub v1.23.1
 	entgo.io/ent v0.10.1
 	github.com/alecthomas/participle/v2 v2.0.0-beta.3
 	github.com/deepmap/oapi-codegen v1.11.0
@@ -237,7 +237,7 @@ require (
 	golang.org/x/exp/typeparams v0.0.0-20220218215828-6cf2b201936e // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
 	golang.org/x/net v0.0.0-20220617184016-355a448f1bc9 // indirect
-	golang.org/x/oauth2 v0.0.0-20220608161450-d0670ef3b1eb // indirect
+	golang.org/x/oauth2 v0.0.0-20220622183110-fd043fe589d2 // indirect
 	golang.org/x/sys v0.0.0-20220615213510-4f61da869c0c // indirect
 	golang.org/x/term v0.0.0-20220526004731-065cf7ba2467 // indirect
 	golang.org/x/text v0.3.7 // indirect
