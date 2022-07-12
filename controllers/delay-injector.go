@@ -36,11 +36,20 @@ import (
 	"go.6river.tech/mmmbbb/oas"
 )
 
-type DelayInjectorController struct{}
+type DelayInjectorController struct {
+	dbName string
+}
 
-func (cc *DelayInjectorController) Register(reg *registry.Registry, router gin.IRouter) error {
-	rg := router.Group("/delays")
-	rg.Use(middleware.WithTransaction(db.GetDefaultDbName(), &sql.TxOptions{}))
+const delaysRootPath = "/delays"
+
+func (cc *DelayInjectorController) Register(_ *registry.Registry, router gin.IRouter) error {
+	if cc.dbName == "" {
+		cc.dbName = db.GetDefaultDbName()
+	}
+	rg := router.Group(delaysRootPath)
+	rg.Use(middleware.WithTransaction(cc.dbName, nil, func(ctx *gin.Context, to *sql.TxOptions) bool {
+		return ctx.Request.Method != http.MethodGet
+	}))
 
 	rg.GET("/*subscription", cc.GetDelay)
 	rg.PUT("/*subscription", cc.PutDelay)
@@ -53,9 +62,10 @@ func (cc *DelayInjectorController) GetDelay(c *gin.Context) {
 	subName := c.Param("subscription")
 	// Gin includes the leading slash when we're using the *param format
 	subName = strings.TrimPrefix(subName, "/")
-	tx := middleware.Transaction(c, db.GetDefaultDbName())
+	// don't need a tx for this, we're read-only
+	cli := middleware.Client(c, cc.dbName)
 
-	sub, err := tx.Subscription.Query().Where(
+	sub, err := cli.Subscription.Query().Where(
 		subscription.Name(subName),
 		subscription.DeletedAtIsNil(),
 	).Only(c)
@@ -74,7 +84,7 @@ func (cc *DelayInjectorController) PutDelay(c *gin.Context) {
 	subName := c.Param("subscription")
 	// Gin includes the leading slash when we're using the *param format
 	subName = strings.TrimPrefix(subName, "/")
-	tx := middleware.Transaction(c, db.GetDefaultDbName())
+	tx := middleware.Transaction(c, cc.dbName)
 
 	defer c.Request.Body.Close()
 	decoder := json.NewDecoder(c.Request.Body)
@@ -100,19 +110,18 @@ func (cc *DelayInjectorController) PutDelay(c *gin.Context) {
 	}
 	if n <= 0 {
 		c.JSON(http.StatusNotFound, gin.H{"subscription": subName, "message": "Subscription not found"})
-	}
-	if n > 1 {
+	} else if n > 1 {
 		panic(fmt.Errorf("BUG DETECTED: %d live subs with same name '%s'", n, subName))
+	} else {
+		c.JSON(http.StatusOK, oas.DeliveryDelay{Delay: dd.Delay})
 	}
-
-	c.JSON(http.StatusOK, oas.DeliveryDelay{Delay: dd.Delay})
 }
 
 func (cc *DelayInjectorController) DeleteDelay(c *gin.Context) {
 	subName := c.Param("subscription")
 	// Gin includes the leading slash when we're using the *param format
 	subName = strings.TrimPrefix(subName, "/")
-	tx := middleware.Transaction(c, db.GetDefaultDbName())
+	tx := middleware.Transaction(c, cc.dbName)
 
 	n, err := tx.Subscription.Update().
 		SetDeliveryDelay(0).
@@ -125,10 +134,9 @@ func (cc *DelayInjectorController) DeleteDelay(c *gin.Context) {
 	}
 	if n <= 0 {
 		c.JSON(http.StatusNotFound, gin.H{"subscription": subName, "message": "Subscription not found"})
-	}
-	if n > 0 {
+	} else if n > 1 {
 		panic(fmt.Errorf("BUG DETECTED: %d live subs with same name '%s'", n, subName))
+	} else {
+		c.Status(http.StatusNoContent)
 	}
-
-	c.Status(http.StatusNoContent)
 }
