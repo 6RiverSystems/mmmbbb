@@ -37,6 +37,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"go.6river.tech/gosix/db/postgres"
+	"go.6river.tech/gosix/ent/customtypes"
 	"go.6river.tech/gosix/logging"
 	oastypes "go.6river.tech/gosix/oas"
 	"go.6river.tech/gosix/server"
@@ -130,6 +131,86 @@ func TestEndpoints(t *testing.T) {
 
 	type msi = map[string]interface{}
 
+	helloWorldMessage := func(t *testing.T) json.RawMessage {
+		return mustJSON(t, msi{
+			"messages": []msi{
+				{
+					"data": mustBase64(t, mustJSON(t, msi{
+						"hello": "world",
+					})),
+				},
+			},
+		})
+	}
+
+	verifyHelloWorldPublish := func(t *testing.T, resp *http.Response) {
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		assert.Contains(t, resp.Header.Get("Content-type"), "application/json")
+		bodyObject := msi{}
+		err := json.NewDecoder(resp.Body).Decode(&bodyObject)
+		assert.NoError(t, err)
+		assert.Contains(t, bodyObject, "messageIds")
+		require.IsType(t, []interface{}{}, bodyObject["messageIds"])
+		ids := bodyObject["messageIds"].([]interface{})
+		assert.Len(t, ids, 1)
+		assert.IsType(t, "", ids[0])
+		id, err := uuid.Parse(ids[0].(string))
+		assert.NoError(t, err)
+		assert.NotZero(t, id)
+	}
+
+	pullOneImmediateBody := func(t *testing.T) json.RawMessage {
+		return mustJSON(t, msi{
+			"returnImmediately": true,
+			"maxMessages":       1,
+		})
+	}
+
+	verifyPullNone := func(t *testing.T, resp *http.Response) {
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		assert.Contains(t, resp.Header.Get("Content-type"), "application/json")
+		bodyObject := msi{}
+		err := json.NewDecoder(resp.Body).Decode(&bodyObject)
+		assert.NoError(t, err)
+		assert.Contains(t, bodyObject, "receivedMessages")
+		require.IsType(t, []interface{}{}, bodyObject["receivedMessages"])
+		msgs := bodyObject["receivedMessages"].([]interface{})
+		assert.Empty(t, msgs)
+	}
+
+	verifyPullHelloWorld := func(t *testing.T, resp *http.Response) {
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		assert.Contains(t, resp.Header.Get("Content-type"), "application/json")
+		bodyObject := msi{}
+		err := json.NewDecoder(resp.Body).Decode(&bodyObject)
+		assert.NoError(t, err)
+		assert.Contains(t, bodyObject, "receivedMessages")
+		require.IsType(t, []interface{}{}, bodyObject["receivedMessages"])
+		msgs := bodyObject["receivedMessages"].([]interface{})
+		if assert.Len(t, msgs, 1) {
+			assert.IsType(t, msi{}, msgs[0])
+			rMsg := msgs[0].(msi)
+			assert.Contains(t, rMsg, "ackId")
+			assert.IsType(t, "", rMsg["ackId"])
+			ackId, err = uuid.Parse(rMsg["ackId"].(string))
+			assert.NoError(t, err)
+			assert.NotZero(t, ackId)
+			assert.Contains(t, rMsg, "message")
+			assert.IsType(t, msi{}, rMsg["message"])
+			msg := rMsg["message"].(msi)
+			assert.Contains(t, msg, "publishTime")
+			assert.IsType(t, "", msg["publishTime"])
+			_, err = time.Parse(time.RFC3339Nano, msg["publishTime"].(string))
+			assert.NoError(t, err)
+			assert.IsType(t, "", msg["data"])
+			data := mustUnBase64(t, msg["data"].(string))
+			payload := msi{}
+			err = json.Unmarshal(data, &payload)
+			assert.NoError(t, err)
+			assert.Equal(t, payload, msi{"hello": "world"})
+		}
+	}
+
 	tests := []struct {
 		name        string
 		url         string
@@ -213,75 +294,15 @@ func TestEndpoints(t *testing.T) {
 			"publish message",
 			fmt.Sprintf("/v1/projects/%s/topics/%s:publish", uniqueProject, uniqueTopic),
 			http.MethodPost,
-			func(t *testing.T) json.RawMessage {
-				return mustJSON(t, msi{
-					"messages": []msi{
-						{
-							"data": mustBase64(t, mustJSON(t, msi{
-								"hello": "world",
-							})),
-						},
-					},
-				})
-			},
-			func(t *testing.T, resp *http.Response) {
-				assert.Equal(t, http.StatusOK, resp.StatusCode)
-				assert.Contains(t, resp.Header.Get("Content-type"), "application/json")
-				bodyObject := msi{}
-				err := json.NewDecoder(resp.Body).Decode(&bodyObject)
-				assert.NoError(t, err)
-				assert.Contains(t, bodyObject, "messageIds")
-				require.IsType(t, []interface{}{}, bodyObject["messageIds"])
-				ids := bodyObject["messageIds"].([]interface{})
-				assert.Len(t, ids, 1)
-				assert.IsType(t, "", ids[0])
-				id, err := uuid.Parse(ids[0].(string))
-				assert.NoError(t, err)
-				assert.NotZero(t, id)
-			},
+			helloWorldMessage,
+			verifyHelloWorldPublish,
 		},
 		{
 			"receive message",
 			fmt.Sprintf("/v1/projects/%s/subscriptions/%s:pull", uniqueProject, uniqueSubscription),
 			http.MethodPost,
-			func(t *testing.T) json.RawMessage {
-				return mustJSON(t, msi{
-					"returnImmediately": true,
-					"maxMessages":       1,
-				})
-			},
-			func(t *testing.T, resp *http.Response) {
-				assert.Equal(t, http.StatusOK, resp.StatusCode)
-				assert.Contains(t, resp.Header.Get("Content-type"), "application/json")
-				bodyObject := msi{}
-				err := json.NewDecoder(resp.Body).Decode(&bodyObject)
-				assert.NoError(t, err)
-				assert.Contains(t, bodyObject, "receivedMessages")
-				require.IsType(t, []interface{}{}, bodyObject["receivedMessages"])
-				msgs := bodyObject["receivedMessages"].([]interface{})
-				if assert.Len(t, msgs, 1) {
-					assert.IsType(t, msi{}, msgs[0])
-					rMsg := msgs[0].(msi)
-					assert.Contains(t, rMsg, "ackId")
-					assert.IsType(t, "", rMsg["ackId"])
-					ackId, err = uuid.Parse(rMsg["ackId"].(string))
-					assert.NoError(t, err)
-					assert.NotZero(t, ackId)
-					assert.Contains(t, rMsg, "message")
-					assert.IsType(t, msi{}, rMsg["message"])
-					msg := rMsg["message"].(msi)
-					assert.Contains(t, msg, "publishTime")
-					assert.IsType(t, "", msg["publishTime"])
-					_, err = time.Parse(time.RFC3339Nano, msg["publishTime"].(string))
-					assert.NoError(t, err)
-					assert.IsType(t, "", msg["data"])
-					data := mustUnBase64(t, msg["data"].(string))
-					payload := msi{}
-					err = json.Unmarshal(data, &payload)
-					assert.NoError(t, err)
-					assert.Equal(t, payload, msi{"hello": "world"})
-				}
-			},
+			pullOneImmediateBody,
+			verifyPullHelloWorld,
 		},
 		{
 			"ack message",
@@ -306,23 +327,8 @@ func TestEndpoints(t *testing.T) {
 			"receive no message",
 			fmt.Sprintf("/v1/projects/%s/subscriptions/%s:pull", uniqueProject, uniqueSubscription),
 			http.MethodPost,
-			func(t *testing.T) json.RawMessage {
-				return mustJSON(t, msi{
-					"returnImmediately": true,
-					"maxMessages":       1,
-				})
-			},
-			func(t *testing.T, resp *http.Response) {
-				assert.Equal(t, http.StatusOK, resp.StatusCode)
-				assert.Contains(t, resp.Header.Get("Content-type"), "application/json")
-				bodyObject := msi{}
-				err := json.NewDecoder(resp.Body).Decode(&bodyObject)
-				assert.NoError(t, err)
-				assert.Contains(t, bodyObject, "receivedMessages")
-				require.IsType(t, []interface{}{}, bodyObject["receivedMessages"])
-				msgs := bodyObject["receivedMessages"].([]interface{})
-				assert.Empty(t, msgs)
-			},
+			pullOneImmediateBody,
+			verifyPullNone,
 		},
 		{
 			"re-ack message",
@@ -342,6 +348,50 @@ func TestEndpoints(t *testing.T) {
 				// gRPC API doesn't say how many ACKs were "successful"
 				assert.Empty(t, bodyObject)
 			},
+		},
+
+		{
+			"configure delayed delivery",
+			fmt.Sprintf("/delays/projects/%s/subscriptions/%s", uniqueProject, uniqueSubscription),
+			http.MethodPut,
+			func(t *testing.T) json.RawMessage {
+				return mustJSON(t, oas.DeliveryDelay{Delay: customtypes.Interval(time.Second)})
+			},
+			func(t *testing.T, resp *http.Response) {
+				assert.Equal(t, http.StatusOK, resp.StatusCode)
+				assert.Contains(t, resp.Header.Get("Content-type"), "application/json")
+				bodyObject := oas.DeliveryDelay{}
+				err := json.NewDecoder(resp.Body).Decode(&bodyObject)
+				assert.NoError(t, err)
+				assert.Equal(t, bodyObject.Delay, customtypes.Interval(time.Second))
+			},
+		},
+		{
+			"publish delayed message",
+			fmt.Sprintf("/v1/projects/%s/topics/%s:publish", uniqueProject, uniqueTopic),
+			http.MethodPost,
+			helloWorldMessage,
+			verifyHelloWorldPublish,
+		},
+		{
+			"no receive delayed message",
+			fmt.Sprintf("/v1/projects/%s/subscriptions/%s:pull", uniqueProject, uniqueSubscription),
+			http.MethodPost,
+			pullOneImmediateBody,
+			verifyPullNone,
+		},
+		{
+			"receive after delay",
+			fmt.Sprintf("/v1/projects/%s/subscriptions/%s:pull", uniqueProject, uniqueSubscription),
+			http.MethodPost,
+			func(t *testing.T) json.RawMessage {
+				if testing.Short() {
+					t.Skip()
+				}
+				time.Sleep(time.Second)
+				return pullOneImmediateBody(t)
+			},
+			verifyPullHelloWorld,
 		},
 
 		{
