@@ -75,7 +75,8 @@ func deliverToSubscription(
 		SetMessage(m).
 		SetSubscription(s).
 		SetExpiresAt(now.Add(time.Duration(s.MessageTTL))).
-		SetPublishedAt(now)
+		SetPublishedAt(now).
+		SetAttemptAt(now.Add(time.Duration(s.DeliveryDelay)))
 	if s.OrderedDelivery && m.OrderKey != nil && *m.OrderKey != "" {
 		// set the delivery NotBefore the most recent non-expired delivery
 		lastDelivery, err := tx.Subscription.QueryDeliveries(s).
