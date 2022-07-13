@@ -517,6 +517,21 @@ func (Lint) AddLicense(ctx context.Context) error {
 	)
 }
 
+// FixLicense runs the addlicense tool in fix mode
+func (Lint) FixLicense(ctx context.Context) error {
+	return sh.Run(
+		"go", "run", "github.com/google/addlicense",
+		"-c", "6 River Systems",
+		"-l", "mit",
+		"-skip", "css",
+		"-skip", "js",
+		"-skip", "yml",
+		"-skip", "html",
+		"-ignore", "version/version.go",
+		".",
+	)
+}
+
 type Compile mg.Namespace
 
 func CompileDefault(ctx context.Context) error {

@@ -28,8 +28,8 @@ In its simplest form, you can use:
 docker run --rm --publish 8084-8085:8084-8085/tcp 6river/mmmbbb-service
 ```
 
-If you want to keep the SQLite database across runs, add `--volume
-/local/path:/data` to have the database kept in `/local/path/mmmbbb.sqlite`.
+If you want to keep the SQLite database across runs, add
+`--volume /local/path:/data` to have the database kept in `/local/path/mmmbbb.sqlite`.
 
 ### Initializing a PostgreSQL Database
 
@@ -47,22 +47,22 @@ with startup.
 
 ### Environment variables
 
-* `NODE_ENV`
-  * Useful values are `test`, `development`, or `production`
-  * Determines defaults for logging and the database to use
-* `DATABASE_URL`
-  * Supported values are `postgres://user:password@host:port/database` or
+- `NODE_ENV`
+  - Useful values are `test`, `development`, or `production`
+  - Determines defaults for logging and the database to use
+- `DATABASE_URL`
+  - Supported values are `postgres://user:password@host:port/database` or
     `sqlite:///path/to/file.sqlite` (note the number of slashes!). See below for
     extra notes for using SQLite.
-* `LOG_LEVEL`
-  * Supported values are `trace`, `debug`, `info`, `warn`, `error`, `fatal`,
+- `LOG_LEVEL`
+  - Supported values are `trace`, `debug`, `info`, `warn`, `error`, `fatal`,
     `panic` (i.e. the level names from `zerolog`)
-* `PORT`
-  * Sets the _base_ port for the application. This is where it listens for
+- `PORT`
+  - Sets the _base_ port for the application. This is where it listens for
     normal HTTP connections for metrics and the OAS UI.
-  * The gRPC port will be this plus one
-* `CREATE_DB_VIA`
-  * See above regarding PostgreSQL initialization
+  - The gRPC port will be this plus one
+- `CREATE_DB_VIA`
+  - See above regarding PostgreSQL initialization
 
 ### Supported persistence backends
 
@@ -106,52 +106,52 @@ Cloud SDK as of June 2021, it should work with this one too.
 Several features are supported here that Google's emulator does not support (as
 of June 2021):
 
-* Server driven delivery backoff (but see note below on how this differs from
+- Server driven delivery backoff (but see note below on how this differs from
   Google's production implementation)
-* Subscription filters
-* Dead letter topics for subscriptions
-* Ordered message delivery to subscriptions
+- Subscription filters
+- Dead letter topics for subscriptions
+- Ordered message delivery to subscriptions
 
 ### Features that are not implemented
 
-* Region settings
-* KMS settings
-* Custom ACK deadlines
-* ACK'd message retention
-  * While you cannot configure this, there is a limited retention that is always
+- Region settings
+- KMS settings
+- Custom ACK deadlines
+- ACK'd message retention
+  - While you cannot configure this, there is a limited retention that is always
     active, see below on the partial support for seek to time
-* Authenticating PUSH delivery
-* The Schema API and any PubSub settings related to it
-* Authentication settings for Push subscriptions
-* Authenticating to the service itself
-* Detaching subscriptions
-* Subscription Snapshots and seeking to them
-  * Seeking to a time is partially supported, but see below for notes
-* Changing message retry backoff settings for a subscription may not fully take
+- Authenticating PUSH delivery
+- The Schema API and any PubSub settings related to it
+- Authentication settings for Push subscriptions
+- Authenticating to the service itself
+- Detaching subscriptions
+- Subscription Snapshots and seeking to them
+  - Seeking to a time is partially supported, but see below for notes
+- Changing message retry backoff settings for a subscription may not fully take
   effect when actively streaming messages from it (including from an HTTP Push
   configuration)
 
 ### Features that are different
 
-* Some default timeouts & expiration delays may have different defaults from the
+- Some default timeouts & expiration delays may have different defaults from the
   Google ones, though they should all still be suitable for development purposes
-* You cannot actually turn off the exponential backoff for delivery retries,
+- You cannot actually turn off the exponential backoff for delivery retries,
   though you can change its settings. If configure a subscription without this
   enabled, a default set of backoff settings will be used and it will still be
   active under the hood, even though it will appear disabled in the gRPC API.
-* All published messages must (currently) have a JSON payload, not arbitrary
+- All published messages must (currently) have a JSON payload, not arbitrary
   binary data. This restriction may be lifted in the future.
-* Some activities the Google emulator considers an error, `mmmbbb` does not. For
+- Some activities the Google emulator considers an error, `mmmbbb` does not. For
   example, several subscription settings can be modified via the gRPC API after
   subscription creation in `mmmbbb`, but not in Google's products. Google treats
   an HTTP Push endpoint that returns content with a 201 No Content response as
   an error (NACK), `mmmbbb` does not.
-* This is a clean room implementation, based only on _documented_ behavior. As
+- This is a clean room implementation, based only on _documented_ behavior. As
   such, some corner cases where Google does not describe what their system does
   in their API documentation may be have differently with this implementation.
-  * Example: Google does not currently document what happens if you delete a
+  - Example: Google does not currently document what happens if you delete a
     topic that is referenced as the dead letter topic for some Subscription.
-* Seeking a subscription to a time doesn't require enabling message retention,
+- Seeking a subscription to a time doesn't require enabling message retention,
   since `mmmbbb` always retains messages to a limited extent. While seeking to a
   time outside the limited automatic retention will not produce an error,
   neither will it resurrect messages that have been permanently deleted.
@@ -201,6 +201,16 @@ via the `GET /faults` endpoint, and new injections can be added via the
 at `/oas-ui/`, or the [gosix
 documentation](https://github.com/6RiverSystems/gosix/blob/main/docs/faults.md)
 on the gRPC fault interceptor.
+
+## Delivery Delays
+
+For testing purposes, a subscription can be configured to delay delivering all
+messages a minimum time after they were published. Open the `/oas-ui/` and look
+at the `/delays` endpoints for details. The gist is that every message for the
+subscription will not have any delivery attempted until the given delay after it
+was published. This delay does _not_ adjust for prior messages in an ordered
+delivery subscription, it is just a minimum initial delay after the initial
+publish.
 
 ### Examples
 

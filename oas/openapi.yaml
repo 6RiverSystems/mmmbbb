@@ -154,6 +154,67 @@ paths:
               schema:
                 $ref: "#/components/schemas/ConfiguredFault"
 
+  /delays/{subscription}:
+    get:
+      tags:
+        - DelayInjection
+      summary: Get delivery delay setting for a subscription
+      parameters:
+        - name: subscription
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "projects/[^/]+/subscriptions/[^/]+"
+      responses:
+        200:
+          description: Configured delivery delay
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeliveryDelay"
+    put:
+      tags:
+        - DelayInjection
+      summary: Set delivery delay for a subscription
+      description: >
+        Set the minimum delay after publishing before any message is eligible
+        for delivery. Note that this is the delay after publishing, _not_ the
+        delay after any prior message is delivered or acknowledged.
+      parameters:
+        - name: subscription
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "projects/[^/]+/subscriptions/[^/]+"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeliveryDelay"
+      responses:
+        200:
+          description: Configured delivery delay
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeliveryDelay"
+    delete:
+      tags:
+        - DelayInjection
+      summary: Delete (set to zero) delivery delay for a subscription
+      parameters:
+        - name: subscription
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "projects/[^/]+/subscriptions/[^/]+"
+      responses:
+        204:
+          description: Delay removed
+
 components:
   schemas:
     UptimeResponse:
@@ -247,3 +308,13 @@ components:
           format: int64
         faultDescription:
           type: string
+
+    DeliveryDelay:
+      type: object
+      required:
+        - delay
+      properties:
+        delay:
+          type: string
+          description: Delivery delay, formatted as a Go Duration
+          x-go-type: customtypes.Interval

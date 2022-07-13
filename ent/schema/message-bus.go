@@ -257,6 +257,10 @@ func (Subscription) Fields() []ent.Field {
 			StorageKey("dead_letter_topic_id").
 			Optional().
 			Nillable(),
+		field.Other("deliveryDelay", customtypes.Interval(0)).
+			StorageKey("delivery_delay").
+			SchemaType(intervalTypes).
+			Default(customtypes.Interval(0)),
 	}
 }
 
