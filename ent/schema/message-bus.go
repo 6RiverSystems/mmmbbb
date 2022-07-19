@@ -44,10 +44,12 @@ var textTypes = map[string]string{
 
 var timestampTypes = map[string]string{
 	dialect.Postgres: "timestamptz",
+	// dialect.SQLite:   "datetime",
 }
 
 var intervalTypes = map[string]string{
 	dialect.Postgres: "interval",
+	dialect.SQLite:   "text",
 }
 
 var jsonTypes = map[string]string{
