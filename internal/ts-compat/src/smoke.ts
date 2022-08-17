@@ -53,7 +53,7 @@ async function main() {
   try {
     const [t] = await p.createTopic(id);
     await p.createTopic(id);
-  } catch (err) {
+  } catch (err: any) {
     // ignore already exists
     if (err.code !== 6) {
       console.error(err);
@@ -104,10 +104,10 @@ async function main() {
     msgTimeout.refresh();
   });
 
-  const msgID = await t.publishJSON(
-    { hello: "world" },
-    { attr1: new Date().toISOString() }
-  );
+  const msgID = await t.publishMessage({
+    json: { hello: "world" },
+    attributes: { attr1: new Date().toISOString() },
+  });
   console.log("Published messageID:", msgID);
 
   await msgsP;
