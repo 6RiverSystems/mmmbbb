@@ -310,6 +310,8 @@ func (a *GetSubscriptionMessages) buildDeliveryQuery(
 	// and performance-impacting SQL. we have to do this as a custom-ish predicate
 	// to get the join predicate applied to the "root" selector
 	if sub.OrderedDelivery {
+		// check the delivery we're looking at either (a) has no "not before"
+		// predecessor delivery, or that predecessor is completed or expired.
 		predicates = append(predicates, func(s *sql.Selector) {
 			// do this as a left join instead of an "in" and a sub-select: left join
 			// requires reading at most one more row per candidate in this
