@@ -276,10 +276,17 @@ func (a *GetSubscriptionMessages) queryAndLockDeliveriesOnce(
 	now := time.Now()
 
 	q := a.buildDeliveryQuery(tx, sub, delivery.AttemptAtLTE(now))
+	// SQLite doesn't support `for update`, and doesn't need it because its
+	// always doing SERIALIZABLE transactions
 	if tx.Dialect() != dialect.SQLite {
-		// SQLite doesn't support `for update`, and doesn't need it because its
-		// always doing SERIALIZABLE transactions
-		q = q.ForUpdate(sql.WithLockAction(sql.SkipLocked))
+		q = q.ForUpdate(
+			// we don't need to lock the messages table, just the deliveries we're
+			// about to try to deliver. also if we self-joined to deliveries for the
+			// no-before, this will only lock the delivery we are considering due to
+			// the other copy having a table alias.
+			sql.WithLockTables(delivery.Table),
+			sql.WithLockAction(sql.SkipLocked),
+		)
 	}
 	deliveries, err := q.
 		Limit(a.params.MaxMessages).
