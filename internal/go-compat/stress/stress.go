@@ -32,6 +32,9 @@ import (
 	"cloud.google.com/go/pubsub"
 	"github.com/google/uuid"
 	"golang.org/x/sync/errgroup"
+	"google.golang.org/api/option"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
@@ -45,8 +48,20 @@ func main() {
 		panicIf(err)
 	}
 
-	os.Setenv("PUBSUB_EMULATOR_HOST", "localhost:8802")
-	psc, err := pubsub.NewClient(ctx, "go-compat-stress")
+	var pscOpts []option.ClientOption
+	if os.Getenv("CONCURRENT_EMULATORS") != "" {
+		// using the emulator forces the library to use just one connection, which
+		// sucks for stress testing
+		pscOpts = append(pscOpts,
+			option.WithGRPCDialOption(grpc.WithTransportCredentials(insecure.NewCredentials())),
+			option.WithTelemetryDisabled(),
+			option.WithEndpoint("localhost:8802"),
+			option.WithoutAuthentication(),
+		)
+	} else {
+		os.Setenv("PUBSUB_EMULATOR_HOST", "localhost:8802")
+	}
+	psc, err := pubsub.NewClient(ctx, "go-compat-stress", pscOpts...)
 	panicIf(err)
 	id := "go-stress-" + uuid.NewString()
 	t, err := psc.CreateTopic(ctx, id)
@@ -64,6 +79,10 @@ func main() {
 	defer func() { panicIf(s.Delete(ctx)) }()
 	// configure the flow control same as our typical apps
 	s.ReceiveSettings.MaxOutstandingMessages = 20
+	// scaling up from the default of 10 can make it go faster if the emulator can
+	// keep up, but you need to balance cpu usage by postgres, the server, and
+	// this client.
+	// s.ReceiveSettings.NumGoroutines = 10
 
 	const numMessages = 5000
 
