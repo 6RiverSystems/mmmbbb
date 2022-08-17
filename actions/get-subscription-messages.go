@@ -32,7 +32,6 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
-	"github.com/prometheus/client_golang/prometheus"
 
 	"go.6river.tech/gosix/db/postgres"
 	"go.6river.tech/mmmbbb/ent"
@@ -171,14 +170,12 @@ RETRY:
 			if sub, err = a.verifySub(ctx, tx); err != nil {
 				return err
 			}
-			if err = a.acquireLock(ctx, tx); err != nil {
-				return err
-			}
 
-			deliveries, err := a.queryDeliveriesOnce(ctx, tx, sub)
+			deliveries, err := a.queryAndLockDeliveriesOnce(ctx, tx, sub)
 			if err != nil {
 				return err
 			}
+
 			// SQLite is always serialized, so retrying within the same transaction
 			// won't help, but if we aren't bound to a single transaction, then we can
 			// do retries
@@ -270,33 +267,7 @@ func (a *GetSubscriptionMessages) verifySub(
 	return sub, nil
 }
 
-func (a *GetSubscriptionMessages) acquireLock(
-	ctx context.Context,
-	tx *ent.Tx,
-) error {
-	if tx.Dialect() != dialect.Postgres {
-		return nil
-	}
-
-	timer := prometheus.NewTimer(getSubscriptionMessagesLockTime)
-
-	// use the top 16 and bottom 48 bits (4 & 12 nibbles=hex-chars) of the UUID
-	// as the hash for advisory locks. we have to cast this back down to signed
-	// int64 for compat with pg
-	subIDHash := int64(
-		uint64(*(*uint16)((unsafe.Pointer)(&a.params.ID[0])))<<48 |
-			(*(*uint64)((unsafe.Pointer)(&a.params.ID[8])) & 0x0000ffff_ffffffff))
-
-	// acquire an advisory lock on the subscription we're monitoring, so that
-	// concurrent delivery fetchers for it won't pull the same messages
-	if _, err := tx.DBTx().ExecContext(ctx, "select pg_advisory_xact_lock($1)", subIDHash); err != nil {
-		return err
-	}
-	timer.ObserveDuration()
-	return nil
-}
-
-func (a *GetSubscriptionMessages) queryDeliveriesOnce(
+func (a *GetSubscriptionMessages) queryAndLockDeliveriesOnce(
 	ctx context.Context,
 	tx *ent.Tx,
 	sub *ent.Subscription,
@@ -304,7 +275,13 @@ func (a *GetSubscriptionMessages) queryDeliveriesOnce(
 	// fresh now for every retry
 	now := time.Now()
 
-	deliveries, err := a.buildDeliveryQuery(tx, sub, delivery.AttemptAtLTE(now)).
+	q := a.buildDeliveryQuery(tx, sub, delivery.AttemptAtLTE(now))
+	if tx.Dialect() != dialect.SQLite {
+		// SQLite doesn't support `for update`, and doesn't need it because its
+		// always doing SERIALIZABLE transactions
+		q = q.ForUpdate(sql.WithLockAction(sql.SkipLocked))
+	}
+	deliveries, err := q.
 		Limit(a.params.MaxMessages).
 		WithMessage().
 		All(ctx)
