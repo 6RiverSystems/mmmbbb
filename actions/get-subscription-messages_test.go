@@ -82,9 +82,11 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 			assert.NoError,
 			1,
 			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, r *getSubscriptionMessagesResults) {
-				d := r.deliveries[0]
-				assert.Equal(t, xID(t, &ent.Delivery{}, 0), d.ID)
-				// most checking of the delivery is in common code
+				if assert.NotEmpty(t, r.deliveries, "should get at least one delivery") {
+					d := r.deliveries[0]
+					assert.Equal(t, xID(t, &ent.Delivery{}, 0), d.ID)
+					// most checking of the delivery is in common code
+				}
 			},
 		},
 		{

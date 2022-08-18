@@ -501,35 +501,31 @@ func (Lint) golangci(ctx context.Context, junit bool) error {
 	return err
 }
 
+var addLicenseOptions = []string{
+	"-c", "6 River Systems",
+	"-l", "mit",
+	"-skip", "css",
+	"-skip", "js",
+	"-skip", "yml",
+	"-skip", "html",
+	"-ignore", "version/version.go",
+	"-ignore", "internal/ts-compat/pnpm-lock.yaml",
+}
+
 // AddLicense runs the addlicense tool in check mode
 func (Lint) AddLicense(ctx context.Context) error {
-	return sh.Run(
-		"go", "run", "github.com/google/addlicense",
-		"-c", "6 River Systems",
-		"-l", "mit",
-		"-skip", "css",
-		"-skip", "js",
-		"-skip", "yml",
-		"-skip", "html",
-		"-ignore", "version/version.go",
-		"-check",
-		".",
-	)
+	args := []string{"run", "github.com/google/addlicense"}
+	args = append(args, addLicenseOptions...)
+	args = append(args, "-check", ".")
+	return sh.Run("go", args...)
 }
 
 // FixLicense runs the addlicense tool in fix mode
 func (Lint) FixLicense(ctx context.Context) error {
-	return sh.Run(
-		"go", "run", "github.com/google/addlicense",
-		"-c", "6 River Systems",
-		"-l", "mit",
-		"-skip", "css",
-		"-skip", "js",
-		"-skip", "yml",
-		"-skip", "html",
-		"-ignore", "version/version.go",
-		".",
-	)
+	args := []string{"run", "github.com/google/addlicense"}
+	args = append(args, addLicenseOptions...)
+	args = append(args, ".")
+	return sh.Run("go", args...)
 }
 
 type Compile mg.Namespace

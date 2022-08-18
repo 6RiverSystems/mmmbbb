@@ -76,8 +76,8 @@
       "name": "Launch mmmbbb go compat stress client",
       "type": "go",
       "request": "launch",
-      "cwd": "${workspaceFolder}/internal/go-compat",
-      "program": "${workspaceFolder}/internal/go-compat/stress.go"
+      "cwd": "${workspaceFolder}/internal/go-compat/stress",
+      "program": "${workspaceFolder}/internal/go-compat/stress/stress.go"
     },
     {
       "name": "Debug ent generation for mmmbbb",

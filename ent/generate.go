@@ -28,4 +28,4 @@ import (
 	_ "github.com/olekukonko/tablewriter"
 )
 
-//go:generate go run entgo.io/ent/cmd/ent generate --feature entql ./schema
+//go:generate go run entgo.io/ent/cmd/ent generate --feature entql --feature sql/lock ./schema

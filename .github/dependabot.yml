@@ -1,7 +1,21 @@
 version: 2
+registries:
+  artifactory:
+    type: npm-registry
+    url: https://sixriver.jfrog.io/sixriver/api/npm/npm-local/
+    username: 6rs-machine
+    password: ${{secrets.ARTIFACTORY_TOKEN}}
 updates:
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
       interval: "weekly"
       day: tuesday
+  - package-ecosystem: "npm"
+    directory: "/internal/ts-compat/" # Location of package manifests
+    schedule:
+      interval: "weekly"
+      day: tuesday
+    versioning-strategy: increase
+    registries:
+      - artifactory
