@@ -197,8 +197,7 @@ workflows:
             parameters:
               pgimg:
                 - cimg/postgres:9.6
-                # - cimg/postgres:13.5
-                - cimg/postgres:14.1
+                - cimg/postgres:14.4
               cgo:
                 - "1"
                 - "0"
