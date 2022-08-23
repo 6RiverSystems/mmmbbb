@@ -33,7 +33,7 @@ require (
 	google.golang.org/grpc v1.48.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.2.0
 	google.golang.org/protobuf v1.28.1
-	gotest.tools/gotestsum v1.8.1
+	gotest.tools/gotestsum v1.8.2
 	modernc.org/sqlite v1.18.1
 	mvdan.cc/gofumpt v0.3.1
 )
@@ -143,7 +143,6 @@ require (
 	github.com/jingyugao/rowserrcheck v1.1.1 // indirect
 	github.com/jirfag/go-printf-func-name v0.0.0-20200119135958-7558a9eaa5af // indirect
 	github.com/jmoiron/sqlx v1.3.5 // indirect
-	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/julz/importas v0.1.0 // indirect
