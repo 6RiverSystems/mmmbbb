@@ -22,7 +22,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/prometheus/client_golang v1.13.0
 	github.com/quasilyte/go-ruleguard/dsl v0.3.21
-	github.com/rs/zerolog v1.27.0
+	github.com/rs/zerolog v1.28.0
 	github.com/stretchr/testify v1.8.0
 	go.6river.tech/gosix v0.5.38
 	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e
