@@ -3,7 +3,7 @@ module go.6river.tech/mmmbbb
 go 1.18
 
 require (
-	cloud.google.com/go/pubsub v1.24.0
+	cloud.google.com/go/pubsub v1.25.1
 	entgo.io/ent v0.11.2
 	github.com/alecthomas/participle/v2 v2.0.0-beta.5
 	github.com/deepmap/oapi-codegen v1.11.0
@@ -24,7 +24,7 @@ require (
 	github.com/quasilyte/go-ruleguard/dsl v0.3.21
 	github.com/rs/zerolog v1.27.0
 	github.com/stretchr/testify v1.8.0
-	go.6river.tech/gosix v0.5.37
+	go.6river.tech/gosix v0.5.38
 	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
 	golang.org/x/tools v0.1.13-0.20220804200503-81c7dc4e4efa
@@ -41,7 +41,7 @@ require (
 require (
 	4d63.com/gochecknoglobals v0.1.0 // indirect
 	ariga.io/atlas v0.5.1-0.20220717122844-8593d7eb1a8e // indirect
-	cloud.google.com/go v0.102.1 // indirect
+	cloud.google.com/go v0.104.0 // indirect
 	cloud.google.com/go/compute v1.7.0 // indirect
 	cloud.google.com/go/iam v0.3.0 // indirect
 	github.com/Antonboom/errname v0.1.7 // indirect
@@ -238,7 +238,7 @@ require (
 	github.com/zclconf/go-cty v1.10.0 // indirect
 	gitlab.com/bosi/decorder v0.2.3 // indirect
 	go.opencensus.io v0.23.0 // indirect
-	go.uber.org/atomic v1.7.0 // indirect
+	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.17.0 // indirect
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
