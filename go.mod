@@ -16,7 +16,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.11.3
 	github.com/iancoleman/strcase v0.2.0
 	github.com/jackc/pgconn v1.13.0
-	github.com/jackc/pgx/v4 v4.17.0
+	github.com/jackc/pgx/v4 v4.17.1
 	github.com/magefile/mage v1.13.0
 	github.com/mattn/go-sqlite3 v1.14.15
 	github.com/olekukonko/tablewriter v0.0.5
