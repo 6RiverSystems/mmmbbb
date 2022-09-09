@@ -6,7 +6,7 @@
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "program": "${workspaceFolder}/cmd/service",
+      "program": "${workspaceFolder}/cmd/mmmbbb",
       "cwd": "${workspaceFolder}",
       "env": {
         "NODE_ENV": "development",
@@ -25,7 +25,7 @@
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "program": "${workspaceFolder}/cmd/service",
+      "program": "${workspaceFolder}/cmd/mmmbbb",
       "cwd": "${workspaceFolder}",
       "env": {
         "NODE_ENV": "development",
@@ -46,7 +46,7 @@
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "program": "${workspaceFolder}/cmd/service",
+      "program": "${workspaceFolder}/cmd/mmmbbb",
       "cwd": "${workspaceFolder}",
       "env": {
         "NODE_ENV": "test",
