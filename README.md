@@ -15,7 +15,7 @@ This will be run automatically by `6mon`.
 ### For others
 
 You can build and run the `mmmbbb` app locally, or you can use our published
-Docker image `6river/mmmbbb-service`. The latter is simpler.
+Docker image `6river/mmmbbb`. The latter is simpler.
 
 The docker image defaults to using a SQLite back-end, which is stored in a
 `/data` volume in the container. This is done to minimize the amount of setup
@@ -25,7 +25,7 @@ better performance.
 In its simplest form, you can use:
 
 ```shell
-docker run --rm --publish 8084-8085:8084-8085/tcp 6river/mmmbbb-service
+docker run --rm --publish 8084-8085:8084-8085/tcp 6river/mmmbbb
 ```
 
 If you want to keep the SQLite database across runs, add
