@@ -84,14 +84,14 @@ jobs:
           command: ./mage -v testGoCISplit
 
       - run:
-          name: Validate service is working (service)
-          command: ./mage -v testSmoke service localhost:3001
+          name: Validate service is working (mmmbbb)
+          command: ./mage -v testSmoke mmmbbb localhost:3001
 
       - run:
           name: Coverage HTML report
           command: |
             go tool cover -html="${TEST_RESULTS}/coverage.out" -o "${TEST_RESULTS}/coverage.html"
-            go tool cover -html="${TEST_RESULTS}/coverage-smoke-service.out" -o "${TEST_RESULTS}/coverage-smoke-service.html"
+            go tool cover -html="${TEST_RESULTS}/coverage-smoke-mmmbbb.out" -o "${TEST_RESULTS}/coverage-smoke-mmmbbb.html"
       - sixrs-gke/codecov:
           codecov-params: "-s ${TEST_RESULTS}"
       - store_artifacts:
