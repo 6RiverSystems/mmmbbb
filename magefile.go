@@ -72,7 +72,7 @@ var goLintArgs = []string{"--build-tags", "nomsgpack"}
 var goTestArgs = []string{"-vet=off", "-cover", "-coverpkg=./..."}
 
 var (
-	cmds     = []string{"service"}
+	cmds     = []string{"mmmbbb"}
 	goArches = []string{"amd64", "arm64"}
 )
 
@@ -799,6 +799,10 @@ func dockerRunMultiArch(ctx context.Context, cmd string, push bool) error {
 		version = strings.TrimSpace(string(content))
 	}
 	baseImage := "mmmbbb-" + cmd
+	if cmd == "mmmbbb" {
+		// don't name things `mmmbbb-mmmbbb`
+		baseImage = "mmmbbb"
+	}
 	baseTag := baseImage + ":" + version
 	if push {
 		const gcrBase = "gcr.io/plasma-column-128721/"
