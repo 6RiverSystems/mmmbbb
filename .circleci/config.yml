@@ -40,7 +40,10 @@ jobs:
             - go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-
 
       - run: ./mage -v get
-      - run: ./mage -v installCITools
+      # gotestsum is included in the cimg/go image
+      # - run: ./mage -v installCITools
+      # however protobuf is not
+      - run: ./mage -v installProtobufTools
       - run: ./mage -v generate:force
 
       - run:
@@ -161,7 +164,10 @@ jobs:
           name: Capture chosen version
           path: .version
       - run: ./mage -v get
-      - run: ./mage -v installCITools
+      # gotestsum is included in the cimg/go image
+      # - run: ./mage -v installCITools
+      # however protobuf is not
+      - run: ./mage -v installProtobufTools
       - run: ./mage -v generate:force
       - setup_remote_docker:
           version: 20.10.11

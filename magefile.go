@@ -319,10 +319,19 @@ func InstallProtobufTools(ctx context.Context) error {
 	return nil
 }
 
+// InstallCITools installs tools we expect the CI provider to normally provide.
+// It may be useful for developers too, but outside CI we won't rely on this
+// having been run.
 func InstallCITools(ctx context.Context) error {
 	mg.CtxDeps(ctx, InstallProtobufTools)
 
-	return sh.Run("go", "install", "gotest.tools/gotestsum")
+	if err := sh.Run("go", "install", "gotest.tools/gotestsum"); err != nil {
+		return err
+	}
+	if err := sh.Run("go", "install", "github.com/golangci/golangci-lint/cmd/golangci-lint"); err != nil {
+		return err
+	}
+	return nil
 }
 
 /* TODO
@@ -383,7 +392,8 @@ type Lint mg.Namespace
 // LintDefault runs all the lint:* targets
 func LintDefault(ctx context.Context) error {
 	mg.CtxDeps(ctx, GenerateDefault)
-	mg.CtxDeps(ctx, Lint{}.Basic, Lint{}.Golangci)
+	// basic includes everything except golangci-lint and govulncheck
+	mg.CtxDeps(ctx, Lint{}.Basic, Lint{}.VulnCheck, Lint{}.Golangci)
 	return nil
 }
 
@@ -392,13 +402,14 @@ func (Lint) Default(ctx context.Context) error {
 	return LintDefault(ctx)
 }
 
+// Basic runs all the lint targets except golangci-lint and govulncheck
 func (Lint) Basic(ctx context.Context) error {
 	mg.CtxDeps(ctx, Lint{}.Vet, Lint{}.Format, Lint{}.Imports, Lint{}.AddLicense)
 	return nil
 }
 
 func (Lint) Ci(ctx context.Context) error {
-	mg.CtxDeps(ctx, Lint{}.Basic, Lint{}.GolangciJUnit)
+	mg.CtxDeps(ctx, Lint{}.Basic, Lint{}.VulnCheck, Lint{}.GolangciJUnit)
 	return nil
 }
 
@@ -468,11 +479,23 @@ func (Lint) GolangciJUnit(ctx context.Context) error {
 }
 
 func (Lint) golangci(ctx context.Context, junit bool) error {
-	args := []string{"run"}
-	if os.Getenv("VERBOSE") != "" {
-		args = append(args, "-v")
+	// in CI, expect golangci-lint to be installed, so we don't need to use "go
+	// run" to build it from source
+	var cmd string
+	var args []string
+	if os.Getenv("CI") == "" {
+		cmd = "go"
+		// this "run" is for "go"
+		args = []string{"run"}
+		if os.Getenv("VERBOSE") != "" {
+			args = append(args, "-v")
+		}
+		args = append(args, "github.com/golangci/golangci-lint/cmd/golangci-lint")
+	} else {
+		cmd = "golangci-lint"
 	}
-	args = append(args, "github.com/golangci/golangci-lint/cmd/golangci-lint", "run")
+	// this "run" is for "golangci-lint"
+	args = append(args, "run")
 	args = append(args, goLintArgs...)
 	if os.Getenv("VERBOSE") != "" {
 		args = append(args, "-v")
@@ -497,35 +520,54 @@ func (Lint) golangci(ctx context.Context, junit bool) error {
 		}
 		defer outFile.Close()
 	}
-	_, err = sh.Exec(map[string]string{}, outFile, os.Stderr, "go", args...)
+	_, err = sh.Exec(map[string]string{}, outFile, os.Stderr, cmd, args...)
 	return err
-}
-
-var addLicenseOptions = []string{
-	"-c", "6 River Systems",
-	"-l", "mit",
-	"-skip", "css",
-	"-skip", "js",
-	"-skip", "yml",
-	"-skip", "html",
-	"-ignore", "version/version.go",
-	"-ignore", "internal/ts-compat/pnpm-lock.yaml",
 }
 
 // AddLicense runs the addlicense tool in check mode
 func (Lint) AddLicense(ctx context.Context) error {
-	args := []string{"run", "github.com/google/addlicense"}
-	args = append(args, addLicenseOptions...)
-	args = append(args, "-check", ".")
-	return sh.Run("go", args...)
+	fmt.Println("Linting(addlicense)...")
+	// like sh.Run, but with stderr to stdout, because addlicense generates
+	// non-error notices on stderr we don't want to see normally
+	var buf *bytes.Buffer
+	var cmdout, cmderr io.Writer
+	if mg.Verbose() {
+		cmdout, cmderr = os.Stdout, os.Stderr
+	} else {
+		buf = &bytes.Buffer{}
+		cmdout, cmderr = buf, buf
+	}
+	ran, err := sh.Exec(
+		nil,
+		cmdout, cmderr,
+		"go", "run", "github.com/google/addlicense",
+		"-c", "6 River Systems",
+		"-l", "mit",
+		"-ignore", "**/*.css",
+		"-ignore", "**/*.js",
+		"-ignore", "**/*.yml",
+		"-ignore", "**/*.html",
+		"-ignore", "version/version.go",
+		"-ignore", "internal/ts-compat/pnpm-lock.yaml",
+		"-check",
+		".",
+	)
+	if ran && err != nil && buf != nil {
+		// print output to stderr (including what was originally stdout), can't do
+		// anything with errors from this
+		_, _ = io.Copy(os.Stderr, buf)
+	}
+	return err
 }
 
-// FixLicense runs the addlicense tool in fix mode
-func (Lint) FixLicense(ctx context.Context) error {
-	args := []string{"run", "github.com/google/addlicense"}
-	args = append(args, addLicenseOptions...)
-	args = append(args, ".")
-	return sh.Run("go", args...)
+// VulnCheck runs govulncheck
+func (Lint) VulnCheck(ctx context.Context) error {
+	fmt.Println("Linting(vulncheck)...")
+	return sh.Run(
+		"go", "run", "golang.org/x/vuln/cmd/govulncheck",
+		"-test",
+		"./...",
+	)
 }
 
 type Compile mg.Namespace
