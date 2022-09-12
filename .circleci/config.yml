@@ -40,7 +40,8 @@ jobs:
             - go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-
 
       - run: ./mage -v get
-      - run: ./mage -v installCITools
+      # gotestsum is included in the cimg/go image
+      # - run: ./mage -v installCITools
       - run: ./mage -v generate:force
 
       - run:

@@ -30,6 +30,7 @@ import (
 	_ "github.com/golangci/golangci-lint/pkg/commands"
 	_ "github.com/google/addlicense"
 	_ "golang.org/x/tools/imports"
+	_ "golang.org/x/vuln/cmd/govulncheck"
 	_ "gotest.tools/gotestsum/cmd"
 	_ "mvdan.cc/gofumpt"
 
