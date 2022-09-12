@@ -323,6 +323,8 @@ func InstallProtobufTools(ctx context.Context) error {
 // It may be useful for developers too, but outside CI we won't rely on this
 // having been run.
 func InstallCITools(ctx context.Context) error {
+	mg.CtxDeps(ctx, InstallProtobufTools)
+
 	if err := sh.Run("go", "install", "gotest.tools/gotestsum"); err != nil {
 		return err
 	}
