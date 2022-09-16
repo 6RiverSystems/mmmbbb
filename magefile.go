@@ -841,8 +841,11 @@ func dockerRunMultiArch(ctx context.Context, cmd string, push bool) error {
 		version = strings.TrimSpace(string(content))
 	}
 	baseImage := "mmmbbb-" + cmd
+	extraTag := ""
 	if cmd == "mmmbbb" {
 		// don't name things `mmmbbb-mmmbbb`
+		// TEMPORARY: ... except for backwards compatibility to gcr.io
+		extraTag = "mmmbbb-service"
 		baseImage = "mmmbbb"
 	}
 	baseTag := baseImage + ":" + version
@@ -853,6 +856,9 @@ func dockerRunMultiArch(ctx context.Context, cmd string, push bool) error {
 		if os.Getenv("CIRCLE_BRANCH") == "main" {
 			// push latest tag on main
 			args = append(args, "-t", gcrBase+baseImage+":latest")
+			if extraTag != "" {
+				args = append(args, "-t", gcrBase+extraTag+":latest")
+			}
 			// also push to docker hub for builds on main
 			if os.Getenv("DOCKERHUB_USER") != "" {
 				mg.CtxDeps(ctx, Docker{}.HubLogin)
