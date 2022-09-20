@@ -214,8 +214,8 @@ github.com/fsnotify/fsnotify v1.5.4/go.mod h1:OVB6XrOHzAwXMpEM7uPOzcehqUV2UqJxmV
 github.com/fzipp/gocyclo v0.6.0 h1:lsblElZG7d3ALtGMx9fmxeTKZaLLpU8mET09yN4BBLo=
 github.com/fzipp/gocyclo v0.6.0/go.mod h1:rXPyn8fnlpa0R2csP/31uerbiVBugk5whMdlyaLkLoA=
 github.com/getkin/kin-openapi v0.94.0/go.mod h1:LWZfzOd7PRy8GJ1dJ6mCU6tNdSfOwRac1BUPam4aw6Q=
-github.com/getkin/kin-openapi v0.100.0 h1:8L9xNFNJFDqIRjZwwFjWhTTmTAxPRn/BVTzPn+hOA2s=
-github.com/getkin/kin-openapi v0.100.0/go.mod h1:w4lRPHiyOdwGbOkLIyk+P0qCwlu7TXPCHD/64nSXzgE=
+github.com/getkin/kin-openapi v0.102.0 h1:qrzANKLqtUKlKUAofkmlV08pVNiVW2PgeWbKi/H2WVQ=
+github.com/getkin/kin-openapi v0.102.0/go.mod h1:w4lRPHiyOdwGbOkLIyk+P0qCwlu7TXPCHD/64nSXzgE=
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/gin-contrib/expvar v0.0.1 h1:IuU5ArEgihz50vG8Onrwz22kJr7Mcvgv9xSSpfU5g+w=
 github.com/gin-contrib/expvar v0.0.1/go.mod h1:8o2CznfQi1JjktORdHr2/abg3wSV6OCnXh0yGypvvVw=
