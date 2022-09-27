@@ -7,7 +7,7 @@ require (
 	entgo.io/ent v0.11.2
 	github.com/alecthomas/participle/v2 v2.0.0-beta.5
 	github.com/deepmap/oapi-codegen v1.11.0
-	github.com/getkin/kin-openapi v0.102.0
+	github.com/getkin/kin-openapi v0.103.0
 	github.com/gin-gonic/gin v1.8.1
 	github.com/golang/protobuf v1.5.2
 	github.com/golangci/golangci-lint v1.49.0
@@ -24,12 +24,12 @@ require (
 	github.com/quasilyte/go-ruleguard/dsl v0.3.21
 	github.com/rs/zerolog v1.28.0
 	github.com/stretchr/testify v1.8.0
-	go.6river.tech/gosix v0.5.42
+	go.6river.tech/gosix v0.5.45
 	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
 	golang.org/x/tools v0.1.13-0.20220804200503-81c7dc4e4efa
 	golang.org/x/vuln v0.0.0-20220908210932-64dbbd7bba4f
-	google.golang.org/api v0.96.0
+	google.golang.org/api v0.97.0
 	google.golang.org/genproto v0.0.0-20220822174746-9e6da59bd2fc
 	google.golang.org/grpc v1.49.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.2.0
@@ -85,7 +85,7 @@ require (
 	github.com/gin-contrib/expvar v0.0.1 // indirect
 	github.com/gin-contrib/gzip v0.0.6 // indirect
 	github.com/gin-contrib/location v0.0.2 // indirect
-	github.com/gin-contrib/logger v0.2.2 // indirect
+	github.com/gin-contrib/logger v0.2.5 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-critic/go-critic v0.6.4 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect
