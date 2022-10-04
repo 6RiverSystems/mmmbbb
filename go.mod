@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	cloud.google.com/go/pubsub v1.25.1
-	entgo.io/ent v0.11.2
+	entgo.io/ent v0.11.3
 	github.com/alecthomas/participle/v2 v2.0.0-beta.5
 	github.com/deepmap/oapi-codegen v1.11.0
 	github.com/getkin/kin-openapi v0.103.0
@@ -41,7 +41,7 @@ require (
 
 require (
 	4d63.com/gochecknoglobals v0.1.0 // indirect
-	ariga.io/atlas v0.5.1-0.20220717122844-8593d7eb1a8e // indirect
+	ariga.io/atlas v0.7.2-0.20220927111110-867ee0cca56a // indirect
 	cloud.google.com/go v0.104.0 // indirect
 	cloud.google.com/go/compute v1.7.0 // indirect
 	cloud.google.com/go/iam v0.3.0 // indirect
@@ -131,7 +131,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-version v1.6.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/hashicorp/hcl/v2 v2.11.1 // indirect
+	github.com/hashicorp/hcl/v2 v2.13.0 // indirect
 	github.com/hexops/gotextdiff v1.0.3 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/invopop/yaml v0.1.0 // indirect
