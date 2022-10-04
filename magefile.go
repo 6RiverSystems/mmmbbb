@@ -64,8 +64,10 @@ var (
 var goImportsFlags = []string{"-local", "github.com/6RiverSystems,go.6river.tech"}
 
 // cSpell:ignore nomsgpack
-var goBuildArgs = []string{"-tags", "nomsgpack"}
-var goLintArgs = []string{"--build-tags", "nomsgpack"}
+var (
+	goBuildArgs = []string{"-tags", "nomsgpack"}
+	goLintArgs  = []string{"--build-tags", "nomsgpack"}
+)
 
 // always test with race and coverage, we'll run vet separately.
 // unless CGO is disabled, and race is not available
