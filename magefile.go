@@ -817,22 +817,36 @@ func (Docker) MultiarchPushAll(ctx context.Context) error {
 
 func (Docker) MultiarchBuild(ctx context.Context, cmd string) error {
 	fmt.Printf("Docker-MultiArch(%s)...\n", cmd)
-	return dockerRunMultiArch(ctx, cmd, false)
+	return dockerRunMultiArch(ctx, cmd, "build")
+}
+
+func (Docker) MultiarchLoadArch(ctx context.Context, cmd string, arch string) error {
+	fmt.Printf("Docker-MultiArchLoad(%s)...\n", cmd)
+	return dockerRunMultiArch(ctx, cmd, "load", arch)
 }
 
 func (Docker) MultiarchPush(ctx context.Context, cmd string) error {
 	fmt.Printf("Docker-MultiArchPush(%s)...\n", cmd)
-	return dockerRunMultiArch(ctx, cmd, true)
+	return dockerRunMultiArch(ctx, cmd, "push")
 }
 
-func dockerRunMultiArch(ctx context.Context, cmd string, push bool) error {
+func dockerRunMultiArch(ctx context.Context, cmd string, mode string, arches ...string) error {
+	switch mode {
+	case "build", "load", "push":
+		// OK
+	default:
+		return fmt.Errorf("invalid multi-arch mode '%s', must be build, load, or push", mode)
+	}
 	var args []string
 	if os.Getenv("CI") != "" {
 		args = append(args, "--context", "multiarch-context")
 	}
 	args = append(args, "buildx", "build", "--builder", multiArchBuilderName)
 	var platforms []string
-	for _, arch := range goArches {
+	if len(arches) == 0 {
+		arches = goArches
+	}
+	for _, arch := range arches {
 		platforms = append(platforms, runtime.GOOS+"/"+arch)
 	}
 	args = append(args, "--platform", strings.Join(platforms, ","))
@@ -848,7 +862,7 @@ func dockerRunMultiArch(ctx context.Context, cmd string, push bool) error {
 		baseImage = "mmmbbb"
 	}
 	baseTag := baseImage + ":" + version
-	if push {
+	if mode == "push" {
 		const gcrBase = "gcr.io/plasma-column-128721/"
 		// push everything to gcr
 		args = append(args, "-t", gcrBase+baseTag)
@@ -868,8 +882,10 @@ func dockerRunMultiArch(ctx context.Context, cmd string, push bool) error {
 		args = append(args, "-t", baseTag)
 	}
 	args = append(args, "--build-arg", "BINARYNAME="+cmd)
-	if push {
+	if mode == "push" {
 		args = append(args, "--push")
+	} else if mode == "load" {
+		args = append(args, "--load")
 	}
 	args = append(args, ".")
 	return sh.RunWithV(

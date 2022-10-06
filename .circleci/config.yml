@@ -185,6 +185,14 @@ jobs:
           name: Build multiarch docker images
           command: ./mage -v docker:multiarchBuildAll
       - run:
+          name: Verify docker images
+          command: |
+            set -xeuo pipefail
+            for plat in amd64 arm64 ; do
+              ./mage -v docker:docker:multiarchLoadArch mmmbbb $plat
+              docker run --rm --platform linux/$plat --entrypoint /app/mmmbbb mmmbbb:$(<.version) --version
+            done
+      - run:
           name: Push multiarch docker images
           command: ./mage -v docker:multiarchPushAll
       - save_cache:
