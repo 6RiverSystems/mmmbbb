@@ -83,7 +83,7 @@ parameters in the `DATABASE_URL`.
 CGo enabled (`mattn` driver):
 
 ```text
-?_fk=1&_journal_mode=wal&cache=private&_busy_timeout=10000&_txlock=immediate
+?_fk=true&_journal_mode=wal&cache=private&_busy_timeout=10000&_txlock=immediate
 ```
 
 CGo disabled (`modernc` driver):
