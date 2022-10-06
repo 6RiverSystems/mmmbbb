@@ -192,6 +192,7 @@ jobs:
               ./mage -v docker:docker:multiarchLoadArch mmmbbb $plat
               docker run --rm --platform linux/$plat --entrypoint /app/mmmbbb mmmbbb:$(<.version) --version
             done
+          # TODO: actually run the app to verify its default SQLite configuration works
       - run:
           name: Push multiarch docker images
           command: ./mage -v docker:multiarchPushAll
