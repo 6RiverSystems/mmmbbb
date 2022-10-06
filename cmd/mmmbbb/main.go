@@ -21,7 +21,10 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"os"
+	"runtime"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/getkin/kin-openapi/openapi3"
@@ -48,6 +51,23 @@ import (
 )
 
 func main() {
+	if len(os.Args) > 1 {
+		if len(os.Args) == 2 {
+			switch os.Args[1] {
+			case "--help":
+				fmt.Println("mmmbbb does not accept command line arguments")
+				return
+			case "--version":
+				fmt.Printf("This is mmmbbb version %s running on %s/%s\n",
+					version.SemrelVersion, runtime.GOOS, runtime.GOARCH)
+				return
+			}
+		}
+
+		fmt.Fprintln(os.Stderr, "mmmbbb does not accept command line arguments")
+		os.Exit(1)
+	}
+
 	if err := NewApp().Main(); err != nil {
 		panic(err)
 	}
