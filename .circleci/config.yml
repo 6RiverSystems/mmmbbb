@@ -192,7 +192,7 @@ jobs:
               ./mage -v docker:multiarchLoadArch mmmbbb $plat
               docker run --rm --platform linux/$plat --entrypoint /app/mmmbbb mmmbbb:$(<.version) --version
               # fire this one into the background for the smoke test run
-              docker run --rm --platform linux/$plat -p 8084 mmmbbb:$(<.version) &
+              docker run --rm --platform linux/$plat -p 8084:8084/tcp mmmbbb:$(<.version) &
               pid=$!
               # this should ask the app to shut down at the end
               ./mage -v testSmokeCore mmmbbb localhost:8084

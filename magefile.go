@@ -675,6 +675,8 @@ func TestSmokeCore(ctx context.Context, cmd, hostPort string) error {
 	if mg.Verbose() {
 		fmt.Printf("Waiting for app(%s) at %s...\n", cmd, hostPort)
 	}
+	errTicker := time.NewTicker(15 * time.Second)
+	defer errTicker.Stop()
 	for {
 		select {
 		// stop waiting on context cancellation, e.g. if the app we're trying to
@@ -685,6 +687,11 @@ func TestSmokeCore(ctx context.Context, cmd, hostPort string) error {
 		}
 		conn, err := net.DialTimeout("tcp", hostPort, 15*time.Second)
 		if err != nil {
+			select {
+			case <-errTicker.C:
+				fmt.Fprintf(os.Stderr, "App still not ready: %v\n", err)
+			default:
+			}
 			time.Sleep(50 * time.Millisecond)
 		}
 		if conn != nil {
