@@ -192,10 +192,14 @@ jobs:
               ./mage -v docker:multiarchLoadArch mmmbbb $plat
               docker run --rm --platform linux/$plat --entrypoint /app/mmmbbb mmmbbb:$(<.version) --version
               # fire this one into the background for the smoke test run
-              docker run --rm --platform linux/$plat -p 8084:8084/tcp mmmbbb:$(<.version) &
+              docker run --name mmmbbb-smoke-$plat --rm --platform linux/$plat mmmbbb:$(<.version) &
               pid=$!
+              # can't contact the remote docker directly, so we have to build
+              # the mage binary, copy it over, and exec it
+              ./mage -v -compile magebinary-$plat
+              docker cp magebinary-$plat mmmbbb-smoke-$plat:/
               # this should ask the app to shut down at the end
-              ./mage -v testSmokeCore mmmbbb localhost:8084
+              docker exec mmmbbb-smoke-$plat /magebinary-$plat -v testSmokeCore mmmbbb localhost:8084
               wait $pid
             done
           # TODO: actually run the app to verify its default SQLite configuration works
