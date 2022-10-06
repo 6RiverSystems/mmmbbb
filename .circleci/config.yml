@@ -196,7 +196,7 @@ jobs:
               pid=$!
               # can't contact the remote docker directly, so we have to build
               # the mage binary, copy it over, and exec it
-              ./mage -v -compile magebinary-$plat
+              CGO_ENABLED=0 GOARCH=$plat ./mage -v -compile magebinary-$plat
               docker cp magebinary-$plat mmmbbb-smoke-$plat:/
               # this should ask the app to shut down at the end
               docker exec mmmbbb-smoke-$plat /magebinary-$plat -v testSmokeCore mmmbbb localhost:8084
