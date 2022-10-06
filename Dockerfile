@@ -32,7 +32,11 @@ RUN \
 ENV NODE_ENV=production
 # default to an in-container SQLite database to simplify usage as a drop-in
 # TODO: add all the needed parameters in code instead of requiring them here
-ENV DATABASE_URL=sqlite:///data/mmmbbb.sqlite?_fk=true&_journal_mode=wal&cache=private&_busy_timeout=10000&_txlock=immediate
+# NOTE: this is for the non-cgo modernc implementation
+ENV DATABASE_URL=sqlite:///data/mmmbbb.sqlite?_pragma=foreign_keys(1)&_pragma=journal_mode(wal)&_pragma=busy_timeout(10000)&cache=private&_txlock=immediate
+# this is what you would use for a cgo-enabled build:
+# ENV DATABASE_URL=sqlite:///data/mmmbbb.sqlite?_fk=true&_journal_mode=wal&cache=private&_busy_timeout=10000&_txlock=immediate
+
 # base port 8084 for HTTP results in the gRPC using 8085 for compatibility with
 # the google emulator's defaults
 ENV PORT=8084
