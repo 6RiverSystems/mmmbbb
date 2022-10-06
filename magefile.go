@@ -27,7 +27,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"go/build"
 	"io"
 	"net"
 	"net/http"
@@ -46,7 +45,6 @@ import (
 
 	// tools this needs, to keep `go mod tidy` from deleting lines
 	_ "github.com/golangci/golangci-lint/pkg/commands"
-	"golang.org/x/exp/slices"
 	"golang.org/x/sync/errgroup"
 	_ "golang.org/x/tools/imports"
 )
@@ -101,21 +99,6 @@ func init() {
 	// TODO: better way to detect CGO off?
 	if os.Getenv("CGO_ENABLED") != "0" {
 		goTestArgs = append(goTestArgs, "-race")
-	}
-
-	// ensure PATH contains GOBIN
-	pathElements := strings.Split(os.Getenv("PATH"), string(os.PathListSeparator))
-
-	var goBin string
-	var err error
-	if goBin, err = sh.Output("go", "env", "GOBIN"); err != nil {
-		panic(err)
-	} else if goBin == "" {
-		// GOBIN is usually not set, infer it from GOPATH if so
-		goBin = path.Join(build.Default.GOPATH, "bin")
-	}
-	if !slices.Contains(pathElements, goBin) {
-		os.Setenv("PATH", strings.Join(append(pathElements, goBin), string(os.PathListSeparator)))
 	}
 }
 
