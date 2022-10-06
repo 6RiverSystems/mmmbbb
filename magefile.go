@@ -27,7 +27,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"go/build"
 	"io"
 	"net"
 	"net/http"
@@ -46,7 +45,6 @@ import (
 
 	// tools this needs, to keep `go mod tidy` from deleting lines
 	_ "github.com/golangci/golangci-lint/pkg/commands"
-	"golang.org/x/exp/slices"
 	"golang.org/x/sync/errgroup"
 	_ "golang.org/x/tools/imports"
 )
@@ -101,21 +99,6 @@ func init() {
 	// TODO: better way to detect CGO off?
 	if os.Getenv("CGO_ENABLED") != "0" {
 		goTestArgs = append(goTestArgs, "-race")
-	}
-
-	// ensure PATH contains GOBIN
-	pathElements := strings.Split(os.Getenv("PATH"), string(os.PathListSeparator))
-
-	var goBin string
-	var err error
-	if goBin, err = sh.Output("go", "env", "GOBIN"); err != nil {
-		panic(err)
-	} else if goBin == "" {
-		// GOBIN is usually not set, infer it from GOPATH if so
-		goBin = path.Join(build.Default.GOPATH, "bin")
-	}
-	if !slices.Contains(pathElements, goBin) {
-		os.Setenv("PATH", strings.Join(append(pathElements, goBin), string(os.PathListSeparator)))
 	}
 }
 
@@ -660,53 +643,76 @@ func TestSmoke(ctx context.Context, cmd, hostPort string) error {
 		cmd := exec.CommandContext(ctx, "gotestsum", args...)
 		cmd.Env = append([]string{}, os.Environ()...)
 		cmd.Env = append(cmd.Env, "NODE_ENV=acceptance")
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
 		return cmd.Run()
 	})
 	eg.Go(func() error {
-		// wait for the app to get running
-		if mg.Verbose() {
-			fmt.Printf("Waiting for app(%s) at %s...\n", cmd, hostPort)
-		}
-		for {
-			conn, err := net.DialTimeout("tcp", hostPort, time.Minute)
-			if err != nil {
-				time.Sleep(50 * time.Millisecond)
-			}
-			if conn != nil {
-				conn.Close()
-				break
-			}
-		}
-		// run a couple quick HTTP checks
-		// TODO: these should be input specs too
-		tryURL := func(m string, u *url.URL) error {
-			if mg.Verbose() {
-				fmt.Printf("Trying %s %s ...\n", m, u)
-			}
-			if req, err := http.NewRequestWithContext(ctx, m, u.String(), nil); err != nil {
-				return err
-			} else if resp, err := http.DefaultClient.Do(req); err != nil {
-				return err
-			} else {
-				if resp.Body != nil {
-					defer resp.Body.Close()
-				}
-				if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-					return fmt.Errorf("failed %s %s: %d %s", m, u, resp.StatusCode, resp.Status)
-				}
-			}
-			return nil
-		}
-		if err := tryURL(http.MethodGet, &url.URL{Scheme: "http", Host: hostPort, Path: "/"}); err != nil {
-			return err
-		}
-		// TODO: poke some gRPC gateway endpoints
-		if err := tryURL(http.MethodPost, &url.URL{Scheme: "http", Host: hostPort, Path: "/server/shutdown"}); err != nil {
-			return err
-		}
-		return nil
+		return TestSmokeCore(ctx, cmd, hostPort)
 	})
 	return eg.Wait()
+}
+
+func TestSmokeCore(ctx context.Context, cmd, hostPort string) error {
+	// wait for the app to get running
+	if mg.Verbose() {
+		fmt.Printf("Waiting for app(%s) at %s...\n", cmd, hostPort)
+	}
+	errTicker := time.NewTicker(15 * time.Second)
+	defer errTicker.Stop()
+	for {
+		select {
+		// stop waiting on context cancellation, e.g. if the app we're trying to
+		// test exited with an error
+		case <-ctx.Done():
+			return ctx.Err()
+		default: // continue
+		}
+		conn, err := net.DialTimeout("tcp", hostPort, 15*time.Second)
+		if err != nil {
+			select {
+			case <-errTicker.C:
+				fmt.Fprintf(os.Stderr, "App still not ready: %v\n", err)
+			default:
+			}
+			time.Sleep(50 * time.Millisecond)
+		}
+		if conn != nil {
+			if err := conn.Close(); err != nil {
+				return err
+			}
+			fmt.Println("App is up")
+			break
+		}
+	}
+	// run a couple quick HTTP checks
+	// TODO: these should be input specs too
+	tryURL := func(m string, u *url.URL) error {
+		if mg.Verbose() {
+			fmt.Printf("Trying %s %s ...\n", m, u)
+		}
+		if req, err := http.NewRequestWithContext(ctx, m, u.String(), nil); err != nil {
+			return err
+		} else if resp, err := http.DefaultClient.Do(req); err != nil {
+			return err
+		} else {
+			if resp.Body != nil {
+				defer resp.Body.Close()
+			}
+			if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+				return fmt.Errorf("failed %s %s: %d %s", m, u, resp.StatusCode, resp.Status)
+			}
+		}
+		return nil
+	}
+	if err := tryURL(http.MethodGet, &url.URL{Scheme: "http", Host: hostPort, Path: "/"}); err != nil {
+		return err
+	}
+	// TODO: poke some gRPC gateway endpoints
+	if err := tryURL(http.MethodPost, &url.URL{Scheme: "http", Host: hostPort, Path: "/server/shutdown"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func CompileAndTest(ctx context.Context) error {
@@ -817,22 +823,36 @@ func (Docker) MultiarchPushAll(ctx context.Context) error {
 
 func (Docker) MultiarchBuild(ctx context.Context, cmd string) error {
 	fmt.Printf("Docker-MultiArch(%s)...\n", cmd)
-	return dockerRunMultiArch(ctx, cmd, false)
+	return dockerRunMultiArch(ctx, cmd, "build")
+}
+
+func (Docker) MultiarchLoadArch(ctx context.Context, cmd string, arch string) error {
+	fmt.Printf("Docker-MultiArchLoad(%s)...\n", cmd)
+	return dockerRunMultiArch(ctx, cmd, "load", arch)
 }
 
 func (Docker) MultiarchPush(ctx context.Context, cmd string) error {
 	fmt.Printf("Docker-MultiArchPush(%s)...\n", cmd)
-	return dockerRunMultiArch(ctx, cmd, true)
+	return dockerRunMultiArch(ctx, cmd, "push")
 }
 
-func dockerRunMultiArch(ctx context.Context, cmd string, push bool) error {
+func dockerRunMultiArch(ctx context.Context, cmd string, mode string, arches ...string) error {
+	switch mode {
+	case "build", "load", "push":
+		// OK
+	default:
+		return fmt.Errorf("invalid multi-arch mode '%s', must be build, load, or push", mode)
+	}
 	var args []string
 	if os.Getenv("CI") != "" {
 		args = append(args, "--context", "multiarch-context")
 	}
 	args = append(args, "buildx", "build", "--builder", multiArchBuilderName)
 	var platforms []string
-	for _, arch := range goArches {
+	if len(arches) == 0 {
+		arches = goArches
+	}
+	for _, arch := range arches {
 		platforms = append(platforms, runtime.GOOS+"/"+arch)
 	}
 	args = append(args, "--platform", strings.Join(platforms, ","))
@@ -848,7 +868,7 @@ func dockerRunMultiArch(ctx context.Context, cmd string, push bool) error {
 		baseImage = "mmmbbb"
 	}
 	baseTag := baseImage + ":" + version
-	if push {
+	if mode == "push" {
 		const gcrBase = "gcr.io/plasma-column-128721/"
 		// push everything to gcr
 		args = append(args, "-t", gcrBase+baseTag)
@@ -868,8 +888,10 @@ func dockerRunMultiArch(ctx context.Context, cmd string, push bool) error {
 		args = append(args, "-t", baseTag)
 	}
 	args = append(args, "--build-arg", "BINARYNAME="+cmd)
-	if push {
+	if mode == "push" {
 		args = append(args, "--push")
+	} else if mode == "load" {
+		args = append(args, "--load")
 	}
 	args = append(args, ".")
 	return sh.RunWithV(

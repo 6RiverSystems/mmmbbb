@@ -185,6 +185,25 @@ jobs:
           name: Build multiarch docker images
           command: ./mage -v docker:multiarchBuildAll
       - run:
+          name: Verify docker images
+          command: |
+            set -xeuo pipefail
+            for plat in amd64 arm64 ; do
+              ./mage -v docker:multiarchLoadArch mmmbbb $plat
+              docker run --rm --platform linux/$plat --entrypoint /app/mmmbbb mmmbbb:$(<.version) --version
+              # fire this one into the background for the smoke test run
+              docker run --name mmmbbb-smoke-$plat --rm --platform linux/$plat mmmbbb:$(<.version) &
+              pid=$!
+              # can't contact the remote docker directly, so we have to build
+              # the mage binary, copy it over, and exec it
+              CGO_ENABLED=0 ./mage -v -compile magebinary-$plat -goarch $plat
+              docker cp magebinary-$plat mmmbbb-smoke-$plat:/
+              # this should ask the app to shut down at the end
+              docker exec mmmbbb-smoke-$plat /magebinary-$plat -v testSmokeCore mmmbbb localhost:8084
+              wait $pid
+            done
+          # TODO: actually run the app to verify its default SQLite configuration works
+      - run:
           name: Push multiarch docker images
           command: ./mage -v docker:multiarchPushAll
       - save_cache:
