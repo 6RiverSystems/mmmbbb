@@ -761,9 +761,9 @@ func Clean(ctx context.Context) error {
 func ReleaseBinary(ctx context.Context, cmd, arch string) error {
 	env := map[string]string{
 		"GOARCH": arch,
-	}
-	if arch != runtime.GOARCH {
-		env["CGO_ENABLED"] = "0"
+		// NOTE: the base CI image we use can have a newer version of libc6 than the
+		// runtime base image, so we need to build statically always.
+		"CGO_ENABLED": "0",
 	}
 	args := []string{"build", "-v"}
 	args = append(args, goBuildArgs...)
