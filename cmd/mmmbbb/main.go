@@ -50,6 +50,8 @@ import (
 	_ "go.6river.tech/mmmbbb/ent/runtime"
 )
 
+var testModeIgnoreArgs = false
+
 func main() {
 	if len(os.Args) > 1 {
 		if len(os.Args) == 2 {
@@ -64,8 +66,10 @@ func main() {
 			}
 		}
 
-		fmt.Fprintln(os.Stderr, "mmmbbb does not accept command line arguments")
-		os.Exit(1)
+		if !testModeIgnoreArgs {
+			fmt.Fprintf(os.Stderr, "mmmbbb does not accept command line arguments: %v\n", os.Args[1:])
+			os.Exit(1)
+		}
 	}
 
 	if err := NewApp().Main(); err != nil {

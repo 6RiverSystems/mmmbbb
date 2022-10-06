@@ -676,9 +676,15 @@ func TestSmokeCore(ctx context.Context, cmd, hostPort string) error {
 		fmt.Printf("Waiting for app(%s) at %s...\n", cmd, hostPort)
 	}
 	for {
-		conn, err := net.DialTimeout("tcp", hostPort, time.Minute)
+		select {
+		// stop waiting on context cancellation, e.g. if the app we're trying to
+		// test exited with an error
+		case <-ctx.Done():
+			return ctx.Err()
+		default: // continue
+		}
+		conn, err := net.DialTimeout("tcp", hostPort, 15*time.Second)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "App not ready yet: %v\n", err)
 			time.Sleep(50 * time.Millisecond)
 		}
 		if conn != nil {

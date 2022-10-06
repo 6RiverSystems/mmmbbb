@@ -40,5 +40,6 @@ func TestCoverMain(t *testing.T) {
 	if os.Getenv("NODE_ENV") != "acceptance" {
 		t.SkipNow()
 	}
+	testModeIgnoreArgs = true
 	main()
 }
