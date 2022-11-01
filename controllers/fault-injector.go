@@ -93,7 +93,7 @@ func (f *FaultInjectorController) AddDescriptor(c *gin.Context) {
 		FaultDescription: string(fd.Error),
 	}
 	if fd.Parameters != nil {
-		desc.Parameters = fd.Parameters.AdditionalProperties
+		desc.Parameters = *fd.Parameters
 	}
 	f.faults.Add(desc)
 	c.JSON(http.StatusCreated, toOAS(desc))
@@ -106,9 +106,7 @@ func toOAS(d faults.Description) oas.ConfiguredFault {
 		FaultDescription: &d.FaultDescription,
 	}
 	if len(d.Parameters) != 0 {
-		ret.Parameters = &oas.ConfiguredFault_Parameters{
-			AdditionalProperties: d.Parameters,
-		}
+		ret.Parameters = &d.Parameters
 	}
 	return ret
 }
