@@ -13,7 +13,7 @@ require (
 	github.com/golangci/golangci-lint v1.50.1
 	github.com/google/addlicense v1.0.0
 	github.com/google/uuid v1.3.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.13.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.14.0
 	github.com/iancoleman/strcase v0.2.0
 	github.com/jackc/pgconn v1.13.0
 	github.com/jackc/pgx/v4 v4.17.2
@@ -29,7 +29,7 @@ require (
 	golang.org/x/tools v0.3.0
 	golang.org/x/vuln v0.0.0-20220908210932-64dbbd7bba4f
 	google.golang.org/api v0.103.0
-	google.golang.org/genproto v0.0.0-20221027153422-115e99e71e1c
+	google.golang.org/genproto v0.0.0-20221114212237-e4508ebdbee1
 	google.golang.org/grpc v1.50.1
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.2.0
 	google.golang.org/protobuf v1.28.1
@@ -44,7 +44,7 @@ require (
 	cloud.google.com/go v0.105.0 // indirect
 	cloud.google.com/go/compute v1.12.1 // indirect
 	cloud.google.com/go/compute/metadata v0.2.1 // indirect
-	cloud.google.com/go/iam v0.6.0 // indirect
+	cloud.google.com/go/iam v0.7.0 // indirect
 	github.com/Abirdcfly/dupword v0.0.7 // indirect
 	github.com/Antonboom/errname v0.1.7 // indirect
 	github.com/Antonboom/nilnil v0.1.1 // indirect
@@ -250,7 +250,7 @@ require (
 	golang.org/x/exp/typeparams v0.0.0-20220827204233-334a2380cb91 // indirect
 	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/net v0.2.0 // indirect
-	golang.org/x/oauth2 v0.1.0 // indirect
+	golang.org/x/oauth2 v0.2.0 // indirect
 	golang.org/x/sys v0.2.0 // indirect
 	golang.org/x/term v0.2.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
