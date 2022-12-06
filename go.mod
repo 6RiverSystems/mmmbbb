@@ -3,11 +3,11 @@ module go.6river.tech/mmmbbb
 go 1.19
 
 require (
-	cloud.google.com/go/pubsub v1.26.0
+	cloud.google.com/go/pubsub v1.27.1
 	entgo.io/ent v0.11.4
 	github.com/alecthomas/participle/v2 v2.0.0-beta.5
-	github.com/deepmap/oapi-codegen v1.12.3
-	github.com/getkin/kin-openapi v0.109.0
+	github.com/deepmap/oapi-codegen v1.12.4
+	github.com/getkin/kin-openapi v0.110.0
 	github.com/gin-gonic/gin v1.8.1
 	github.com/golang/protobuf v1.5.2
 	github.com/golangci/golangci-lint v1.50.1
@@ -24,12 +24,12 @@ require (
 	github.com/quasilyte/go-ruleguard/dsl v0.3.21
 	github.com/rs/zerolog v1.28.0
 	github.com/stretchr/testify v1.8.1
-	go.6river.tech/gosix v0.5.58
+	go.6river.tech/gosix v0.5.59
 	golang.org/x/sync v0.1.0
 	golang.org/x/tools v0.3.0
 	golang.org/x/vuln v0.0.0-20220908210932-64dbbd7bba4f
 	google.golang.org/api v0.103.0
-	google.golang.org/genproto v0.0.0-20221114212237-e4508ebdbee1
+	google.golang.org/genproto v0.0.0-20221201164419-0e50fba7f41c
 	google.golang.org/grpc v1.51.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.2.0
 	google.golang.org/protobuf v1.28.1
