@@ -170,7 +170,14 @@ func (Generate) Ent(ctx context.Context) error {
 }
 
 func (Generate) OAS(ctx context.Context) error {
-	if dirty, err := target.Path("./oas/oas-types.go", "./oas/generate.go", "./oas/openapi.yaml", "go.mod", "go.sum"); err != nil {
+	if dirty, err := target.Path(
+		"./oas/oas-types.go",
+		"./oas/generate.go",
+		"./oas/openapi.yaml",
+		"./oas/oapi-codegen.yaml",
+		"go.mod",
+		"go.sum",
+	); err != nil {
 		return err
 	} else if !dirty {
 		return nil
