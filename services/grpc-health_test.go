@@ -43,10 +43,10 @@ func Test_healthServer_Check(t *testing.T) {
 	deadClient := enttest.ClientForTest(t)
 	assert.NoError(t, deadClient.Close())
 
-	servicesNoInit := registry.New(t.Name() + "noInit")
-	servicesNoStart := registry.New(t.Name() + "noStart")
+	servicesNoInit := registry.New(t.Name()+"noInit", nil)
+	servicesNoStart := registry.New(t.Name()+"noStart", nil)
 	assert.NoError(t, servicesNoStart.InitializeServices(testutils.ContextForTest(t), client))
-	servicesRunning := registry.New(t.Name() + "running")
+	servicesRunning := registry.New(t.Name()+"running", nil)
 	assert.NoError(t, servicesRunning.InitializeServices(testutils.ContextForTest(t), client))
 	assert.NoError(t, servicesRunning.StartServices(testutils.ContextForTest(t)))
 
@@ -140,7 +140,7 @@ func TestGrpc_healthServer_Check(t *testing.T) {
 		{
 			"not init",
 			func(t *testing.T, client *ent.Client, tt *test) {},
-			registry.New(t.Name() + "not-init"),
+			registry.New(t.Name()+"not-init", nil),
 			args{},
 			&health.HealthCheckResponse{Status: health.HealthCheckResponse_NOT_SERVING},
 			assert.NoError,
@@ -150,7 +150,7 @@ func TestGrpc_healthServer_Check(t *testing.T) {
 			func(t *testing.T, client *ent.Client, tt *test) {
 				assert.NoError(t, tt.services.InitializeServices(tt.args.ctx, client))
 			},
-			registry.New(t.Name() + "not-started"),
+			registry.New(t.Name()+"not-started", nil),
 			args{},
 			&health.HealthCheckResponse{Status: health.HealthCheckResponse_NOT_SERVING},
 			assert.NoError,
@@ -161,7 +161,7 @@ func TestGrpc_healthServer_Check(t *testing.T) {
 				assert.NoError(t, tt.services.InitializeServices(tt.args.ctx, client))
 				assert.NoError(t, tt.services.StartServices(tt.args.ctx))
 			},
-			registry.New(t.Name() + "healthy"),
+			registry.New(t.Name()+"healthy", nil),
 			args{},
 			&health.HealthCheckResponse{Status: health.HealthCheckResponse_SERVING},
 			assert.NoError,
@@ -171,7 +171,7 @@ func TestGrpc_healthServer_Check(t *testing.T) {
 			func(t *testing.T, client *ent.Client, tt *test) {
 				require.NoError(t, client.Close())
 			},
-			registry.New(t.Name() + "broken-db"),
+			registry.New(t.Name()+"broken-db", nil),
 			args{},
 			&health.HealthCheckResponse{Status: health.HealthCheckResponse_NOT_SERVING},
 			assert.NoError,

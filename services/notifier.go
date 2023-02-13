@@ -30,8 +30,8 @@ import (
 
 	"entgo.io/ent/dialect"
 	"github.com/google/uuid"
-	"github.com/jackc/pgconn"
-	"github.com/jackc/pgx/v4/stdlib"
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/stdlib"
 	"golang.org/x/sync/errgroup"
 
 	"go.6river.tech/gosix/db/postgres"
