@@ -15,7 +15,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.2
 	github.com/iancoleman/strcase v0.2.0
-	github.com/jackc/pgx/v5 v5.3.0
+	github.com/jackc/pgx/v5 v5.3.1
 	github.com/magefile/mage v1.14.0
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/olekukonko/tablewriter v0.0.5
@@ -23,11 +23,11 @@ require (
 	github.com/quasilyte/go-ruleguard/dsl v0.3.22
 	github.com/rs/zerolog v1.29.0
 	github.com/stretchr/testify v1.8.2
-	go.6river.tech/gosix v0.8.4
+	go.6river.tech/gosix v0.8.5
 	golang.org/x/sync v0.1.0
 	golang.org/x/tools v0.6.1-0.20230222164832-25d2519c8696
 	golang.org/x/vuln v0.0.0-20220908210932-64dbbd7bba4f
-	google.golang.org/api v0.110.0
+	google.golang.org/api v0.111.0
 	google.golang.org/genproto v0.0.0-20230223222841-637eb2293923
 	google.golang.org/grpc v1.53.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.2.0
