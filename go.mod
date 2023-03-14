@@ -31,7 +31,7 @@ require (
 	google.golang.org/genproto v0.0.0-20230303212802-e74f57abe488
 	google.golang.org/grpc v1.53.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.3.0
-	google.golang.org/protobuf v1.29.0
+	google.golang.org/protobuf v1.29.1
 	gotest.tools/gotestsum v1.9.0
 	modernc.org/sqlite v1.21.0
 	mvdan.cc/gofumpt v0.4.0
