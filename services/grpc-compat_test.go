@@ -507,12 +507,13 @@ func TestGrpcCompat(t *testing.T) {
 		{
 			name: "subscription http push",
 			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
-				srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					// this will be replaced in the test steps
-					w.WriteHeader(http.StatusServiceUnavailable)
-					t.Fatal("server setup race lost")
+				srv := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					// test step will replace this with the real listener before starting the server
+					panic("should never be called")
 				}))
-				require.NotEmpty(t, srv.URL)
+				// s.URL won't be populated until we start the server, but we can find
+				// it out from the Listener, which is already created
+				serverURL := "http://" + srv.Listener.Addr().String()
 				tt.servers = append(tt.servers, srv)
 				t.Cleanup(srv.Close)
 
@@ -550,7 +551,7 @@ func TestGrpcCompat(t *testing.T) {
 						MinimumBackoff: 51 * time.Millisecond,
 					},
 					PushConfig: pubsub.PushConfig{
-						Endpoint: srv.URL,
+						Endpoint: serverURL,
 					},
 				})
 				require.NoError(t, err)
@@ -607,6 +608,7 @@ func TestGrpcCompat(t *testing.T) {
 							w.WriteHeader(http.StatusInternalServerError)
 						}
 					})
+					tt.servers[0].Start()
 					<-rCtx.Done()
 				},
 			},
