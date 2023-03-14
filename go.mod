@@ -23,7 +23,7 @@ require (
 	github.com/quasilyte/go-ruleguard/dsl v0.3.22
 	github.com/rs/zerolog v1.29.0
 	github.com/stretchr/testify v1.8.2
-	go.6river.tech/gosix v0.8.6
+	go.6river.tech/gosix v0.8.7
 	golang.org/x/sync v0.1.0
 	golang.org/x/tools v0.7.0
 	golang.org/x/vuln v0.0.0-20220908210932-64dbbd7bba4f

@@ -87,6 +87,10 @@ func (s *subscriberServer) CreateSubscription(ctx context.Context, req *pubsub.S
 	if params.MessageTTL == 0 {
 		params.MessageTTL = defaultSubscriptionMessageTTL
 	}
+	if req.RetryPolicy != nil {
+		params.MinBackoff = req.RetryPolicy.MinimumBackoff.AsDuration()
+		params.MaxBackoff = req.RetryPolicy.MaximumBackoff.AsDuration()
+	}
 	if req.DeadLetterPolicy != nil {
 		params.MaxDeliveryAttempts = req.DeadLetterPolicy.MaxDeliveryAttempts
 		if params.MaxDeliveryAttempts == 0 {

@@ -23,6 +23,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"strconv"
 	"sync"
@@ -56,9 +58,10 @@ func TestGrpcCompat(t *testing.T) {
 		steps []func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client)
 		after func(t *testing.T, ctx context.Context, client *ent.Client, tt *test)
 		// tests can fill these in to share state among before/step/concurrent/after
-		topics []pubsub.Topic
-		subs   []pubsub.Subscription
-		errs   []error
+		topics  []pubsub.Topic
+		subs    []pubsub.Subscription
+		servers []*httptest.Server
+		errs    []error
 	}
 	type testStep = func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client)
 
@@ -97,7 +100,7 @@ func TestGrpcCompat(t *testing.T) {
 				assert.Equal(t, 1, successes)
 				assert.Equal(t, 1, fails)
 			},
-			nil, nil, nil,
+			nil, nil, nil, nil,
 		},
 		{
 			"concurrent sub create",
@@ -137,7 +140,7 @@ func TestGrpcCompat(t *testing.T) {
 				assert.Equal(t, 1, successes)
 				assert.Equal(t, 1, fails)
 			},
-			nil, nil, nil,
+			nil, nil, nil, nil,
 		},
 		{
 			"list topics",
@@ -175,7 +178,7 @@ func TestGrpcCompat(t *testing.T) {
 				assert.ElementsMatch(t, expected, actual)
 			}},
 			nil,
-			nil, nil, nil,
+			nil, nil, nil, nil,
 		},
 		{
 			"list subs on one topic",
@@ -210,7 +213,7 @@ func TestGrpcCompat(t *testing.T) {
 				assert.ElementsMatch(t, expected, actual)
 			}},
 			nil,
-			nil, nil, nil,
+			nil, nil, nil, nil,
 		},
 		{
 			"list subs on all topics",
@@ -260,7 +263,7 @@ func TestGrpcCompat(t *testing.T) {
 				assert.ElementsMatch(t, expected, actual)
 			}},
 			nil,
-			nil, nil, nil,
+			nil, nil, nil, nil,
 		},
 		{
 			// TODO: this isn't a very "unity" test
@@ -303,7 +306,7 @@ func TestGrpcCompat(t *testing.T) {
 				require.False(t, exists)
 			}},
 			nil,
-			nil, nil, nil,
+			nil, nil, nil, nil,
 		},
 		{
 			// TODO: this isn't a very "unity" test
@@ -379,7 +382,7 @@ func TestGrpcCompat(t *testing.T) {
 				require.False(t, exists)
 			}},
 			nil,
-			nil, nil, nil,
+			nil, nil, nil, nil,
 		},
 		{
 			"streaming pull",
@@ -445,7 +448,7 @@ func TestGrpcCompat(t *testing.T) {
 				},
 			},
 			nil,
-			nil, nil, nil,
+			nil, nil, nil, nil,
 		},
 		{
 			"synchronous pull",
@@ -514,7 +517,104 @@ func TestGrpcCompat(t *testing.T) {
 				},
 			},
 			nil,
-			nil, nil, nil,
+			nil, nil, nil, nil,
+		},
+		{
+			"subscription http push",
+			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+				srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					// this will be replaced in the test steps
+					w.WriteHeader(http.StatusServiceUnavailable)
+				}))
+				require.NotEmpty(t, srv.URL)
+				tt.servers = append(tt.servers, srv)
+				t.Cleanup(srv.Close)
+
+				pusher := &httpPusher{}
+				err := pusher.Initialize(ctx, nil, client)
+				require.NoError(t, err)
+				pusherReady := make(chan struct{})
+				// TODO: this needs to be part of the errgroup
+				go func() {
+					if err := pusher.Start(ctx, pusherReady); err != nil {
+						tt.errs = append(tt.errs, err)
+					}
+				}()
+				<-pusherReady
+				t.Cleanup(func() { _ = pusher.Cleanup(ctx, nil) })
+
+				topic, err := psc.CreateTopic(ctx, safeName(t))
+				require.NoError(t, err)
+				sub, err := topic.CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{
+					RetryPolicy: &pubsub.RetryPolicy{
+						MinimumBackoff: 51 * time.Millisecond,
+					},
+					PushConfig: pubsub.PushConfig{
+						Endpoint: srv.URL,
+					},
+				})
+				require.NoError(t, err)
+				tt.topics = []pubsub.Topic{topic}
+				tt.subs = []pubsub.Subscription{sub}
+			},
+			[]testStep{
+				// sender
+				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+					id, err := tt.topics[0].Publish(ctx, &pubsub.RealMessage{
+						// bare numbers are valid json values
+						Data: json.RawMessage(`1`),
+					}).Get(ctx)
+					assert.NoError(t, err)
+					assert.NotEmpty(t, id)
+					// pause so the subscriber gets two separate "pulls"
+					time.Sleep(100 * time.Millisecond)
+					id, err = tt.topics[0].Publish(ctx, &pubsub.RealMessage{
+						Data: json.RawMessage(`2`),
+					}).Get(ctx)
+					assert.NoError(t, err)
+					assert.NotEmpty(t, id)
+				},
+				// receiver
+				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+					i := int32(0)
+					rCtx, cancel := context.WithCancel(ctx)
+					tt.servers[0].Config.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+						defer r.Body.Close()
+						counter := atomic.AddInt32(&i, 1)
+						expected := counter
+						if expected > 2 {
+							expected = 2
+						}
+						var m pubsub.PushRequest
+						dec := json.NewDecoder(r.Body)
+						assert.NoError(t, dec.Decode(&m))
+						assert.Equal(t, strconv.Itoa(int(expected)), m.Message.Data)
+						if counter == 1 {
+							// go fast
+							w.WriteHeader(http.StatusNoContent)
+						} else if counter == 2 {
+							// delay and nack
+							time.Sleep(50 * time.Millisecond)
+							w.WriteHeader(http.StatusInternalServerError)
+						} else if counter == 3 {
+							// delay and ack and done
+							time.Sleep(150 * time.Millisecond)
+							w.WriteHeader(http.StatusNoContent)
+							cancel()
+						} else {
+							assert.LessOrEqual(t, expected, int32(3))
+							// above will always fail
+							w.WriteHeader(http.StatusInternalServerError)
+						}
+					})
+					<-rCtx.Done()
+					tt.servers[0].Close()
+				},
+			},
+			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test) {
+				tt.servers[0].Close()
+			},
+			nil, nil, nil, nil,
 		},
 		{
 			"subscription filter",
@@ -568,7 +668,7 @@ func TestGrpcCompat(t *testing.T) {
 				},
 			},
 			nil,
-			nil, nil, nil,
+			nil, nil, nil, nil,
 		},
 		{
 			"sub purge via seek",
@@ -610,7 +710,7 @@ func TestGrpcCompat(t *testing.T) {
 				},
 			},
 			nil,
-			nil, nil, nil,
+			nil, nil, nil, nil,
 		},
 	}
 	for _, tt := range tests {
