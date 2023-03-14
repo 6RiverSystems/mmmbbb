@@ -64,7 +64,12 @@ func (s *subscriberServer) CreateSubscription(ctx context.Context, req *pubsub.S
 	}
 
 	if req.PushConfig != nil {
-		return nil, status.Error(codes.Unimplemented, "Advanced features not supported")
+		if len(req.PushConfig.Attributes) != 0 {
+			return nil, status.Error(codes.Unimplemented, "Advanced features not supported (PushConfig.Attributes)")
+		}
+		if req.PushConfig.AuthenticationMethod != nil {
+			return nil, status.Error(codes.Unimplemented, "Advanced features not supported (PushConfig.AuthenticationMethod)")
+		}
 	}
 
 	params := actions.CreateSubscriptionParams{
@@ -88,6 +93,9 @@ func (s *subscriberServer) CreateSubscription(ctx context.Context, req *pubsub.S
 			params.MaxDeliveryAttempts = defaultDeadLetterMaxAttempts
 		}
 		params.DeadLetterTopic = req.DeadLetterPolicy.DeadLetterTopic
+	}
+	if req.PushConfig != nil {
+		params.PushEndpoint = req.PushConfig.PushEndpoint
 	}
 	action := actions.NewCreateSubscription(params)
 	err := s.client.DoCtxTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable}, action.Execute)
