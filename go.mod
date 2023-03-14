@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go/pubsub v1.29.0
 	entgo.io/ent v0.11.10
 	github.com/alecthomas/participle/v2 v2.0.0-beta.5
-	github.com/deepmap/oapi-codegen v1.12.4
+	github.com/deepmap/oapi-codegen v1.12.5-0.20230306175225-3a8047e50fbf
 	github.com/getkin/kin-openapi v0.115.0
 	github.com/gin-gonic/gin v1.9.0
 	github.com/golang/protobuf v1.5.3
@@ -157,7 +157,7 @@ require (
 	github.com/kulti/thelper v0.6.3 // indirect
 	github.com/kunwardeep/paralleltest v1.0.6 // indirect
 	github.com/kyoh86/exportloopref v0.1.11 // indirect
-	github.com/labstack/echo/v4 v4.9.1 // indirect
+	github.com/labstack/echo/v4 v4.10.2 // indirect
 	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/ldez/gomoddirectives v0.2.3 // indirect
 	github.com/ldez/tagliatelle v0.4.0 // indirect
