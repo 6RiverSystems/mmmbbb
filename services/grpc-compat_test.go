@@ -21,6 +21,7 @@ package services
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -589,7 +590,9 @@ func TestGrpcCompat(t *testing.T) {
 						var m pubsub.PushRequest
 						dec := json.NewDecoder(r.Body)
 						assert.NoError(t, dec.Decode(&m))
-						assert.Equal(t, strconv.Itoa(int(expected)), m.Message.Data)
+						decoded, err := base64.StdEncoding.DecodeString(m.Message.Data)
+						assert.NoError(t, err, "message data should be base64 decodable")
+						assert.Equal(t, strconv.Itoa(int(expected)), string(decoded))
 						if counter == 1 {
 							// go fast
 							w.WriteHeader(http.StatusNoContent)

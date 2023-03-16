@@ -22,6 +22,7 @@ package actions
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -229,10 +230,12 @@ func (c *httpPushStreamConn) nowFailing(newValue bool) (isChanged bool) {
 }
 
 func (c *httpPushStreamConn) Send(ctx context.Context, del *SubscriptionMessageDelivery) error {
+	// payload must be base64 encoded since the base API supports binary payloads
+	payload64 := base64.StdEncoding.EncodeToString(del.Payload)
 	bodyObject := pubsub.PushRequest{
 		Message: pubsub.PushMessage{
 			Attributes: del.Attributes,
-			Data:       string(del.Payload),
+			Data:       payload64,
 			MessageId:  del.MessageID.String(),
 			// OrderingKey set below
 			// TODO: is this the right format?
