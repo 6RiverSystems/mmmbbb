@@ -252,6 +252,7 @@ func (c *httpPushStreamConn) Send(ctx context.Context, del *SubscriptionMessageD
 	if err != nil {
 		return err
 	}
+	req.Header.Set("content-type", "application/json")
 
 	c.wg.Add(1)
 	go func() {
