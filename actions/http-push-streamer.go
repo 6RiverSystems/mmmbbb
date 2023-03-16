@@ -22,6 +22,7 @@ package actions
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -95,6 +96,7 @@ type httpPushStreamConn struct {
 	maxBytes         int
 	maxMessages      int
 	failing          bool
+	lastFail         time.Time
 }
 
 var _ StreamConnection = &httpPushStreamConn{}
@@ -218,17 +220,22 @@ func (c *httpPushStreamConn) Receive(ctx context.Context) (*MessageStreamRequest
 
 func (c *httpPushStreamConn) nowFailing(newValue bool) (isChanged bool) {
 	c.mu.Lock()
-	isChanged = c.failing != newValue
+	isChanged = c.failing != newValue || time.Since(c.lastFail) > time.Minute
 	c.failing = newValue
+	if isChanged && newValue {
+		c.lastFail = time.Now()
+	}
 	c.mu.Unlock()
 	return
 }
 
 func (c *httpPushStreamConn) Send(ctx context.Context, del *SubscriptionMessageDelivery) error {
+	// payload must be base64 encoded since the base API supports binary payloads
+	payload64 := base64.StdEncoding.EncodeToString(del.Payload)
 	bodyObject := pubsub.PushRequest{
 		Message: pubsub.PushMessage{
 			Attributes: del.Attributes,
-			Data:       string(del.Payload),
+			Data:       payload64,
 			MessageId:  del.MessageID.String(),
 			// OrderingKey set below
 			// TODO: is this the right format?
@@ -248,6 +255,7 @@ func (c *httpPushStreamConn) Send(ctx context.Context, del *SubscriptionMessageD
 	if err != nil {
 		return err
 	}
+	req.Header.Set("content-type", "application/json")
 
 	c.wg.Add(1)
 	go func() {
@@ -262,11 +270,14 @@ func (c *httpPushStreamConn) Send(ctx context.Context, del *SubscriptionMessageD
 		}
 		if err != nil {
 			// nack, don't fail the sending
+			var evt *zerolog.Event
 			if c.nowFailing(true) {
-				c.logger.Warn().
-					Err(err).
-					Msg("Failed to contact push endpoint")
+				evt = c.logger.Warn()
+			} else {
+				evt = c.logger.Trace()
 			}
+			evt.Err(err).Msg("Failed to contact push endpoint")
+
 			httpPushFailures.WithLabelValues("error").Inc()
 			q = c.nackQueue
 		} else {
@@ -278,11 +289,13 @@ func (c *httpPushStreamConn) Send(ctx context.Context, del *SubscriptionMessageD
 				c.nowFailing(false)
 				metric = httpPushSuccesses
 			default:
+				var evt *zerolog.Event
 				if c.nowFailing(true) {
-					c.logger.Info().
-						Int("code", resp.StatusCode).
-						Msg("HTTP error (nack) from push endpoint")
+					evt = c.logger.Warn()
+				} else {
+					evt = c.logger.Trace()
 				}
+				evt.Int("code", resp.StatusCode).Msg("HTTP error (nack) from push endpoint")
 				metric = httpPushFailures
 				q = c.nackQueue
 			}

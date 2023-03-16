@@ -21,6 +21,7 @@ package services
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -67,7 +68,9 @@ func TestHttpPush(t *testing.T) {
 			func(t *testing.T, msgs chan *pubsub.PushRequest) error {
 				m := <-msgs
 				assert.Equal(t, safeName(t), m.Subscription)
-				assert.Equal(t, `{"sequence":0}`, m.Message.Data)
+				decoded, err := base64.StdEncoding.DecodeString(m.Message.Data)
+				assert.NoError(t, err, "message data should be base64 decodable")
+				assert.Equal(t, `{"sequence":0}`, string(decoded))
 				assert.Empty(t, m.Message.Attributes)
 				assert.Empty(t, m.Message.OrderingKey)
 				assertNoMore(t, msgs)
@@ -114,7 +117,9 @@ func TestHttpPush(t *testing.T) {
 			func(t *testing.T, msgs chan *pubsub.PushRequest) error {
 				m := <-msgs
 				assert.Equal(t, safeName(t), m.Subscription)
-				assert.Equal(t, `{"sequence":0}`, m.Message.Data)
+				decoded, err := base64.StdEncoding.DecodeString(m.Message.Data)
+				assert.NoError(t, err, "message data should be base64 decodable")
+				assert.Equal(t, `{"sequence":0}`, string(decoded))
 				assert.Empty(t, m.Message.Attributes)
 				assert.Empty(t, m.Message.OrderingKey)
 				assertNoMore(t, msgs)
@@ -167,7 +172,9 @@ func TestHttpPush(t *testing.T) {
 			func(t *testing.T, msgs chan *pubsub.PushRequest) error {
 				m := <-msgs
 				assert.Equal(t, safeName(t), m.Subscription)
-				assert.Equal(t, `{"sequence":1}`, m.Message.Data)
+				decoded, err := base64.StdEncoding.DecodeString(m.Message.Data)
+				assert.NoError(t, err, "message data should be base64 decodable")
+				assert.Equal(t, `{"sequence":1}`, string(decoded))
 				assert.Empty(t, m.Message.Attributes)
 				assert.Empty(t, m.Message.OrderingKey)
 				assertNoMore(t, msgs)
@@ -195,7 +202,9 @@ func TestHttpPush(t *testing.T) {
 					var mm struct {
 						Sequence int `json:"sequence"`
 					}
-					assert.NoError(t, json.Unmarshal([]byte(m.Message.Data), &mm))
+					decoded, err := base64.StdEncoding.DecodeString(m.Message.Data)
+					assert.NoError(t, err, "message data should be base64 decodable")
+					assert.NoError(t, json.Unmarshal(decoded, &mm))
 					assert.GreaterOrEqual(t, mm.Sequence, 0)
 					assert.Less(t, mm.Sequence, 100)
 					assert.Empty(t, m.Message.Attributes)
@@ -239,7 +248,9 @@ func TestHttpPush(t *testing.T) {
 				var mm struct {
 					Sequence int `json:"sequence"`
 				}
-				assert.NoError(t, json.Unmarshal([]byte(pr.Message.Data), &mm))
+				decoded, err := base64.StdEncoding.DecodeString(pr.Message.Data)
+				assert.NoError(t, err, "message data should be base64 decodable")
+				assert.NoError(t, json.Unmarshal(decoded, &mm))
 				slow := mm.Sequence%2 == 1
 				if slow {
 					// TODO: this makes this test slow, but this time value is part of the
@@ -256,7 +267,9 @@ func TestHttpPush(t *testing.T) {
 					var mm struct {
 						Sequence int `json:"sequence"`
 					}
-					assert.NoError(t, json.Unmarshal([]byte(m.Message.Data), &mm))
+					decoded, err := base64.StdEncoding.DecodeString(m.Message.Data)
+					assert.NoError(t, err, "message data should be base64 decodable")
+					assert.NoError(t, json.Unmarshal(decoded, &mm))
 					assert.GreaterOrEqual(t, mm.Sequence, 0)
 					assert.Less(t, mm.Sequence, 4)
 					assert.Empty(t, m.Message.Attributes)
@@ -291,7 +304,9 @@ func TestHttpPush(t *testing.T) {
 				var mm struct {
 					Sequence int `json:"sequence"`
 				}
-				assert.NoError(t, json.Unmarshal([]byte(pr.Message.Data), &mm))
+				decoded, err := base64.StdEncoding.DecodeString(pr.Message.Data)
+				assert.NoError(t, err, "message data should be base64 decodable")
+				assert.NoError(t, json.Unmarshal(decoded, &mm))
 				// push messages don't get a DeliveryAttempt, so we just nack it once
 				// and be done with it
 				if mm.Sequence == 10 {
@@ -310,7 +325,9 @@ func TestHttpPush(t *testing.T) {
 					var mm struct {
 						Sequence int `json:"sequence"`
 					}
-					assert.NoError(t, json.Unmarshal([]byte(m.Message.Data), &mm))
+					decoded, err := base64.StdEncoding.DecodeString(m.Message.Data)
+					assert.NoError(t, err, "message data should be base64 decodable")
+					assert.NoError(t, json.Unmarshal(decoded, &mm))
 					assert.GreaterOrEqual(t, mm.Sequence, 0)
 					assert.Less(t, mm.Sequence, 11)
 					assert.Empty(t, m.Message.Attributes)
@@ -357,7 +374,9 @@ func TestHttpPush(t *testing.T) {
 				var mm struct {
 					Sequence int `json:"sequence"`
 				}
-				assert.NoError(t, json.Unmarshal([]byte(pr.Message.Data), &mm))
+				decoded, err := base64.StdEncoding.DecodeString(pr.Message.Data)
+				assert.NoError(t, err, "message data should be base64 decodable")
+				assert.NoError(t, json.Unmarshal(decoded, &mm))
 				w.WriteHeader(http.StatusInternalServerError)
 			},
 			func(t *testing.T, msgs chan *pubsub.PushRequest) error {
@@ -367,7 +386,9 @@ func TestHttpPush(t *testing.T) {
 					var mm struct {
 						Sequence int `json:"sequence"`
 					}
-					assert.NoError(t, json.Unmarshal([]byte(m.Message.Data), &mm))
+					decoded, err := base64.StdEncoding.DecodeString(m.Message.Data)
+					assert.NoError(t, err, "message data should be base64 decodable")
+					assert.NoError(t, json.Unmarshal(decoded, &mm))
 					assert.Equal(t, mm.Sequence, 0)
 					assert.Empty(t, m.Message.Attributes)
 					assert.Empty(t, m.Message.OrderingKey)
