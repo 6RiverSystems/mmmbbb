@@ -95,6 +95,7 @@ type httpPushStreamConn struct {
 	maxBytes         int
 	maxMessages      int
 	failing          bool
+	lastFail         time.Time
 }
 
 var _ StreamConnection = &httpPushStreamConn{}
@@ -218,8 +219,11 @@ func (c *httpPushStreamConn) Receive(ctx context.Context) (*MessageStreamRequest
 
 func (c *httpPushStreamConn) nowFailing(newValue bool) (isChanged bool) {
 	c.mu.Lock()
-	isChanged = c.failing != newValue
+	isChanged = c.failing != newValue || time.Since(c.lastFail) > time.Minute
 	c.failing = newValue
+	if isChanged && newValue {
+		c.lastFail = time.Now()
+	}
 	c.mu.Unlock()
 	return
 }
@@ -262,11 +266,14 @@ func (c *httpPushStreamConn) Send(ctx context.Context, del *SubscriptionMessageD
 		}
 		if err != nil {
 			// nack, don't fail the sending
+			var evt *zerolog.Event
 			if c.nowFailing(true) {
-				c.logger.Warn().
-					Err(err).
-					Msg("Failed to contact push endpoint")
+				evt = c.logger.Warn()
+			} else {
+				evt = c.logger.Trace()
 			}
+			evt.Err(err).Msg("Failed to contact push endpoint")
+
 			httpPushFailures.WithLabelValues("error").Inc()
 			q = c.nackQueue
 		} else {
@@ -278,11 +285,13 @@ func (c *httpPushStreamConn) Send(ctx context.Context, del *SubscriptionMessageD
 				c.nowFailing(false)
 				metric = httpPushSuccesses
 			default:
+				var evt *zerolog.Event
 				if c.nowFailing(true) {
-					c.logger.Info().
-						Int("code", resp.StatusCode).
-						Msg("HTTP error (nack) from push endpoint")
+					evt = c.logger.Warn()
+				} else {
+					evt = c.logger.Trace()
 				}
+				evt.Int("code", resp.StatusCode).Msg("HTTP error (nack) from push endpoint")
 				metric = httpPushFailures
 				q = c.nackQueue
 			}
