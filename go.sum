@@ -67,8 +67,8 @@ github.com/BurntSushi/toml v1.2.1 h1:9F2/+DoOYIOksmaJFPw1tGFy1eDnIJXg+UHjuD8lTak
 github.com/BurntSushi/toml v1.2.1/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/DATA-DOG/go-sqlmock v1.5.0 h1:Shsta01QNfFxHCfpW6YH2STWB0MudeXXEWMr20OEh60=
-github.com/Depado/ginprom v1.7.6 h1:KJ9RRt1MkZJ82/GWUrGacZKJXgUI5G4ZP54JsdOzpHw=
-github.com/Depado/ginprom v1.7.6/go.mod h1:ogHxVkoMAC8cQX5P1fRBLlzKioeK6REv77juHoy0GU4=
+github.com/Depado/ginprom v1.7.7 h1:XGpxhe6KafXATWDwKt5WsOJIGPTyvV7HGzuL1RPwv0s=
+github.com/Depado/ginprom v1.7.7/go.mod h1:+8/mYv5GNWvhtvqM4A5NKEnGY+qVyhNALRkwE7J110E=
 github.com/Djarvur/go-err113 v0.0.0-20210108212216-aea10b59be24 h1:sHglBQTwgx+rWPdisA5ynNEsoARbiCBOyGcJM4/OzsM=
 github.com/Djarvur/go-err113 v0.0.0-20210108212216-aea10b59be24/go.mod h1:4UJr5HIiMZrwgkSPdsjy2uOQExX/WEILpIrO9UPGuXs=
 github.com/GaijinEntertainment/go-exhaustruct/v2 v2.3.0 h1:+r1rSv4gvYn0wmRjC8X7IAzX8QezqtFV9m0MUHFJgts=
@@ -766,8 +766,8 @@ github.com/zclconf/go-cty v1.10.0 h1:mp9ZXQeIcN8kAwuqorjH+Q+njbJKjLrvB2yIh4q7U+0
 github.com/zclconf/go-cty v1.10.0/go.mod h1:vVKLxnk3puL4qRAv72AO+W99LUD4da90g3uUAzyuvAk=
 gitlab.com/bosi/decorder v0.2.3 h1:gX4/RgK16ijY8V+BRQHAySfQAb354T7/xQpDB2n10P0=
 gitlab.com/bosi/decorder v0.2.3/go.mod h1:9K1RB5+VPNQYtXtTDAzd2OEftsZb1oV0IrJrzChSdGE=
-go.6river.tech/gosix v0.8.10 h1:H6lezOMoUQiyP9w0NrRKu4EQwX2d6M9aoe9YWYYUWm8=
-go.6river.tech/gosix v0.8.10/go.mod h1:IsytxzhAPJl5ThdmjtkDbpkVeOJZTAPiEEH43jrJpoQ=
+go.6river.tech/gosix v0.8.11 h1:ID9gxt6VqLxwPMVCL03K9A5zjDCcSq90PHQkdG/H9cQ=
+go.6river.tech/gosix v0.8.11/go.mod h1:qKnJPCyi1ry3vhH+AMQsZBagkme8klPcDu24d5zqRjM=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
 go.opencensus.io v0.22.0/go.mod h1:+kGneAE2xo2IficOXnaByMWTGM9T73dGwxeWcUqIpI8=
 go.opencensus.io v0.22.2/go.mod h1:yxeiOL68Rb0Xd1ddK5vPZ/oVn4vY4Ynel7k9FzqtOIw=

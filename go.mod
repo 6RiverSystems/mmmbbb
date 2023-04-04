@@ -23,7 +23,7 @@ require (
 	github.com/quasilyte/go-ruleguard/dsl v0.3.22
 	github.com/rs/zerolog v1.29.0
 	github.com/stretchr/testify v1.8.2
-	go.6river.tech/gosix v0.8.10
+	go.6river.tech/gosix v0.8.11
 	golang.org/x/sync v0.1.0
 	golang.org/x/tools v0.7.1-0.20230317165317-fa556487c5c2
 	golang.org/x/vuln v0.0.0-20230313161840-8a73a7e4f203
@@ -49,7 +49,7 @@ require (
 	github.com/Antonboom/errname v0.1.9 // indirect
 	github.com/Antonboom/nilnil v0.1.3 // indirect
 	github.com/BurntSushi/toml v1.2.1 // indirect
-	github.com/Depado/ginprom v1.7.6 // indirect
+	github.com/Depado/ginprom v1.7.7 // indirect
 	github.com/Djarvur/go-err113 v0.0.0-20210108212216-aea10b59be24 // indirect
 	github.com/GaijinEntertainment/go-exhaustruct/v2 v2.3.0 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
