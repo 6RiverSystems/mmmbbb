@@ -34,7 +34,7 @@ require (
 	google.golang.org/protobuf v1.30.0
 	gotest.tools/gotestsum v1.10.0
 	modernc.org/sqlite v1.21.1
-	mvdan.cc/gofumpt v0.4.0
+	mvdan.cc/gofumpt v0.5.0
 )
 
 require (
