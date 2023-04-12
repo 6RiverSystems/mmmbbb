@@ -24,6 +24,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"io"
 	"net/http"
 	"strconv"
 	"sync"
@@ -288,6 +289,20 @@ func (c *httpPushStreamConn) Send(ctx context.Context, del *SubscriptionMessageD
 				// TODO: emulate google's insistence that no-content has no content
 				c.nowFailing(false)
 				metric = httpPushSuccesses
+				defer resp.Body.Close()
+				body, err := io.ReadAll(resp.Body)
+				if err != nil {
+					c.logger.Error().
+						Str("pushEndpoint", c.endpoint).
+						Str("subscriptionName", c.subscriptionName).
+						Msg("failed to read push subscription's response")
+				} else {
+					c.logger.Trace().
+						Str("pushEndpoint", c.endpoint).
+						Str("subscriptionName", c.subscriptionName).
+						Str("response", string(body)).
+						Msg("successful push")
+				}
 			default:
 				var evt *zerolog.Event
 				if c.nowFailing(true) {
