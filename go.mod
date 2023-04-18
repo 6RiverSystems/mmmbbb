@@ -21,7 +21,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/prometheus/client_golang v1.14.0
 	github.com/quasilyte/go-ruleguard/dsl v0.3.22
-	github.com/rs/zerolog v1.29.0
+	github.com/rs/zerolog v1.29.1
 	github.com/stretchr/testify v1.8.2
 	go.6river.tech/gosix v0.8.12
 	golang.org/x/sync v0.1.0
