@@ -52,8 +52,9 @@ func (a *PruneCompletedMessages) Execute(ctx context.Context, tx *ent.Tx) error 
 			// messages can only be pruned by publish time, not completion time, because
 			// we only get here when all the completions have been pruned
 			message.PublishedAtLTE(time.Now().Add(-a.params.MinAge)),
-			// we rely on deliveries being pruned to then allow messages to be pruned
-			// UPSTREAM: ticket for HasRelationWith efficiency
+			// we rely on deliveries being pruned to then allow messages to be pruned.
+			// this being efficient relies on the fixes in
+			// https://github.com/ent/ent/pull/3492
 			message.Not(message.HasDeliveries()),
 		).
 		Limit(a.params.MaxDelete).

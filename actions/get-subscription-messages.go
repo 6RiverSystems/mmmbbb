@@ -492,7 +492,7 @@ func (a *GetSubscriptionMessages) Results() map[string]interface{} {
 
 // defaultMinDelay is the default ack timeout for subscriptions that don't
 // configure a backoff. This is currently 10 seconds, because the Google client
-// will immediately modack everything it receives up to that, so there's no
+// will immediately mod-ack everything it receives up to that, so there's no
 // point in having it set lower here.
 const defaultMinDelay = 10 * time.Second
 
