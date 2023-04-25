@@ -3,16 +3,21 @@ version: 2.1
 orbs:
   sixrs-gke: sixriversystems/sixrs-gke@3
 
+aliases:
+  - &pg_legacy 9.6
+  - &pg_default 14.7
+  - &pg_future 15.2
+
 jobs:
   all-in-one:
     parameters:
-      pgimg:
+      pgver:
         type: string
       cgo:
         type: string
     docker:
       - image: cimg/go:1.20
-      - image: << parameters.pgimg >>
+      - image: cimg/postgres:<< parameters.pgver >>
         environment:
           POSTGRES_USER: circle
           POSTGRES_DB: circle_test
@@ -58,10 +63,12 @@ jobs:
           command: |
             ./mage -v format
             git diff --exit-code
-      # we only need to run lint on one pg version
+      # we only need to run lint on one build variant
       - when:
           condition:
-            equal: ["cimg/postgres:9.6", << parameters.pgimg >>]
+            and:
+              - equal: ["1", << parameters.cgo >>]
+              - equal: [*pg_default, << parameters.pgver >>]
           steps:
             - restore_cache:
                 name: Restore golangci-lint cache
@@ -219,9 +226,10 @@ workflows:
           context: 6rs-circle
           matrix:
             parameters:
-              pgimg:
-                - cimg/postgres:9.6
-                - cimg/postgres:14.6
+              pgver:
+                - *pg_legacy
+                - *pg_default
+                - *pg_future
               cgo:
                 - "1"
                 - "0"
