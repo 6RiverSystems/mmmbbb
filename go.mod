@@ -25,8 +25,8 @@ require (
 	github.com/stretchr/testify v1.8.2
 	go.6river.tech/gosix v0.8.16
 	golang.org/x/sync v0.1.0
-	golang.org/x/tools v0.8.0
-	golang.org/x/vuln v0.0.0-20230313161840-8a73a7e4f203
+	golang.org/x/tools v0.8.1-0.20230424202313-71ea8f168c16
+	golang.org/x/vuln v0.0.0-20230331150515-f33f198c2538
 	google.golang.org/api v0.119.0
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
 	google.golang.org/grpc v1.54.0
@@ -275,5 +275,5 @@ require (
 	modernc.org/token v1.0.1 // indirect
 	mvdan.cc/interfacer v0.0.0-20180901003855-c20040233aed // indirect
 	mvdan.cc/lint v0.0.0-20170908181259-adc824a0674b // indirect
-	mvdan.cc/unparam v0.0.0-20221223090309-7455f1af531d // indirect
+	mvdan.cc/unparam v0.0.0-20230312165513-e84e2d14e3b8 // indirect
 )
