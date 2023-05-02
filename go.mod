@@ -27,7 +27,7 @@ require (
 	golang.org/x/sync v0.1.0
 	golang.org/x/tools v0.8.1-0.20230424202313-71ea8f168c16
 	golang.org/x/vuln v0.0.0-20230331150515-f33f198c2538
-	google.golang.org/api v0.119.0
+	google.golang.org/api v0.120.0
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
 	google.golang.org/grpc v1.54.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.3.0
