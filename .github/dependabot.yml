@@ -1,10 +1,10 @@
 version: 2
-registries:
-  artifactory:
-    type: npm-registry
-    url: https://sixriver.jfrog.io/sixriver/api/npm/npm-local/
-    username: 6rs-machine
-    password: ${{secrets.ARTIFACTORY_TOKEN}}
+# registries:
+#   artifactory:
+#     type: npm-registry
+#     url: https://sixriver.jfrog.io/sixriver/api/npm/npm-local/
+#     username: 6rs-machine
+#     password: ${{secrets.ARTIFACTORY_TOKEN}}
 updates:
   - package-ecosystem: "gomod"
     directory: "/"
