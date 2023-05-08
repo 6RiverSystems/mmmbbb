@@ -157,10 +157,7 @@ jobs:
         # tag.
       - when:
           condition:
-            and:
-              - equal: ["main", << pipeline.git.branch >>]
-              - equal: ["1", << parameters.cgo >>]
-              - equal: [*pg_default, << parameters.pgver >>]
+            equal: ["main", << pipeline.git.branch >>]
           steps:
             - sixrs-gke/run-release
       - unless:
