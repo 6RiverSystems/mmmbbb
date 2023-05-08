@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  sixrs-gke: sixriversystems/sixrs-gke@3
+  sixrs-gke: sixriversystems/sixrs-gke@7
 
 aliases:
   # - &pg_legacy "9.6"
