@@ -4,7 +4,7 @@ orbs:
   sixrs-gke: sixriversystems/sixrs-gke@3
 
 aliases:
-  - &pg_legacy "9.6"
+  # - &pg_legacy "9.6"
   - &pg_default "14.7"
   - &pg_future "15.2"
 
@@ -157,7 +157,9 @@ jobs:
         # tag.
       - when:
           condition:
-            equal: ["main", << pipeline.git.branch >>]
+              - equal: ["main", << pipeline.git.branch >>]
+              - equal: ["1", << parameters.cgo >>]
+              - equal: [*pg_default, << parameters.pgver >>]
           steps:
             - sixrs-gke/run-release
       - unless:
@@ -227,7 +229,7 @@ workflows:
           matrix:
             parameters:
               pgver:
-                - *pg_legacy
+                # - *pg_legacy
                 - *pg_default
                 - *pg_future
               cgo:
