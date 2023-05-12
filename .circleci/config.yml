@@ -5,8 +5,8 @@ orbs:
 
 aliases:
   # - &pg_legacy "9.6"
-  - &pg_default "14.7"
-  - &pg_future "15.2"
+  - &pg_default "14.8"
+  - &pg_future "15.3"
 
 jobs:
   all-in-one:
