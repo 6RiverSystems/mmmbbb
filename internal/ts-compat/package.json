@@ -18,7 +18,7 @@
   "author": "Matthew Gabeler-Lee <mgabeler-lee@6river.com>",
   "license": "PROPRIETARY",
   "devDependencies": {
-    "@types/node": "^16.18.26",
+    "@types/node": "^17.0.45",
     "typescript": "^5.0.4"
   },
   "dependencies": {
