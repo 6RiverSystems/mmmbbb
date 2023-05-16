@@ -16,18 +16,18 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.2
 	github.com/iancoleman/strcase v0.2.0
 	github.com/jackc/pgx/v5 v5.3.1
-	github.com/magefile/mage v1.14.0
+	github.com/magefile/mage v1.15.0
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/prometheus/client_golang v1.15.1
 	github.com/quasilyte/go-ruleguard/dsl v0.3.22
 	github.com/rs/zerolog v1.29.1
 	github.com/stretchr/testify v1.8.2
-	go.6river.tech/gosix v0.8.21
+	go.6river.tech/gosix v0.8.24
 	golang.org/x/sync v0.2.0
 	golang.org/x/tools v0.9.1
 	golang.org/x/vuln v0.0.0-20230331150515-f33f198c2538
-	google.golang.org/api v0.121.0
+	google.golang.org/api v0.122.0
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
 	google.golang.org/grpc v1.55.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.3.0
