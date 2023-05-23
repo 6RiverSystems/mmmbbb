@@ -7,7 +7,7 @@ require (
 	entgo.io/ent v0.12.3
 	github.com/alecthomas/participle/v2 v2.0.0
 	github.com/deepmap/oapi-codegen v1.12.5-0.20230314231417-0cfaaa77a7d2
-	github.com/getkin/kin-openapi v0.116.0
+	github.com/getkin/kin-openapi v0.117.0
 	github.com/gin-gonic/gin v1.9.0
 	github.com/golang/protobuf v1.5.3
 	github.com/golangci/golangci-lint v1.52.2
@@ -22,12 +22,12 @@ require (
 	github.com/prometheus/client_golang v1.15.1
 	github.com/quasilyte/go-ruleguard/dsl v0.3.22
 	github.com/rs/zerolog v1.29.1
-	github.com/stretchr/testify v1.8.2
-	go.6river.tech/gosix v0.8.24
+	github.com/stretchr/testify v1.8.3
+	go.6river.tech/gosix v0.8.25
 	golang.org/x/sync v0.2.0
 	golang.org/x/tools v0.9.1
 	golang.org/x/vuln v0.0.0-20230331150515-f33f198c2538
-	google.golang.org/api v0.122.0
+	google.golang.org/api v0.123.0
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
 	google.golang.org/grpc v1.55.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.3.0
