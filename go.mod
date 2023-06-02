@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go/pubsub v1.31.0
 	entgo.io/ent v0.12.3
 	github.com/alecthomas/participle/v2 v2.0.0
-	github.com/deepmap/oapi-codegen v1.12.5-0.20230314231417-0cfaaa77a7d2
+	github.com/deepmap/oapi-codegen v1.13.0
 	github.com/getkin/kin-openapi v0.117.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang/protobuf v1.5.3
@@ -23,9 +23,9 @@ require (
 	github.com/quasilyte/go-ruleguard/dsl v0.3.22
 	github.com/rs/zerolog v1.29.1
 	github.com/stretchr/testify v1.8.3
-	go.6river.tech/gosix v0.8.26
+	go.6river.tech/gosix v0.8.28
 	golang.org/x/sync v0.2.0
-	golang.org/x/tools v0.9.1
+	golang.org/x/tools v0.9.2
 	golang.org/x/vuln v0.0.0-20230331150515-f33f198c2538
 	google.golang.org/api v0.124.0
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
@@ -173,7 +173,7 @@ require (
 	github.com/matoous/godox v0.0.0-20230222163458-006bad1f9d26 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
-	github.com/mattn/go-runewidth v0.0.13 // indirect
+	github.com/mattn/go-runewidth v0.0.14 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/mbilski/exhaustivestruct v1.2.0 // indirect
 	github.com/mgechev/revive v1.3.1 // indirect
