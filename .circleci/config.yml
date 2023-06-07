@@ -237,3 +237,8 @@ workflows:
           context: 6rs-circle
           requires:
             - all-in-one
+          filters:
+            branches:
+              only:
+                - main
+                - publish/*
