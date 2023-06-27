@@ -29,7 +29,7 @@ require (
 	golang.org/x/vuln v0.0.0-20230331150515-f33f198c2538
 	google.golang.org/api v0.128.0
 	google.golang.org/genproto v0.0.0-20230530153820-e85fd2cbaebc
-	google.golang.org/grpc v1.56.0
+	google.golang.org/grpc v1.56.1
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.3.0
 	google.golang.org/protobuf v1.30.0
 	gotest.tools/gotestsum v1.10.0
