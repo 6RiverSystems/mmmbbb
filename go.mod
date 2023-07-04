@@ -26,7 +26,7 @@ require (
 	go.6river.tech/gosix v0.8.35
 	golang.org/x/sync v0.3.0
 	golang.org/x/tools v0.10.0
-	golang.org/x/vuln v0.0.0-20230331150515-f33f198c2538
+	golang.org/x/vuln v0.2.0
 	google.golang.org/api v0.128.0
 	google.golang.org/genproto v0.0.0-20230530153820-e85fd2cbaebc
 	google.golang.org/grpc v1.56.1
