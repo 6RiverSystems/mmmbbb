@@ -877,11 +877,14 @@ func dockerRunMultiArch(ctx context.Context, cmd string, mode string, arches ...
 	baseTag := baseImage + ":" + version
 	if mode == "push" {
 		const gcrBase = "gcr.io/plasma-column-128721/"
-		// push everything to gcr
+		const arBase = "us-docker.pkg.dev/plasma-column-128721/gcr.io/"
+		// push everything to gcr & ar
 		args = append(args, "-t", gcrBase+baseTag)
+		args = append(args, "-t", arBase+baseTag)
 		if os.Getenv("CIRCLE_BRANCH") == "main" {
 			// push latest tag on main
 			args = append(args, "-t", gcrBase+baseImage+":latest")
+			args = append(args, "-t", arBase+baseImage+":latest")
 			// also push to docker hub for builds on main
 			if os.Getenv("DOCKERHUB_USER") != "" {
 				mg.CtxDeps(ctx, Docker{}.HubLogin)
