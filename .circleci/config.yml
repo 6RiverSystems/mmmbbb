@@ -219,7 +219,6 @@ jobs:
             - ~/.cache/go-build
 
 workflows:
-  version: 2
   build-workflow:
     jobs:
       - all-in-one:
