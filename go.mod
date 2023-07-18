@@ -33,7 +33,7 @@ require (
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.3.0
 	google.golang.org/protobuf v1.31.0
 	gotest.tools/gotestsum v1.10.1
-	modernc.org/sqlite v1.23.1
+	modernc.org/sqlite v1.24.0
 	mvdan.cc/gofumpt v0.5.0
 )
 
