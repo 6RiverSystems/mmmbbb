@@ -283,34 +283,55 @@ func (c *httpPushStreamConn) Send(ctx context.Context, del *SubscriptionMessageD
 			q = c.nackQueue
 		} else {
 			var metric *prometheus.CounterVec
+			defer resp.Body.Close()
+			respBody, respBodyErr := io.ReadAll(resp.Body)
+			// TODO: if we fail to read the response, should we treat it as a NACK
+			// even if the status code was success?
 			switch resp.StatusCode {
 			case http.StatusProcessing, http.StatusOK, http.StatusCreated, http.StatusAccepted, http.StatusNoContent:
 				// all good, leave q as ack queue
 				// TODO: emulate google's insistence that no-content has no content
 				c.nowFailing(false)
 				metric = httpPushSuccesses
-				defer resp.Body.Close()
-				body, err := io.ReadAll(resp.Body)
-				if err != nil {
-					c.logger.Error().
-						Str("pushEndpoint", c.endpoint).
-						Str("subscriptionName", c.subscriptionName).
-						Msg("failed to read push subscription's response")
+				var evt *zerolog.Event
+				var msg string
+				if respBodyErr != nil {
+					evt = c.logger.Error().
+						Err(respBodyErr)
+					msg = ("failed to read push subscription's response on ACK")
 				} else {
-					c.logger.Trace().
-						Str("pushEndpoint", c.endpoint).
-						Str("subscriptionName", c.subscriptionName).
-						Str("response", string(body)).
-						Msg("successful push")
+					evt = c.logger.Trace().
+						Str("response", string(respBody))
+					msg = ("successful push")
 				}
+				evt.
+					Int("code", resp.StatusCode).
+					Str("pushEndpoint", c.endpoint).
+					Str("subscriptionName", c.subscriptionName).
+					Msg(msg)
 			default:
 				var evt *zerolog.Event
-				if c.nowFailing(true) {
+				failingChanged := c.nowFailing(true)
+				if respBodyErr != nil {
+					evt = c.logger.Error()
+				} else if failingChanged {
 					evt = c.logger.Warn()
 				} else {
 					evt = c.logger.Trace()
 				}
-				evt.Int("code", resp.StatusCode).Msg("HTTP error (nack) from push endpoint")
+				evt = evt.
+					Int("code", resp.StatusCode).
+					Str("pushEndpoint", c.endpoint).
+					Str("subscriptionName", c.subscriptionName)
+				if respBodyErr != nil {
+					evt.
+						Err(respBodyErr).
+						Msg("failed to read response during HTTP error (nack) from push endpoint")
+				} else {
+					evt.
+						Str("response", string(respBody)).
+						Msg("HTTP error (nack) from push endpoint")
+				}
 				metric = httpPushFailures
 				q = c.nackQueue
 			}
