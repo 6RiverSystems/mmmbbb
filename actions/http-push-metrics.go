@@ -39,7 +39,7 @@ var httpPushSuccesses = promauto.NewCounterVec(
 	prometheus.CounterOpts{
 		Namespace: version.AppName,
 		Name:      "http_push_streamer_successes",
-		Help:      "Number of attempted HTTP pushes that failed",
+		Help:      "Number of attempted HTTP pushes that succeeded",
 	},
 	[]string{"status"},
 )
