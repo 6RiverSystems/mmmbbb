@@ -23,6 +23,7 @@ import (
 	"context"
 	"time"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
 
@@ -82,15 +83,16 @@ func deliverToSubscription(
 		lastDelivery, err := tx.Subscription.QueryDeliveries(s).
 			Where(
 				delivery.ExpiresAtGT(now),
-				delivery.HasMessageWith(
-					message.OrderKey(*m.OrderKey),
-					// ent uses a very wide sub-select, this helps narrow it down
-					// UPSTREAM: ticket for HasRelationWith efficiency
-					// TODO: this won't work correctly if this is a dead letter delivery,
-					// but then dead letter delivery isn't nominally supported for
-					// ordered message delivery
-					message.TopicID(m.TopicID),
-				),
+				// delivery.HasMessageWith is much slower than a join here, because it
+				// uses an inefficient `in` subquery
+				func(s *sql.Selector) {
+					t := sql.Table(message.Table)
+					s.Join(t).On(s.C(delivery.MessageColumn), t.C(message.FieldID))
+					s.Where(sql.And(
+						// not necessary? maybe helps with indexes?
+						sql.EQ(t.C(message.TopicColumn), m.TopicID),
+					))
+				},
 			).
 			Order(ent.Desc(delivery.FieldPublishedAt)).
 			First(ctx)
