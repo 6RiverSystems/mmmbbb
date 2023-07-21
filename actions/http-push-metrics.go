@@ -26,20 +26,11 @@ import (
 	"go.6river.tech/mmmbbb/version"
 )
 
-var httpPushFailures = promauto.NewCounterVec(
-	prometheus.CounterOpts{
+var httpPushDuration = promauto.NewHistogramVec(
+	prometheus.HistogramOpts{
 		Namespace: version.AppName,
-		Name:      "http_push_streamer_failures",
-		Help:      "Number of attempted HTTP pushes that failed",
+		Name:      "http_push_duration",
+		Help:      "Duration to push a single HTTP delivery",
 	},
-	[]string{"status"},
-)
-
-var httpPushSuccesses = promauto.NewCounterVec(
-	prometheus.CounterOpts{
-		Namespace: version.AppName,
-		Name:      "http_push_streamer_successes",
-		Help:      "Number of attempted HTTP pushes that succeeded",
-	},
-	[]string{"status"},
+	[]string{"outcome", "status"},
 )

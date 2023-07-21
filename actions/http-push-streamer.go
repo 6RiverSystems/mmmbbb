@@ -31,7 +31,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/zerolog"
 
 	"go.6river.tech/gosix/logging"
@@ -269,6 +268,7 @@ func (c *httpPushStreamConn) Send(ctx context.Context, del *SubscriptionMessageD
 		if dur < time.Second {
 			q = c.fastAckQueue
 		}
+		var outcome, httpStatus string // for metrics
 		if err != nil {
 			// nack, don't fail the sending
 			var evt *zerolog.Event
@@ -279,10 +279,10 @@ func (c *httpPushStreamConn) Send(ctx context.Context, del *SubscriptionMessageD
 			}
 			evt.Err(err).Msg("Failed to contact push endpoint")
 
-			httpPushFailures.WithLabelValues("error").Inc()
+			outcome, httpStatus = "error", "xxx"
 			q = c.nackQueue
 		} else {
-			var metric *prometheus.CounterVec
+			httpStatus = strconv.Itoa(resp.StatusCode)
 			defer resp.Body.Close()
 			respBody, respBodyErr := io.ReadAll(resp.Body)
 			// TODO: if we fail to read the response, should we treat it as a NACK
@@ -292,7 +292,7 @@ func (c *httpPushStreamConn) Send(ctx context.Context, del *SubscriptionMessageD
 				// all good, leave q as ack queue
 				// TODO: emulate google's insistence that no-content has no content
 				c.nowFailing(false)
-				metric = httpPushSuccesses
+				outcome = "success"
 				var evt *zerolog.Event
 				var msg string
 				if respBodyErr != nil {
@@ -332,11 +332,11 @@ func (c *httpPushStreamConn) Send(ctx context.Context, del *SubscriptionMessageD
 						Str("response", string(respBody)).
 						Msg("HTTP error (nack) from push endpoint")
 				}
-				metric = httpPushFailures
+				outcome = "failure"
 				q = c.nackQueue
 			}
-			metric.WithLabelValues(strconv.Itoa(resp.StatusCode)).Inc()
 		}
+		httpPushDuration.WithLabelValues(outcome, httpStatus).Observe(dur.Seconds())
 		select {
 		case q <- del.ID:
 		case <-ctx.Done():
