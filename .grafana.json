@@ -466,6 +466,7 @@
 						"axisColorMode": "text",
 						"axisLabel": "",
 						"axisPlacement": "auto",
+						"axisSoftMin": 0,
 						"barAlignment": 0,
 						"drawStyle": "line",
 						"fillOpacity": 0,
@@ -733,6 +734,7 @@
 						"axisColorMode": "text",
 						"axisLabel": "",
 						"axisPlacement": "auto",
+						"axisSoftMin": 0,
 						"barAlignment": 0,
 						"drawStyle": "line",
 						"fillOpacity": 0,
@@ -1539,6 +1541,6 @@
 	"timezone": "",
 	"title": "mmmbbb",
 	"uid": "p3HzdEynz",
-	"version": 12,
+	"version": 13,
 	"weekStart": ""
 }
