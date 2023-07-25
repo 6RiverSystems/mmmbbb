@@ -23,11 +23,11 @@ require (
 	github.com/quasilyte/go-ruleguard/dsl v0.3.22
 	github.com/rs/zerolog v1.29.1
 	github.com/stretchr/testify v1.8.4
-	go.6river.tech/gosix v0.8.39
+	go.6river.tech/gosix v0.8.40
 	golang.org/x/sync v0.3.0
 	golang.org/x/tools v0.11.0
 	golang.org/x/vuln v1.0.0
-	google.golang.org/api v0.132.0
+	google.golang.org/api v0.133.0
 	google.golang.org/genproto v0.0.0-20230706204954-ccb25ca9f130
 	google.golang.org/grpc v1.56.2
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.3.0
