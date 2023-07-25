@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@google-cloud/pubsub':
-    specifier: ^3.7.1
-    version: 3.7.1
+    specifier: ^3.7.2
+    version: 3.7.2
 
 devDependencies:
   '@types/node':
@@ -69,8 +69,8 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  /@google-cloud/pubsub@3.7.1:
-    resolution: {integrity: sha512-J6jzgIubq1sAMafnSF2wGnOn1qkNd0l0Y5ChG33rU27/iDXmxKabaiY/dvFndX3v57TE/QcB9uQt5A6Pek+WrA==}
+  /@google-cloud/pubsub@3.7.2:
+    resolution: {integrity: sha512-WzglA4SaptghUO+lpCRpw/0DfH0jGK4apUbIFkVniqntsTb/iNsGxqmCxu/vwqpJm1dStpCJsUx0tSzSSh2A2A==}
     engines: {node: '>=12.0.0'}
     dependencies:
       '@google-cloud/paginator': 4.0.0
@@ -84,7 +84,7 @@ packages:
       arrify: 2.0.1
       extend: 3.0.2
       google-auth-library: 8.2.0
-      google-gax: 3.6.0
+      google-gax: 3.6.1
       heap-js: 2.2.0
       is-stream-ended: 0.1.4
       lodash.snakecase: 4.1.1
@@ -110,7 +110,7 @@ packages:
       '@types/long': 4.0.2
       lodash.camelcase: 4.3.0
       long: 4.0.0
-      protobufjs: 7.2.3
+      protobufjs: 7.2.4
       yargs: 16.2.0
     dev: false
 
@@ -535,8 +535,8 @@ packages:
       - supports-color
     dev: false
 
-  /google-gax@3.6.0:
-    resolution: {integrity: sha512-2fyb61vWxUonHiArRNJQmE4tx5oY1ni8VPo08fzII409vDSCWG7apDX4qNOQ2GXXT82gLBn3d3P1Dydh7pWjyw==}
+  /google-gax@3.6.1:
+    resolution: {integrity: sha512-g/lcUjGcB6DSw2HxgEmCDOrI/CByOwqRvsuUvNalHUK2iPPPlmAIpbMbl62u0YufGMr8zgE3JL7th6dCb1Ry+w==}
     engines: {node: '>=12'}
     hasBin: true
     dependencies:
@@ -552,8 +552,8 @@ packages:
       node-fetch: 2.6.7
       object-hash: 3.0.0
       proto3-json-serializer: 1.0.3
-      protobufjs: 7.2.3
-      protobufjs-cli: 1.1.1(protobufjs@7.2.3)
+      protobufjs: 7.2.4
+      protobufjs-cli: 1.1.1(protobufjs@7.2.4)
       retry-request: 5.0.1
     transitivePeerDependencies:
       - encoding
@@ -842,10 +842,10 @@ packages:
     resolution: {integrity: sha512-4Xo7uzbTfc8ur9R8VgI0pJpI6aHix76cc7DHJEfZKrZ6vOUbOddxBrsMzAGG2s6b3iHknl4Gn50dA2Y3AoCdow==}
     engines: {node: '>=12.0.0'}
     dependencies:
-      protobufjs: 7.2.3
+      protobufjs: 7.2.4
     dev: false
 
-  /protobufjs-cli@1.1.1(protobufjs@7.2.3):
+  /protobufjs-cli@1.1.1(protobufjs@7.2.4):
     resolution: {integrity: sha512-VPWMgIcRNyQwWUv8OLPyGQ/0lQY/QTQAVN5fh+XzfDwsVw1FZ2L3DM/bcBf8WPiRz2tNpaov9lPZfNcmNo6LXA==}
     engines: {node: '>=12.0.0'}
     hasBin: true
@@ -859,14 +859,14 @@ packages:
       glob: 8.0.3
       jsdoc: 4.0.2
       minimist: 1.2.6
-      protobufjs: 7.2.3
+      protobufjs: 7.2.4
       semver: 7.3.7
       tmp: 0.2.1
       uglify-js: 3.17.0
     dev: false
 
-  /protobufjs@7.2.3:
-    resolution: {integrity: sha512-TtpvOqwB5Gdz/PQmOjgsrGH1nHjAQVCN7JG4A6r1sXRWESL5rNMAiRcBQlCAdKxZcAbstExQePYG8xof/JVRgg==}
+  /protobufjs@7.2.4:
+    resolution: {integrity: sha512-AT+RJgD2sH8phPmCf7OUZR8xGdcJRga4+1cOaXJ64hvcSkVhNcRHOwIxUatPH15+nj59WAGTDv3LSGZPEQbJaQ==}
     engines: {node: '>=12.0.0'}
     requiresBuild: true
     dependencies:
