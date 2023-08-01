@@ -652,8 +652,8 @@ github.com/rogpeppe/go-internal v1.8.0/go.mod h1:WmiCO8CzOY8rg0OYDC4/i/2WRWAB6po
 github.com/rogpeppe/go-internal v1.10.0 h1:TMyTOH3F/DB16zRVcYyreMH6GnZZrwQVAoYjRBZyWFQ=
 github.com/rs/cors v1.8.2 h1:KCooALfAYGs415Cwu5ABvv9n9509fSiG5SQJn/AQo4U=
 github.com/rs/cors v1.8.2/go.mod h1:XyqrcTp5zjWr1wsJ8PIRZssZ8b/WMcMf71DJnit4EMU=
-github.com/rs/cors/wrapper/gin v0.0.0-20220223021805-a4a5ce87d5a2 h1:1aAml1kdZoFYpFSgGJVzjqICbOv05pUotSI1+9VQaX8=
-github.com/rs/cors/wrapper/gin v0.0.0-20220223021805-a4a5ce87d5a2/go.mod h1:IqFyM9uAsle0Bd4h2u+28E+Ma2884FPhOsrREy4dj80=
+github.com/rs/cors/wrapper/gin v0.0.0-20230526135330-e90f16747950 h1:AqLt1PEuscqbMJkmkfOw1xLlDH0VIQzrDEuOGggv0a4=
+github.com/rs/cors/wrapper/gin v0.0.0-20230526135330-e90f16747950/go.mod h1:gmu40DuK3SLdKUzGOUofS3UDZwyeOUy6ZjPPuaALatw=
 github.com/rs/xid v1.5.0/go.mod h1:trrq9SKmegXys3aeAKXMUTdJsYXVwGY3RLcfgqegfbg=
 github.com/rs/zerolog v1.30.0 h1:SymVODrcRsaRaSInD9yQtKbtWqwsfoPcRff/oRXLj4c=
 github.com/rs/zerolog v1.30.0/go.mod h1:/tk+P47gFdPXq4QYjvCmT5/Gsug2nagsFWBWhAiSi1w=
@@ -788,8 +788,8 @@ github.com/zclconf/go-cty v1.10.0/go.mod h1:vVKLxnk3puL4qRAv72AO+W99LUD4da90g3uU
 gitlab.com/bosi/decorder v0.2.3 h1:gX4/RgK16ijY8V+BRQHAySfQAb354T7/xQpDB2n10P0=
 gitlab.com/bosi/decorder v0.2.3/go.mod h1:9K1RB5+VPNQYtXtTDAzd2OEftsZb1oV0IrJrzChSdGE=
 go-simpler.org/assert v0.5.0 h1:+5L/lajuQtzmbtEfh69sr5cRf2/xZzyJhFjoOz/PPqs=
-go.6river.tech/gosix v0.8.41 h1:BMHqin7SKKn/4hUm7QfKPdYbAANeb97vSQYakB+ao08=
-go.6river.tech/gosix v0.8.41/go.mod h1:L+D+8Wb0Y9df4j4cXT3vbADocwwQSpMk8pAosAcMZSc=
+go.6river.tech/gosix v0.8.42 h1:QIU4IZB+SOhO3Otr1iI8lfwjWg2+OjPaLexUkjVnJqM=
+go.6river.tech/gosix v0.8.42/go.mod h1:S+JtarznUQhzWCToSEhXgD6S9kISN8H+4RdNBTh6R4I=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
 go.opencensus.io v0.22.0/go.mod h1:+kGneAE2xo2IficOXnaByMWTGM9T73dGwxeWcUqIpI8=
 go.opencensus.io v0.22.2/go.mod h1:yxeiOL68Rb0Xd1ddK5vPZ/oVn4vY4Ynel7k9FzqtOIw=

@@ -23,7 +23,7 @@ require (
 	github.com/quasilyte/go-ruleguard/dsl v0.3.22
 	github.com/rs/zerolog v1.30.0
 	github.com/stretchr/testify v1.8.4
-	go.6river.tech/gosix v0.8.41
+	go.6river.tech/gosix v0.8.42
 	golang.org/x/sync v0.3.0
 	golang.org/x/tools v0.11.1
 	golang.org/x/vuln v1.0.0
@@ -206,7 +206,7 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/rs/cors v1.8.2 // indirect
-	github.com/rs/cors/wrapper/gin v0.0.0-20220223021805-a4a5ce87d5a2 // indirect
+	github.com/rs/cors/wrapper/gin v0.0.0-20230526135330-e90f16747950 // indirect
 	github.com/ryancurrah/gomodguard v1.3.0 // indirect
 	github.com/ryanrolds/sqlclosecheck v0.4.0 // indirect
 	github.com/sanposhiho/wastedassign/v2 v2.0.7 // indirect
