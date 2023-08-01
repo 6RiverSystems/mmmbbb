@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@google-cloud/pubsub':
-    specifier: ^3.7.2
-    version: 3.7.2
+    specifier: ^3.7.3
+    version: 3.7.3
 
 devDependencies:
   '@types/node':
@@ -69,8 +69,8 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  /@google-cloud/pubsub@3.7.2:
-    resolution: {integrity: sha512-WzglA4SaptghUO+lpCRpw/0DfH0jGK4apUbIFkVniqntsTb/iNsGxqmCxu/vwqpJm1dStpCJsUx0tSzSSh2A2A==}
+  /@google-cloud/pubsub@3.7.3:
+    resolution: {integrity: sha512-ZRDC4g7tpIJ8fkAp4MiU+tDfousM/q6pXK6ytFn0cbYEdNQuWOf4wqopNYMOUJ+AIjaTbgmNw77dStOKTc9Acg==}
     engines: {node: '>=12.0.0'}
     dependencies:
       '@google-cloud/paginator': 4.0.0
