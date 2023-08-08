@@ -34,11 +34,11 @@ type PruneDeletedTopics struct {
 	pruneAction
 }
 
-var _ Action = (*PruneDeletedTopics)(nil)
+var _ Action[PruneCommonParams, PruneCommonResults] = (*PruneDeletedTopics)(nil)
 
 func NewPruneDeletedTopics(params PruneCommonParams) *PruneDeletedTopics {
 	return &PruneDeletedTopics{
-		pruneAction: *newPruneAction(params),
+		pruneAction: newPruneAction(params),
 	}
 }
 

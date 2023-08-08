@@ -276,9 +276,9 @@ func (s *topicMirrorOut) watchSub(ctx context.Context, subName, topicName string
 		if err := getter.ExecuteClient(ctx, s.client); err != nil {
 			return err
 		}
-		deliveries := getter.Deliveries()
+		results, _ := getter.Results()
 		// if we get no deliveries, and have been orphaned, give up
-		if len(deliveries) == 0 {
+		if len(results.Deliveries) == 0 {
 			if t, err := s.client.Topic.Get(ctx, topicID); err != nil {
 				return err
 			} else if t.DeletedAt != nil {
@@ -290,8 +290,8 @@ func (s *topicMirrorOut) watchSub(ctx context.Context, subName, topicName string
 				return nil
 			}
 		}
-		pubResults := make([]*pubsub.PublishResult, len(deliveries))
-		for i, d := range deliveries {
+		pubResults := make([]*pubsub.PublishResult, len(results.Deliveries))
+		for i, d := range results.Deliveries {
 			var orderKey string
 			if d.OrderKey != nil {
 				orderKey = *d.OrderKey
@@ -323,7 +323,7 @@ func (s *topicMirrorOut) watchSub(ctx context.Context, subName, topicName string
 			if _, err := r.Get(ctx); err != nil {
 				return err
 			}
-			acks[i] = deliveries[i].ID
+			acks[i] = results.Deliveries[i].ID
 		}
 		messagesMirroredCounter.WithLabelValues(directionOutbound).Add(float64(len(pubResults)))
 		ack := actions.NewAckDeliveries(acks...)

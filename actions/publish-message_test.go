@@ -92,7 +92,7 @@ func TestPublishMessage_Execute(t *testing.T) {
 			},
 			assert.NoError,
 			&publishMessageResults{
-				numDeliveries: 0,
+				NumDeliveries: 0,
 			},
 			[]uuid.UUID{
 				// zero: expect no sub to receive a message
@@ -118,7 +118,7 @@ func TestPublishMessage_Execute(t *testing.T) {
 			},
 			assert.NoError,
 			&publishMessageResults{
-				numDeliveries: 1,
+				NumDeliveries: 1,
 			},
 			[]uuid.UUID{ /* filled in before */ },
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
@@ -141,7 +141,7 @@ func TestPublishMessage_Execute(t *testing.T) {
 			},
 			assert.NoError,
 			&publishMessageResults{
-				numDeliveries: 1,
+				NumDeliveries: 1,
 			},
 			[]uuid.UUID{ /* filled in before */ },
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
@@ -165,7 +165,7 @@ func TestPublishMessage_Execute(t *testing.T) {
 			},
 			assert.NoError,
 			&publishMessageResults{
-				numDeliveries: 1,
+				NumDeliveries: 1,
 			},
 			[]uuid.UUID{ /* filled in before */ },
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
@@ -191,7 +191,7 @@ func TestPublishMessage_Execute(t *testing.T) {
 			},
 			assert.NoError,
 			&publishMessageResults{
-				numDeliveries: 1,
+				NumDeliveries: 1,
 			},
 			[]uuid.UUID{ /* filled in before */ },
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
@@ -215,7 +215,7 @@ func TestPublishMessage_Execute(t *testing.T) {
 			},
 			assert.NoError,
 			&publishMessageResults{
-				numDeliveries: 2,
+				NumDeliveries: 2,
 			},
 			[]uuid.UUID{ /* filled in before */ },
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
@@ -248,7 +248,7 @@ func TestPublishMessage_Execute(t *testing.T) {
 			},
 			assert.NoError,
 			&publishMessageResults{
-				numDeliveries: 1,
+				NumDeliveries: 1,
 			},
 			[]uuid.UUID{ /* filled in before */ },
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
@@ -290,7 +290,7 @@ func TestPublishMessage_Execute(t *testing.T) {
 			},
 			assert.NoError,
 			&publishMessageResults{
-				numDeliveries: 2,
+				NumDeliveries: 2,
 			},
 			[]uuid.UUID{ /* filled in before */ },
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
@@ -339,7 +339,7 @@ func TestPublishMessage_Execute(t *testing.T) {
 			},
 			assert.NoError,
 			&publishMessageResults{
-				numDeliveries: 2,
+				NumDeliveries: 2,
 			},
 			[]uuid.UUID{ /* filled in before */ },
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
@@ -379,7 +379,7 @@ func TestPublishMessage_Execute(t *testing.T) {
 			},
 			assert.NoError,
 			&publishMessageResults{
-				numDeliveries: 1,
+				NumDeliveries: 1,
 			},
 			nil,
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
@@ -405,7 +405,7 @@ func TestPublishMessage_Execute(t *testing.T) {
 			},
 			assert.NoError,
 			&publishMessageResults{
-				numDeliveries: 0,
+				NumDeliveries: 0,
 			},
 			nil,
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
@@ -508,23 +508,24 @@ func TestPublishMessage_Execute(t *testing.T) {
 				tt.assertion(t, a.Execute(ctx, tx))
 				// TODO: if err, verify no message
 				// TODO: if no error, verify message
+				results, ok := a.Results()
 				if tt.results != nil {
 					require.NotNil(t, a.results)
-					assert.True(t, a.HasResults())
-					assert.Equal(t, tt.results.numDeliveries, a.results.numDeliveries)
-					assert.Equal(t, tt.results.numDeliveries, a.NumDeliveries())
-					assert.NotZero(t, a.MessageID())
+					assert.True(t, ok)
+					assert.Equal(t, tt.results.NumDeliveries, a.results.NumDeliveries)
+					assert.Equal(t, tt.results.NumDeliveries, results.NumDeliveries)
+					assert.NotZero(t, results.ID)
 
-					m, err := tx.Message.Get(ctx, a.MessageID())
+					m, err := tx.Message.Get(ctx, results.ID)
 					require.NoError(t, err)
 					assert.Equal(t, m.Payload, tt.params.Payload)
 					assert.Equal(t, m.Attributes, tt.params.Attributes)
 					d, err := m.QueryDeliveries().All(ctx)
 					require.NoError(t, err)
-					assert.Len(t, d, a.NumDeliveries())
+					assert.Len(t, d, results.NumDeliveries)
 				} else {
 					assert.Nil(t, a.results)
-					assert.False(t, a.HasResults())
+					assert.False(t, ok)
 					// TODO: verify no deliveries created
 				}
 				if tt.after != nil {

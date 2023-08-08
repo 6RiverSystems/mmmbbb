@@ -39,16 +39,15 @@ type SeekSubscriptionToTimeParams struct {
 }
 
 type seekSubscriptionToTimeResults struct {
-	numAcked   int
-	numDeAcked int
+	NumAcked   int
+	NumDeAcked int
 }
 
 type SeekSubscriptionToTime struct {
-	params  SeekSubscriptionToTimeParams
-	results *seekSubscriptionToTimeResults
+	actionBase[SeekSubscriptionToTimeParams, seekSubscriptionToTimeResults]
 }
 
-var _ Action = (*SeekSubscriptionToTime)(nil)
+var _ Action[SeekSubscriptionToTimeParams, seekSubscriptionToTimeResults] = (*SeekSubscriptionToTime)(nil)
 
 func NewSeekSubscriptionToTime(params SeekSubscriptionToTimeParams) *SeekSubscriptionToTime {
 	if params.Name == "" && params.ID == nil {
@@ -59,7 +58,9 @@ func NewSeekSubscriptionToTime(params SeekSubscriptionToTimeParams) *SeekSubscri
 	}
 	// FUTURE: do we want to bound how far in the future or past the target can be?
 	return &SeekSubscriptionToTime{
-		params: params,
+		actionBase[SeekSubscriptionToTimeParams, seekSubscriptionToTimeResults]{
+			params: params,
+		},
 	}
 }
 
@@ -123,36 +124,9 @@ func (a *SeekSubscriptionToTime) Execute(ctx context.Context, tx *ent.Tx) error 
 	}
 
 	a.results = &seekSubscriptionToTimeResults{
-		numAcked:   numAcked,
-		numDeAcked: numDeAcked,
+		NumAcked:   numAcked,
+		NumDeAcked: numDeAcked,
 	}
 
 	return nil
-}
-
-func (a *SeekSubscriptionToTime) Parameters() map[string]interface{} {
-	return map[string]interface{}{
-		"id":   a.params.ID,
-		"name": a.params.Name,
-		"time": a.params.Time,
-	}
-}
-
-func (a *SeekSubscriptionToTime) HasResults() bool {
-	return a.results != nil
-}
-
-func (a *SeekSubscriptionToTime) NumAcked() int {
-	return a.results.numAcked
-}
-
-func (a *SeekSubscriptionToTime) NumDeAcked() int {
-	return a.results.numDeAcked
-}
-
-func (a *SeekSubscriptionToTime) Results() map[string]interface{} {
-	return map[string]interface{}{
-		"numAcked":   a.results.numAcked,
-		"numDeAcked": a.results.numDeAcked,
-	}
 }

@@ -184,19 +184,21 @@ func TestCreateSubscription_Execute(t *testing.T) {
 				tt.assertion(t, a.Execute(ctx, tx))
 				if tt.expect != nil {
 					assert.NotNil(t, a.results)
-					assert.Equal(t, tt.expect.topicID, a.TopicID())
+					results, ok := a.Results()
+					assert.True(t, ok)
+					assert.Equal(t, tt.expect.topicID, results.TopicID)
 					if tt.expect.subscription.ID != (uuid.UUID{}) {
-						assert.Equal(t, tt.expect.subscription.ID, a.SubscriptionID())
-						assert.Equal(t, tt.expect.subscription.ID, a.Subscription().ID)
-						checkSubEqual(t, &tt.expect.subscription, a.Subscription())
+						assert.Equal(t, tt.expect.subscription.ID, results.ID)
+						assert.Equal(t, tt.expect.subscription.ID, results.Sub.ID)
+						checkSubEqual(t, &tt.expect.subscription, results.Sub)
 					} else {
-						assert.Equal(t, a.Subscription().ID, a.SubscriptionID())
-						assert.NotEqual(t, a.SubscriptionID(), uuid.UUID{})
+						assert.Equal(t, results.Sub.ID, results.ID)
+						assert.NotEqual(t, results.ID, uuid.UUID{})
 					}
 
-					sub, err := tx.Subscription.Get(ctx, a.SubscriptionID())
+					sub, err := tx.Subscription.Get(ctx, results.ID)
 					assert.NoError(t, err)
-					checkSubEqual(t, a.Subscription(), sub)
+					checkSubEqual(t, results.Sub, sub)
 				} else {
 					assert.Nil(t, a.results)
 				}

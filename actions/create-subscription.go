@@ -50,16 +50,15 @@ type CreateSubscriptionParams struct {
 	DeadLetterTopic     string
 }
 type createSubscriptionResults struct {
-	topicID uuid.UUID
-	id      uuid.UUID
-	sub     *ent.Subscription
+	TopicID uuid.UUID
+	ID      uuid.UUID
+	Sub     *ent.Subscription `json:"-"`
 }
 type CreateSubscription struct {
-	params  CreateSubscriptionParams
-	results *createSubscriptionResults
+	actionBase[CreateSubscriptionParams, createSubscriptionResults]
 }
 
-var _ Action = (*CreateSubscription)(nil)
+var _ Action[CreateSubscriptionParams, createSubscriptionResults] = (*CreateSubscription)(nil)
 
 func NewCreateSubscription(params CreateSubscriptionParams) *CreateSubscription {
 	if params.TTL <= 0 {
@@ -75,7 +74,9 @@ func NewCreateSubscription(params CreateSubscriptionParams) *CreateSubscription 
 		panic(errors.New("must set both or neither of MaxDeliveryAttempts and DeadLetterTopic"))
 	}
 	return &CreateSubscription{
-		params: params,
+		actionBase[CreateSubscriptionParams, createSubscriptionResults]{
+			params: params,
+		},
 	}
 }
 
@@ -155,9 +156,9 @@ func (a *CreateSubscription) Execute(ctx context.Context, tx *ent.Tx) error {
 	NotifyModifySubscription(tx, s.ID, s.Name)
 
 	a.results = &createSubscriptionResults{
-		topicID: topic.ID,
-		id:      s.ID,
-		sub:     s,
+		TopicID: topic.ID,
+		ID:      s.ID,
+		Sub:     s,
 	}
 
 	timer.Succeeded(func() { createSubscriptionsCounter.Inc() })
@@ -179,35 +180,4 @@ func findTopic(ctx context.Context, tx *ent.Tx, name string) (*ent.Topic, error)
 		return nil, err
 	}
 	return topic, nil
-}
-
-func (a *CreateSubscription) TopicID() uuid.UUID {
-	return a.results.topicID
-}
-
-func (a *CreateSubscription) SubscriptionID() uuid.UUID {
-	return a.results.id
-}
-
-func (a *CreateSubscription) Subscription() *ent.Subscription {
-	return a.results.sub
-}
-
-func (a *CreateSubscription) Parameters() map[string]interface{} {
-	return map[string]interface{}{
-		"topicName": a.params.TopicName,
-		"name":      a.params.Name,
-	}
-}
-
-func (a *CreateSubscription) HasResults() bool {
-	return a.results != nil
-}
-
-func (a *CreateSubscription) Results() map[string]interface{} {
-	return map[string]interface{}{
-		"id":      a.results.id,
-		"topicID": a.results.topicID,
-		// ent object is intentionally omitted here
-	}
 }

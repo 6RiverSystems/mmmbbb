@@ -204,9 +204,10 @@ func (s *topicMirrorIn) startMirrorsOnce(ctx context.Context) error {
 					return err
 				}
 			} else {
+				results, _ := ct.Results()
 				s.logger.Info().
 					Str("topicName", localTopicName).
-					Stringer("topicID", ct.TopicID()).
+					Stringer("topicID", results.ID).
 					Msg("Created local mirror topic")
 			}
 			return nil

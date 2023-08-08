@@ -69,7 +69,7 @@ func TestDeadLetterDeliveries_Execute(t *testing.T) {
 			},
 			assert.NoError,
 			&DeadLetterDeliveriesResults{
-				numDeadLettered: 1,
+				NumDeadLettered: 1,
 			},
 		},
 		{
@@ -92,7 +92,7 @@ func TestDeadLetterDeliveries_Execute(t *testing.T) {
 			},
 			assert.NoError,
 			&DeadLetterDeliveriesResults{
-				numDeadLettered: 1,
+				NumDeadLettered: 1,
 			},
 		},
 		{
@@ -112,7 +112,7 @@ func TestDeadLetterDeliveries_Execute(t *testing.T) {
 			},
 			assert.NoError,
 			&DeadLetterDeliveriesResults{
-				numDeadLettered: 0,
+				NumDeadLettered: 0,
 			},
 		},
 		{
@@ -132,7 +132,7 @@ func TestDeadLetterDeliveries_Execute(t *testing.T) {
 			},
 			assert.NoError,
 			&DeadLetterDeliveriesResults{
-				numDeadLettered: 0,
+				NumDeadLettered: 0,
 			},
 		},
 		{
@@ -153,7 +153,7 @@ func TestDeadLetterDeliveries_Execute(t *testing.T) {
 			},
 			assert.NoError,
 			&DeadLetterDeliveriesResults{
-				numDeadLettered: 1,
+				NumDeadLettered: 1,
 			},
 		},
 		{
@@ -172,7 +172,7 @@ func TestDeadLetterDeliveries_Execute(t *testing.T) {
 			},
 			assert.NoError,
 			&DeadLetterDeliveriesResults{
-				numDeadLettered: 1,
+				NumDeadLettered: 1,
 			},
 		},
 	}
@@ -191,10 +191,13 @@ func TestDeadLetterDeliveries_Execute(t *testing.T) {
 				a := NewDeadLetterDeliveries(tt.params)
 				tt.assertion(t, a.Execute(ctx, tx))
 				assert.Equal(t, tt.results, a.results)
+				results, ok := a.Results()
 				if tt.results != nil {
-					if assert.True(t, a.HasResults()) {
-						assert.Equal(t, tt.results.numDeadLettered, a.NumDeadLettered())
+					if assert.True(t, ok) {
+						assert.Equal(t, tt.results.NumDeadLettered, results.NumDeadLettered)
 					}
+				} else {
+					assert.False(t, ok)
 				}
 				subID := xID(t, &ent.Subscription{}, 0)
 				remaining, err := tx.Delivery.Query().
@@ -204,7 +207,7 @@ func TestDeadLetterDeliveries_Execute(t *testing.T) {
 					).Count(ctx)
 				assert.NoError(t, err)
 				if tt.results != nil {
-					assert.Equal(t, countBefore-tt.results.numDeadLettered, remaining)
+					assert.Equal(t, countBefore-tt.results.NumDeadLettered, remaining)
 				} else {
 					assert.Equal(t, countBefore, remaining)
 				}
@@ -219,7 +222,7 @@ func TestDeadLetterDeliveries_Execute(t *testing.T) {
 					).Count(ctx)
 				assert.NoError(t, err)
 				if tt.results != nil {
-					assert.Equal(t, tt.results.numDeadLettered*countDLSubs, countDLDeliveries)
+					assert.Equal(t, tt.results.NumDeadLettered*countDLSubs, countDLDeliveries)
 				} else {
 					assert.Zero(t, countDLDeliveries)
 				}

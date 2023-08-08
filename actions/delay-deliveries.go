@@ -39,20 +39,21 @@ type DelayDeliveriesParams struct {
 }
 
 type delayDeliveriesResults struct {
-	numDelayed int
+	NumDelayed int
 }
 
 type DelayDeliveries struct {
-	params  DelayDeliveriesParams
-	results *delayDeliveriesResults
+	actionBase[DelayDeliveriesParams, delayDeliveriesResults]
 }
 
-var _ Action = (*DelayDeliveries)(nil)
+var _ Action[DelayDeliveriesParams, delayDeliveriesResults] = (*DelayDeliveries)(nil)
 
 func NewDelayDeliveries(params DelayDeliveriesParams) *DelayDeliveries {
 	// we accept negative delays at this layer, some higher layers will enforce tighter constraints
 	return &DelayDeliveries{
-		params: params,
+		actionBase[DelayDeliveriesParams, delayDeliveriesResults]{
+			params: params,
+		},
 	}
 }
 
@@ -107,30 +108,9 @@ func (a *DelayDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 	}
 
 	a.results = &delayDeliveriesResults{
-		numDelayed: numDelayed,
+		NumDelayed: numDelayed,
 	}
 	timer.Succeeded(func() { delayDeliveriesCounter.Add(float64(numDelayed)) })
 
 	return nil
-}
-
-func (a *DelayDeliveries) Parameters() map[string]interface{} {
-	return map[string]interface{}{
-		"ids":   a.params.IDs,
-		"delay": a.params.Delay,
-	}
-}
-
-func (a *DelayDeliveries) HasResults() bool {
-	return a.results != nil
-}
-
-func (a *DelayDeliveries) NumDelayed() int {
-	return a.results.numDelayed
-}
-
-func (a *DelayDeliveries) Results() map[string]interface{} {
-	return map[string]interface{}{
-		"numDelayed": a.results.numDelayed,
-	}
 }

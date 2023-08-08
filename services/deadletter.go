@@ -103,9 +103,9 @@ LOOP:
 			action := actions.NewDeadLetterDeliveries(s.settings.DeadLetterDeliveriesParams)
 			err := s.client.DoCtxTx(ctx, nil, action.Execute)
 			var n int
-			if action.HasResults() {
+			if results, ok := action.Results(); ok {
 				evt := s.logger.Trace()
-				n = action.NumDeadLettered()
+				n = results.NumDeadLettered
 				if n > 0 {
 					evt = s.logger.Info()
 				}

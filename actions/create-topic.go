@@ -33,21 +33,23 @@ type CreateTopicParams struct {
 	Name   string
 	Labels map[string]string
 }
+type createTopicResults struct {
+	ID uuid.UUID
+}
 type CreateTopic struct {
-	params  CreateTopicParams
-	results *struct {
-		id uuid.UUID
-	}
+	actionBase[CreateTopicParams, createTopicResults]
 }
 
-var _ Action = (*CreateTopic)(nil)
+var _ Action[CreateTopicParams, createTopicResults] = (*CreateTopic)(nil)
 
 func NewCreateTopic(params CreateTopicParams) *CreateTopic {
 	if params.Name == "" {
 		panic(errors.New("Topic must have a non-empty name"))
 	}
 	return &CreateTopic{
-		params: params,
+		actionBase[CreateTopicParams, createTopicResults]{
+			params: params,
+		},
 	}
 }
 
@@ -85,31 +87,11 @@ func (a *CreateTopic) Execute(ctx context.Context, tx *ent.Tx) error {
 
 	NotifyModifyTopic(tx, t.ID, t.Name)
 
-	a.results = &struct{ id uuid.UUID }{
-		id: t.ID,
+	a.results = &createTopicResults{
+		ID: t.ID,
 	}
 
 	timer.Succeeded(func() { createTopicsCounter.Inc() })
 
 	return nil
-}
-
-func (a *CreateTopic) TopicID() uuid.UUID {
-	return a.results.id
-}
-
-func (a *CreateTopic) Parameters() map[string]interface{} {
-	return map[string]interface{}{
-		"name": a.params.Name,
-	}
-}
-
-func (a *CreateTopic) HasResults() bool {
-	return a.results != nil
-}
-
-func (a *CreateTopic) Results() map[string]interface{} {
-	return map[string]interface{}{
-		"id": a.results.id,
-	}
 }

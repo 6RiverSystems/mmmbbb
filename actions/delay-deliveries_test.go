@@ -65,7 +65,7 @@ func TestDelayDeliveries_Execute(t *testing.T) {
 			},
 			assert.NoError,
 			&delayDeliveriesResults{
-				numDelayed: 1,
+				NumDelayed: 1,
 			},
 		},
 		{
@@ -84,7 +84,7 @@ func TestDelayDeliveries_Execute(t *testing.T) {
 			},
 			assert.NoError,
 			&delayDeliveriesResults{
-				numDelayed: 0,
+				NumDelayed: 0,
 			},
 		},
 	}
@@ -99,10 +99,13 @@ func TestDelayDeliveries_Execute(t *testing.T) {
 				a := NewDelayDeliveries(tt.params)
 				tt.assertion(t, a.Execute(ctx, tx))
 				assert.Equal(t, tt.results, a.results)
+				results, ok := a.Results()
 				if tt.results != nil {
-					if assert.True(t, a.HasResults()) {
-						assert.Equal(t, tt.results.numDelayed, a.NumDelayed())
+					if assert.True(t, ok) {
+						assert.Equal(t, tt.results.NumDelayed, results.NumDelayed)
 					}
+				} else {
+					assert.False(t, ok)
 				}
 				unDelayed, err := tx.Delivery.Query().
 					Where(

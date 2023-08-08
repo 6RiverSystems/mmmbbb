@@ -325,9 +325,10 @@ func TestMessageStreamer_Go(t *testing.T) {
 						l.Trace().Int("numAcks", len(acks)).Msg("Sending acks")
 						a := NewAckDeliveries(acks...)
 						assert.NoError(t, client.DoCtxTx(ctx, nil, a.Execute))
-						if assert.True(t, a.HasResults()) {
-							assert.Equal(t, len(acks), a.NumAcked())
-							l.Trace().Int("numAcks", a.NumAcked()).Msg("Sent acks")
+						results, ok := a.Results()
+						if assert.True(t, ok) {
+							assert.Equal(t, len(acks), results.NumAcked)
+							l.Trace().Int("numAcks", results.NumAcked).Msg("Sent acks")
 						}
 						acks = acks[:0]
 					}

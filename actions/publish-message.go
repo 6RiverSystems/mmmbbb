@@ -41,22 +41,23 @@ type PublishMessageParams struct {
 	OrderKey   string
 }
 type publishMessageResults struct {
-	id            uuid.UUID
-	numDeliveries int
+	ID            uuid.UUID
+	NumDeliveries int
 }
 type PublishMessage struct {
-	params  PublishMessageParams
-	results *publishMessageResults
+	actionBase[PublishMessageParams, publishMessageResults]
 }
 
-var _ Action = (*PublishMessage)(nil)
+var _ Action[PublishMessageParams, publishMessageResults] = (*PublishMessage)(nil)
 
 func NewPublishMessage(params PublishMessageParams) *PublishMessage {
 	if params.TopicName == "" && params.TopicID == nil {
 		panic(errors.New("Must provide Name or ID"))
 	}
 	return &PublishMessage{
-		params: params,
+		actionBase[PublishMessageParams, publishMessageResults]{
+			params: params,
+		},
 	}
 }
 
@@ -124,8 +125,8 @@ func (a *PublishMessage) Execute(ctx context.Context, tx *ent.Tx) error {
 	}
 
 	a.results = &publishMessageResults{
-		id:            m.ID,
-		numDeliveries: len(dc),
+		ID:            m.ID,
+		NumDeliveries: len(dc),
 	}
 	timer.Succeeded(func() {
 		publishedMessagesCounter.Inc()
@@ -133,32 +134,4 @@ func (a *PublishMessage) Execute(ctx context.Context, tx *ent.Tx) error {
 	})
 
 	return nil
-}
-
-func (a *PublishMessage) MessageID() uuid.UUID {
-	return a.results.id
-}
-
-func (a *PublishMessage) NumDeliveries() int {
-	return a.results.numDeliveries
-}
-
-func (a *PublishMessage) Parameters() map[string]interface{} {
-	return map[string]interface{}{
-		"topicName": a.params.TopicName,
-		"topicID":   a.params.TopicID,
-		"payload":   a.params.Payload,
-		"orderKey":  a.params.OrderKey,
-	}
-}
-
-func (a *PublishMessage) HasResults() bool {
-	return a.results != nil
-}
-
-func (a *PublishMessage) Results() map[string]interface{} {
-	return map[string]interface{}{
-		"id":            a.results.id,
-		"numDeliveries": a.results.numDeliveries,
-	}
 }

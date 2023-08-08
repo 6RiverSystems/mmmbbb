@@ -30,22 +30,23 @@ import (
 )
 
 type deleteTopicParams struct {
-	name string
+	Name string
 }
 type deleteTopicResults struct {
-	numDeleted int
+	NumDeleted int
 }
 type DeleteTopic struct {
-	params  deleteTopicParams
-	results *deleteTopicResults
+	actionBase[deleteTopicParams, deleteTopicResults]
 }
 
-var _ Action = (*DeleteTopic)(nil)
+var _ Action[deleteTopicParams, deleteTopicResults] = (*DeleteTopic)(nil)
 
 func NewDeleteTopic(name string) *DeleteTopic {
 	return &DeleteTopic{
-		params: struct{ name string }{
-			name: name,
+		actionBase[deleteTopicParams, deleteTopicResults]{
+			params: deleteTopicParams{
+				Name: name,
+			},
 		},
 	}
 }
@@ -58,7 +59,7 @@ func (a *DeleteTopic) Execute(ctx context.Context, tx *ent.Tx) error {
 
 	topics, err := tx.Topic.Query().
 		Where(
-			topic.Name(a.params.name),
+			topic.Name(a.params.Name),
 			topic.DeletedAtIsNil(),
 		).
 		All(ctx)
@@ -87,29 +88,9 @@ func (a *DeleteTopic) Execute(ctx context.Context, tx *ent.Tx) error {
 	}
 
 	a.results = &deleteTopicResults{
-		numDeleted: numDeleted,
+		NumDeleted: numDeleted,
 	}
 	timer.Succeeded(func() { deleteTopicsCounter.Add(float64(numDeleted)) })
 
 	return nil
-}
-
-func (a *DeleteTopic) NumDeleted() int {
-	return a.results.numDeleted
-}
-
-func (a *DeleteTopic) Parameters() map[string]interface{} {
-	return map[string]interface{}{
-		"name": a.params.name,
-	}
-}
-
-func (a *DeleteTopic) HasResults() bool {
-	return a.results != nil
-}
-
-func (a *DeleteTopic) Results() map[string]interface{} {
-	return map[string]interface{}{
-		"numDeleted": a.results.numDeleted,
-	}
 }

@@ -86,16 +86,18 @@ func TestDeleteTopic_Execute(t *testing.T) {
 				a := NewDeleteTopic(nameFor(t, 0))
 				tt.assertion(t, a.Execute(ctx, tx))
 				assert.Equal(t, tt.expect, a.results)
+				results, ok := a.Results()
 				if tt.expect != nil {
-					if assert.True(t, a.HasResults()) {
-						assert.Equal(t, tt.expect.numDeleted, a.NumDeleted())
+					if assert.True(t, ok) {
+						assert.Equal(t, tt.expect.NumDeleted, results.NumDeleted)
 					}
 				} else {
 					assert.Nil(t, a.results)
+					assert.False(t, ok)
 				}
 				return nil
 			}))
-			if tt.expect != nil && tt.expect.numDeleted > 0 {
+			if tt.expect != nil && tt.expect.NumDeleted > 0 {
 				assertClosed(t, topicMod)
 			} else {
 				assertOpenEmpty(t, topicMod)

@@ -33,27 +33,28 @@ import (
 )
 
 type NackDeliveriesParams struct {
-	ids []uuid.UUID
+	IDs []uuid.UUID
 }
 
 type nackDeliveriesResults struct {
-	numNacked       int
-	numDeadLettered int
+	NumNacked       int
+	NumDeadLettered int
 }
 
 type NackDeliveries struct {
-	params  NackDeliveriesParams
-	results *nackDeliveriesResults
+	actionBase[NackDeliveriesParams, nackDeliveriesResults]
 }
 
-var _ Action = (*NackDeliveries)(nil)
+var _ Action[NackDeliveriesParams, nackDeliveriesResults] = (*NackDeliveries)(nil)
 
 func NewNackDeliveries(
 	ids ...uuid.UUID,
 ) *NackDeliveries {
 	return &NackDeliveries{
-		params: struct{ ids []uuid.UUID }{
-			ids: ids,
+		actionBase[NackDeliveriesParams, nackDeliveriesResults]{
+			params: NackDeliveriesParams{
+				IDs: ids,
+			},
 		},
 	}
 }
@@ -71,7 +72,7 @@ func (a *NackDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 
 	deliveries, err := tx.Delivery.Query().
 		Where(
-			delivery.IDIn(a.params.ids...),
+			delivery.IDIn(a.params.IDs...),
 			delivery.CompletedAtIsNil(),
 			delivery.ExpiresAtGT(now),
 		).
@@ -128,35 +129,10 @@ func (a *NackDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 	}
 
 	a.results = &nackDeliveriesResults{
-		numNacked:       len(deliveries),
-		numDeadLettered: numDeadLettered,
+		NumNacked:       len(deliveries),
+		NumDeadLettered: numDeadLettered,
 	}
 	timer.Succeeded(func() { nackDeliveriesCounter.Add(float64(len(deliveries))) })
 
 	return nil
-}
-
-func (a *NackDeliveries) Parameters() map[string]interface{} {
-	return map[string]interface{}{
-		"ids": a.params.ids,
-	}
-}
-
-func (a *NackDeliveries) HasResults() bool {
-	return a.results != nil
-}
-
-func (a *NackDeliveries) NumNacked() int {
-	return a.results.numNacked
-}
-
-func (a *NackDeliveries) NumDeadLettered() int {
-	return a.results.numDeadLettered
-}
-
-func (a *NackDeliveries) Results() map[string]interface{} {
-	return map[string]interface{}{
-		"numNacked":       a.results.numNacked,
-		"numDeadLettered": a.results.numDeadLettered,
-	}
 }

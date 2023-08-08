@@ -82,8 +82,8 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 			assert.NoError,
 			1,
 			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, r *getSubscriptionMessagesResults) {
-				if assert.NotEmpty(t, r.deliveries, "should get at least one delivery") {
-					d := r.deliveries[0]
+				if assert.NotEmpty(t, r.Deliveries, "should get at least one delivery") {
+					d := r.Deliveries[0]
 					assert.Equal(t, xID(t, &ent.Delivery{}, 0), d.ID)
 					// most checking of the delivery is in common code
 				}
@@ -152,7 +152,7 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 			assert.NoError,
 			1,
 			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, r *getSubscriptionMessagesResults) {
-				d := r.deliveries[0]
+				d := r.Deliveries[0]
 				assert.Equal(t, xID(t, &ent.Delivery{}, 1), d.ID)
 				// most checking of the delivery is in common code
 			},
@@ -187,7 +187,7 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 			assert.NoError,
 			1,
 			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, r *getSubscriptionMessagesResults) {
-				d := r.deliveries[0]
+				d := r.Deliveries[0]
 				assert.Equal(t, xID(t, &ent.Delivery{}, 1), d.ID)
 				// most checking of the delivery is in common code
 			},
@@ -212,7 +212,7 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 			assert.NoError,
 			1,
 			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, r *getSubscriptionMessagesResults) {
-				d := r.deliveries[0]
+				d := r.Deliveries[0]
 				// receiving either message is valid
 				assert.Contains(t, []uuid.UUID{
 					xID(t, &ent.Delivery{}, 0),
@@ -247,7 +247,7 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 			assert.NoError,
 			1,
 			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, r *getSubscriptionMessagesResults) {
-				d := r.deliveries[0]
+				d := r.Deliveries[0]
 				// receiving either message is valid
 				assert.Contains(t, []uuid.UUID{
 					xID(t, &ent.Delivery{}, 0),
@@ -316,7 +316,7 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 			assert.NoError,
 			1,
 			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, r *getSubscriptionMessagesResults) {
-				d := r.deliveries[0]
+				d := r.Deliveries[0]
 				assert.Equal(t, xID(t, &ent.Delivery{}, 0), d.ID)
 				// most checking of the delivery is in common code
 			},
@@ -367,7 +367,7 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 			assert.NoError,
 			1,
 			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, r *getSubscriptionMessagesResults) {
-				d := r.deliveries[0]
+				d := r.Deliveries[0]
 				assert.Equal(t, xID(t, &ent.Delivery{}, 1), d.ID)
 				// most checking of the delivery is in common code
 			},
@@ -411,8 +411,8 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 			1,
 			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, r *getSubscriptionMessagesResults) {
 				require.NotNil(t, r)
-				require.NotNil(t, r.deliveries)
-				d := r.deliveries[0]
+				require.NotNil(t, r.Deliveries)
+				d := r.Deliveries[0]
 				assert.Equal(t, xID(t, &ent.Delivery{}, 1), d.ID)
 				// most checking of the delivery is in common code
 			},
@@ -439,7 +439,7 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 			assert.NoError,
 			0,
 			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, r *getSubscriptionMessagesResults) {
-				assert.Equal(t, 1, r.numDeadLettered)
+				assert.Equal(t, 1, r.NumDeadLettered)
 
 				origDelivery, err := client.Delivery.Get(ctx, xID(t, &ent.Delivery{}, 0))
 				require.NoError(t, err)
@@ -482,10 +482,11 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 			err := a.ExecuteClient(ctx, client)
 			assert.NoError(t, eg.Wait())
 			tt.assertion(t, err)
+			results, ok := a.Results()
 			if err == nil {
-				if assert.True(t, a.HasResults()) {
-					assert.Equal(t, a.results.deliveries, a.Deliveries())
-					for _, d := range a.Deliveries() {
+				if assert.True(t, ok) {
+					assert.Equal(t, a.results.Deliveries, results.Deliveries)
+					for _, d := range results.Deliveries {
 						del, err := client.Delivery.Get(ctx, d.ID)
 						require.NoError(t, err)
 						msg, err := del.QueryMessage().Only(ctx)
@@ -503,10 +504,10 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 						assert.Greater(t, del.Attempts, 0)
 						assert.Greater(t, del.AttemptAt.UnixNano(), time.Now().UnixNano())
 					}
-					require.Len(t, a.Deliveries(), tt.numExpected)
+					require.Len(t, results.Deliveries, tt.numExpected)
 				}
 			} else {
-				assert.False(t, a.HasResults())
+				assert.False(t, ok)
 				require.Nil(t, a.results)
 			}
 			if tt.after != nil {

@@ -48,8 +48,9 @@ func TestCreateTopic(t *testing.T) {
 			},
 			func(t *testing.T, err error, a *CreateTopic) {
 				require.NoError(t, err)
-				require.True(t, a.HasResults())
-				assert.NotEqual(t, a.TopicID(), uuid.UUID{}, "Must not save with zero uuid")
+				results, ok := a.Results()
+				require.True(t, ok)
+				assert.NotEqual(t, results.ID, uuid.UUID{}, "Must not save with zero uuid")
 			},
 		},
 		{
@@ -63,9 +64,10 @@ func TestCreateTopic(t *testing.T) {
 			},
 			func(t *testing.T, err error, a *CreateTopic) {
 				require.NoError(t, err)
-				require.True(t, a.HasResults())
-				require.NotEqual(t, a.TopicID(), uuid.UUID{}, "Must not save with zero uuid")
-				topic, err := client.Topic.Get(ctx, a.TopicID())
+				results, ok := a.Results()
+				require.True(t, ok)
+				require.NotEqual(t, results.ID, uuid.UUID{}, "Must not save with zero uuid")
+				topic, err := client.Topic.Get(ctx, results.ID)
 				require.NoError(t, err)
 				require.NotNil(t, topic)
 				assert.Equal(t, topic.Labels, a.params.Labels)
@@ -97,7 +99,8 @@ func TestCreateTopic(t *testing.T) {
 			func(t *testing.T, err error, a *CreateTopic) {
 				assert.Error(t, err)
 				assert.ErrorIs(t, err, ErrExists)
-				assert.False(t, a.HasResults())
+				_, ok := a.Results()
+				assert.False(t, ok)
 			},
 		},
 	}
