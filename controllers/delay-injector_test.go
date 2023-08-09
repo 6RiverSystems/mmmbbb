@@ -45,7 +45,7 @@ import (
 
 func setupDelayInjectorController(
 	t *testing.T,
-	dbName string,
+	dbName ginmiddleware.EntKey[*ent.Client, *ent.Tx],
 	ec *ent.Client,
 	cc *DelayInjectorController,
 ) *httptest.Server {
@@ -169,7 +169,7 @@ func TestDelayInjectorController_GetDelay(t *testing.T) {
 	}
 
 	client := enttest.ClientForTest(t)
-	dbName := t.Name()
+	dbName := ginmiddleware.EntKey[*ent.Client, *ent.Tx](t.Name())
 	cc := &DelayInjectorController{dbName: dbName}
 	s := setupDelayInjectorController(t, dbName, client, cc)
 	defer s.Close()
@@ -232,7 +232,7 @@ func TestDelayInjectorController_SetDelay(t *testing.T) {
 	}
 
 	client := enttest.ClientForTest(t)
-	dbName := t.Name()
+	dbName := ginmiddleware.EntKey[*ent.Client, *ent.Tx](t.Name())
 	cc := &DelayInjectorController{dbName: dbName}
 	s := setupDelayInjectorController(t, dbName, client, cc)
 	defer s.Close()
@@ -277,7 +277,7 @@ func TestDelayInjectorController_DeleteDelay(t *testing.T) {
 	}
 
 	client := enttest.ClientForTest(t)
-	dbName := t.Name()
+	dbName := ginmiddleware.EntKey[*ent.Client, *ent.Tx](t.Name())
 	cc := &DelayInjectorController{dbName: dbName}
 	s := setupDelayInjectorController(t, dbName, client, cc)
 	defer s.Close()

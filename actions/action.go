@@ -47,6 +47,7 @@ var _ ActionData[string, int] = (*actionBase[string, int])(nil)
 func (a *actionBase[P, R]) Parameters() P {
 	return a.params
 }
+
 func (a *actionBase[P, R]) Results() (results R, ok bool) {
 	if a.results != nil {
 		results, ok = *a.results, true

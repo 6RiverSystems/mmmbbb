@@ -34,11 +34,6 @@ import (
 
 // custom add-ons to the Client type for use in our environment
 
-// BeginTxGeneric implements ginmiddleware.EntClient
-func (c *Client) BeginTxGeneric(ctx context.Context, opts *sql.TxOptions) (entcommon.EntTx, error) {
-	return c.BeginTx(ctx, opts)
-}
-
 func (c *Client) EntityClient(name string) entcommon.EntityClient {
 	switch name {
 	case "Topic":

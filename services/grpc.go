@@ -65,7 +65,7 @@ func isValidSubscriptionName(name string) bool {
 		segments[3] != ""
 }
 
-func InitializeGrpcServers(_ context.Context, server *grpc.Server, services *registry.Registry, client_ entcommon.EntClient) error {
+func InitializeGrpcServers(_ context.Context, server *grpc.Server, services *registry.Registry, client_ entcommon.EntClientBase) error {
 	client := client_.(*ent.Client)
 	pubsub.RegisterPublisherServer(server, &publisherServer{client: client})
 	pubsub.RegisterSubscriberServer(server, &subscriberServer{client: client})
