@@ -36,12 +36,11 @@ type DeadLetterDeliveriesParams struct {
 }
 
 type DeadLetterDeliveriesResults struct {
-	numDeadLettered int // `json:"numDeadLettered"`
+	NumDeadLettered int
 }
 
 type DeadLetterDeliveries struct {
-	params  DeadLetterDeliveriesParams
-	results *DeadLetterDeliveriesResults
+	actionBase[DeadLetterDeliveriesParams, DeadLetterDeliveriesResults]
 }
 
 func NewDeadLetterDeliveries(params DeadLetterDeliveriesParams) *DeadLetterDeliveries {
@@ -49,7 +48,9 @@ func NewDeadLetterDeliveries(params DeadLetterDeliveriesParams) *DeadLetterDeliv
 		panic(errors.New("MaxDeliveries must be > 0"))
 	}
 	return &DeadLetterDeliveries{
-		params: params,
+		actionBase[DeadLetterDeliveriesParams, DeadLetterDeliveriesResults]{
+			params: params,
+		},
 	}
 }
 
@@ -121,30 +122,10 @@ func (a *DeadLetterDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 	}
 
 	a.results = &DeadLetterDeliveriesResults{
-		numDeadLettered: len(deliveryData),
+		NumDeadLettered: len(deliveryData),
 	}
 
 	timer.Succeeded(func() { deadLetterDeliveriesActionCounter.Add(float64(len(deliveryData))) })
 
 	return nil
-}
-
-func (a *DeadLetterDeliveries) Parameters() map[string]interface{} {
-	return map[string]interface{}{
-		"maxDeliveries": a.params.MaxDeliveries,
-	}
-}
-
-func (a *DeadLetterDeliveries) NumDeadLettered() int {
-	return a.results.numDeadLettered
-}
-
-func (a *DeadLetterDeliveries) HasResults() bool {
-	return a.results != nil
-}
-
-func (a *DeadLetterDeliveries) Results() map[string]interface{} {
-	return map[string]interface{}{
-		"numDeadLettered": a.results.numDeadLettered,
-	}
 }

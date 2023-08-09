@@ -49,7 +49,7 @@ type GetSubscriptionMessagesParams struct {
 	MaxBytesStrict bool
 	MaxWait        time.Duration
 	// Waiting, if non-nil, will be closed when the action first goes into a delay
-	Waiting chan<- struct{}
+	Waiting chan<- struct{} `json:"-"`
 }
 type SubscriptionMessageDelivery struct {
 	ID          uuid.UUID `json:"id"`
@@ -64,15 +64,14 @@ type SubscriptionMessageDelivery struct {
 	Attributes    map[string]string `json:"attributes"`
 }
 type getSubscriptionMessagesResults struct {
-	deliveries      []*SubscriptionMessageDelivery
-	numDeadLettered int
+	Deliveries      []*SubscriptionMessageDelivery
+	NumDeadLettered int
 }
 type GetSubscriptionMessages struct {
-	params  GetSubscriptionMessagesParams
-	results *getSubscriptionMessagesResults
+	actionBase[GetSubscriptionMessagesParams, getSubscriptionMessagesResults]
 }
 
-var _ Action = (*GetSubscriptionMessages)(nil)
+var _ Action[GetSubscriptionMessagesParams, getSubscriptionMessagesResults] = (*GetSubscriptionMessages)(nil)
 
 func NewGetSubscriptionMessages(params GetSubscriptionMessagesParams) *GetSubscriptionMessages {
 	if params.MaxMessages < 1 {
@@ -89,7 +88,9 @@ func NewGetSubscriptionMessages(params GetSubscriptionMessagesParams) *GetSubscr
 		panic(errors.New("Must provide Name or ID"))
 	}
 	return &GetSubscriptionMessages{
-		params: params,
+		actionBase[GetSubscriptionMessagesParams, getSubscriptionMessagesResults]{
+			params: params,
+		},
 	}
 }
 
@@ -183,7 +184,7 @@ RETRY:
 				if err = a.applyResults(ctx, tx, sub, deliveries); err != nil {
 					return err
 				}
-				timer.Succeeded(func() { getSubscriptionMessagesCounter.Add(float64(len(a.results.deliveries))) })
+				timer.Succeeded(func() { getSubscriptionMessagesCounter.Add(float64(len(a.results.Deliveries))) })
 			} else {
 				if next, err = a.nextAttempt(ctx, tx, sub); err != nil {
 					return err
@@ -388,7 +389,7 @@ func (a *GetSubscriptionMessages) applyResults(
 	}
 
 	results := &getSubscriptionMessagesResults{
-		deliveries: make([]*SubscriptionMessageDelivery, 0, len(deliveries)),
+		Deliveries: make([]*SubscriptionMessageDelivery, 0, len(deliveries)),
 	}
 
 	hasDeadLettering := sub.HasFullDeadLetterConfig()
@@ -416,7 +417,7 @@ func (a *GetSubscriptionMessages) applyResults(
 			); err != nil {
 				return err
 			}
-			results.numDeadLettered++
+			results.NumDeadLettered++
 			continue
 		}
 
@@ -434,7 +435,7 @@ func (a *GetSubscriptionMessages) applyResults(
 			Attributes:    d.Edges.Message.Attributes,
 		}
 
-		results.deliveries = append(results.deliveries, delivery)
+		results.Deliveries = append(results.Deliveries, delivery)
 		bytes += len(d.Edges.Message.Payload)
 
 		if i+1 >= a.params.MaxMessages {
@@ -449,8 +450,8 @@ func (a *GetSubscriptionMessages) applyResults(
 	// TODO: some tests expect low throughput stuff to come in order, so we have
 	// to do this on a copy of the array; those tests should be fixed, but doing
 	// so is non-trivial.
-	sortedDeliveries := make([]*SubscriptionMessageDelivery, len(results.deliveries))
-	copy(sortedDeliveries, results.deliveries)
+	sortedDeliveries := make([]*SubscriptionMessageDelivery, len(results.Deliveries))
+	copy(sortedDeliveries, results.Deliveries)
 	sort.Slice(sortedDeliveries, func(i, j int) bool { return parse.UUIDLess(deliveries[i].ID, deliveries[j].ID) })
 
 	for _, d := range sortedDeliveries {
@@ -465,29 +466,6 @@ func (a *GetSubscriptionMessages) applyResults(
 
 	a.results = results
 	return nil
-}
-
-func (a *GetSubscriptionMessages) Deliveries() []*SubscriptionMessageDelivery {
-	return a.results.deliveries
-}
-
-func (a *GetSubscriptionMessages) Parameters() map[string]interface{} {
-	return map[string]interface{}{
-		"name":        a.params.Name,
-		"id":          a.params.ID,
-		"maxMessages": a.params.MaxMessages,
-		"maxBytes":    a.params.MaxBytes,
-	}
-}
-
-func (a *GetSubscriptionMessages) HasResults() bool {
-	return a.results != nil
-}
-
-func (a *GetSubscriptionMessages) Results() map[string]interface{} {
-	return map[string]interface{}{
-		"deliveries": a.results.deliveries,
-	}
 }
 
 // defaultMinDelay is the default ack timeout for subscriptions that don't

@@ -30,22 +30,23 @@ import (
 )
 
 type deleteSubscriptionParams struct {
-	name string
+	Name string
 }
 type deleteSubscriptionResults struct {
-	numDeleted int
+	NumDeleted int
 }
 type DeleteSubscription struct {
-	params  deleteSubscriptionParams
-	results *deleteSubscriptionResults
+	actionBase[deleteSubscriptionParams, deleteSubscriptionResults]
 }
 
-var _ Action = (*DeleteSubscription)(nil)
+var _ Action[deleteSubscriptionParams, deleteSubscriptionResults] = (*DeleteSubscription)(nil)
 
 func NewDeleteSubscription(name string) *DeleteSubscription {
 	return &DeleteSubscription{
-		params: struct{ name string }{
-			name: name,
+		actionBase[deleteSubscriptionParams, deleteSubscriptionResults]{
+			params: deleteSubscriptionParams{
+				Name: name,
+			},
 		},
 	}
 }
@@ -59,7 +60,7 @@ func (a *DeleteSubscription) Execute(ctx context.Context, tx *ent.Tx) error {
 	// need to lookup the subs to notify about deleting them
 	subs, err := tx.Subscription.Query().
 		Where(
-			subscription.Name(a.params.name),
+			subscription.Name(a.params.Name),
 			subscription.DeletedAtIsNil(),
 		).
 		All(ctx)
@@ -88,30 +89,10 @@ func (a *DeleteSubscription) Execute(ctx context.Context, tx *ent.Tx) error {
 	}
 
 	a.results = &deleteSubscriptionResults{
-		numDeleted: numDeleted,
+		NumDeleted: numDeleted,
 	}
 
 	timer.Succeeded(func() { deleteSubscriptionsCounter.Add(float64(numDeleted)) })
 
 	return nil
-}
-
-func (a *DeleteSubscription) NumDeleted() int {
-	return a.results.numDeleted
-}
-
-func (a *DeleteSubscription) Parameters() map[string]interface{} {
-	return map[string]interface{}{
-		"name": a.params.name,
-	}
-}
-
-func (a *DeleteSubscription) HasResults() bool {
-	return a.results != nil
-}
-
-func (a *DeleteSubscription) Results() map[string]interface{} {
-	return map[string]interface{}{
-		"numDeleted": a.results.numDeleted,
-	}
 }

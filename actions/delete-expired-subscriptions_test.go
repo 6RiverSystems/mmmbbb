@@ -123,9 +123,10 @@ func TestDeleteExpiredSubscriptions_Execute(t *testing.T) {
 				a := NewDeleteExpiredSubscriptions(tt.params)
 				tt.assertion(t, a.Execute(ctx, tx))
 				assert.Equal(t, tt.expect, a.results)
+				results, ok := a.Results()
 				if tt.expect != nil {
-					if assert.True(t, a.HasResults()) {
-						assert.Equal(t, tt.expect.NumDeleted, a.NumDeleted())
+					if assert.True(t, ok) {
+						assert.Equal(t, tt.expect.NumDeleted, results.NumDeleted)
 					}
 
 					// deleted subs should match the result expectation
@@ -137,6 +138,8 @@ func TestDeleteExpiredSubscriptions_Execute(t *testing.T) {
 						assert.NotZero(t, d.ExpiresAt)
 						assert.Less(t, d.ExpiresAt.UnixNano(), time.Now().UnixNano())
 					}
+				} else {
+					assert.False(t, ok)
 				}
 				return nil
 			}))

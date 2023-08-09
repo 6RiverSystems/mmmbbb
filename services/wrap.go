@@ -40,7 +40,7 @@ type wrappedService struct {
 	mmmbbbService
 }
 
-func (s *wrappedService) Initialize(ctx context.Context, services *registry.Registry, client_ entcommon.EntClient) error {
+func (s *wrappedService) Initialize(ctx context.Context, services *registry.Registry, client_ entcommon.EntClientBase) error {
 	client := client_.(*ent.Client)
 	return s.mmmbbbService.Initialize(ctx, services, client)
 }

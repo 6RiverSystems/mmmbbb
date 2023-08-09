@@ -66,10 +66,7 @@ func (s *PruneCommonSettings) ApplyDefaults() {
 	}
 }
 
-type pruneAction interface {
-	actions.Action
-	NumDeleted() int
-}
+type pruneAction = actions.Action[actions.PruneCommonParams, actions.PruneCommonResults]
 
 type pruneService struct {
 	name          string
@@ -119,12 +116,12 @@ LOOP:
 		select {
 		case <-ticker.C:
 			n, err := s.runOnce(ctx)
-			if s.action.HasResults() {
+			if results, ok := s.action.Results(); ok {
 				evt := s.logger.Trace()
-				if s.action.NumDeleted() > 0 {
+				if results.NumDeleted > 0 {
 					evt = s.logger.Info()
 				}
-				evt.Int("numDeleted", s.action.NumDeleted()).Msg("Action results")
+				evt.Int("numDeleted", results.NumDeleted).Msg("Action results")
 			}
 			if err != nil {
 				// log errors and go back to max interval, but don't give up
@@ -172,8 +169,8 @@ func (s *pruneService) runOnce(
 		err = tx.Commit()
 		tx = nil
 	}
-	if s.action.HasResults() {
-		return s.action.NumDeleted(), err
+	if results, ok := s.action.Results(); ok {
+		return results.NumDeleted, err
 	}
 	return 0, err
 }

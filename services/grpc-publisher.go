@@ -331,7 +331,8 @@ func (s *publisherServer) Publish(ctx context.Context, req *pubsub.PublishReques
 				// no expected logic errors here, only db weirdness
 				return grpc.AsStatusError(err)
 			}
-			resp.MessageIds[i] = action.MessageID().String()
+			results, _ := action.Results()
+			resp.MessageIds[i] = results.ID.String()
 		}
 
 		return nil

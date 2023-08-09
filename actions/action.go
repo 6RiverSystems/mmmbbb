@@ -28,16 +28,31 @@ import (
 	"go.6river.tech/mmmbbb/ent"
 )
 
-type Action interface {
+type Action[P any, R any] interface {
+	ActionData[P, R]
 	Execute(context.Context, *ent.Tx) error
+}
+type ActionData[P any, R any] interface {
+	Parameters() P
+	Results() (results R, ok bool)
+}
 
-	// individual types should declare accessors for specific results
+type actionBase[P, R any] struct {
+	params  P
+	results *R
+}
 
-	// these are for diag/logging, so strong typing isn't critical
+var _ ActionData[string, int] = (*actionBase[string, int])(nil)
 
-	Parameters() map[string]interface{}
-	HasResults() bool
-	Results() map[string]interface{}
+func (a *actionBase[P, R]) Parameters() P {
+	return a.params
+}
+
+func (a *actionBase[P, R]) Results() (results R, ok bool) {
+	if a.results != nil {
+		results, ok = *a.results, true
+	}
+	return
 }
 
 // actionTimer is a variation on a prometheus.Timer, where it records the

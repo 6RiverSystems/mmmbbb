@@ -66,7 +66,7 @@ func TestNackDeliveries_Execute(t *testing.T) {
 			NackDeliveriesParams{ /* generated in before */ },
 			assert.NoError,
 			&nackDeliveriesResults{
-				numNacked: 1,
+				NumNacked: 1,
 			},
 			nil,
 		},
@@ -84,7 +84,7 @@ func TestNackDeliveries_Execute(t *testing.T) {
 			NackDeliveriesParams{ /* generated in before */ },
 			assert.NoError,
 			&nackDeliveriesResults{
-				numNacked: 0,
+				NumNacked: 0,
 			},
 			nil,
 		},
@@ -106,8 +106,8 @@ func TestNackDeliveries_Execute(t *testing.T) {
 			NackDeliveriesParams{ /* generated in before */ },
 			assert.NoError,
 			&nackDeliveriesResults{
-				numNacked:       1,
-				numDeadLettered: 1,
+				NumNacked:       1,
+				NumDeadLettered: 1,
 			},
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
 				origDelivery, err := tx.Delivery.Get(ctx, xID(t, &ent.Delivery{}, 0))
@@ -135,16 +135,18 @@ func TestNackDeliveries_Execute(t *testing.T) {
 				if tt.before != nil {
 					tt.before(t, ctx, tx, &tt)
 				}
-				a := NewNackDeliveries(tt.params.ids...)
+				a := NewNackDeliveries(tt.params.IDs...)
 				tt.assertion(t, a.Execute(ctx, tx))
 				assert.Equal(t, tt.results, a.results)
+				results, ok := a.Results()
+				assert.Equal(t, tt.results != nil, ok)
 				if tt.results != nil && a.results != nil {
-					assert.Equal(t, tt.results.numNacked, a.NumNacked())
-					assert.Equal(t, tt.results.numDeadLettered, a.NumDeadLettered())
+					assert.Equal(t, tt.results.NumNacked, results.NumNacked)
+					assert.Equal(t, tt.results.NumDeadLettered, results.NumDeadLettered)
 				}
 				unNacked, err := tx.Delivery.Query().
 					Where(
-						delivery.IDIn(tt.params.ids...),
+						delivery.IDIn(tt.params.IDs...),
 						delivery.AttemptAtLTE(time.Now()),
 						delivery.CompletedAtIsNil(),
 					).Count(ctx)
@@ -152,12 +154,12 @@ func TestNackDeliveries_Execute(t *testing.T) {
 				assert.Zero(t, unNacked)
 				numDeadLettered, err := tx.Delivery.Query().
 					Where(
-						delivery.IDIn(tt.params.ids...),
+						delivery.IDIn(tt.params.IDs...),
 						delivery.CompletedAtNotNil(),
 					).Count(ctx)
 				assert.NoError(t, err)
 				if tt.results != nil {
-					assert.Equal(t, tt.results.numDeadLettered, numDeadLettered)
+					assert.Equal(t, tt.results.NumDeadLettered, numDeadLettered)
 				} else {
 					assert.Zero(t, numDeadLettered)
 				}

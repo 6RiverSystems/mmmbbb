@@ -32,11 +32,11 @@ type PruneExpiredDeliveries struct {
 	pruneAction
 }
 
-var _ Action = (*PruneExpiredDeliveries)(nil)
+var _ Action[PruneCommonParams, PruneCommonResults] = (*PruneExpiredDeliveries)(nil)
 
 func NewPruneExpiredDeliveries(params PruneCommonParams) *PruneExpiredDeliveries {
 	return &PruneExpiredDeliveries{
-		pruneAction: *newPruneAction(params),
+		pruneAction: newPruneAction(params),
 	}
 }
 

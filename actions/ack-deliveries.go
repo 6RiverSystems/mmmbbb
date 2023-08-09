@@ -37,21 +37,22 @@ type AckDeliveriesParams struct {
 	ids []uuid.UUID
 }
 type ackDeliveriesResults struct {
-	numAcked int
+	NumAcked int
 }
 type AckDeliveries struct {
-	params  AckDeliveriesParams
-	results *ackDeliveriesResults
+	actionBase[AckDeliveriesParams, ackDeliveriesResults]
 }
 
-var _ Action = (*AckDeliveries)(nil)
+var _ Action[AckDeliveriesParams, ackDeliveriesResults] = (*AckDeliveries)(nil)
 
 func NewAckDeliveries(
 	ids ...uuid.UUID,
 ) *AckDeliveries {
 	return &AckDeliveries{
-		params: AckDeliveriesParams{
-			ids: ids,
+		actionBase[AckDeliveriesParams, ackDeliveriesResults]{
+			params: AckDeliveriesParams{
+				ids: ids,
+			},
 		},
 	}
 }
@@ -111,29 +112,9 @@ func (a *AckDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 	})
 
 	a.results = &ackDeliveriesResults{
-		numAcked: numAcked,
+		NumAcked: numAcked,
 	}
 	timer.Succeeded(func() { ackDeliveriesCounter.Add(float64(numAcked)) })
 
 	return nil
-}
-
-func (a *AckDeliveries) Parameters() map[string]interface{} {
-	return map[string]interface{}{
-		"ids": a.params.ids,
-	}
-}
-
-func (a *AckDeliveries) HasResults() bool {
-	return a.results != nil
-}
-
-func (a *AckDeliveries) NumAcked() int {
-	return a.results.numAcked
-}
-
-func (a *AckDeliveries) Results() map[string]interface{} {
-	return map[string]interface{}{
-		"numAcked": a.results.numAcked,
-	}
 }

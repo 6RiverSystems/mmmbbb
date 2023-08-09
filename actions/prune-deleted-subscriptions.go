@@ -34,11 +34,11 @@ type PruneDeletedSubscriptions struct {
 	pruneAction
 }
 
-var _ Action = (*PruneDeletedSubscriptions)(nil)
+var _ Action[PruneCommonParams, PruneCommonResults] = (*PruneDeletedSubscriptions)(nil)
 
 func NewPruneDeletedSubscriptions(params PruneCommonParams) *PruneDeletedSubscriptions {
 	return &PruneDeletedSubscriptions{
-		pruneAction: *newPruneAction(params),
+		pruneAction: newPruneAction(params),
 	}
 }
 

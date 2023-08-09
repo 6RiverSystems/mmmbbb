@@ -65,7 +65,7 @@ func TestAckDeliveries_Execute(t *testing.T) {
 			AckDeliveriesParams{ /* generated in before */ },
 			assert.NoError,
 			&ackDeliveriesResults{
-				numAcked: 1,
+				NumAcked: 1,
 			},
 			uuid.UUID{},
 		},
@@ -84,7 +84,7 @@ func TestAckDeliveries_Execute(t *testing.T) {
 			AckDeliveriesParams{ /* generated in before */ },
 			assert.NoError,
 			&ackDeliveriesResults{
-				numAcked: 0,
+				NumAcked: 0,
 			},
 			uuid.UUID{},
 		},
@@ -106,7 +106,7 @@ func TestAckDeliveries_Execute(t *testing.T) {
 			AckDeliveriesParams{ /* generated in before */ },
 			assert.NoError,
 			&ackDeliveriesResults{
-				numAcked: 1,
+				NumAcked: 1,
 			},
 			uuid.UUID{ /* generated in before */ },
 		},
@@ -127,8 +127,10 @@ func TestAckDeliveries_Execute(t *testing.T) {
 				a := NewAckDeliveries(tt.params.ids...)
 				tt.assertion(t, a.Execute(ctx, tx))
 				assert.Equal(t, tt.results, a.results)
-				if tt.results != nil && a.results != nil {
-					assert.Equal(t, tt.results.numAcked, a.NumAcked())
+				results, ok := a.Results()
+				assert.Equal(t, tt.results != nil, ok)
+				if tt.results != nil {
+					assert.Equal(t, *tt.results, results)
 				}
 				unAcked, err := tx.Delivery.Query().
 					Where(

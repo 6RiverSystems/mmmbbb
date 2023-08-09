@@ -20,29 +20,25 @@
 package middleware
 
 import (
-	"database/sql"
+	"sync"
 
-	"github.com/gin-gonic/gin"
-
+	"go.6river.tech/gosix/db"
 	"go.6river.tech/gosix/ginmiddleware"
 	"go.6river.tech/mmmbbb/ent"
 )
 
-// thin shims around the generic ent middleware to add app-specific type safety.
-// these rely on a custom method added to the Client.
+var key ginmiddleware.EntKey[*ent.Client, *ent.Tx]
 
-func Client(c *gin.Context, name string) *ent.Client {
-	return ginmiddleware.Client(c, name).(*ent.Client)
+// TODO: upgrade to simpler construct once using go 1.21
+var keyInit sync.Once
+
+func Key() ginmiddleware.EntKey[*ent.Client, *ent.Tx] {
+	keyInit.Do(func() {
+		key = ginmiddleware.EntKey[*ent.Client, *ent.Tx](db.GetDefaultDbName())
+	})
+	return key
 }
 
-func WithTransaction(
-	name string,
-	opts *sql.TxOptions,
-	controls ...ginmiddleware.TransactionControl,
-) gin.HandlerFunc {
-	return ginmiddleware.WithTransaction(name, opts, controls...)
-}
-
-func Transaction(c *gin.Context, name string) *ent.Tx {
-	return ginmiddleware.Transaction(c, name).(*ent.Tx)
-}
+// func Transaction(c *gin.Context) *ent.Tx {
+// 	return ginmiddleware.Transaction(c, Key())
+// }

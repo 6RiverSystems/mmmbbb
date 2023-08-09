@@ -31,11 +31,11 @@ type PruneCompletedMessages struct {
 	pruneAction
 }
 
-var _ Action = (*PruneCompletedMessages)(nil)
+var _ Action[PruneCommonParams, PruneCommonResults] = (*PruneCompletedMessages)(nil)
 
 func NewPruneCompletedMessages(params PruneCommonParams) *PruneCompletedMessages {
 	return &PruneCompletedMessages{
-		pruneAction: *newPruneAction(params),
+		pruneAction: newPruneAction(params),
 	}
 }
 

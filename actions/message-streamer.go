@@ -241,9 +241,9 @@ func (ms *MessageStreamer) Go(ctx context.Context, conn StreamConnection) error 
 				return err
 			}
 
-			deliveries := getter.Deliveries()
+			results, _ := getter.Results()
 			mu.Lock()
-			for _, del := range deliveries {
+			for _, del := range results.Deliveries {
 				pending[del.ID] = &pendingMessage{
 					bytes:         len(del.Payload),
 					nextAttemptAt: del.NextAttemptAt,
@@ -251,17 +251,17 @@ func (ms *MessageStreamer) Go(ctx context.Context, conn StreamConnection) error 
 			}
 			mu.Unlock()
 
-			if len(deliveries) != 0 {
+			if len(results.Deliveries) != 0 {
 				ms.Logger.Trace().
-					// Interface("delivery", deliveries[0]).
-					Int("numDeliveries", len(deliveries)).
+					// Interface("delivery", results.Deliveries[0]).
+					Int("numDeliveries", len(results.Deliveries)).
 					Msg("Streaming some deliveries")
 				if sb, ok := conn.(StreamConnectionBatchSend); ok {
-					if err := sb.SendBatch(ctx, deliveries); err != nil {
+					if err := sb.SendBatch(ctx, results.Deliveries); err != nil {
 						return err
 					}
 				} else {
-					for _, d := range deliveries {
+					for _, d := range results.Deliveries {
 						if err := conn.Send(ctx, d); err != nil {
 							return err
 						}
@@ -420,11 +420,11 @@ func (ms *MessageStreamer) doAcksNacks(ctx context.Context, ackIDs, nackIDs []uu
 	if err != nil {
 		evt = ms.Logger.Error().Err(err)
 	}
-	if ack.HasResults() && len(ackIDs) != 0 {
-		evt.Int("attemptedAcks", len(ackIDs)).Int("acked", ack.NumAcked())
+	if ackRes, ok := ack.Results(); ok && len(ackIDs) != 0 {
+		evt.Int("attemptedAcks", len(ackIDs)).Int("acked", ackRes.NumAcked)
 	}
-	if nack.HasResults() && len(nackIDs) != 0 {
-		evt.Int("attemptedNacks", len(nackIDs)).Int("nacked", nack.NumNacked())
+	if results, ok := nack.Results(); ok && len(nackIDs) != 0 {
+		evt.Int("attemptedNacks", len(nackIDs)).Int("nacked", results.NumNacked)
 	}
 	evt.Msg("Processed ACK/NACK request")
 	return err
@@ -446,8 +446,8 @@ func (ms *MessageStreamer) doDelay(ctx context.Context, ids []uuid.UUID, delay t
 	}
 	evt = evt.Int("attempted", len(ids))
 	var numDelayed int
-	if dd.HasResults() {
-		numDelayed = dd.NumDelayed()
+	if results, ok := dd.Results(); ok {
+		numDelayed = results.NumDelayed
 		evt = evt.Int("delayed", numDelayed)
 	}
 	evt.Msg("Processed delays")

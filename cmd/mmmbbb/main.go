@@ -90,7 +90,7 @@ func NewApp() *app.App {
 			}
 			return nil
 		},
-		InitEnt: func(ctx context.Context, drv *sql.Driver, logger func(args ...interface{}), debug bool) (entcommon.EntClient, error) {
+		InitEnt: func(ctx context.Context, drv *sql.Driver, logger func(args ...interface{}), debug bool) (entcommon.EntClientBase, error) {
 			opts := []ent.Option{
 				ent.Driver(drv),
 				ent.Log(logger),

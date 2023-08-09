@@ -137,10 +137,13 @@ func TestPrunedDeletedSubscriptionDeliveries_Execute(t *testing.T) {
 				a := NewPruneDeletedSubscriptionDeliveries(tt.params)
 				tt.assertion(t, a.Execute(ctx, tx))
 				assert.Equal(t, tt.expect, a.results)
+				results, ok := a.Results()
 				if tt.expect != nil {
-					if assert.True(t, a.HasResults()) {
-						assert.Equal(t, tt.expect.NumDeleted, a.NumDeleted())
+					if assert.True(t, ok) {
+						assert.Equal(t, tt.expect.NumDeleted, results.NumDeleted)
 					}
+				} else {
+					assert.False(t, ok)
 				}
 
 				numRemaining, err := tx.Delivery.Query().Count(ctx)

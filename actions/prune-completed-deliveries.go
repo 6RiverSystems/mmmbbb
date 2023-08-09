@@ -31,11 +31,11 @@ type PruneCompletedDeliveries struct {
 	pruneAction
 }
 
-var _ Action = (*PruneCompletedDeliveries)(nil)
+var _ Action[PruneCommonParams, PruneCommonResults] = (*PruneCompletedDeliveries)(nil)
 
 func NewPruneCompletedDeliveries(params PruneCommonParams) *PruneCompletedDeliveries {
 	return &PruneCompletedDeliveries{
-		pruneAction: *newPruneAction(params),
+		pruneAction: newPruneAction(params),
 	}
 }
 

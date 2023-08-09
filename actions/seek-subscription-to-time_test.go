@@ -65,7 +65,7 @@ func TestSeekSubscriptionToTime_Execute(t *testing.T) {
 			// lots of details here will be filled in by the before hook
 			SeekSubscriptionToTimeParams{},
 			assert.NoError,
-			&seekSubscriptionToTimeResults{numAcked: 10, numDeAcked: 0},
+			&seekSubscriptionToTimeResults{NumAcked: 10, NumDeAcked: 0},
 			uuid.UUID{},
 			nil, nil, nil, nil,
 		},
@@ -88,7 +88,7 @@ func TestSeekSubscriptionToTime_Execute(t *testing.T) {
 			// lots of details here will be filled in by the before hook
 			SeekSubscriptionToTimeParams{},
 			assert.NoError,
-			&seekSubscriptionToTimeResults{numAcked: 0, numDeAcked: 10},
+			&seekSubscriptionToTimeResults{NumAcked: 0, NumDeAcked: 10},
 			uuid.UUID{},
 			nil, nil, nil, nil,
 		},
@@ -111,7 +111,7 @@ func TestSeekSubscriptionToTime_Execute(t *testing.T) {
 			// lots of details here will be filled in by the before hook
 			SeekSubscriptionToTimeParams{},
 			assert.NoError,
-			&seekSubscriptionToTimeResults{numAcked: 0, numDeAcked: 0},
+			&seekSubscriptionToTimeResults{NumAcked: 0, NumDeAcked: 0},
 			uuid.UUID{},
 			nil, nil, nil, nil,
 		},
@@ -133,7 +133,7 @@ func TestSeekSubscriptionToTime_Execute(t *testing.T) {
 			// lots of details here will be filled in by the before hook
 			SeekSubscriptionToTimeParams{},
 			assert.NoError,
-			&seekSubscriptionToTimeResults{numAcked: 0, numDeAcked: 0},
+			&seekSubscriptionToTimeResults{NumAcked: 0, NumDeAcked: 0},
 			uuid.UUID{},
 			nil, nil, nil, nil,
 		},
@@ -156,17 +156,15 @@ func TestSeekSubscriptionToTime_Execute(t *testing.T) {
 				a := NewSeekSubscriptionToTime(tt.params)
 				tt.assertion(t, a.Execute(ctx, tx))
 				assert.Equal(t, tt.results, a.results)
-				jsonParams := a.Parameters()
-				assert.Equal(t, &tt.sub.ID, jsonParams["id"])
-				assert.Equal(t, tt.sub.Name, jsonParams["name"])
-				assert.Equal(t, tt.params.Time, jsonParams["time"])
-				assert.Equal(t, tt.results != nil, a.HasResults())
+				params := a.Parameters()
+				assert.Equal(t, &tt.sub.ID, params.ID)
+				assert.Equal(t, tt.sub.Name, params.Name)
+				assert.Equal(t, tt.params.Time, params.Time)
+				results, ok := a.Results()
+				assert.Equal(t, tt.results != nil, ok)
 				if tt.results != nil && a.results != nil {
-					assert.Equal(t, tt.results.numAcked, a.NumAcked())
-					assert.Equal(t, tt.results.numDeAcked, a.NumDeAcked())
-					jsonResults := a.Results()
-					assert.Equal(t, tt.results.numAcked, jsonResults["numAcked"])
-					assert.Equal(t, tt.results.numDeAcked, jsonResults["numDeAcked"])
+					assert.Equal(t, tt.results.NumAcked, results.NumAcked)
+					assert.Equal(t, tt.results.NumDeAcked, results.NumDeAcked)
 				}
 				expectAckState(t, ctx, tx, tt.expectAcked, true)
 				expectAckState(t, ctx, tx, tt.expectNotAcked, false)

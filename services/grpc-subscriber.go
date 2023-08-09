@@ -115,7 +115,8 @@ func (s *subscriberServer) CreateSubscription(ctx context.Context, req *pubsub.S
 		}
 		return nil, grpc.AsStatusError(err)
 	}
-	return entSubscriptionToGrpc(action.Subscription(), params.TopicName, params.DeadLetterTopic), nil
+	results, _ := action.Results()
+	return entSubscriptionToGrpc(results.Sub, params.TopicName, params.DeadLetterTopic), nil
 }
 
 func (s *subscriberServer) GetSubscription(ctx context.Context, req *pubsub.GetSubscriptionRequest) (*pubsub.Subscription, error) {
@@ -442,9 +443,9 @@ func (s *subscriberServer) Pull(ctx context.Context, req *pubsub.PullRequest) (*
 		}
 		return nil, grpc.AsStatusError(err)
 	}
-	deliveries := action.Deliveries()
-	msgs := make([]*pubsub.ReceivedMessage, len(deliveries))
-	for i, d := range deliveries {
+	results, _ := action.Results()
+	msgs := make([]*pubsub.ReceivedMessage, len(results.Deliveries))
+	for i, d := range results.Deliveries {
 		msgs[i] = entDeliveryToGrpc(d)
 	}
 

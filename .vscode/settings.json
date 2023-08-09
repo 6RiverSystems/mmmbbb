@@ -20,6 +20,7 @@
     "EBNF",
     "emptypb",
     "entc",
+    "entcommon",
     "entgo",
     "entql",
     "enttest",
