@@ -25,8 +25,8 @@ require (
 	github.com/stretchr/testify v1.8.4
 	go.6river.tech/gosix v0.9.1
 	golang.org/x/sync v0.3.0
-	golang.org/x/tools v0.12.0
-	golang.org/x/vuln v1.0.0
+	golang.org/x/tools v0.12.1-0.20230815132531-74c255bcf846
+	golang.org/x/vuln v1.0.1
 	google.golang.org/api v0.137.0
 	google.golang.org/genproto v0.0.0-20230803162519-f966b187b2e5
 	google.golang.org/grpc v1.57.0
