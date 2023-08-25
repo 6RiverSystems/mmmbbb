@@ -11,6 +11,10 @@ updates:
     schedule:
       interval: "weekly"
       day: tuesday
+    groups:
+      go-everything:
+        patterns:
+          - "*"
   - package-ecosystem: "npm"
     directory: "/internal/ts-compat/" # Location of package manifests
     schedule:
@@ -19,3 +23,7 @@ updates:
     versioning-strategy: increase
     # registries:
     #   - artifactory
+    groups:
+      npm-ts-compat-everything:
+        patterns:
+          - "*"
