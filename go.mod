@@ -13,7 +13,7 @@ require (
 	github.com/golangci/golangci-lint v1.54.2
 	github.com/google/addlicense v1.1.1
 	github.com/google/uuid v1.3.1
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.2
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.17.1
 	github.com/iancoleman/strcase v0.3.0
 	github.com/jackc/pgx/v5 v5.4.3
 	github.com/magefile/mage v1.15.0
@@ -23,7 +23,7 @@ require (
 	github.com/quasilyte/go-ruleguard/dsl v0.3.22
 	github.com/rs/zerolog v1.30.0
 	github.com/stretchr/testify v1.8.4
-	go.6river.tech/gosix v0.9.2
+	go.6river.tech/gosix v0.9.4
 	golang.org/x/sync v0.3.0
 	golang.org/x/tools v0.12.1-0.20230815132531-74c255bcf846
 	golang.org/x/vuln v1.0.1
@@ -267,8 +267,8 @@ require (
 	golang.org/x/term v0.11.0 // indirect
 	golang.org/x/text v0.12.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20230803162519-f966b187b2e5 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20230807174057-1744710a1577 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20230822172742-b8732ec3820d // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230822172742-b8732ec3820d // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
