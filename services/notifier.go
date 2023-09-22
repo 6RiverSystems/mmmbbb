@@ -124,7 +124,6 @@ func (n *pgNotifier) Start(ctx context.Context, ready chan<- struct{}) error {
 
 	// connection retry loop
 	eg.Go(func() error {
-	LOOP:
 		for {
 			if err := n.runOnce(egCtx, &ready); err != nil {
 				if isContextError(err, egCtx) {
@@ -136,7 +135,7 @@ func (n *pgNotifier) Start(ctx context.Context, ready chan<- struct{}) error {
 				retryDelay := time.After(time.Second)
 				select {
 				case <-retryDelay:
-					continue LOOP
+					continue
 				case <-egCtx.Done():
 					return nil
 				}
