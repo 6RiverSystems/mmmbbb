@@ -766,8 +766,8 @@ github.com/zclconf/go-cty v1.10.0/go.mod h1:vVKLxnk3puL4qRAv72AO+W99LUD4da90g3uU
 gitlab.com/bosi/decorder v0.4.0 h1:HWuxAhSxIvsITcXeP+iIRg9d1cVfvVkmlF7M68GaoDY=
 gitlab.com/bosi/decorder v0.4.0/go.mod h1:xarnteyUoJiOTEldDysquWKTVDCKo2TOIOIibSuWqOg=
 go-simpler.org/assert v0.6.0 h1:QxSrXa4oRuo/1eHMXSBFHKvJIpWABayzKldqZyugG7E=
-go.6river.tech/gosix v0.10.7 h1:wzyS3yUWVzKXpvHaqpZhaqjUuHOkdUJY9pRXR+f8Ir0=
-go.6river.tech/gosix v0.10.7/go.mod h1:93P5SE6sZ2AeMKujC6NS1A7J3vDPZfzSl8hwmfmztzY=
+go.6river.tech/gosix v0.10.9 h1:4q4e1ksxsSOJFXvYhZRALHtbo/dz2LwvWpBSDybFzOg=
+go.6river.tech/gosix v0.10.9/go.mod h1:BQrkD3m8M48O/Gv/9v7M+pr7kHSJyeIrucBaY7EKh+s=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
 go.opencensus.io v0.22.0/go.mod h1:+kGneAE2xo2IficOXnaByMWTGM9T73dGwxeWcUqIpI8=
 go.opencensus.io v0.22.2/go.mod h1:yxeiOL68Rb0Xd1ddK5vPZ/oVn4vY4Ynel7k9FzqtOIw=

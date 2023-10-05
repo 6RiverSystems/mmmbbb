@@ -26,6 +26,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/sync/errgroup"
@@ -108,6 +109,7 @@ func initPubsubClient(t testing.TB) pubsub.Client {
 	psClient, err := pubsub.NewClient(
 		testutils.ContextForTest(t),
 		safeName(t),
+		prometheus.NewPedanticRegistry(),
 		"__test__"+strings.ReplaceAll(uuid.NewString(), "-", ""),
 		nil,
 	)

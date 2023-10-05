@@ -30,6 +30,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/zerolog"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/iterator"
@@ -95,7 +96,7 @@ func (s *topicMirrorIn) Initialize(ctx context.Context, _ *registry.Registry, cl
 	// context here is just for running initialization, whereas what we pass to
 	// NewClient will hang around, so we give that the background context and will
 	// handle stopping it differently
-	s.psClient, err = pubsub.NewClient(context.Background(), s.project, "topic_mirror_in", nil)
+	s.psClient, err = pubsub.NewClient(context.Background(), s.project, prometheus.DefaultRegisterer, "topic_mirror_in", nil)
 	if err != nil {
 		return err
 	}
