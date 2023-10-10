@@ -45,6 +45,16 @@ import (
 	"go.6river.tech/mmmbbb/ent/subscription"
 )
 
+func assertEqualJSON(t testing.TB, expected any, actual []byte) bool {
+	// JSON normalization differs between PG & SQLite, we don't care about that,
+	// we just want to assert on the value equality.
+	var actualValue any
+	if !assert.NoError(t, json.Unmarshal(actual, &actualValue)) {
+		return false
+	}
+	return assert.EqualValues(t, expected, actualValue)
+}
+
 // TODO: a bunch of these tests should be moved into `actions`
 func TestHttpPush(t *testing.T) {
 	logging.ConfigureDefaultLogging()
@@ -70,7 +80,7 @@ func TestHttpPush(t *testing.T) {
 				assert.Equal(t, safeName(t), m.Subscription)
 				decoded, err := base64.StdEncoding.DecodeString(m.Message.Data)
 				assert.NoError(t, err, "message data should be base64 decodable")
-				assert.Equal(t, `{"sequence": 0}`, string(decoded))
+				assertEqualJSON(t, map[string]any{"sequence": 0.0}, decoded)
 				assert.Empty(t, m.Message.Attributes)
 				assert.Empty(t, m.Message.OrderingKey)
 				assertNoMore(t, msgs)
@@ -119,7 +129,7 @@ func TestHttpPush(t *testing.T) {
 				assert.Equal(t, safeName(t), m.Subscription)
 				decoded, err := base64.StdEncoding.DecodeString(m.Message.Data)
 				assert.NoError(t, err, "message data should be base64 decodable")
-				assert.Equal(t, `{"sequence": 0}`, string(decoded))
+				assertEqualJSON(t, map[string]any{"sequence": 0.0}, decoded)
 				assert.Empty(t, m.Message.Attributes)
 				assert.Empty(t, m.Message.OrderingKey)
 				assertNoMore(t, msgs)
@@ -174,7 +184,7 @@ func TestHttpPush(t *testing.T) {
 				assert.Equal(t, safeName(t), m.Subscription)
 				decoded, err := base64.StdEncoding.DecodeString(m.Message.Data)
 				assert.NoError(t, err, "message data should be base64 decodable")
-				assert.Equal(t, `{"sequence": 1}`, string(decoded))
+				assertEqualJSON(t, map[string]any{"sequence": 1.0}, decoded)
 				assert.Empty(t, m.Message.Attributes)
 				assert.Empty(t, m.Message.OrderingKey)
 				assertNoMore(t, msgs)
@@ -550,7 +560,7 @@ func assertNoMore(t testing.TB, msgs chan *pubsub.PushRequest) {
 func publishMarker(t testing.TB, client *ent.Client, sequence int) error {
 	err := client.DoCtxTx(testutils.ContextForTest(t), nil, actions.NewPublishMessage(actions.PublishMessageParams{
 		TopicName: safeName(t),
-		Payload:   json.RawMessage(fmt.Sprintf(`{"sequence":%d}`, sequence)),
+		Payload:   json.RawMessage(fmt.Sprintf(`{"sequence": %d}`, sequence)),
 	}).Execute)
 	assert.NoError(t, err)
 	return err
