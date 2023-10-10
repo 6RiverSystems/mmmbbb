@@ -21,30 +21,82 @@ package enttest
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path"
 	"strings"
 	"testing"
+	"time"
+
+	dbSql "database/sql"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/ory/dockertest/v3"
+	"github.com/ory/dockertest/v3/docker"
+	"github.com/stretchr/testify/require"
 	_ "modernc.org/sqlite"
 
 	"go.6river.tech/gosix/db"
 	"go.6river.tech/gosix/db/postgres"
 	"go.6river.tech/gosix/testutils"
 	"go.6river.tech/mmmbbb/ent"
+	"go.6river.tech/mmmbbb/migrations"
 	"go.6river.tech/mmmbbb/version"
 )
+
+func StartDockertest(t testing.TB) string {
+	// if no DB url provided, use dockertest to spin one up
+	if testing.Short() {
+		t.Skip("dockertest setup is not short, skipping test")
+	}
+	t.Log("using dockertest to create postgresql 14 db")
+	pool, err := dockertest.NewPool("")
+	require.NoError(t, err)
+	require.NoError(t, pool.Client.PingWithContext(testutils.ContextForTest(t)))
+	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
+		Repository: "postgres",
+		Tag:        "14-alpine",
+		Env: []string{
+			"POSTGRES_USER=mmmbbb",
+			"POSTGRES_PASSWORD=mmmbbb",
+			"POSTGRES_DB=test",
+		},
+	}, func(hc *docker.HostConfig) {
+		// set AutoRemove to true so that stopped container goes away by itself
+		hc.AutoRemove = true
+		hc.RestartPolicy = docker.RestartPolicy{Name: "no"}
+	})
+	require.NoError(t, err)
+	t.Cleanup(func() { resource.Close() })
+	hostAndPort := resource.GetHostPort("5432/tcp")
+	dbUrl := fmt.Sprintf("postgres://mmmbbb:mmmbbb@%s/test?sslmode=disable", hostAndPort)
+	// wait for the db server to be ready
+	pool.MaxWait = 30 * time.Second
+	require.NoError(t, pool.Retry(func() error {
+		if db, err := dbSql.Open("pgx", dbUrl); err != nil {
+			t.Log("DB not ready yet")
+			return err
+		} else {
+			defer db.Close()
+			return db.Ping()
+		}
+	}))
+	t.Logf("DB is ready at %s", dbUrl)
+	return dbUrl
+}
 
 func ClientForTest(t testing.TB, opts ...ent.Option) *ent.Client {
 	var driverName, dialectName, dsn string
 	if env := os.Getenv("NODE_ENV"); env == "acceptance" {
 		driverName = "pgx"
 		dialectName = dialect.Postgres
-		dsn = db.PostgreSQLDSN("acceptance")
+		if dsn = os.Getenv("DATABASE_URL"); dsn == "" {
+			dsn = StartDockertest(t)
+			t.Setenv("DATABASE_URL", dsn)
+		}
 	} else {
 		driverName = db.SQLiteDriverName
 		dialectName = dialect.SQLite
@@ -76,7 +128,12 @@ func ClientForTest(t testing.TB, opts ...ent.Option) *ent.Client {
 		}
 		t.Fatalf("Failed to connect %s for ent: %v", dialectName, err)
 	}
-	if dialectName != dialect.Postgres {
+	switch dialectName {
+	case dialect.Postgres:
+		if err := db.MigrateUp(testutils.ContextForTest(t), client, migrations.MessageBusMigrations); err != nil {
+			t.Fatalf("Failed to apply migrations: %v", err)
+		}
+	default:
 		if err := db.MigrateUpEnt(testutils.ContextForTest(t), client.Schema); err != nil {
 			t.Fatalf("Failed to apply migrations: %v", err)
 		}

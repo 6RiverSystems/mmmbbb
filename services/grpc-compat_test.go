@@ -26,7 +26,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -772,9 +771,7 @@ func BenchmarkGrpcThroughputHardPostgreSQL(b *testing.B) {
 }
 
 func benchUsePg(b *testing.B) {
-	oldEnv := os.Getenv("NODE_ENV")
-	b.Cleanup(func() { os.Setenv("NODE_ENV", oldEnv) })
-	os.Setenv("NODE_ENV", "acceptance")
+	b.Setenv("NODE_ENV", "acceptance")
 }
 
 func benchThroughput(b *testing.B, numTopics, subsPerTopic, maxMessages int, payload json.RawMessage) {

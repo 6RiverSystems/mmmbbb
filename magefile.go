@@ -635,6 +635,7 @@ func TestSmoke(ctx context.Context, cmd, hostPort string) error {
 	// start the test run in the background
 	eg.Go(func() error {
 		args := []string{
+			"run", "gotest.tools/gotestsum",
 			"--format", "standard-verbose",
 			"--junitfile", filepath.Join(resultsDir, "gotestsum-smoke-report-"+cmd+".xml"),
 			"--",
@@ -647,7 +648,7 @@ func TestSmoke(ctx context.Context, cmd, hostPort string) error {
 			"./"+filepath.Join("cmd", cmd),
 		)
 		// have to use normal exec so the context can terminate this
-		cmd := exec.CommandContext(ctx, "gotestsum", args...)
+		cmd := exec.CommandContext(ctx, "go", args...)
 		cmd.Env = append([]string{}, os.Environ()...)
 		cmd.Env = append(cmd.Env, "NODE_ENV=acceptance")
 		cmd.Stdout = os.Stdout
