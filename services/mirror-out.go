@@ -250,6 +250,8 @@ func (s *topicMirrorOut) watchSub(ctx context.Context, subName, topicName string
 	psTopicName := s.localToRemoteName(topicName)
 	// assumes monitor loop will have handled topic creation
 	psTopic := s.psClient.Topic(psTopicName)
+	// assume we need to retain in-order delivery
+	psTopic.EnableMessageOrdering()
 
 	logger := s.logger.With(func(c zerolog.Context) zerolog.Context {
 		return c.

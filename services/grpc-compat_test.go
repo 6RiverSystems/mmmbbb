@@ -627,6 +627,7 @@ func TestGrpcCompat(t *testing.T) {
 			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
 				topic, err := psc.CreateTopic(ctx, safeName(t))
 				require.NoError(t, err)
+				topic.EnableMessageOrdering()
 				tt.topics = []pubsub.Topic{topic}
 			},
 			steps: []testStep{
