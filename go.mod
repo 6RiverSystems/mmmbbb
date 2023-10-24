@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go/pubsub v1.33.0
 	entgo.io/ent v0.12.4
 	github.com/alecthomas/participle/v2 v2.1.0
-	github.com/deepmap/oapi-codegen v1.16.1
+	github.com/deepmap/oapi-codegen v1.16.2
 	github.com/getkin/kin-openapi v0.120.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang/protobuf v1.5.3
