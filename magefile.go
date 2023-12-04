@@ -329,7 +329,7 @@ func InstallCITools(ctx context.Context) error {
 /* TODO
 tools:
 	mkdir -p ./tools
-	GOBIN=$(PWD)/tools go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen
+	GOBIN=$(PWD)/tools go install github.com/deepmap/oapi-codegen/v2/cmd/oapi-codegen
 	GOBIN=$(PWD)/tools go install entgo.io/ent/cmd/...
 	GOBIN=$(PWD)/tools go install github.com/golangci/golangci-lint/cmd/golangci-lint
 */

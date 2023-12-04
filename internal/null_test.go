@@ -34,7 +34,7 @@ import (
 	_ "gotest.tools/gotestsum/cmd"
 	_ "mvdan.cc/gofumpt"
 
-	_ "github.com/deepmap/oapi-codegen/pkg/codegen"
+	_ "github.com/deepmap/oapi-codegen/v2/pkg/codegen"
 	// needed for golangci-lint
 	_ "github.com/quasilyte/go-ruleguard/dsl"
 
