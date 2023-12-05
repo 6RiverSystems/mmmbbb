@@ -7,7 +7,7 @@ require (
 	entgo.io/ent v0.12.5
 	github.com/alecthomas/participle/v2 v2.1.1
 	github.com/deepmap/oapi-codegen/v2 v2.0.0
-	github.com/getkin/kin-openapi v0.120.0
+	github.com/getkin/kin-openapi v0.122.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang/protobuf v1.5.3
 	github.com/golangci/golangci-lint v1.55.2
