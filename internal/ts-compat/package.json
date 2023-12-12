@@ -19,7 +19,7 @@
   "license": "PROPRIETARY",
   "devDependencies": {
     "@types/node": "^17.0.45",
-    "typescript": "^5.3.2"
+    "typescript": "^5.3.3"
   },
   "dependencies": {
     "@google-cloud/pubsub": "^4.0.7"
