@@ -24,7 +24,7 @@ require (
 	github.com/quasilyte/go-ruleguard/dsl v0.3.22
 	github.com/rs/zerolog v1.31.0
 	github.com/stretchr/testify v1.8.5-0.20231109004427-db8608ed63f5
-	go.6river.tech/gosix v0.10.29
+	go.6river.tech/gosix v0.10.30
 	golang.org/x/sync v0.5.0
 	golang.org/x/tools v0.16.1
 	golang.org/x/vuln v1.0.1
@@ -32,7 +32,7 @@ require (
 	google.golang.org/genproto v0.0.0-20231127180814-3a041ad873d4
 	google.golang.org/grpc v1.60.1
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.3.0
-	google.golang.org/protobuf v1.31.0
+	google.golang.org/protobuf v1.32.0
 	gotest.tools/gotestsum v1.11.0
 	modernc.org/sqlite v1.28.0
 	mvdan.cc/gofumpt v0.5.0
