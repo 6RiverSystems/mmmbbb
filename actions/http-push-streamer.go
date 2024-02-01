@@ -238,8 +238,8 @@ func (c *httpPushStreamConn) Send(ctx context.Context, del *SubscriptionMessageD
 			Data:       payload64,
 			MessageId:  del.MessageID.String(),
 			// OrderingKey set below
-			// TODO: is this the right format?
-			PublishTime: del.PublishedAt.String(),
+			// NOTE: format matters!?
+			PublishTime: del.PublishedAt.Format(time.RFC3339Nano),
 		},
 		Subscription: c.subscriptionName,
 	}
