@@ -112,7 +112,7 @@ func (a *PublishMessage) Execute(ctx context.Context, tx *ent.Tx) error {
 	// add a delivery for each active subscription
 	dc := make([]*ent.DeliveryCreate, 0, len(t.Edges.Subscriptions))
 	for _, s := range t.Edges.Subscriptions {
-		if createDelivery, err := deliverToSubscription(ctx, tx, s, m, now, "actions/publish-message"); err != nil {
+		if createDelivery, err := deliverToSubscription(ctx, tx, s, m, now, "actions/publish-message", nil); err != nil {
 			return err
 		} else if createDelivery != nil {
 			dc = append(dc, createDelivery)
