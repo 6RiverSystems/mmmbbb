@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@google-cloud/pubsub':
-    specifier: ^4.3.0
-    version: 4.3.0
+    specifier: ^4.3.1
+    version: 4.3.1
 
 devDependencies:
   '@types/node':
@@ -42,8 +42,8 @@ packages:
     engines: {node: '>=14'}
     dev: false
 
-  /@google-cloud/pubsub@4.3.0:
-    resolution: {integrity: sha512-U+H1SQXtzgVubLSTDCAe37sfEXp3rBIwTow/RaS2Ep+fclQOXKmElrk7y4YfPH4utoG5vGMzlWMGv4jq4aWuxw==}
+  /@google-cloud/pubsub@4.3.1:
+    resolution: {integrity: sha512-AYiCv9yCC3qQVf4twdexExxx4dCBECVVskv6k6bjrpJ+XLK9ICRj9SaiQnF8HKP9W0UbNRcRiakxoSjsjZTK5A==}
     engines: {node: '>=14.0.0'}
     dependencies:
       '@google-cloud/paginator': 5.0.0
@@ -56,8 +56,8 @@ packages:
       '@types/long': 4.0.2
       arrify: 2.0.1
       extend: 3.0.2
-      google-auth-library: 9.6.2
-      google-gax: 4.3.0
+      google-auth-library: 9.6.3
+      google-gax: 4.3.1
       heap-js: 2.3.0
       is-stream-ended: 0.1.4
       lodash.snakecase: 4.1.1
@@ -67,8 +67,8 @@ packages:
       - supports-color
     dev: false
 
-  /@grpc/grpc-js@1.9.14:
-    resolution: {integrity: sha512-nOpuzZ2G3IuMFN+UPPpKrC6NsLmWsTqSsm66IRfnBt1D4pwTqE27lmbpcPM+l2Ua4gE7PfjRHI6uedAy7hoXUw==}
+  /@grpc/grpc-js@1.10.0:
+    resolution: {integrity: sha512-tx+eoEsqkMkLCHR4OOplwNIaJ7SVZWzeVKzEMBz8VR+TbssgBYOP4a0P+KQiQ6LaTG4SGaIEu7YTS8xOmkOWLA==}
     engines: {node: ^8.13.0 || >=10.10.0}
     dependencies:
       '@grpc/proto-loader': 0.7.10
@@ -329,7 +329,7 @@ packages:
     engines: {node: '>=14'}
     dependencies:
       extend: 3.0.2
-      https-proxy-agent: 7.0.2
+      https-proxy-agent: 7.0.3
       is-stream: 2.0.1
       node-fetch: 2.7.0
     transitivePeerDependencies:
@@ -353,8 +353,8 @@ packages:
     engines: {node: 6.* || 8.* || >= 10.*}
     dev: false
 
-  /google-auth-library@9.6.2:
-    resolution: {integrity: sha512-8G5i+uELrRE244PGnTc9UxiWZ2FMWD5jiIe9P2XSxCvXv/0ip/phjeHSE4bhJnLBdJb+Bu/Gj9Lr33TmDnbAiw==}
+  /google-auth-library@9.6.3:
+    resolution: {integrity: sha512-4CacM29MLC2eT9Cey5GDVK4Q8t+MMp8+OEdOaqD9MG6b0dOyLORaaeJMPQ7EESVgm/+z5EKYyFLxgzBJlJgyHQ==}
     engines: {node: '>=14'}
     dependencies:
       base64-js: 1.5.1
@@ -368,16 +368,16 @@ packages:
       - supports-color
     dev: false
 
-  /google-gax@4.3.0:
-    resolution: {integrity: sha512-SWHX72gbccNfpPoeTkNmZJxmLyKWeLr0+5Ch6qtrf4oAN8KFXnyXe5EixatILnJWufM3L59MRZ4hSJWVJ3IQqw==}
+  /google-gax@4.3.1:
+    resolution: {integrity: sha512-qpSfslpwqToIgQ+Tf3MjWIDjYK4UFIZ0uz6nLtttlW9N1NQA4PhGf9tlGo6KDYJ4rgL2w4CjXVd0z5yeNpN/Iw==}
     engines: {node: '>=14'}
     dependencies:
-      '@grpc/grpc-js': 1.9.14
+      '@grpc/grpc-js': 1.10.0
       '@grpc/proto-loader': 0.7.10
       '@types/long': 4.0.2
       abort-controller: 3.0.0
       duplexify: 4.1.2
-      google-auth-library: 9.6.2
+      google-auth-library: 9.6.3
       node-fetch: 2.7.0
       object-hash: 3.0.0
       proto3-json-serializer: 2.0.1
@@ -426,8 +426,8 @@ packages:
       - supports-color
     dev: false
 
-  /https-proxy-agent@7.0.2:
-    resolution: {integrity: sha512-NmLNjm6ucYwtcUmL7JQC1ZQ57LmHP4lT15FQ8D61nak1rO6DH+fz5qNK2Ap5UN4ZapYICE3/0KodcLYSPsPbaA==}
+  /https-proxy-agent@7.0.3:
+    resolution: {integrity: sha512-kCnwztfX0KZJSLOBrcL0emLeFako55NWMovvyPP2AjsghNk9RB1yjSI+jVumPHYZsNXegNoqupSW9IY3afSH8w==}
     engines: {node: '>= 14'}
     dependencies:
       agent-base: 7.1.0
