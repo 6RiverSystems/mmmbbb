@@ -119,6 +119,20 @@ func (Delivery) Annotations() []schema.Annotation {
 	}
 }
 
+type Snapshot struct {
+	ent.Schema
+}
+
+func (Snapshot) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entsql.Annotation{Table: "snapshots"},
+		edge.Annotation{
+			// don't serialize edges to JSON
+			StructTag: `json:"-"`,
+		},
+	}
+}
+
 // NOTE: field comments don't actually go anywhere right now
 
 func (Topic) Fields() []ent.Field {
@@ -430,6 +444,52 @@ func (Delivery) Indexes() []ent.Index {
 		index.Edges("notBefore"),
 		index.Edges("subscription"),
 		index.Edges("message"),
+	}
+}
+
+func (Snapshot) Fields() []ent.Field {
+	return []ent.Field{
+		field.UUID("id", uuid.UUID{}).
+			StorageKey("id").
+			Default(uuid.New).
+			Immutable(),
+		// topicID should be immutable, but that breaks the edge
+		field.UUID("topicID", uuid.UUID{}).
+			StorageKey("topic_id"),
+		field.String("name").
+			StorageKey("name").
+			SchemaType(textTypes).
+			Immutable().
+			NotEmpty(),
+		field.Time("createdAt").
+			StorageKey("created_at").
+			SchemaType(timestampTypes).
+			Default(time.Now).
+			Immutable(),
+		field.Time("expiresAt").
+			StorageKey("expires_at").
+			SchemaType(timestampTypes),
+		field.JSON("labels", map[string]string{}).
+			StorageKey("labels").
+			SchemaType(jsonTypes).
+			Optional(),
+		field.Time("ackedMessagesBefore").
+			StorageKey("acked_messages_before").
+			SchemaType(timestampTypes),
+		field.JSON("ackedMessageIDs", []uuid.UUID{}).
+			StorageKey("acked_message_ids").
+			SchemaType(jsonTypes).
+			Optional(),
+	}
+}
+
+func (Snapshot) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.To("topic", Topic.Type).
+			Unique().
+			Field("topicID").
+			Required().
+			StorageKey(edge.Column("topic_id")),
 	}
 }
 

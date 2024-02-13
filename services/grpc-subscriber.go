@@ -724,13 +724,6 @@ func applyPushConfig(mut *ent.SubscriptionUpdateOne, cfg *pubsub.PushConfig) *en
 	return mut
 }
 
-// Not planned: GetSnapshot
-// Not planned: ListSnapshots
-// Not planned: CreateSnapshot
-// Not planned: UpdateSnapshot
-// Not planned: DeleteSnapshot
-// Not planned: Seek
-
 func entSubscriptionToGrpc(subscription *ent.Subscription, topicName, deadLetterTopicName string) *pubsub.Subscription {
 	nominalDelay, _ := actions.NextDelayFor(subscription, 0)
 	ret := &pubsub.Subscription{

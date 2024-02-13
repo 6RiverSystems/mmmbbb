@@ -26,6 +26,7 @@ import (
 	"github.com/google/uuid"
 
 	"go.6river.tech/mmmbbb/ent"
+	"go.6river.tech/mmmbbb/ent/snapshot"
 	"go.6river.tech/mmmbbb/ent/topic"
 )
 
@@ -80,6 +81,12 @@ func (a *DeleteTopic) Execute(ctx context.Context, tx *ent.Tx) error {
 		ClearLive().
 		Save(ctx)
 	if err != nil {
+		return err
+	}
+	// hot-delete any snapshots, no live/dead impl there for now
+	if _, err := tx.Snapshot.Delete().
+		Where(snapshot.TopicIDIn(ids...)).
+		Exec(ctx); err != nil {
 		return err
 	}
 

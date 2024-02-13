@@ -65,6 +65,16 @@ func isValidSubscriptionName(name string) bool {
 		segments[3] != ""
 }
 
+func isValidSnapshotName(name string) bool {
+	// match projects/.../snapshots/...
+	segments := strings.Split(name, "/")
+	return len(segments) == 4 &&
+		segments[0] == "projects" &&
+		segments[1] != "" &&
+		segments[2] == "snapshots" &&
+		segments[3] != ""
+}
+
 func InitializeGrpcServers(_ context.Context, server *grpc.Server, services *registry.Registry, client_ entcommon.EntClientBase) error {
 	client := client_.(*ent.Client)
 	pubsub.RegisterPublisherServer(server, &publisherServer{client: client})
