@@ -21,6 +21,8 @@ package services
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/google/uuid"
@@ -28,7 +30,9 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"go.6river.tech/gosix/db/postgres"
 	"go.6river.tech/gosix/grpc"
+	"go.6river.tech/mmmbbb/actions"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/predicate"
 	"go.6river.tech/mmmbbb/ent/snapshot"
@@ -116,7 +120,26 @@ func (s *subscriberServer) CreateSnapshot(ctx context.Context, req *pubsub.Creat
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / subscription path %s", req.Subscription)
 	}
 
-	return nil, status.Errorf(codes.Unimplemented, "method CreateSnapshot not implemented")
+	params := actions.CreateSnapshotParams{
+		SubscriptionName: req.Subscription,
+		Name:             req.Name,
+		Labels:           req.Labels,
+	}
+	action := actions.NewCreateSnapshot(params)
+	if err := s.client.DoCtxTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable}, action.Execute); err != nil {
+		if isNotFound(err) {
+			return nil, status.Errorf(codes.NotFound, "Subscription not found: %s", req.Subscription)
+		}
+		if errors.Is(err, actions.ErrExists) {
+			return nil, status.Error(codes.AlreadyExists, "Subscription already exists")
+		}
+		if _, ok := postgres.IsPostgreSQLErrorCode(err, postgres.SerializationFailure); ok {
+			return nil, status.Error(codes.Aborted, err.Error())
+		}
+		return nil, grpc.AsStatusError(err)
+	}
+	results, _ := action.Results()
+	return entSnapshotToGrpc(results.Snapshot, results.TopicName), nil
 }
 
 func (s *subscriberServer) UpdateSnapshot(ctx context.Context, req *pubsub.UpdateSnapshotRequest) (*pubsub.Snapshot, error) {
