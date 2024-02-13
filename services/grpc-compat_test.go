@@ -417,7 +417,8 @@ func TestGrpcCompat(t *testing.T) {
 						if expected > 2 {
 							expected = 2
 						}
-						assert.Equal(t, ([]byte)(strconv.Itoa(int(expected))), m.RealMessage().Data)
+						assert.Equal(t, strconv.Itoa(int(expected)), string(m.RealMessage().Data),
+							"should get expected message (in order)")
 						if counter == 1 {
 							// go fast
 							defer m.Ack()

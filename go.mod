@@ -1,6 +1,8 @@
 module go.6river.tech/mmmbbb
 
-go 1.20
+go 1.21
+
+toolchain go1.21.6
 
 require (
 	cloud.google.com/go/pubsub v1.36.1
@@ -34,7 +36,7 @@ require (
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.3.0
 	google.golang.org/protobuf v1.32.0
 	gotest.tools/gotestsum v1.11.0
-	modernc.org/sqlite v1.28.0
+	modernc.org/sqlite v1.29.0
 	mvdan.cc/gofumpt v0.6.0
 )
 
@@ -159,6 +161,7 @@ require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-version v1.6.0 // indirect
+	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/hashicorp/hcl v1.0.1-vault-5 // indirect
 	github.com/hashicorp/hcl/v2 v2.19.1 // indirect
 	github.com/hexops/gotextdiff v1.0.3 // indirect
@@ -175,7 +178,6 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/julz/importas v0.1.0 // indirect
-	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/kisielk/errcheck v1.6.3 // indirect
 	github.com/kisielk/gotool v1.0.0 // indirect
 	github.com/kkHAIKE/contextcheck v1.1.4 // indirect
@@ -209,6 +211,7 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/moricho/tparallel v0.3.1 // indirect
 	github.com/nakabonne/nestif v0.3.1 // indirect
+	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/nishanths/exhaustive v0.11.0 // indirect
 	github.com/nishanths/predeclared v0.2.2 // indirect
 	github.com/nunnatsa/ginkgolinter v0.14.1 // indirect
@@ -305,15 +308,12 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	honnef.co/go/tools v0.4.6 // indirect
-	lukechampine.com/uint128 v1.2.0 // indirect
-	modernc.org/cc/v3 v3.40.0 // indirect
-	modernc.org/ccgo/v3 v3.16.13 // indirect
-	modernc.org/libc v1.29.0 // indirect
+	modernc.org/gc/v3 v3.0.0-20240107210532-573471604cb6 // indirect
+	modernc.org/libc v1.41.0 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.7.2 // indirect
-	modernc.org/opt v0.1.3 // indirect
 	modernc.org/strutil v1.2.0 // indirect
-	modernc.org/token v1.0.1 // indirect
+	modernc.org/token v1.1.0 // indirect
 	mvdan.cc/interfacer v0.0.0-20180901003855-c20040233aed // indirect
 	mvdan.cc/lint v0.0.0-20170908181259-adc824a0674b // indirect
 	mvdan.cc/unparam v0.0.0-20230917202934-3ee2d22f45fb // indirect
