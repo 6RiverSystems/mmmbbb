@@ -20,7 +20,7 @@
 create table snapshots (
 	id uuid not null primary key,
 	topic_id uuid not null references topics (id),
-	name string not null unique,
+	name text not null unique,
 	created_at timestamptz not null,
 	expires_at timestamptz not null,
 	labels jsonb null,
