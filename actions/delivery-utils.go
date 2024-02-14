@@ -43,29 +43,21 @@ func deliverToSubscription(
 	m *ent.Message,
 	now time.Time,
 	loggerName string,
-	cachedFilter **filter.Condition,
 ) (*ent.DeliveryCreate, error) {
-	if cachedFilter == nil {
-		var f *filter.Condition
-		cachedFilter = &f
-	}
 	if s.MessageFilter != nil && *s.MessageFilter != "" {
-		if *cachedFilter == nil {
-			var err error
-			if *cachedFilter, err = filter.Parser.ParseString(s.Name, *s.MessageFilter); err != nil {
-				// filter errors should have been caught at subscription create/update.
-				// do not break delivery because one sub has a broken filter, assume the
-				// filter matches nothing and drop the message.
-				logging.GetLoggerWith(loggerName, func(c zerolog.Context) zerolog.Context {
-					return c.
-						Str("subscriptionName", s.Name).
-						Stringer("subscriptionID", s.ID)
-				}).Err(err).Msg("skipping delivery due to subscription filter parse error")
-				filterErrorsCounter.Inc()
-				return nil, nil
-			}
-		}
-		if match, err := (*cachedFilter).Evaluate(m.Attributes); err != nil {
+		// TODO: cache parsed filters
+		if f, err := filter.Parser.ParseString(s.Name, *s.MessageFilter); err != nil {
+			// filter errors should have been caught at subscription create/update.
+			// do not break delivery because one sub has a broken filter, assume the
+			// filter matches nothing and drop the message.
+			logging.GetLoggerWith(loggerName, func(c zerolog.Context) zerolog.Context {
+				return c.
+					Str("subscriptionName", s.Name).
+					Stringer("subscriptionID", s.ID)
+			}).Err(err).Msg("skipping delivery due to subscription filter parse error")
+			filterErrorsCounter.Inc()
+			return nil, nil
+		} else if match, err := f.Evaluate(m.Attributes); err != nil {
 			// same idea
 			logging.GetLoggerWith(loggerName, func(c zerolog.Context) zerolog.Context {
 				return c.
@@ -168,7 +160,7 @@ func deadLetterDelivery(
 		}
 		var dlc []*ent.DeliveryCreate
 		for _, s := range dlTopic.Edges.Subscriptions {
-			if dc, err := deliverToSubscription(ctx, tx, s, m, now, loggerName, nil); err != nil {
+			if dc, err := deliverToSubscription(ctx, tx, s, m, now, loggerName); err != nil {
 				return err
 			} else if dc != nil {
 				dlc = append(dlc, dc)
