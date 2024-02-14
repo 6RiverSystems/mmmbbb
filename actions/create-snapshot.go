@@ -142,11 +142,15 @@ func (a *CreateSnapshot) Execute(ctx context.Context, tx *ent.Tx) error {
 				func(s *sql.Selector) {
 					t := sql.Table(delivery.Table).As("d")
 					s.LeftJoin(t).On(s.C(message.FieldID), t.C(delivery.FieldMessageID))
-					s.Where(sql.Or(
-						// no delivery
-						sql.IsNull(t.C(delivery.FieldID)),
-						// completed delivery
-						sql.NotNull(t.C(delivery.FieldCompletedAt)),
+					s.Where(sql.And(
+						// only care about deliveries for the same sub
+						sql.EQ(t.C(delivery.FieldSubscriptionID), sub.ID),
+						sql.Or(
+							// no delivery
+							sql.IsNull(t.C(delivery.FieldID)),
+							// completed delivery
+							sql.NotNull(t.C(delivery.FieldCompletedAt)),
+						),
 					))
 				},
 			).
