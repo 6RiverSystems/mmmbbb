@@ -478,7 +478,8 @@ func (s *subscriberServer) Seek(ctx context.Context, req *pubsub.SeekRequest) (*
 		return &pubsub.SeekResponse{}, nil
 	case *pubsub.SeekRequest_Snapshot:
 		action := actions.NewSeekSubscriptionToSnapshot(actions.SeekSubscriptionToSnapshotParams{
-			// FIXME
+			SubscriptionName: req.Subscription,
+			SnapshotName:     target.Snapshot,
 		})
 		if err := s.client.DoCtxTxRetry(
 			ctx,
