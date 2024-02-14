@@ -24,16 +24,13 @@ import (
 	"errors"
 	"time"
 
-	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
 
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/delivery"
-	"go.6river.tech/mmmbbb/ent/message"
 	"go.6river.tech/mmmbbb/ent/predicate"
 	"go.6river.tech/mmmbbb/ent/snapshot"
 	"go.6river.tech/mmmbbb/ent/subscription"
-	"go.6river.tech/mmmbbb/filter"
 )
 
 type SeekSubscriptionToSnapshotParams struct {
@@ -141,7 +138,6 @@ func (a *SeekSubscriptionToSnapshot) Execute(ctx context.Context, tx *ent.Tx) er
 	if nda, err := tx.Delivery.Update().
 		Where(
 			delivery.SubscriptionID(sub.ID),
-			delivery.ExpiresAtGTE(now),
 			delivery.PublishedAtGTE(snap.AckedMessagesBefore),
 			delivery.MessageIDNotIn(snap.AckedMessageIDs...),
 			delivery.CompletedAtNotNil(),
@@ -154,39 +150,6 @@ func (a *SeekSubscriptionToSnapshot) Execute(ctx context.Context, tx *ent.Tx) er
 	} else {
 		numDeAcked += nda
 	}
-
-	// recreate missing deliveries from after the threshold. we use an "on
-	// conflict ignore" insert instead of trying to find which ones are missing.
-	msgs, err := tx.Message.Query().
-		Where(
-			message.TopicID(sub.TopicID),
-			message.PublishedAtGTE(snap.AckedMessagesBefore),
-			message.IDNotIn(snap.AckedMessageIDs...),
-		).
-		Order(message.ByPublishedAt()).
-		All(ctx)
-	if err != nil {
-		return err
-	}
-	// since this is all for the same sub, caching the filter will help
-	var f *filter.Condition
-	var newDeliveries []*ent.DeliveryCreate
-	for _, m := range msgs {
-		if cd, err := deliverToSubscription(ctx, tx, sub, m, now, "actions/seek-subscription-to-snapshot", &f); err != nil {
-			return err
-		} else if cd != nil {
-			newDeliveries = append(newDeliveries, cd)
-		}
-	}
-
-	if err := tx.Delivery.
-		CreateBulk(newDeliveries...).
-		OnConflict(sql.DoNothing()).
-		Exec(ctx); err != nil {
-		return err
-	}
-	// this won't be quite right
-	numDeAcked += len(newDeliveries)
 
 	if numAcked != 0 || numDeAcked != 0 {
 		notifyPublish(tx, sub.ID)

@@ -535,7 +535,7 @@ func TestPublishMessage_Execute(t *testing.T) {
 			}))
 			for id, n := range pubNotifies {
 				// if we get a watch-anything expect, we expect nothing to have happened
-				if id != (uuid.UUID{}) {
+				if id != uuid.Nil {
 					assertClosed(t, n)
 				} else {
 					assertOpenEmpty(t, n)

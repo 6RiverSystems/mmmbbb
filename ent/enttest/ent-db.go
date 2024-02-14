@@ -148,6 +148,7 @@ func ResetTables(t testing.TB, client *ent.Client) {
 		client.Delivery.Delete().Exec,
 		client.Message.Delete().Exec,
 		client.Subscription.Delete().Exec,
+		client.Snapshot.Delete().Exec,
 		client.Topic.Delete().Exec,
 	}
 	ctx := testutils.ContextForTest(t)

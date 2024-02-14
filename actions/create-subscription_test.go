@@ -187,7 +187,7 @@ func TestCreateSubscription_Execute(t *testing.T) {
 					results, ok := a.Results()
 					assert.True(t, ok)
 					assert.Equal(t, tt.expect.topicID, results.TopicID)
-					if tt.expect.subscription.ID != (uuid.UUID{}) {
+					if tt.expect.subscription.ID != uuid.Nil {
 						assert.Equal(t, tt.expect.subscription.ID, results.ID)
 						assert.Equal(t, tt.expect.subscription.ID, results.Sub.ID)
 						checkSubEqual(t, &tt.expect.subscription, results.Sub)

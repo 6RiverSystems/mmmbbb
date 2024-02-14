@@ -95,6 +95,32 @@ func createSubscriptionClient(
 	return subscription
 }
 
+func createSnapshot(
+	t *testing.T, ctx context.Context, tx *ent.Tx, topic *ent.Topic, offset int,
+	opts ...func(*ent.SnapshotCreate) *ent.SnapshotCreate,
+) *ent.Snapshot {
+	return createSnapshotClient(t, ctx, tx.Client(), topic, offset, opts...)
+}
+
+func createSnapshotClient(
+	t *testing.T, ctx context.Context, client *ent.Client, topic *ent.Topic, offset int,
+	opts ...func(*ent.SnapshotCreate) *ent.SnapshotCreate,
+) *ent.Snapshot {
+	sc := client.Snapshot.Create().
+		SetID(xID(t, &ent.Snapshot{}, offset)).
+		SetName(nameFor(t, offset)).
+		SetTopic(topic).
+		SetExpiresAt(testutils.DeadlineForTest(t)).
+		SetAckedMessagesBefore(time.Now()).
+		SetAckedMessageIDs([]uuid.UUID{})
+	for _, o := range opts {
+		sc = o(sc)
+	}
+	snap, err := sc.Save(ctx)
+	require.NoError(t, err)
+	return snap
+}
+
 func createMessage(
 	t *testing.T, ctx context.Context, tx *ent.Tx, topic *ent.Topic, offset int,
 	opts ...func(*ent.MessageCreate) *ent.MessageCreate,
@@ -135,7 +161,8 @@ func createDeliveryClient(
 		SetID(xID(t, &ent.Delivery{}, offset)).
 		SetMessage(msg).
 		SetSubscription(sub).
-		SetExpiresAt(testutils.DeadlineForTest(t))
+		SetExpiresAt(testutils.DeadlineForTest(t)).
+		SetPublishedAt(msg.PublishedAt)
 	for _, o := range opts {
 		dc = o(dc)
 	}
