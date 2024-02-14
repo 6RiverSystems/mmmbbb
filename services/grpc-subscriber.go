@@ -477,7 +477,22 @@ func (s *subscriberServer) Seek(ctx context.Context, req *pubsub.SeekRequest) (*
 		}
 		return &pubsub.SeekResponse{}, nil
 	case *pubsub.SeekRequest_Snapshot:
-		return nil, status.Errorf(codes.Unimplemented, "Snapshots are not supported")
+		action := actions.NewSeekSubscriptionToSnapshot(actions.SeekSubscriptionToSnapshotParams{
+			SubscriptionName: req.Subscription,
+			SnapshotName:     target.Snapshot,
+		})
+		if err := s.client.DoCtxTxRetry(
+			ctx,
+			nil,
+			action.Execute,
+			postgres.RetryOnErrorCode(postgres.DeadlockDetected),
+		); err != nil {
+			if isNotFound(err) {
+				return nil, status.Errorf(codes.NotFound, "Subscription or snapshot not found: %s / %s", req.Subscription, target.Snapshot)
+			}
+			return nil, grpc.AsStatusError(err)
+		}
+		return &pubsub.SeekResponse{}, nil
 	default:
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid type for SeekRequest.Target")
 	}
@@ -723,13 +738,6 @@ func applyPushConfig(mut *ent.SubscriptionUpdateOne, cfg *pubsub.PushConfig) *en
 	}
 	return mut
 }
-
-// Not planned: GetSnapshot
-// Not planned: ListSnapshots
-// Not planned: CreateSnapshot
-// Not planned: UpdateSnapshot
-// Not planned: DeleteSnapshot
-// Not planned: Seek
 
 func entSubscriptionToGrpc(subscription *ent.Subscription, topicName, deadLetterTopicName string) *pubsub.Subscription {
 	nominalDelay, _ := actions.NextDelayFor(subscription, 0)

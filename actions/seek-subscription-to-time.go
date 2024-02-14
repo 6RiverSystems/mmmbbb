@@ -38,10 +38,11 @@ type SeekSubscriptionToTimeParams struct {
 	Time time.Time
 }
 
-type seekSubscriptionToTimeResults struct {
+type seekSubscriptionResults struct {
 	NumAcked   int
 	NumDeAcked int
 }
+type seekSubscriptionToTimeResults = seekSubscriptionResults
 
 type SeekSubscriptionToTime struct {
 	actionBase[SeekSubscriptionToTimeParams, seekSubscriptionToTimeResults]

@@ -86,16 +86,14 @@ func (a *CreateSubscription) Execute(ctx context.Context, tx *ent.Tx) error {
 	timer := startActionTimer(createSubscriptionsHistogram, tx)
 	defer timer.Ended()
 
-	exists, err := tx.Subscription.Query().
+	if exists, err := tx.Subscription.Query().
 		Where(
 			subscription.Name(a.params.Name),
 			subscription.DeletedAtIsNil(),
 		).
-		Exist(ctx)
-	if err != nil {
+		Exist(ctx); err != nil {
 		return err
-	}
-	if exists {
+	} else if exists {
 		return ErrExists
 	}
 

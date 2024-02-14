@@ -141,7 +141,7 @@ func TestAckDeliveries_Execute(t *testing.T) {
 				assert.Zero(t, unAcked)
 				return nil
 			}))
-			if tt.expectPublishNotify != (uuid.UUID{}) {
+			if tt.expectPublishNotify != uuid.Nil {
 				assertClosed(t, pubNotify)
 			} else {
 				assertOpenEmpty(t, pubNotify)

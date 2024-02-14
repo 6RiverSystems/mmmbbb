@@ -125,8 +125,7 @@ of June 2021):
 - Authentication settings for Push subscriptions
 - Authenticating to the service itself
 - Detaching subscriptions
-- Subscription Snapshots and seeking to them
-  - Seeking to a time is partially supported, but see below for notes
+- Updating snapshots
 - Changing message retry backoff settings for a subscription may not fully take
   effect when actively streaming messages from it (including from an HTTP Push
   configuration)
@@ -151,10 +150,10 @@ of June 2021):
   in their API documentation may be have differently with this implementation.
   - Example: Google does not currently document what happens if you delete a
     topic that is referenced as the dead letter topic for some Subscription.
-- Seeking a subscription to a time doesn't require enabling message retention,
-  since `mmmbbb` always retains messages to a limited extent. While seeking to a
-  time outside the limited automatic retention will not produce an error,
-  neither will it resurrect messages that have been permanently deleted.
+- Seeking a subscription to a time or snapshot doesn't require enabling message
+  retention, since `mmmbbb` always retains messages to a limited extent. While
+  seeking to a time outside the limited automatic retention will not produce an
+  error, neither will it resurrect messages that have been permanently deleted.
 
 ## Database model
 

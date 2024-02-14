@@ -350,7 +350,7 @@ func TestMessageStreamer_Go(t *testing.T) {
 			if tt.before != nil {
 				tt.before(t, ctx, client, &tt)
 			}
-			if tt.params.subscriptionName == "" && tt.params.subscriptionID == (uuid.UUID{}) {
+			if tt.params.subscriptionName == "" && tt.params.subscriptionID == uuid.Nil {
 				tt.params.subscriptionName = nameFor(t, 0)
 			}
 			a := &MessageStreamer{
@@ -360,7 +360,7 @@ func TestMessageStreamer_Go(t *testing.T) {
 				AutomaticNack:    tt.params.automaticNack,
 			}
 			a.Logger.Level(zerolog.Disabled)
-			if tt.params.subscriptionID != (uuid.UUID{}) {
+			if tt.params.subscriptionID != uuid.Nil {
 				a.SubscriptionID = &tt.params.subscriptionID
 			}
 			runCtx, cancel := context.WithCancel(ctx)

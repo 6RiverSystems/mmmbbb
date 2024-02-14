@@ -180,7 +180,7 @@ func TestPrunedExpiredDeliveries_Execute(t *testing.T) {
 				return nil
 			}))
 			// deleting expired ones should send a notify
-			if tt.expectPublishNotify != (uuid.UUID{}) {
+			if tt.expectPublishNotify != uuid.Nil {
 				assertClosed(t, pubNotify)
 			} else {
 				assertOpenEmpty(t, pubNotify)

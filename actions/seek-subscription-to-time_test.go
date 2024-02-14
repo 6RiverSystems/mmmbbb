@@ -66,7 +66,7 @@ func TestSeekSubscriptionToTime_Execute(t *testing.T) {
 			SeekSubscriptionToTimeParams{},
 			assert.NoError,
 			&seekSubscriptionToTimeResults{NumAcked: 10, NumDeAcked: 0},
-			uuid.UUID{},
+			uuid.Nil,
 			nil, nil, nil, nil,
 		},
 		{
@@ -89,7 +89,7 @@ func TestSeekSubscriptionToTime_Execute(t *testing.T) {
 			SeekSubscriptionToTimeParams{},
 			assert.NoError,
 			&seekSubscriptionToTimeResults{NumAcked: 0, NumDeAcked: 10},
-			uuid.UUID{},
+			uuid.Nil,
 			nil, nil, nil, nil,
 		},
 		{
@@ -112,7 +112,7 @@ func TestSeekSubscriptionToTime_Execute(t *testing.T) {
 			SeekSubscriptionToTimeParams{},
 			assert.NoError,
 			&seekSubscriptionToTimeResults{NumAcked: 0, NumDeAcked: 0},
-			uuid.UUID{},
+			uuid.Nil,
 			nil, nil, nil, nil,
 		},
 		{
@@ -134,7 +134,7 @@ func TestSeekSubscriptionToTime_Execute(t *testing.T) {
 			SeekSubscriptionToTimeParams{},
 			assert.NoError,
 			&seekSubscriptionToTimeResults{NumAcked: 0, NumDeAcked: 0},
-			uuid.UUID{},
+			uuid.Nil,
 			nil, nil, nil, nil,
 		},
 	}
@@ -170,7 +170,7 @@ func TestSeekSubscriptionToTime_Execute(t *testing.T) {
 				expectAckState(t, ctx, tx, tt.expectNotAcked, false)
 				return nil
 			}))
-			if tt.expectPublishNotify != (uuid.UUID{}) {
+			if tt.expectPublishNotify != (uuid.Nil) {
 				assertClosed(t, pubNotify)
 			} else {
 				assertOpenEmpty(t, pubNotify)

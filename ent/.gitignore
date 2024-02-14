@@ -24,6 +24,8 @@ tx.go
 # per-entity files
 topic*/
 /topic*.go
+snapshot*/
+/snapshot*.go
 subscription*/
 /subscription*.go
 message*/
