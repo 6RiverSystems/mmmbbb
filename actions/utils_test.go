@@ -199,6 +199,18 @@ func checkSubEqual(t *testing.T, expected, actual *ent.Subscription) {
 	// ignoring Edges
 }
 
+func checkSnapEqual(t *testing.T, expected, actual *ent.Snapshot, timeEpsilon time.Duration) {
+	// ignoring: ID, TopicID, CreatedAt
+	assert.Equal(t, expected.Name, actual.Name)
+	assert.WithinDuration(t, expected.ExpiresAt, actual.ExpiresAt, timeEpsilon,
+		"ExpiresAt")
+	assert.Equal(t, expected.Labels, actual.Labels)
+	assert.WithinDuration(t, expected.AckedMessagesBefore, actual.AckedMessagesBefore, timeEpsilon,
+		"AckedMessagesBefore")
+	// don't care about order here
+	assert.ElementsMatch(t, expected.AckedMessageIDs, actual.AckedMessageIDs)
+}
+
 func checkNullableIntervalEqual(t *testing.T, expected, actual *customtypes.Interval) bool {
 	return assert.Equal(t, expected, actual)
 }

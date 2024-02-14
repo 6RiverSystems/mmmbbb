@@ -174,8 +174,8 @@ func TestCreateSubscription_Execute(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			enttest.ResetTables(t, client)
-			subMod := SubModifiedAwaiter(uuid.UUID{}, t.Name())
-			defer CancelSubModifiedAwaiter(uuid.UUID{}, t.Name(), subMod)
+			subMod := SubModifiedAwaiter(uuid.Nil, t.Name())
+			defer CancelSubModifiedAwaiter(uuid.Nil, t.Name(), subMod)
 			assert.NoError(t, client.DoCtxTx(testutils.ContextForTest(t), nil, func(ctx context.Context, tx *ent.Tx) error {
 				if tt.before != nil {
 					tt.before(t, ctx, tx, &tt)
@@ -193,7 +193,7 @@ func TestCreateSubscription_Execute(t *testing.T) {
 						checkSubEqual(t, &tt.expect.subscription, results.Sub)
 					} else {
 						assert.Equal(t, results.Sub.ID, results.ID)
-						assert.NotEqual(t, results.ID, uuid.UUID{})
+						assert.NotEqual(t, results.ID, uuid.Nil)
 					}
 
 					sub, err := tx.Subscription.Get(ctx, results.ID)

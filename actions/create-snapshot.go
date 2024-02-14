@@ -100,6 +100,7 @@ func (a *CreateSnapshot) Execute(ctx context.Context, tx *ent.Tx) error {
 	create := tx.Snapshot.Create().
 		SetID(uuid.New()).
 		SetName(a.params.Name).
+		SetTopicID(sub.TopicID).
 		SetCreatedAt(now).
 		SetExpiresAt(now.Add(defaultSnapshotTTL))
 	if a.params.Labels != nil {
@@ -115,7 +116,7 @@ func (a *CreateSnapshot) Execute(ctx context.Context, tx *ent.Tx) error {
 	oldestUnAcked, err := sub.QueryDeliveries().
 		Where(
 			delivery.CompletedAtIsNil(),
-			delivery.ExpiresAtLT(now),
+			delivery.ExpiresAtGT(now),
 		).
 		Order(delivery.ByPublishedAt()).
 		Limit(1).
