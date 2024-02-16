@@ -444,6 +444,10 @@ func (Delivery) Indexes() []ent.Index {
 		index.Edges("notBefore"),
 		index.Edges("subscription"),
 		index.Edges("message"),
+		// order of the fields in the index matters here!
+		index.
+			Fields("subscriptionID", "attemptAt").
+			Annotations(entsql.IndexWhere("completed_at is null")),
 	}
 }
 
@@ -460,6 +464,7 @@ func (Snapshot) Fields() []ent.Field {
 			StorageKey("name").
 			SchemaType(textTypes).
 			Immutable().
+			Unique().
 			NotEmpty(),
 		field.Time("createdAt").
 			StorageKey("created_at").

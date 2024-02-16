@@ -290,6 +290,9 @@ func (a *GetSubscriptionMessages) queryAndLockDeliveriesOnce(
 		)
 	}
 	deliveries, err := q.
+		// this helps the query planner to know that it should use the index. not
+		// sure why it needs this hint, but it seems to help.
+		Order(delivery.ByAttemptAt()).
 		Limit(a.params.MaxMessages).
 		WithMessage().
 		All(ctx)
