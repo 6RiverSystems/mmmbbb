@@ -4,9 +4,9 @@ orbs:
   sixrs-gke: sixriversystems/sixrs-gke@7
 
 aliases:
-  - &pg_default "14.10"
-  - &pg_future "15.5"
-  - &pg_latest "16.1"
+  - &pg_default "14.11"
+  - &pg_future "15.6"
+  - &pg_latest "16.2"
 
 jobs:
   all-in-one:
