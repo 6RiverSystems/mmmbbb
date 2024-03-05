@@ -29,7 +29,6 @@ import (
 
 var key ginmiddleware.EntKey[*ent.Client, *ent.Tx]
 
-// TODO: upgrade to simpler construct once using go 1.21
 var keyInit sync.Once
 
 func Key() ginmiddleware.EntKey[*ent.Client, *ent.Tx] {
