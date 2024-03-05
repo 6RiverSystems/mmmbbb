@@ -176,8 +176,7 @@ jobs:
       # however protobuf is not
       - run: ./mage -v installProtobufTools
       - run: ./mage -v generate:force
-      - setup_remote_docker:
-          version: 20.10.11
+      - setup_remote_docker
       - sixrs-gke/docker-login
       - run:
           name: Initialize docker buildx
