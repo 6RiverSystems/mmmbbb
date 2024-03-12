@@ -19,9 +19,9 @@
   "license": "PROPRIETARY",
   "devDependencies": {
     "@types/node": "^17.0.45",
-    "typescript": "^5.3.3"
+    "typescript": "^5.4.2"
   },
   "dependencies": {
-    "@google-cloud/pubsub": "^4.3.2"
+    "@google-cloud/pubsub": "^4.3.3"
   }
 }
