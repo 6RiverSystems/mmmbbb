@@ -203,10 +203,14 @@ func TestMessageStreamer_Go(t *testing.T) {
 						notifyPublish(tx, sub.ID)
 						return nil
 					}))
-					del := <-conn.outbound
-					assert.NotNil(t, del)
-					assert.Equal(t, delID, del.ID)
-					assert.Equal(t, msgID, del.MessageID)
+					select {
+					case <-ctx.Done():
+						assert.NoError(t, ctx.Err(), "context canceled waiting for delivery")
+					case del := <-conn.outbound:
+						assert.NotNil(t, del)
+						assert.Equal(t, delID, del.ID)
+						assert.Equal(t, msgID, del.MessageID)
+					}
 				}
 				// end the session
 				cancel()
@@ -244,10 +248,14 @@ func TestMessageStreamer_Go(t *testing.T) {
 				}))
 				// receive up to flow control limit
 				for m := 0; m < 2; m++ {
-					del := <-conn.outbound
-					assert.NotNil(t, del)
-					assert.Equal(t, xID(t, &ent.Delivery{}, m), del.ID)
-					assert.Equal(t, xID(t, &ent.Message{}, m), del.MessageID)
+					select {
+					case <-ctx.Done():
+						assert.NoError(t, ctx.Err(), "context canceled waiting for delivery")
+					case del := <-conn.outbound:
+						assert.NotNil(t, del)
+						assert.Equal(t, xID(t, &ent.Delivery{}, m), del.ID)
+						assert.Equal(t, xID(t, &ent.Message{}, m), del.MessageID)
+					}
 				}
 				// verify we get nothing now
 				select {
