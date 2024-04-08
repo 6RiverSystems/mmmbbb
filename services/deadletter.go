@@ -24,10 +24,9 @@ import (
 	"math/rand"
 	"time"
 
-	"go.6river.tech/gosix/logging"
-	"go.6river.tech/gosix/registry"
 	"go.6river.tech/mmmbbb/actions"
 	"go.6river.tech/mmmbbb/ent"
+	"go.6river.tech/mmmbbb/logging"
 )
 
 // this is _almost_ a pruning service, except it doesn't have an age parameter
@@ -79,7 +78,7 @@ func (s *deadLetter) Name() string {
 	return "dead-letter"
 }
 
-func (s *deadLetter) Initialize(_ context.Context, _ *registry.Registry, client *ent.Client) error {
+func (s *deadLetter) Initialize(_ context.Context, client *ent.Client) error {
 	s.settings.ApplyDefaults()
 
 	s.logger = logging.GetLogger("services/" + s.Name())
@@ -133,7 +132,7 @@ LOOP:
 	return nil
 }
 
-func (s *deadLetter) Cleanup(context.Context, *registry.Registry) error {
+func (s *deadLetter) Cleanup(context.Context) error {
 	logger := s.logger
 	// these aren't really necessary
 	s.client = nil

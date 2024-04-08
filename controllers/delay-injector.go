@@ -28,8 +28,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"go.6river.tech/gosix/ginmiddleware"
-	"go.6river.tech/gosix/registry"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/subscription"
 	"go.6river.tech/mmmbbb/middleware"
@@ -37,17 +35,17 @@ import (
 )
 
 type DelayInjectorController struct {
-	dbName ginmiddleware.EntKey[*ent.Client, *ent.Tx]
+	dbName middleware.EntKey
 }
 
 const delaysRootPath = "/delays"
 
-func (cc *DelayInjectorController) Register(_ *registry.Registry, router gin.IRouter) error {
+func (cc *DelayInjectorController) Register(router gin.IRouter) error {
 	if cc.dbName == "" {
 		cc.dbName = middleware.Key()
 	}
 	rg := router.Group(delaysRootPath)
-	rg.Use(ginmiddleware.WithTransaction(cc.dbName, nil, func(ctx *gin.Context, to *sql.TxOptions) bool {
+	rg.Use(middleware.WithTransaction(cc.dbName, nil, func(ctx *gin.Context, to *sql.TxOptions) bool {
 		return ctx.Request.Method != http.MethodGet
 	}))
 
@@ -63,7 +61,7 @@ func (cc *DelayInjectorController) GetDelay(c *gin.Context) {
 	// Gin includes the leading slash when we're using the *param format
 	subName = strings.TrimPrefix(subName, "/")
 	// don't need a tx for this, we're read-only
-	cli := ginmiddleware.Client(c, cc.dbName)
+	cli := middleware.Client(c, cc.dbName)
 
 	sub, err := cli.Subscription.Query().Where(
 		subscription.Name(subName),
@@ -84,7 +82,7 @@ func (cc *DelayInjectorController) PutDelay(c *gin.Context) {
 	subName := c.Param("subscription")
 	// Gin includes the leading slash when we're using the *param format
 	subName = strings.TrimPrefix(subName, "/")
-	tx := ginmiddleware.Transaction(c, cc.dbName)
+	tx := middleware.Transaction(c, cc.dbName)
 
 	defer c.Request.Body.Close()
 	decoder := json.NewDecoder(c.Request.Body)
@@ -121,7 +119,7 @@ func (cc *DelayInjectorController) DeleteDelay(c *gin.Context) {
 	subName := c.Param("subscription")
 	// Gin includes the leading slash when we're using the *param format
 	subName = strings.TrimPrefix(subName, "/")
-	tx := ginmiddleware.Transaction(c, cc.dbName)
+	tx := middleware.Transaction(c, cc.dbName)
 
 	n, err := tx.Subscription.Update().
 		SetDeliveryDelay(0).

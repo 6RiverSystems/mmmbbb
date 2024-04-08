@@ -34,7 +34,7 @@ import (
 	"entgo.io/ent/schema/index"
 	"github.com/google/uuid"
 
-	"go.6river.tech/gosix/ent/customtypes"
+	"go.6river.tech/mmmbbb/internal/sqltypes"
 )
 
 var textTypes = map[string]string{
@@ -232,11 +232,11 @@ func (Subscription) Fields() []ent.Field {
 		field.String("ttl").
 			StorageKey("ttl").
 			SchemaType(intervalTypes).
-			GoType(customtypes.Interval(0)),
+			GoType(sqltypes.Interval(0)),
 		field.String("messageTTL").
 			StorageKey("message_ttl").
 			SchemaType(intervalTypes).
-			GoType(customtypes.Interval(0)),
+			GoType(sqltypes.Interval(0)),
 		field.Bool("orderedDelivery").
 			StorageKey("ordered_delivery").
 			Optional().
@@ -248,13 +248,13 @@ func (Subscription) Fields() []ent.Field {
 		field.String("minBackoff").
 			StorageKey("min_backoff").
 			SchemaType(intervalTypes).
-			GoType((*customtypes.Interval)(nil)).
+			GoType((*sqltypes.Interval)(nil)).
 			Optional().
 			Nillable(),
 		field.String("maxBackoff").
 			StorageKey("max_backoff").
 			SchemaType(intervalTypes).
-			GoType((*customtypes.Interval)(nil)).
+			GoType((*sqltypes.Interval)(nil)).
 			Optional().
 			Nillable(),
 		field.String("pushEndpoint").
@@ -273,10 +273,10 @@ func (Subscription) Fields() []ent.Field {
 			StorageKey("dead_letter_topic_id").
 			Optional().
 			Nillable(),
-		field.Other("deliveryDelay", customtypes.Interval(0)).
+		field.Other("deliveryDelay", sqltypes.Interval(0)).
 			StorageKey("delivery_delay").
 			SchemaType(intervalTypes).
-			Default(customtypes.Interval(0)),
+			Default(sqltypes.Interval(0)),
 	}
 }
 

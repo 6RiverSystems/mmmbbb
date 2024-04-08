@@ -30,12 +30,12 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"go.6river.tech/gosix/db/postgres"
-	"go.6river.tech/gosix/grpc"
 	"go.6river.tech/mmmbbb/actions"
+	"go.6river.tech/mmmbbb/db/postgres"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/predicate"
 	"go.6river.tech/mmmbbb/ent/snapshot"
+	"go.6river.tech/mmmbbb/grpc"
 	"go.6river.tech/mmmbbb/grpc/pubsub"
 )
 

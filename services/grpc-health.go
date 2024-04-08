@@ -21,12 +21,10 @@ package services
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	health "google.golang.org/grpc/health/grpc_health_v1"
 
-	"go.6river.tech/gosix/registry"
 	"go.6river.tech/mmmbbb/ent"
 )
 
@@ -36,12 +34,12 @@ import (
 type healthServer struct {
 	health.UnimplementedHealthServer
 
-	client   *ent.Client
-	services *registry.Registry
+	client  *ent.Client
+	readies []ReadyCheck
 }
 
 func (s *healthServer) Check(ctx context.Context, req *health.HealthCheckRequest) (*health.HealthCheckResponse, error) {
-	if s.client == nil || s.services == nil {
+	if s.client == nil || s.readies == nil {
 		return &health.HealthCheckResponse{
 			Status: health.HealthCheckResponse_NOT_SERVING,
 		}, nil
@@ -58,28 +56,21 @@ func (s *healthServer) Check(ctx context.Context, req *health.HealthCheckRequest
 		}, nil
 	}
 
-	if !s.services.ServicesInitialized() || !s.services.ServicesStarted() {
+	// TODO: restore ready-by-service support
+	if req.Service != "" {
 		return &health.HealthCheckResponse{
-			Status: health.HealthCheckResponse_NOT_SERVING,
+			Status: health.HealthCheckResponse_SERVICE_UNKNOWN,
 		}, nil
-	}
-	var err error
-	if req.GetService() == "" {
-		err = s.services.WaitAllReady(ctx)
-	} else {
-		err = s.services.WaitReadyByName(ctx, req.GetService())
 	}
 
-	if err != nil {
-		if errors.Is(err, registry.ServiceNotFoundError) {
+	for _, r := range s.readies {
+		if err := r.Ready(); err != nil {
 			return &health.HealthCheckResponse{
-				Status: health.HealthCheckResponse_SERVICE_UNKNOWN,
+				Status: health.HealthCheckResponse_NOT_SERVING,
 			}, nil
 		}
-		return &health.HealthCheckResponse{
-			Status: health.HealthCheckResponse_NOT_SERVING,
-		}, nil
 	}
+
 	return &health.HealthCheckResponse{
 		Status: health.HealthCheckResponse_SERVING,
 	}, nil

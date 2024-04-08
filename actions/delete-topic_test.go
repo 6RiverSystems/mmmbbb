@@ -26,9 +26,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"go.6river.tech/gosix/testutils"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/enttest"
+	"go.6river.tech/mmmbbb/internal/testutil"
 )
 
 func TestDeleteTopic_Execute(t *testing.T) {
@@ -79,7 +79,7 @@ func TestDeleteTopic_Execute(t *testing.T) {
 			topicID := xID(t, &ent.Topic{}, 0)
 			topicMod := TopicModifiedAwaiter(topicID, nameFor(t, 0))
 			defer CancelTopicModifiedAwaiter(topicID, nameFor(t, 0), topicMod)
-			assert.NoError(t, client.DoCtxTx(testutils.ContextForTest(t), nil, func(ctx context.Context, tx *ent.Tx) error {
+			assert.NoError(t, client.DoCtxTx(testutil.Context(t), nil, func(ctx context.Context, tx *ent.Tx) error {
 				if tt.before != nil {
 					tt.before(t, ctx, tx, &tt)
 				}

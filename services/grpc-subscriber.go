@@ -33,18 +33,18 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"go.6river.tech/gosix/db/postgres"
-	"go.6river.tech/gosix/ent/customtypes"
-	"go.6river.tech/gosix/grpc"
-	"go.6river.tech/gosix/logging"
 	"go.6river.tech/mmmbbb/actions"
+	"go.6river.tech/mmmbbb/db/postgres"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/predicate"
 	"go.6river.tech/mmmbbb/ent/subscription"
 	"go.6river.tech/mmmbbb/ent/topic"
 	"go.6river.tech/mmmbbb/filter"
+	"go.6river.tech/mmmbbb/grpc"
 	mbgrpc "go.6river.tech/mmmbbb/grpc"
 	"go.6river.tech/mmmbbb/grpc/pubsub"
+	"go.6river.tech/mmmbbb/internal/sqltypes"
+	"go.6river.tech/mmmbbb/logging"
 	"go.6river.tech/mmmbbb/parse"
 )
 
@@ -196,14 +196,14 @@ func (s *subscriberServer) UpdateSubscription(ctx context.Context, req *pubsub.U
 				if ttl == 0 {
 					ttl = defaultSubscriptionTTL
 				}
-				subUpdate.SetTTL(customtypes.Interval(ttl))
+				subUpdate.SetTTL(sqltypes.Interval(ttl))
 				subUpdate.SetExpiresAt(time.Now().Add(ttl))
 			case "message_retention_duration":
 				messageTTL := req.Subscription.MessageRetentionDuration.AsDuration()
 				if messageTTL == 0 {
 					messageTTL = defaultSubscriptionMessageTTL
 				}
-				subUpdate.SetMessageTTL(customtypes.Interval(messageTTL))
+				subUpdate.SetMessageTTL(sqltypes.Interval(messageTTL))
 			case "enable_message_ordering":
 				// NOTE: Google does not support changing this on the fly, even though
 				// we (sort of) do
@@ -215,12 +215,12 @@ func (s *subscriberServer) UpdateSubscription(ctx context.Context, req *pubsub.U
 				if min == nil {
 					subUpdate.ClearMinBackoff()
 				} else {
-					subUpdate.SetMinBackoff(customtypes.IntervalPtr(min.AsDuration()))
+					subUpdate.SetMinBackoff(sqltypes.IntervalPtr(min.AsDuration()))
 				}
 				if max == nil {
 					subUpdate.ClearMaxBackoff()
 				} else {
-					subUpdate.SetMaxBackoff(customtypes.IntervalPtr(max.AsDuration()))
+					subUpdate.SetMaxBackoff(sqltypes.IntervalPtr(max.AsDuration()))
 				}
 			case "push_config":
 				if err := validatePushConfig(req.Subscription.PushConfig); err != nil {

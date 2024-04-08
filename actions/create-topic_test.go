@@ -26,12 +26,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"go.6river.tech/gosix/testutils"
 	"go.6river.tech/mmmbbb/ent/enttest"
+	"go.6river.tech/mmmbbb/internal/testutil"
 )
 
 func TestCreateTopic(t *testing.T) {
-	ctx := testutils.ContextForTest(t)
+	ctx := testutil.Context(t)
 	client := enttest.ClientForTest(t)
 
 	tests := []struct {
@@ -87,7 +87,7 @@ func TestCreateTopic(t *testing.T) {
 			"fail create duplicate",
 			func(t *testing.T) {
 				require.NoError(t, client.DoCtxTx(
-					testutils.ContextForTest(t),
+					testutil.Context(t),
 					nil,
 					NewCreateTopic(CreateTopicParams{Name: "xyzzy"}).
 						Execute,

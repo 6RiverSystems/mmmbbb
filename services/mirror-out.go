@@ -27,20 +27,18 @@ import (
 	"regexp"
 	"time"
 
+	"cloud.google.com/go/pubsub"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/google/uuid"
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/zerolog"
 
-	"go.6river.tech/gosix/logging"
-	"go.6river.tech/gosix/pubsub"
-	"go.6river.tech/gosix/registry"
 	"go.6river.tech/mmmbbb/actions"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/topic"
+	"go.6river.tech/mmmbbb/logging"
 )
 
 // topicMirrorOut manages mirroring mmmbbb topics to google pubsub
@@ -56,7 +54,7 @@ type topicMirrorOut struct {
 	logger      *logging.Logger
 	hostName    string
 	client      *ent.Client
-	psClient    pubsub.Client
+	psClient    *pubsub.Client
 	subWatchers map[string]monitoredGroup
 }
 
@@ -64,7 +62,7 @@ func (s *topicMirrorOut) Name() string {
 	return fmt.Sprintf("topic-mirror-out(%s)", s.project)
 }
 
-func (s *topicMirrorOut) Initialize(ctx context.Context, _ *registry.Registry, client *ent.Client) error {
+func (s *topicMirrorOut) Initialize(ctx context.Context, client *ent.Client) error {
 	if s.project == "" {
 		return errors.New("project config missing")
 	}
@@ -90,7 +88,7 @@ func (s *topicMirrorOut) Initialize(ctx context.Context, _ *registry.Registry, c
 	// context here is just for running initialization, whereas what we pass to
 	// NewClient will hang around, so we give that the background context and will
 	// handle stopping it differently
-	s.psClient, err = pubsub.NewClient(context.Background(), s.project, prometheus.DefaultRegisterer, "topic_mirror_out", nil)
+	s.psClient, err = pubsub.NewClient(context.Background(), s.project)
 	if err != nil {
 		return err
 	}
@@ -251,7 +249,7 @@ func (s *topicMirrorOut) watchSub(ctx context.Context, subName, topicName string
 	// assumes monitor loop will have handled topic creation
 	psTopic := s.psClient.Topic(psTopicName)
 	// assume we need to retain in-order delivery
-	psTopic.EnableMessageOrdering()
+	psTopic.EnableMessageOrdering = true
 
 	logger := s.logger.With(func(c zerolog.Context) zerolog.Context {
 		return c.
@@ -312,7 +310,7 @@ func (s *topicMirrorOut) watchSub(ctx context.Context, subName, topicName string
 					outAttrs[k] = v
 				}
 			}
-			pubResults[i] = psTopic.Publish(ctx, &pubsub.RealMessage{
+			pubResults[i] = psTopic.Publish(ctx, &pubsub.Message{
 				OrderingKey: orderKey,
 				Data:        d.Payload,
 				Attributes:  outAttrs,
@@ -370,7 +368,7 @@ func (s *topicMirrorOut) subName(topicName string, topicID uuid.UUID) string {
 	return subName
 }
 
-func (s *topicMirrorOut) Cleanup(ctx context.Context, _ *registry.Registry) error {
+func (s *topicMirrorOut) Cleanup(ctx context.Context) error {
 	if s.psClient != nil {
 		if err := s.psClient.Close(); err != nil {
 			return err
@@ -392,8 +390,12 @@ func init() {
 			}
 		}
 		shardFilter := parseShardConfig()
+		projectId := os.Getenv("PUBSUB_GCLOUD_PROJECT_ID")
+		if projectId == "" {
+			panic(fmt.Errorf("cannot use MIRROR_OUT_SITE_NAME=%q without PUBSUB_GCLOUD_PROJECT_ID", site))
+		}
 		defaultServices = append(defaultServices, &topicMirrorOut{
-			project: pubsub.DefaultProjectId(),
+			project: projectId,
 			localToRemoteName: func(name string) string {
 				return fmt.Sprintf("%s-%s", site, name)
 			},

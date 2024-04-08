@@ -20,26 +20,26 @@
 package services
 
 import (
+	"context"
 	"os"
 	"strconv"
 	"strings"
 	"testing"
 
-	"github.com/google/uuid"
-	"github.com/prometheus/client_golang/prometheus"
+	"cloud.google.com/go/pubsub"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/sync/errgroup"
+	"google.golang.org/grpc"
 
-	grpccommon "go.6river.tech/gosix/grpc"
-	"go.6river.tech/gosix/logging"
-	"go.6river.tech/gosix/pubsub"
-	"go.6river.tech/gosix/registry"
-	"go.6river.tech/gosix/server"
-	"go.6river.tech/gosix/testutils"
 	"go.6river.tech/mmmbbb/defaults"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/enttest"
+	"go.6river.tech/mmmbbb/faults"
+	mbgrpc "go.6river.tech/mmmbbb/grpc"
+	"go.6river.tech/mmmbbb/internal"
+	"go.6river.tech/mmmbbb/internal/testutil"
+	"go.6river.tech/mmmbbb/logging"
 )
 
 func safeName(t testing.TB) string {
@@ -48,25 +48,28 @@ func safeName(t testing.TB) string {
 	return name
 }
 
-func initGrpcTest(t testing.TB) (client *ent.Client, psClient pubsub.Client) {
-	return initGrpcService(t, registry.New(t.Name(), nil)), initPubsubClient(t)
+func initGrpcTest(t testing.TB) (client *ent.Client, psClient *pubsub.Client) {
+	return initGrpcService(t, []ReadyCheck{mockReady{nil}}), initPubsubClient(t)
 }
 
-func initGrpcService(t testing.TB, reg *registry.Registry) *ent.Client {
+func initGrpcService(t testing.TB, readies []ReadyCheck) *ent.Client {
 	logging.ConfigureDefaultLogging()
-	server.EnableRandomPorts()
+	internal.EnableRandomPorts()
 	client := enttest.ClientForTest(t)
-	ctx := testutils.ContextForTest(t)
-	svc := grpccommon.NewGrpcService(
+	ctx := testutil.Context(t)
+	svc := mbgrpc.NewGrpcService(
 		defaults.Port, defaults.GRPCOffset,
 		nil,
-		InitializeGrpcServers,
+		faults.NewSet(t.Name()),
+		func(_ context.Context, server *grpc.Server, client *ent.Client) error {
+			return InitializeGrpcServers(server, client, readies)
+		},
 	)
-	require.NoError(t, svc.Initialize(ctx, reg, client))
+	require.NoError(t, svc.Initialize(ctx, client))
 	t.Cleanup(func() {
 		// TODO: using the test context may not be great here, if it's already
 		// canceled. on the other hand, we want to bound cleanup.
-		assert.NoError(t, svc.Cleanup(ctx, reg))
+		assert.NoError(t, svc.Cleanup(ctx))
 	})
 
 	eg, egCtx := errgroup.WithContext(ctx)
@@ -91,8 +94,8 @@ func initGrpcService(t testing.TB, reg *registry.Registry) *ent.Client {
 	return client
 }
 
-func initPubsubClient(t testing.TB) pubsub.Client {
-	realPort := server.ResolvePort(defaults.Port, defaults.GRPCOffset)
+func initPubsubClient(t testing.TB) *pubsub.Client {
+	realPort := internal.ResolvePort(defaults.Port, defaults.GRPCOffset)
 	oldEmuEnv, oldHadEmuEnv := os.LookupEnv("PUBSUB_EMULATOR_HOST")
 	t.Cleanup(func() {
 		if oldHadEmuEnv {
@@ -107,11 +110,8 @@ func initPubsubClient(t testing.TB) pubsub.Client {
 	// -count N
 	var err error
 	psClient, err := pubsub.NewClient(
-		testutils.ContextForTest(t),
+		testutil.Context(t),
 		safeName(t),
-		prometheus.NewPedanticRegistry(),
-		"__test__"+strings.ReplaceAll(uuid.NewString(), "-", ""),
-		nil,
 	)
 	require.NoError(t, err)
 	t.Cleanup(func() { assert.NoError(t, psClient.Close()) })

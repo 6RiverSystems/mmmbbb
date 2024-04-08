@@ -34,11 +34,10 @@ import (
 	"github.com/jackc/pgx/v5/stdlib"
 	"golang.org/x/sync/errgroup"
 
-	"go.6river.tech/gosix/db/postgres"
-	"go.6river.tech/gosix/logging"
-	"go.6river.tech/gosix/registry"
 	"go.6river.tech/mmmbbb/actions"
+	"go.6river.tech/mmmbbb/db/postgres"
 	"go.6river.tech/mmmbbb/ent"
+	"go.6river.tech/mmmbbb/logging"
 	"go.6river.tech/mmmbbb/version"
 )
 
@@ -68,7 +67,7 @@ func (n *pgNotifier) Name() string {
 	return "pg-notifier"
 }
 
-func (n *pgNotifier) Initialize(ctx context.Context, _ *registry.Registry, client *ent.Client) error {
+func (n *pgNotifier) Initialize(ctx context.Context, client *ent.Client) error {
 	if client.Dialect() != dialect.Postgres {
 		n.db = nil
 		return nil
@@ -332,7 +331,7 @@ func parseUUIDName(s string) (uuid.UUID, string, error) {
 	return id, name, err
 }
 
-func (n *pgNotifier) Cleanup(context.Context, *registry.Registry) error {
+func (n *pgNotifier) Cleanup(context.Context) error {
 	if n.publishHook != nil {
 		actions.RemovePublishHook(n.publishHook)
 		n.publishHook = nil

@@ -27,10 +27,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 
-	"go.6river.tech/gosix/testutils"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/enttest"
 	"go.6river.tech/mmmbbb/ent/subscription"
+	"go.6river.tech/mmmbbb/internal/testutil"
 )
 
 func TestDeleteExpiredSubscriptions_Execute(t *testing.T) {
@@ -116,7 +116,7 @@ func TestDeleteExpiredSubscriptions_Execute(t *testing.T) {
 			enttest.ResetTables(t, client)
 			subMod := SubModifiedAwaiter(uuid.UUID{}, nameFor(t, 0))
 			defer CancelSubModifiedAwaiter(uuid.UUID{}, nameFor(t, 0), subMod)
-			assert.NoError(t, client.DoCtxTx(testutils.ContextForTest(t), nil, func(ctx context.Context, tx *ent.Tx) error {
+			assert.NoError(t, client.DoCtxTx(testutil.Context(t), nil, func(ctx context.Context, tx *ent.Tx) error {
 				if tt.before != nil {
 					tt.before(t, ctx, tx, &tt)
 				}

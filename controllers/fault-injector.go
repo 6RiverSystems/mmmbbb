@@ -31,10 +31,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"go.6river.tech/gosix/faults"
-	"go.6river.tech/gosix/logging"
-	"go.6river.tech/gosix/registry"
 	"go.6river.tech/mmmbbb/ent"
+	"go.6river.tech/mmmbbb/faults"
+	"go.6river.tech/mmmbbb/logging"
 	"go.6river.tech/mmmbbb/oas"
 )
 
@@ -46,12 +45,10 @@ type FaultInjectorController struct {
 	faults *faults.Set
 }
 
-func (f *FaultInjectorController) Register(reg *registry.Registry, router gin.IRouter) error {
-	// TODO: allow using a non-default fault set via dependency injection
-	f.faults = reg.Faults()
+func (f *FaultInjectorController) Register(router gin.IRouter) error {
 	f.logger = logging.GetLogger("controllers/fault-injector")
 
-	reg.RegisterMap(router, "/faults", registry.HandlerMap{
+	Register(router, "/faults", HandlerMap{
 		{http.MethodGet, ""}:         f.GetDescriptors,
 		{http.MethodGet, "/"}:        f.GetDescriptors,
 		{http.MethodPost, "/inject"}: f.AddDescriptor,

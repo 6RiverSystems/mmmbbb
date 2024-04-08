@@ -25,29 +25,11 @@ import (
 	"errors"
 	"fmt"
 
-	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
-
-	entcommon "go.6river.tech/gosix/ent"
 )
 
 // custom add-ons to the Client type for use in our environment
-
-func (c *Client) EntityClient(name string) entcommon.EntityClient {
-	switch name {
-	case "Topic":
-		return c.Topic
-	case "Subscription":
-		return c.Subscription
-	case "Message":
-		return c.Message
-	case "Delivery":
-		return c.Delivery
-	default:
-		panic(fmt.Errorf("Invalid entity name '%s'", name))
-	}
-}
 
 // DoTx wraps inner in a transaction, which will be committed if it returns nil
 // or rolled back if it returns an error
@@ -108,10 +90,6 @@ func (c *Client) DoCtxTxRetry(
 	}
 }
 
-func (c *Client) GetSchema() entcommon.EntClientSchema {
-	return c.Schema
-}
-
 func (c *Client) Dialect() string {
 	return c.driver.Dialect()
 }
@@ -151,52 +129,4 @@ func (tx *Tx) DBTx() *sql.Tx {
 
 func (tx *Tx) Dialect() string {
 	return tx.driver.Dialect()
-}
-
-func (c *TopicClient) CreateEntity() entcommon.EntityCreate {
-	return c.Create()
-}
-
-func (cc *TopicCreate) EntityMutation() ent.Mutation {
-	return cc.Mutation()
-}
-
-func (cc *TopicCreate) SaveEntity(ctx context.Context) (interface{}, error) {
-	return cc.Save(ctx)
-}
-
-func (c *SubscriptionClient) CreateEntity() entcommon.EntityCreate {
-	return c.Create()
-}
-
-func (cc *SubscriptionCreate) EntityMutation() ent.Mutation {
-	return cc.Mutation()
-}
-
-func (cc *SubscriptionCreate) SaveEntity(ctx context.Context) (interface{}, error) {
-	return cc.Save(ctx)
-}
-
-func (c *MessageClient) CreateEntity() entcommon.EntityCreate {
-	return c.Create()
-}
-
-func (cc *MessageCreate) EntityMutation() ent.Mutation {
-	return cc.Mutation()
-}
-
-func (cc *MessageCreate) SaveEntity(ctx context.Context) (interface{}, error) {
-	return cc.Save(ctx)
-}
-
-func (c *DeliveryClient) CreateEntity() entcommon.EntityCreate {
-	return c.Create()
-}
-
-func (cc *DeliveryCreate) EntityMutation() ent.Mutation {
-	return cc.Mutation()
-}
-
-func (cc *DeliveryCreate) SaveEntity(ctx context.Context) (interface{}, error) {
-	return cc.Save(ctx)
 }

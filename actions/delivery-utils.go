@@ -27,13 +27,13 @@ import (
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
 
-	"go.6river.tech/gosix/logging"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/delivery"
 	"go.6river.tech/mmmbbb/ent/message"
 	"go.6river.tech/mmmbbb/ent/subscription"
 	"go.6river.tech/mmmbbb/ent/topic"
 	"go.6river.tech/mmmbbb/filter"
+	"go.6river.tech/mmmbbb/logging"
 )
 
 func deliverToSubscription(
@@ -98,7 +98,7 @@ func deliverToSubscription(
 			First(ctx)
 		if err == nil {
 			createDelivery.SetNotBefore(lastDelivery)
-		} else if err != nil && !ent.IsNotFound(err) {
+		} else if !ent.IsNotFound(err) {
 			return nil, err
 		}
 	}

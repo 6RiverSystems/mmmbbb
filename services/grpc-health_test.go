@@ -21,6 +21,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"strconv"
 	"testing"
 
@@ -30,34 +31,35 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	health "google.golang.org/grpc/health/grpc_health_v1"
 
-	"go.6river.tech/gosix/registry"
-	"go.6river.tech/gosix/server"
-	"go.6river.tech/gosix/testutils"
 	"go.6river.tech/mmmbbb/defaults"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/enttest"
+	"go.6river.tech/mmmbbb/internal"
+	"go.6river.tech/mmmbbb/internal/testutil"
 )
+
+type mockReady struct{ error }
+
+func (m mockReady) Ready() error {
+	return m.error
+}
 
 func Test_healthServer_Check(t *testing.T) {
 	client := enttest.ClientForTest(t)
 	deadClient := enttest.ClientForTest(t)
 	assert.NoError(t, deadClient.Close())
 
-	servicesNoInit := registry.New(t.Name()+"noInit", nil)
-	servicesNoStart := registry.New(t.Name()+"noStart", nil)
-	assert.NoError(t, servicesNoStart.InitializeServices(testutils.ContextForTest(t), client))
-	servicesRunning := registry.New(t.Name()+"running", nil)
-	assert.NoError(t, servicesRunning.InitializeServices(testutils.ContextForTest(t), client))
-	assert.NoError(t, servicesRunning.StartServices(testutils.ContextForTest(t)))
+	// TODO: reintroduce health statuses to this test via `readies`
 
 	type fields struct {
-		client   *ent.Client
-		services *registry.Registry
+		client  *ent.Client
+		readies []ReadyCheck
 	}
 	type args struct {
 		ctx context.Context
 		req *health.HealthCheckRequest
 	}
+	ready := []ReadyCheck{mockReady{nil}}
 	tests := []struct {
 		name      string
 		fields    fields
@@ -67,35 +69,28 @@ func Test_healthServer_Check(t *testing.T) {
 	}{
 		{
 			"no db",
-			fields{nil, servicesRunning},
+			fields{nil, ready},
 			args{},
 			&health.HealthCheckResponse{Status: health.HealthCheckResponse_NOT_SERVING},
 			assert.NoError,
 		},
 		{
-			"no init",
-			fields{client, servicesNoInit},
-			args{},
-			&health.HealthCheckResponse{Status: health.HealthCheckResponse_NOT_SERVING},
-			assert.NoError,
-		},
-		{
-			"no start",
-			fields{client, servicesNoStart},
+			"one not ready",
+			fields{client, []ReadyCheck{mockReady{nil}, mockReady{errors.New("not ready")}}},
 			args{},
 			&health.HealthCheckResponse{Status: health.HealthCheckResponse_NOT_SERVING},
 			assert.NoError,
 		},
 		{
 			"healthy db",
-			fields{client, servicesRunning},
+			fields{client, ready},
 			args{},
 			&health.HealthCheckResponse{Status: health.HealthCheckResponse_SERVING},
 			assert.NoError,
 		},
 		{
 			"broken db",
-			fields{deadClient, servicesRunning},
+			fields{deadClient, ready},
 			args{},
 			&health.HealthCheckResponse{Status: health.HealthCheckResponse_NOT_SERVING},
 			assert.NoError,
@@ -104,18 +99,18 @@ func Test_healthServer_Check(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := &healthServer{
-				client:   tt.fields.client,
-				services: tt.fields.services,
+				client:  tt.fields.client,
+				readies: tt.fields.readies,
 			}
 			if tt.args.ctx == nil {
-				tt.args.ctx = testutils.ContextForTest(t)
+				tt.args.ctx = testutil.Context(t)
 			}
 			if tt.args.req == nil {
 				tt.args.req = &health.HealthCheckRequest{}
 			}
 			got, err := s.Check(tt.args.ctx, tt.args.req)
 			tt.assertion(t, err)
-			assert.Equal(t, tt.want.GetStatus(), got.GetStatus())
+			assert.Equal(t, tt.want.GetStatus().String(), got.GetStatus().String())
 		})
 	}
 }
@@ -129,8 +124,8 @@ func TestGrpc_healthServer_Check(t *testing.T) {
 	type test struct {
 		name      string
 		before    func(t *testing.T, client *ent.Client, tt *test)
-		services  *registry.Registry
 		args      args
+		readies   []ReadyCheck
 		want      *health.HealthCheckResponse
 		assertion assert.ErrorAssertionFunc
 	}
@@ -140,29 +135,26 @@ func TestGrpc_healthServer_Check(t *testing.T) {
 		{
 			"not init",
 			func(t *testing.T, client *ent.Client, tt *test) {},
-			registry.New(t.Name()+"not-init", nil),
 			args{},
+			nil,
 			&health.HealthCheckResponse{Status: health.HealthCheckResponse_NOT_SERVING},
 			assert.NoError,
 		},
 		{
-			"not started",
+			"not ready",
 			func(t *testing.T, client *ent.Client, tt *test) {
-				assert.NoError(t, tt.services.InitializeServices(tt.args.ctx, client))
 			},
-			registry.New(t.Name()+"not-started", nil),
 			args{},
+			[]ReadyCheck{mockReady{errors.New("not ready")}},
 			&health.HealthCheckResponse{Status: health.HealthCheckResponse_NOT_SERVING},
 			assert.NoError,
 		},
 		{
 			"healthy",
 			func(t *testing.T, client *ent.Client, tt *test) {
-				assert.NoError(t, tt.services.InitializeServices(tt.args.ctx, client))
-				assert.NoError(t, tt.services.StartServices(tt.args.ctx))
 			},
-			registry.New(t.Name()+"healthy", nil),
 			args{},
+			[]ReadyCheck{mockReady{nil}},
 			&health.HealthCheckResponse{Status: health.HealthCheckResponse_SERVING},
 			assert.NoError,
 		},
@@ -171,8 +163,8 @@ func TestGrpc_healthServer_Check(t *testing.T) {
 			func(t *testing.T, client *ent.Client, tt *test) {
 				require.NoError(t, client.Close())
 			},
-			registry.New(t.Name()+"broken-db", nil),
 			args{},
+			[]ReadyCheck{mockReady{nil}},
 			&health.HealthCheckResponse{Status: health.HealthCheckResponse_NOT_SERVING},
 			assert.NoError,
 		},
@@ -187,16 +179,16 @@ func TestGrpc_healthServer_Check(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			entClient := initGrpcService(t, tt.services)
-			conn, err := grpc.Dial(
-				"localhost:"+strconv.Itoa(server.ResolvePort(defaults.Port, defaults.GRPCOffset)),
+			entClient := initGrpcService(t, tt.readies)
+			conn, err := grpc.NewClient(
+				"localhost:"+strconv.Itoa(internal.ResolvePort(defaults.Port, defaults.GRPCOffset)),
 				opts...,
 			)
 			require.NoError(t, err)
 			grpcClient := health.NewHealthClient(conn)
 
 			if tt.args.ctx == nil {
-				tt.args.ctx = testutils.ContextForTest(t)
+				tt.args.ctx = testutil.Context(t)
 			}
 			tt.before(t, entClient, &tt)
 			if tt.args.req == nil {
@@ -204,7 +196,7 @@ func TestGrpc_healthServer_Check(t *testing.T) {
 			}
 			got, err := grpcClient.Check(tt.args.ctx, tt.args.req)
 			tt.assertion(t, err)
-			assert.Equal(t, tt.want.GetStatus(), got.GetStatus())
+			assert.Equal(t, tt.want.GetStatus().String(), got.GetStatus().String())
 		})
 	}
 }

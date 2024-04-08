@@ -21,33 +21,40 @@ package main
 
 import (
 	"context"
+	"expvar"
 	"fmt"
 	"net/http"
 	"os"
 	"runtime"
+	"strings"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/getkin/kin-openapi/openapi3"
+	ginexpvar "github.com/gin-contrib/expvar"
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/collectors"
+	"go.uber.org/fx"
+	"google.golang.org/grpc"
 
-	"go.6river.tech/gosix/app"
-	_ "go.6river.tech/gosix/controllers"
-	entcommon "go.6river.tech/gosix/ent"
-	"go.6river.tech/gosix/migrate"
-	"go.6river.tech/gosix/registry"
-	swaggerui "go.6river.tech/gosix/swagger-ui"
 	"go.6river.tech/mmmbbb/controllers"
-	_ "go.6river.tech/mmmbbb/controllers"
+	"go.6river.tech/mmmbbb/db"
 	"go.6river.tech/mmmbbb/defaults"
 	"go.6river.tech/mmmbbb/ent"
+	_ "go.6river.tech/mmmbbb/ent/runtime"
+	"go.6river.tech/mmmbbb/faults"
 	mbgrpc "go.6river.tech/mmmbbb/grpc"
+	swaggerui "go.6river.tech/mmmbbb/internal/swagger-ui"
+	"go.6river.tech/mmmbbb/logging"
+	"go.6river.tech/mmmbbb/middleware"
+	"go.6river.tech/mmmbbb/migrate"
 	"go.6river.tech/mmmbbb/migrations"
 	"go.6river.tech/mmmbbb/oas"
+	"go.6river.tech/mmmbbb/server"
 	"go.6river.tech/mmmbbb/services"
 	_ "go.6river.tech/mmmbbb/services"
 	"go.6river.tech/mmmbbb/version"
-
-	_ "go.6river.tech/mmmbbb/ent/runtime"
 )
 
 var testModeIgnoreArgs = false
@@ -72,63 +79,323 @@ func main() {
 		}
 	}
 
-	if err := NewApp().Main(); err != nil {
+	if err := NewApp().main(); err != nil {
 		panic(err)
 	}
 }
 
-func NewApp() *app.App {
-	app := &app.App{
-		Name:    version.AppName,
-		Version: version.SemrelVersion,
-		Port:    defaults.Port,
-		InitDbMigration: func(ctx context.Context, m *migrate.Migrator) error {
-			if ownMigrations, err := migrate.LoadFS(migrations.MessageBusMigrations, nil); err != nil {
-				return err
-			} else {
-				m.SortAndAppend("", ownMigrations...)
-			}
-			return nil
-		},
-		InitEnt: func(ctx context.Context, drv *sql.Driver, logger func(args ...interface{}), debug bool) (entcommon.EntClientBase, error) {
-			opts := []ent.Option{
-				ent.Driver(drv),
-				ent.Log(logger),
-			}
-			if debug {
-				opts = append(opts, ent.Debug())
-			}
-			return ent.NewClient(opts...), nil
-		},
-		LoadOASSpec: func(ctx context.Context) (*openapi3.T, error) {
-			return oas.LoadSpec()
-		},
-		OASFS: http.FS(oas.OpenAPIFS),
-		SwaggerUIConfigHandler: swaggerui.CustomConfigHandler(func(config map[string]interface{}) map[string]interface{} {
-			config["urls"] = []map[string]interface{}{
-				{"url": config["url"], "name": version.AppName},
-				{"url": "../oas-grpc/pubsub.swagger.json", "name": "grpc:pubsub"},
-				{"url": "../oas-grpc/schema.swagger.json", "name": "grpc:schema"},
-			}
-			delete(config, "url")
-			return config
-		}),
-		RegisterServices: func(_ context.Context, r *registry.Registry, _ registry.MutableValues) error {
-			services.RegisterDefaultServices(r)
-			return nil
-		},
-		CustomizeRoutes: func(_ context.Context, e *gin.Engine, r *registry.Registry, _ registry.MutableValues) error {
-			e.StaticFS("/oas-grpc", http.FS(mbgrpc.SwaggerFS))
-			controllers.RegisterAll(r)
-			return nil
-		},
-		Grpc: &app.AppGrpc{
-			PortOffset:     defaults.GRPCOffset,
-			Initializer:    services.InitializeGrpcServers,
-			GatewayPaths:   []string{"/v1/projects/*grpcPath", "/healthz"},
-			OnGatewayStart: services.BindGatewayHandlers,
-		},
+type app struct {
+	port int
+
+	opts []fx.Option
+
+	logger        *logging.Logger
+	ginMiddleware []func(*gin.Engine) error
+}
+
+func NewApp() *app {
+	app := &app{
+		port: defaults.Port,
 	}
-	app.WithDefaults()
+	// TODO: move these to a provider, and hide GetLogger behind DI
+	logging.ConfigureDefaultLogging()
+	app.logger = logging.GetLogger(version.AppName)
+
+	app.opts = []fx.Option{
+		fx.Invoke(func() {
+			// report the app version as an expvar
+			expvar.NewString("version/" + version.AppName).Set(version.SemrelVersion)
+		}),
+		fx.Provide(func(l fx.Lifecycle) context.Context {
+			ctx, cancel := context.WithCancel(context.Background())
+			l.Append(fx.StopHook(cancel))
+			return ctx
+		}),
+		fx.Provide(func(
+			ctx context.Context,
+			l fx.Lifecycle,
+		) (*sql.Driver, error) {
+			db.SetDefaultDbName(version.AppName)
+			drv, err := app.openDB(ctx, app.logger)
+			if drv != nil {
+				l.Append(fx.StopHook(func() error {
+					err := drv.Close()
+					if err != nil {
+						app.logger.Error().Err(err).Msg("Failed to cleanup SQL connection")
+					}
+					return err
+				}))
+			}
+			return drv, err
+		}),
+		fx.Provide(func(
+			ctx context.Context,
+			l fx.Lifecycle,
+			drv *sql.Driver,
+		) (*ent.Client, error) {
+			client, err := app.setupDB(ctx, drv)
+			return client, err
+		}),
+		fx.Provide(func() *faults.Set {
+			f := faults.NewSet(version.AppName)
+			f.MustRegister(prometheus.DefaultRegisterer)
+			return f
+		}),
+		controllers.Module,
+		fx.Provide(app.provideGrpc),
+		fx.Provide(app.setupGin),
+		// TODO: customize signal handlers?
+		services.Module(),
+	}
+
 	return app
+
+	/*
+			Name:    version.AppName,
+			Version: version.SemrelVersion,
+			Port:    defaults.Port,
+			LoadOASSpec: func(ctx context.Context) (*openapi3.T, error) {
+				return oas.LoadSpec()
+			},
+			OASFS: http.FS(oas.OpenAPIFS),
+			SwaggerUIConfigHandler: swaggerui.CustomConfigHandler(func(config map[string]interface{}) map[string]interface{} {
+				config["urls"] = []map[string]interface{}{
+					{"url": config["url"], "name": version.AppName},
+					{"url": "../oas-grpc/pubsub.swagger.json", "name": "grpc:pubsub"},
+					{"url": "../oas-grpc/schema.swagger.json", "name": "grpc:schema"},
+				}
+				delete(config, "url")
+				return config
+			}),
+			RegisterServices: func(_ context.Context, r *registry.Registry, _ registry.MutableValues) error {
+				services.RegisterDefaultServices(r)
+				return nil
+			},
+			CustomizeRoutes: func(_ context.Context, e *gin.Engine, r *registry.Registry, _ registry.MutableValues) error {
+				e.StaticFS("/oas-grpc", http.FS(mbgrpc.SwaggerFS))
+				controllers.RegisterAll(r)
+				return nil
+			},
+		}
+		app.WithDefaults()
+		return app
+	*/
+}
+
+func (app *app) openDB(ctx context.Context, logger *logging.Logger) (drv *sql.Driver, err error) {
+	// for 6mon friendliness, wait for up to 120 seconds for a db connection
+	if err = func() error {
+		dbWaitCtx, dbWaitCancel := context.WithDeadline(ctx, time.Now().Add(120*time.Second))
+		defer dbWaitCancel()
+		return db.WaitForDB(dbWaitCtx)
+	}(); err != nil {
+		return nil, err
+	}
+
+	if drv, err = db.OpenSqlForEnt(); err != nil {
+		if drv != nil {
+			if err := drv.Close(); err != nil {
+				logger.Error().Err(err).Msg("Failed to cleanup SQL connection")
+			}
+		}
+		return nil, err
+	}
+	return drv, nil
+}
+
+func (app *app) setupDB(ctx context.Context, drv *sql.Driver) (client *ent.Client, err error) {
+	sqlLogger := logging.GetLogger(version.AppName + "/sql")
+	sqlLoggerFunc := func(args ...interface{}) {
+		for _, m := range args {
+			// currently ent only sends us strings
+			sqlLogger.Trace().Msg(m.(string))
+		}
+	}
+	entDebug := strings.Contains(os.Getenv("DEBUG"), "sql")
+	opts := []ent.Option{
+		ent.Driver(drv),
+		ent.Log(sqlLoggerFunc),
+	}
+	if entDebug {
+		opts = append(opts, ent.Debug())
+	}
+
+	client = ent.NewClient(opts...)
+
+	app.ginMiddleware = append(app.ginMiddleware, (func(engine *gin.Engine) error {
+		engine.Use(middleware.WithEntClient(client, middleware.EntKey(db.GetDefaultDbName())))
+		return nil
+	}))
+	// Setup db prometheus metrics
+	prometheus.DefaultRegisterer.MustRegister(collectors.NewDBStatsCollector(drv.DB(), db.GetDefaultDbName()))
+
+	m := &migrate.Migrator{}
+
+	if ownMigrations, err := migrate.LoadFS(migrations.MessageBusMigrations, nil); err != nil {
+		return client, err
+	} else {
+		m.SortAndAppend("", ownMigrations...)
+	}
+
+	// TODO: move this to a lifecycle hook?
+	if err = db.Up(ctx, client, m); err != nil {
+		return client, err
+	}
+
+	return client, nil
+}
+
+type ginParams struct {
+	fx.In
+	Ctx         context.Context
+	L           fx.Lifecycle
+	SD          fx.Shutdowner
+	Client      *ent.Client
+	Controllers []controllers.Controller `group:"controllers"`
+}
+type ginResults struct {
+	fx.Out
+	Engine     *gin.Engine
+	HTTPServer *services.HTTPService
+}
+
+func (app *app) setupGin(params ginParams) (ginResults, error) {
+	var res ginResults
+	res.Engine = server.NewEngine()
+	for _, m := range app.ginMiddleware {
+		if err := m(res.Engine); err != nil {
+			return res, err
+		}
+	}
+
+	// Enable `format: uuid` validation
+	openapi3.DefineStringFormat("uuid", openapi3.FormatOfStringForUUIDOfRFC4122)
+
+	if spec, err := oas.LoadSpec(); err != nil {
+		return res, err
+	} else if spec != nil {
+		res.Engine.Use(middleware.WithOASValidation(
+			spec,
+			true,
+			middleware.AllowUndefinedRoutes(
+				middleware.DefaultOASErrorHandler,
+			),
+			nil,
+		))
+	}
+
+	// TODO: wildcard route doesn't permit this to overlap with the `/oas` "fs"
+	// TODO: this won't work properly behind a path-modifying reverse proxy as we
+	// don't have any `servers` entries so it will guess the wrong base
+	res.Engine.StaticFS("/oas-ui", http.FS(swaggerui.FS))
+	configHandler := swaggerui.CustomConfigHandler(func(config map[string]interface{}) map[string]interface{} {
+		config["urls"] = []map[string]interface{}{
+			{"url": config["url"], "name": version.AppName},
+			{"url": "../oas-grpc/pubsub.swagger.json", "name": "grpc:pubsub"},
+			{"url": "../oas-grpc/schema.swagger.json", "name": "grpc:schema"},
+		}
+		delete(config, "url")
+		return config
+	})
+	res.Engine.GET(swaggerui.ConfigLoadingPath, gin.WrapF(configHandler))
+	// NOTE: this will serve yaml as text/plain. YAML doesn't have a standardized
+	// mime type, so that's OK for now
+	res.Engine.StaticFS("/oas", http.FS(oas.OpenAPIFS))
+
+	// add standard debug routes
+	res.Engine.GET("/debug/vars", ginexpvar.Handler())
+	// use a wildcard route and defert to the default servemux, so that
+	// we don't have to replicate the Index wildcard behavior ourselves
+	res.Engine.Any("/debug/pprof/*profile", gin.WrapH(http.DefaultServeMux))
+	res.Engine.StaticFS("/oas-grpc", http.FS(mbgrpc.SwaggerFS))
+
+	for _, c := range params.Controllers {
+		if err := c.Register(res.Engine); err != nil {
+			return res, err
+		}
+	}
+
+	res.HTTPServer = services.NewHTTPService(res.Engine, app.port, 0)
+	params.L.Append(fx.StartStopHook(
+		func(startCtx context.Context) error {
+			ready := make(chan struct{})
+			go func() {
+				if err := res.HTTPServer.Start(params.Ctx, ready); err != nil {
+					_ = params.SD.Shutdown(fx.ExitCode(1))
+				}
+			}()
+			select {
+			case <-startCtx.Done():
+				return startCtx.Err()
+			case <-ready:
+				return nil
+			}
+		},
+		func(stopCtx context.Context) error {
+			return res.HTTPServer.Cleanup(stopCtx)
+		},
+	))
+
+	return res, nil
+}
+
+type grpcParams struct {
+	fx.In
+	Ctx     context.Context
+	L       fx.Lifecycle
+	SD      fx.Shutdowner
+	Client  *ent.Client
+	Engine  *gin.Engine
+	Faults  *faults.Set
+	Readies []services.ReadyCheck `group:"ready"`
+}
+type grpcResults struct {
+	fx.Out
+	GrpcService services.Service `group:"services"`
+	// GrpcReady      services.ReadyCheck `group:"ready"`
+	GatewayService services.Service `group:"services"`
+	// GatewayReady   services.ReadyCheck `group:"ready"`
+}
+
+func (app *app) provideGrpc(params grpcParams) (grpcResults, error) {
+	var results grpcResults
+	results.GrpcService = mbgrpc.NewGrpcService(
+		app.port, defaults.GRPCOffset,
+		nil,
+		params.Faults,
+		func(_ context.Context, server *grpc.Server, client *ent.Client) error {
+			return services.InitializeGrpcServers(server, client, params.Readies)
+		},
+	)
+	if gsr, err := services.WrapService(params.Ctx, results.GrpcService, params.L, params.SD, params.Client); err != nil {
+		return results, err
+	} else {
+		// results.GatewayReady = gsr.Ready
+		_ = gsr.Ready
+	}
+
+	results.GatewayService = mbgrpc.NewGatewayService(
+		version.AppName,
+		app.port, defaults.GRPCOffset,
+		params.Engine,
+		[]string{"/v1/projects/*grpcPath", "/healthz"},
+		services.BindGatewayHandlers,
+	)
+	if gsr, err := services.WrapService(params.Ctx, results.GatewayService, params.L, params.SD, params.Client); err != nil {
+		return results, err
+	} else {
+		// results.GatewayReady = gsr.Ready
+		_ = gsr.Ready
+	}
+
+	return results, nil
+}
+
+func (a *app) main() error {
+	// TODO: InitializeServices
+	// TODO: StartServices
+	// TODO: WaitAllReady
+	// TODO: WaitServices
+	// TODO: exit
+	panic("not implemented")
 }

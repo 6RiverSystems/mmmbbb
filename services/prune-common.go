@@ -24,10 +24,9 @@ import (
 	"math/rand"
 	"time"
 
-	"go.6river.tech/gosix/logging"
-	"go.6river.tech/gosix/registry"
 	"go.6river.tech/mmmbbb/actions"
 	"go.6river.tech/mmmbbb/ent"
+	"go.6river.tech/mmmbbb/logging"
 )
 
 type PruneCommonSettings struct {
@@ -91,7 +90,7 @@ func (s *pruneService) Name() string {
 	return s.name
 }
 
-func (s *pruneService) Initialize(ctx context.Context, _ *registry.Registry, client *ent.Client) error {
+func (s *pruneService) Initialize(ctx context.Context, client *ent.Client) error {
 	// TODO: need a consistent way to inject configuration: could get config from
 	// the context, but that gets inefficient fast
 	s.settings.ApplyDefaults()
@@ -175,7 +174,7 @@ func (s *pruneService) runOnce(
 	return 0, err
 }
 
-func (s *pruneService) Cleanup(context.Context, *registry.Registry) error {
+func (s *pruneService) Cleanup(context.Context) error {
 	logger := s.logger
 	// these aren't really necessary
 	s.action = nil

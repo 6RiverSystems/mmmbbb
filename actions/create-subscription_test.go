@@ -27,10 +27,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 
-	"go.6river.tech/gosix/ent/customtypes"
-	"go.6river.tech/gosix/testutils"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/enttest"
+	"go.6river.tech/mmmbbb/internal/sqltypes"
+	"go.6river.tech/mmmbbb/internal/testutil"
 )
 
 func TestCreateSubscription_Execute(t *testing.T) {
@@ -64,8 +64,8 @@ func TestCreateSubscription_Execute(t *testing.T) {
 				// topicID set in before
 				subscription: ent.Subscription{
 					// Name set in before
-					TTL:        customtypes.Interval(time.Hour),
-					MessageTTL: customtypes.Interval(time.Minute),
+					TTL:        sqltypes.Interval(time.Hour),
+					MessageTTL: sqltypes.Interval(time.Minute),
 				},
 			},
 		},
@@ -92,8 +92,8 @@ func TestCreateSubscription_Execute(t *testing.T) {
 				// topicID set in before
 				subscription: ent.Subscription{
 					// Name set in before
-					TTL:             customtypes.Interval(time.Hour),
-					MessageTTL:      customtypes.Interval(time.Minute),
+					TTL:             sqltypes.Interval(time.Hour),
+					MessageTTL:      sqltypes.Interval(time.Minute),
 					OrderedDelivery: true,
 					Labels: map[string]string{
 						"xyzzy": "frood",
@@ -176,7 +176,7 @@ func TestCreateSubscription_Execute(t *testing.T) {
 			enttest.ResetTables(t, client)
 			subMod := SubModifiedAwaiter(uuid.Nil, t.Name())
 			defer CancelSubModifiedAwaiter(uuid.Nil, t.Name(), subMod)
-			assert.NoError(t, client.DoCtxTx(testutils.ContextForTest(t), nil, func(ctx context.Context, tx *ent.Tx) error {
+			assert.NoError(t, client.DoCtxTx(testutil.Context(t), nil, func(ctx context.Context, tx *ent.Tx) error {
 				if tt.before != nil {
 					tt.before(t, ctx, tx, &tt)
 				}

@@ -32,9 +32,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"go.6river.tech/gosix/ent/customtypes"
-	"go.6river.tech/gosix/testutils"
 	"go.6river.tech/mmmbbb/ent"
+	"go.6river.tech/mmmbbb/internal/sqltypes"
+	"go.6river.tech/mmmbbb/internal/testutil"
 )
 
 func nameFor(t testing.TB, offset int) string {
@@ -84,9 +84,9 @@ func createSubscriptionClient(
 		SetID(xID(t, &ent.Subscription{}, offset)).
 		SetName(nameFor(t, offset)).
 		SetTopic(topic).
-		SetExpiresAt(testutils.DeadlineForTest(t)).
-		SetTTL(customtypes.Interval(time.Minute)).
-		SetMessageTTL(customtypes.Interval(time.Minute))
+		SetExpiresAt(testutil.DeadlineForTest(t)).
+		SetTTL(sqltypes.Interval(time.Minute)).
+		SetMessageTTL(sqltypes.Interval(time.Minute))
 	for _, o := range opts {
 		sc = o(sc)
 	}
@@ -110,7 +110,7 @@ func createSnapshotClient(
 		SetID(xID(t, &ent.Snapshot{}, offset)).
 		SetName(nameFor(t, offset)).
 		SetTopic(topic).
-		SetExpiresAt(testutils.DeadlineForTest(t)).
+		SetExpiresAt(testutil.DeadlineForTest(t)).
 		SetAckedMessagesBefore(time.Now()).
 		SetAckedMessageIDs([]uuid.UUID{})
 	for _, o := range opts {
@@ -161,7 +161,7 @@ func createDeliveryClient(
 		SetID(xID(t, &ent.Delivery{}, offset)).
 		SetMessage(msg).
 		SetSubscription(sub).
-		SetExpiresAt(testutils.DeadlineForTest(t)).
+		SetExpiresAt(testutil.DeadlineForTest(t)).
 		SetPublishedAt(msg.PublishedAt)
 	for _, o := range opts {
 		dc = o(dc)
@@ -211,7 +211,7 @@ func checkSnapEqual(t *testing.T, expected, actual *ent.Snapshot, timeEpsilon ti
 	assert.ElementsMatch(t, expected.AckedMessageIDs, actual.AckedMessageIDs)
 }
 
-func checkNullableIntervalEqual(t *testing.T, expected, actual *customtypes.Interval) bool {
+func checkNullableIntervalEqual(t *testing.T, expected, actual *sqltypes.Interval) bool {
 	return assert.Equal(t, expected, actual)
 }
 

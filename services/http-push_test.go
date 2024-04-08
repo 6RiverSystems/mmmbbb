@@ -35,14 +35,13 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/sync/errgroup"
 
-	"go.6river.tech/gosix/logging"
-	"go.6river.tech/gosix/pubsub"
-	"go.6river.tech/gosix/testutils"
 	"go.6river.tech/mmmbbb/actions"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/delivery"
 	"go.6river.tech/mmmbbb/ent/enttest"
 	"go.6river.tech/mmmbbb/ent/subscription"
+	"go.6river.tech/mmmbbb/internal/testutil"
+	"go.6river.tech/mmmbbb/logging"
 )
 
 func assertEqualJSON(t testing.TB, expected any, actual []byte) bool {
@@ -64,7 +63,7 @@ func TestHttpPush(t *testing.T) {
 		initialEnable bool
 		sender        func(t *testing.T, client *ent.Client, endpoint string) error
 		responder     pushResponder
-		receiver      func(t *testing.T, msgs chan *pubsub.PushRequest) error
+		receiver      func(t *testing.T, msgs chan *actions.PushRequest) error
 		after         func(t *testing.T, s *httpPusher)
 	}
 	tests := []test{
@@ -75,7 +74,7 @@ func TestHttpPush(t *testing.T) {
 				return publishMarker(t, client, 0)
 			},
 			nil,
-			func(t *testing.T, msgs chan *pubsub.PushRequest) error {
+			func(t *testing.T, msgs chan *actions.PushRequest) error {
 				m := <-msgs
 				assert.Equal(t, safeName(t), m.Subscription)
 				decoded, err := base64.StdEncoding.DecodeString(m.Message.Data)
@@ -98,7 +97,7 @@ func TestHttpPush(t *testing.T) {
 				}
 				// sadly we just need to delay a bit to know the message went through
 				<-time.After(25 * time.Millisecond)
-				if err := client.DoCtxTx(testutils.ContextForTest(t), nil, func(ctx context.Context, tx *ent.Tx) error {
+				if err := client.DoCtxTx(testutil.Context(t), nil, func(ctx context.Context, tx *ent.Tx) error {
 					sub, err := tx.Subscription.Query().
 						Where(subscription.Name(safeName(t))).
 						Only(ctx)
@@ -124,7 +123,7 @@ func TestHttpPush(t *testing.T) {
 				return nil
 			},
 			nil,
-			func(t *testing.T, msgs chan *pubsub.PushRequest) error {
+			func(t *testing.T, msgs chan *actions.PushRequest) error {
 				m := <-msgs
 				assert.Equal(t, safeName(t), m.Subscription)
 				decoded, err := base64.StdEncoding.DecodeString(m.Message.Data)
@@ -145,7 +144,7 @@ func TestHttpPush(t *testing.T) {
 				if err := publishMarker(t, client, 0); err != nil {
 					return err
 				}
-				if err := client.DoCtxTx(testutils.ContextForTest(t), nil, func(ctx context.Context, tx *ent.Tx) error {
+				if err := client.DoCtxTx(testutil.Context(t), nil, func(ctx context.Context, tx *ent.Tx) error {
 					sub, err := tx.Subscription.Query().
 						Where(subscription.Name(safeName(t))).
 						Only(ctx)
@@ -179,7 +178,7 @@ func TestHttpPush(t *testing.T) {
 				return nil
 			},
 			nil,
-			func(t *testing.T, msgs chan *pubsub.PushRequest) error {
+			func(t *testing.T, msgs chan *actions.PushRequest) error {
 				m := <-msgs
 				assert.Equal(t, safeName(t), m.Subscription)
 				decoded, err := base64.StdEncoding.DecodeString(m.Message.Data)
@@ -204,7 +203,7 @@ func TestHttpPush(t *testing.T) {
 				return nil
 			},
 			nil,
-			func(t *testing.T, msgs chan *pubsub.PushRequest) error {
+			func(t *testing.T, msgs chan *actions.PushRequest) error {
 				got := map[int]struct{}{}
 				for len(got) < 100 {
 					m := <-msgs
@@ -236,7 +235,7 @@ func TestHttpPush(t *testing.T) {
 						delivery.CompletedAtIsNil(),
 						delivery.HasSubscriptionWith(subscription.Name(safeName(t))),
 					).
-					Count(testutils.ContextForTest(t)); assert.NoError(t, err) {
+					Count(testutil.Context(t)); assert.NoError(t, err) {
 					assert.Zero(t, incomplete, "all messages should have been delivered and ACKed")
 				}
 			},
@@ -254,7 +253,7 @@ func TestHttpPush(t *testing.T) {
 				}
 				return nil
 			},
-			func(t testing.TB, w http.ResponseWriter, r *http.Request, pr *pubsub.PushRequest) {
+			func(t testing.TB, w http.ResponseWriter, r *http.Request, pr *actions.PushRequest) {
 				var mm struct {
 					Sequence int `json:"sequence"`
 				}
@@ -269,7 +268,7 @@ func TestHttpPush(t *testing.T) {
 				}
 				w.WriteHeader(http.StatusNoContent)
 			},
-			func(t *testing.T, msgs chan *pubsub.PushRequest) error {
+			func(t *testing.T, msgs chan *actions.PushRequest) error {
 				got := map[int]struct{}{}
 				for len(got) < 4 {
 					m := <-msgs
@@ -310,7 +309,7 @@ func TestHttpPush(t *testing.T) {
 				}
 				return nil
 			},
-			func(t testing.TB, w http.ResponseWriter, r *http.Request, pr *pubsub.PushRequest) {
+			func(t testing.TB, w http.ResponseWriter, r *http.Request, pr *actions.PushRequest) {
 				var mm struct {
 					Sequence int `json:"sequence"`
 				}
@@ -327,7 +326,7 @@ func TestHttpPush(t *testing.T) {
 					w.WriteHeader(http.StatusNoContent)
 				}
 			},
-			func(t *testing.T, msgs chan *pubsub.PushRequest) error {
+			func(t *testing.T, msgs chan *actions.PushRequest) error {
 				got := map[int]struct{}{}
 				for len(got) < 11 {
 					m := <-msgs
@@ -364,7 +363,7 @@ func TestHttpPush(t *testing.T) {
 						delivery.CompletedAtIsNil(),
 						delivery.HasSubscriptionWith(subscription.Name(safeName(t))),
 					).
-					Only(testutils.ContextForTest(t)); assert.NoError(t, err) {
+					Only(testutil.Context(t)); assert.NoError(t, err) {
 					assert.Equal(t, 1, del.Attempts)
 					// should be in the future, too, by at least ~50% of the min backoff
 					assert.Greater(t, del.AttemptAt.UnixNano(), time.Now().Add(50*time.Millisecond).UnixNano(), "next attempt should be in the future after NACKs")
@@ -380,7 +379,7 @@ func TestHttpPush(t *testing.T) {
 				}
 				return nil
 			},
-			func(t testing.TB, w http.ResponseWriter, r *http.Request, pr *pubsub.PushRequest) {
+			func(t testing.TB, w http.ResponseWriter, r *http.Request, pr *actions.PushRequest) {
 				var mm struct {
 					Sequence int `json:"sequence"`
 				}
@@ -389,7 +388,7 @@ func TestHttpPush(t *testing.T) {
 				assert.NoError(t, json.Unmarshal(decoded, &mm))
 				w.WriteHeader(http.StatusInternalServerError)
 			},
-			func(t *testing.T, msgs chan *pubsub.PushRequest) error {
+			func(t *testing.T, msgs chan *actions.PushRequest) error {
 				for i := 0; i < 2; i++ {
 					m := <-msgs
 					assert.Equal(t, safeName(t), m.Subscription)
@@ -421,7 +420,7 @@ func TestHttpPush(t *testing.T) {
 						delivery.CompletedAtIsNil(),
 						delivery.HasSubscriptionWith(subscription.Name(safeName(t))),
 					).
-					Only(testutils.ContextForTest(t)); assert.NoError(t, err) {
+					Only(testutil.Context(t)); assert.NoError(t, err) {
 					assert.Equal(t, 2, del.Attempts)
 					// should be in the future, too, by at least ~50% of the min backoff
 					assert.Greater(t, del.AttemptAt.UnixNano(), time.Now().Add(50*time.Millisecond).UnixNano(), "next attempt should be in the future after NACKs")
@@ -433,7 +432,7 @@ func TestHttpPush(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			enttest.ResetTables(t, client)
-			ctx := testutils.ContextForTest(t)
+			ctx := testutil.Context(t)
 
 			receiver, addr, msgs, serverWG := newPushReceiver(t, tt.responder)
 			t.Cleanup(func() {
@@ -461,8 +460,8 @@ func TestHttpPush(t *testing.T) {
 			}).Execute))
 
 			s := &httpPusher{}
-			require.NoError(t, s.Initialize(ctx, nil, client))
-			defer func() { assert.NoError(t, s.Cleanup(ctx, nil)) }()
+			require.NoError(t, s.Initialize(ctx, client))
+			defer func() { assert.NoError(t, s.Cleanup(ctx)) }()
 
 			ctx2, cancel := context.WithCancel(ctx)
 			defer cancel()
@@ -492,12 +491,12 @@ func TestHttpPush(t *testing.T) {
 	}
 }
 
-type pushResponder func(testing.TB, http.ResponseWriter, *http.Request, *pubsub.PushRequest)
+type pushResponder func(testing.TB, http.ResponseWriter, *http.Request, *actions.PushRequest)
 
-func newPushReceiver(t testing.TB, responder pushResponder) (*http.Server, *net.TCPAddr, chan *pubsub.PushRequest, *sync.WaitGroup) {
-	ctx := testutils.ContextForTest(t)
+func newPushReceiver(t testing.TB, responder pushResponder) (*http.Server, *net.TCPAddr, chan *actions.PushRequest, *sync.WaitGroup) {
+	ctx := testutil.Context(t)
 
-	received := make(chan *pubsub.PushRequest, 1)
+	received := make(chan *actions.PushRequest, 1)
 	wg := &sync.WaitGroup{}
 
 	server := &http.Server{
@@ -507,7 +506,7 @@ func newPushReceiver(t testing.TB, responder pushResponder) (*http.Server, *net.
 			assert.Equal(t, http.MethodPost, r.Method)
 			body, err := io.ReadAll(r.Body)
 			assert.NoError(t, err)
-			var m pubsub.PushRequest
+			var m actions.PushRequest
 			err = json.Unmarshal(body, &m)
 			assert.NoError(t, err)
 			if responder != nil {
@@ -539,7 +538,7 @@ func newPushReceiver(t testing.TB, responder pushResponder) (*http.Server, *net.
 	return server, addr, received, wg
 }
 
-func assertNoMore(t testing.TB, msgs chan *pubsub.PushRequest) {
+func assertNoMore(t testing.TB, msgs chan *actions.PushRequest) {
 	assert.NotNil(t, msgs)
 	for {
 		select {
@@ -558,7 +557,7 @@ func assertNoMore(t testing.TB, msgs chan *pubsub.PushRequest) {
 }
 
 func publishMarker(t testing.TB, client *ent.Client, sequence int) error {
-	err := client.DoCtxTx(testutils.ContextForTest(t), nil, actions.NewPublishMessage(actions.PublishMessageParams{
+	err := client.DoCtxTx(testutil.Context(t), nil, actions.NewPublishMessage(actions.PublishMessageParams{
 		TopicName: safeName(t),
 		Payload:   json.RawMessage(fmt.Sprintf(`{"sequence": %d}`, sequence)),
 	}).Execute)

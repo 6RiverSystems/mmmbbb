@@ -33,10 +33,10 @@ import (
 	"modernc.org/sqlite"
 	sqlite3 "modernc.org/sqlite/lib"
 
-	"go.6river.tech/gosix/logging"
-	"go.6river.tech/gosix/testutils"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/enttest"
+	"go.6river.tech/mmmbbb/internal/testutil"
+	"go.6river.tech/mmmbbb/logging"
 )
 
 type mockInbound struct {
@@ -354,7 +354,7 @@ func TestMessageStreamer_Go(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			enttest.ResetTables(t, client)
-			ctx := testutils.ContextForTest(t)
+			ctx := testutil.Context(t)
 			if tt.before != nil {
 				tt.before(t, ctx, client, &tt)
 			}

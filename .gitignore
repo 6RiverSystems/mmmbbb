@@ -7,3 +7,5 @@ bin
 **/debug.test
 tools
 magebinary-*
+go.work
+go.work.sum
