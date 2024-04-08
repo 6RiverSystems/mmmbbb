@@ -715,9 +715,9 @@ func TestSmokeCore(ctx context.Context, cmd, hostPort string) error {
 			fmt.Printf("Trying %s %s ...\n", m, u)
 		}
 		if req, err := http.NewRequestWithContext(ctx, m, u.String(), nil); err != nil {
-			return err
+			return fmt.Errorf("failed to create req %s %s: %v", m, u, err)
 		} else if resp, err := http.DefaultClient.Do(req); err != nil {
-			return err
+			return fmt.Errorf("failed to run req %s %s: %v", m, u, err)
 		} else {
 			if resp.Body != nil {
 				defer resp.Body.Close()
