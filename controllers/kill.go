@@ -21,6 +21,7 @@ package controllers
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/fx"
@@ -52,6 +53,11 @@ func (k *KillController) HandleShutdown(c *gin.Context) {
 
 	// do the shutdown in the background
 	go func() {
+		// wait a moment so the response hopefully is sent
+		// TODO: clean http server shutdown should have allowed the response send
+		// regardless, why isn't that working?
+		<-time.After(10 * time.Millisecond)
+
 		// TODO: log any error
 		_ = k.shutdowner.Shutdown()
 	}()
