@@ -81,7 +81,7 @@ func main() {
 
 	if exitCode, err := NewApp().main(); err != nil {
 		panic(err)
-	} else {
+	} else if exitCode != 0 {
 		os.Exit(exitCode)
 	}
 }
