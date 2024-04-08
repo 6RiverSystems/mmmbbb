@@ -79,8 +79,10 @@ func main() {
 		}
 	}
 
-	if err := NewApp().main(); err != nil {
+	if exitCode, err := NewApp().main(); err != nil {
 		panic(err)
+	} else {
+		os.Exit(exitCode)
 	}
 }
 
@@ -149,37 +151,6 @@ func NewApp() *app {
 	}
 
 	return app
-
-	/*
-			Name:    version.AppName,
-			Version: version.SemrelVersion,
-			Port:    defaults.Port,
-			LoadOASSpec: func(ctx context.Context) (*openapi3.T, error) {
-				return oas.LoadSpec()
-			},
-			OASFS: http.FS(oas.OpenAPIFS),
-			SwaggerUIConfigHandler: swaggerui.CustomConfigHandler(func(config map[string]interface{}) map[string]interface{} {
-				config["urls"] = []map[string]interface{}{
-					{"url": config["url"], "name": version.AppName},
-					{"url": "../oas-grpc/pubsub.swagger.json", "name": "grpc:pubsub"},
-					{"url": "../oas-grpc/schema.swagger.json", "name": "grpc:schema"},
-				}
-				delete(config, "url")
-				return config
-			}),
-			RegisterServices: func(_ context.Context, r *registry.Registry, _ registry.MutableValues) error {
-				services.RegisterDefaultServices(r)
-				return nil
-			},
-			CustomizeRoutes: func(_ context.Context, e *gin.Engine, r *registry.Registry, _ registry.MutableValues) error {
-				e.StaticFS("/oas-grpc", http.FS(mbgrpc.SwaggerFS))
-				controllers.RegisterAll(r)
-				return nil
-			},
-		}
-		app.WithDefaults()
-		return app
-	*/
 }
 
 func (app *app) openDB(ctx context.Context, logger *logging.Logger) (drv *sql.Driver, err error) {
@@ -391,11 +362,28 @@ func (app *app) provideGrpc(params grpcParams) (grpcResults, error) {
 	return results, nil
 }
 
-func (a *app) main() error {
-	// TODO: InitializeServices
-	// TODO: StartServices
-	// TODO: WaitAllReady
-	// TODO: WaitServices
-	// TODO: exit
-	panic("not implemented")
+func (a *app) main() (int, error) {
+	app := fx.New(a.opts...)
+
+	// adapted from fx.App.Run()
+
+	startCtx, cancel := context.WithTimeout(context.Background(), app.StartTimeout())
+	defer cancel()
+
+	if err := app.Start(startCtx); err != nil {
+		return 1, err
+	}
+
+	sig := <-app.Wait()
+	exitCode := sig.ExitCode
+	// app.log().LogEvent(&fxevent.Stopping{Signal: sig.Signal})
+
+	stopCtx, cancel := context.WithTimeout(context.Background(), app.StopTimeout())
+	defer cancel()
+
+	if err := app.Stop(stopCtx); err != nil {
+		return 1, err
+	}
+
+	return exitCode, nil
 }
