@@ -38,11 +38,11 @@ jobs:
           name: Restore module cache
           keys:
             - go-mod-v1-{{ checksum "go.sum" }}
-      - restore_cache:
-          name: Restore similar AIO build cache
-          keys:
-            - go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
-            - go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-
+      # - restore_cache:
+      #     name: Restore similar AIO build cache
+      #     keys:
+      #       - go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
+      #       - go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-
 
       - run: ./mage -v get
       # gotestsum is included in the cimg/go image
@@ -116,11 +116,11 @@ jobs:
           key: go-mod-v1-{{ checksum "go.sum" }}
           paths:
             - "/home/circleci/go/pkg"
-      - save_cache:
-          name: Save AIO build cache
-          key: go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
-          paths:
-            - ~/.cache/go-build
+      # - save_cache:
+      #     name: Save AIO build cache
+      #     key: go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
+      #     paths:
+      #       - ~/.cache/go-build
 
       # post to slack if `main` fails to build
       - when:
