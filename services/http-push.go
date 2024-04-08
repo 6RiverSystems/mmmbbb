@@ -70,6 +70,8 @@ func waitPusherMonitors(ctx context.Context, timeout time.Duration, notifier <-c
 }
 
 type httpPusher struct {
+	cancel  context.CancelFunc
+	done    chan struct{}
 	client  *ent.Client
 	logger  *logging.Logger
 	pushers map[uuid.UUID]monitoredPusher
@@ -89,7 +91,12 @@ func (s *httpPusher) Initialize(_ context.Context, client *ent.Client) error {
 }
 
 func (s *httpPusher) Start(ctx context.Context, ready chan<- struct{}) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	s.cancel = cancel
 	eg, egCtx := errgroup.WithContext(ctx)
+	s.done = make(chan struct{})
+	defer close(s.done)
 
 	eg.Go(func() error { return s.monitorSubs(egCtx, ready) })
 
@@ -199,6 +206,12 @@ func (s *httpPusher) startPushersOnce(ctx context.Context) error {
 }
 
 func (s *httpPusher) Cleanup(context.Context) error {
+	if s.cancel != nil {
+		s.cancel()
+	}
+	if s.done != nil {
+		<-s.done
+	}
 	s.client = nil
 	s.logger = nil
 	s.pushers = nil

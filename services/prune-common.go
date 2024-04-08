@@ -72,6 +72,8 @@ type pruneService struct {
 	actionbuilder func(actions.PruneCommonParams) pruneAction
 	settings      PruneCommonSettings
 	logger        *logging.Logger
+	cancel        context.CancelFunc
+	done          chan struct{}
 	action        pruneAction
 	client        *ent.Client
 }
@@ -105,6 +107,12 @@ func (s *pruneService) Initialize(ctx context.Context, client *ent.Client) error
 }
 
 func (s *pruneService) Start(ctx context.Context, ready chan<- struct{}) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	s.cancel = cancel
+	s.done = make(chan struct{})
+	defer close(s.done)
+
 	// do the initial run soon after startup
 	ticker := time.NewTicker(s.settings.Backoff)
 	s.logger.Trace().Msg("Service started")
@@ -176,7 +184,14 @@ func (s *pruneService) runOnce(
 
 func (s *pruneService) Cleanup(context.Context) error {
 	logger := s.logger
-	// these aren't really necessary
+
+	if s.cancel != nil {
+		s.cancel()
+	}
+	if s.done != nil {
+		<-s.done
+	}
+
 	s.action = nil
 	s.client = nil
 	s.logger = nil

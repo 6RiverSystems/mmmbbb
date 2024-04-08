@@ -56,6 +56,8 @@ const subModifiedChannelName = version.AppName + "_modified_sub"
 
 type pgNotifier struct {
 	db     *sql.DB
+	cancel context.CancelFunc
+	done   chan struct{}
 	logger *logging.Logger
 
 	publishHook     actions.PublishHookHandle
@@ -80,6 +82,12 @@ func (n *pgNotifier) Initialize(ctx context.Context, client *ent.Client) error {
 }
 
 func (n *pgNotifier) Start(ctx context.Context, ready chan<- struct{}) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	n.cancel = cancel
+	n.done = make(chan struct{})
+	defer close(n.done)
+
 	if n.db == nil {
 		// not postgres
 		close(ready)
@@ -332,6 +340,13 @@ func parseUUIDName(s string) (uuid.UUID, string, error) {
 }
 
 func (n *pgNotifier) Cleanup(context.Context) error {
+	if n.cancel != nil {
+		n.cancel()
+	}
+	if n.done != nil {
+		<-n.done
+	}
+
 	if n.publishHook != nil {
 		actions.RemovePublishHook(n.publishHook)
 		n.publishHook = nil

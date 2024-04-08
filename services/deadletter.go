@@ -70,6 +70,8 @@ type deadLetter struct {
 
 	// state
 
+	cancel context.CancelFunc
+	done   chan struct{}
 	logger *logging.Logger
 	client *ent.Client
 }
@@ -90,6 +92,12 @@ func (s *deadLetter) Initialize(_ context.Context, client *ent.Client) error {
 }
 
 func (s *deadLetter) Start(ctx context.Context, ready chan<- struct{}) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	s.cancel = cancel
+	s.done = make(chan struct{})
+	defer close(s.done)
+
 	// do the initial run soon after startup
 	ticker := time.NewTicker(s.settings.Backoff)
 	s.logger.Trace().Msg("Service started")
@@ -134,7 +142,14 @@ LOOP:
 
 func (s *deadLetter) Cleanup(context.Context) error {
 	logger := s.logger
-	// these aren't really necessary
+
+	if s.cancel != nil {
+		s.cancel()
+	}
+	if s.done != nil {
+		<-s.done
+	}
+
 	s.client = nil
 	s.logger = nil
 	if logger != nil {
