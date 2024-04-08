@@ -36,6 +36,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
 	"go.uber.org/fx"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
 
 	"go.6river.tech/mmmbbb/controllers"
@@ -108,10 +109,29 @@ func NewApp() *app {
 			// report the app version as an expvar
 			expvar.NewString("version/" + version.AppName).Set(version.SemrelVersion)
 		}),
-		fx.Provide(func(l fx.Lifecycle) context.Context {
+		fx.Provide(func(l fx.Lifecycle, sd fx.Shutdowner) (context.Context, *errgroup.Group) {
 			ctx, cancel := context.WithCancel(context.Background())
-			l.Append(fx.StopHook(cancel))
-			return ctx
+			eg, ctx := errgroup.WithContext(ctx)
+			l.Append(fx.StartStopHook(
+				func() {
+					go func() {
+						<-ctx.Done()
+						err := eg.Wait()
+						var opts []fx.ShutdownOption
+						if err != nil {
+							opts = append(opts, fx.ExitCode(1))
+						}
+						_ = sd.Shutdown(opts...)
+					}()
+				},
+				func() {
+					cancel()
+					// this just waits for the eg to end, processing errors from it happens
+					// in the goroutine
+					_ = eg.Wait()
+				},
+			))
+			return ctx, eg
 		}),
 		fx.Provide(func(
 			ctx context.Context,
@@ -313,8 +333,8 @@ func (app *app) setupGin(params ginParams) (ginResults, error) {
 type grpcParams struct {
 	fx.In
 	Ctx     context.Context
+	EG      *errgroup.Group
 	L       fx.Lifecycle
-	SD      fx.Shutdowner
 	Client  *ent.Client
 	Engine  *gin.Engine
 	Faults  *faults.Set
@@ -338,7 +358,7 @@ func (app *app) provideGrpc(params grpcParams) (grpcResults, error) {
 			return services.InitializeGrpcServers(server, client, params.Readies)
 		},
 	)
-	if gsr, err := services.WrapService(params.Ctx, results.GrpcService, params.L, params.SD, params.Client); err != nil {
+	if gsr, err := services.WrapService(params.Ctx, params.EG, results.GrpcService, params.L, params.Client); err != nil {
 		return results, err
 	} else {
 		// results.GatewayReady = gsr.Ready
@@ -352,7 +372,7 @@ func (app *app) provideGrpc(params grpcParams) (grpcResults, error) {
 		[]string{"/v1/projects/*grpcPath", "/healthz"},
 		services.BindGatewayHandlers,
 	)
-	if gsr, err := services.WrapService(params.Ctx, results.GatewayService, params.L, params.SD, params.Client); err != nil {
+	if gsr, err := services.WrapService(params.Ctx, params.EG, results.GatewayService, params.L, params.Client); err != nil {
 		return results, err
 	} else {
 		// results.GatewayReady = gsr.Ready

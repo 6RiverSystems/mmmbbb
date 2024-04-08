@@ -25,6 +25,7 @@ import (
 	"sync/atomic"
 
 	"go.uber.org/fx"
+	"golang.org/x/sync/errgroup"
 
 	"go.6river.tech/mmmbbb/ent"
 )
@@ -60,19 +61,19 @@ type serviceResults struct {
 func asService(service Service) fx.Option {
 	return fx.Provide(func(
 		ctx context.Context,
+		eg *errgroup.Group,
 		l fx.Lifecycle,
-		sd fx.Shutdowner,
 		client *ent.Client,
 	) (serviceResults, error) {
-		return WrapService(ctx, service, l, sd, client)
+		return WrapService(ctx, eg, service, l, client)
 	})
 }
 
 func WrapService(
 	ctx context.Context,
+	eg *errgroup.Group,
 	service Service,
 	l fx.Lifecycle,
-	sd fx.Shutdowner,
 	client *ent.Client,
 ) (serviceResults, error) {
 	readyCh := make(chan struct{})
@@ -87,11 +88,9 @@ func WrapService(
 	l.Append(fx.StartStopHook(
 		func() {
 			go ready.watch(ctx)
-			go func() {
-				if err := service.Start(ctx, readyCh); err != nil {
-					_ = sd.Shutdown(fx.ExitCode(1))
-				}
-			}()
+			eg.Go(func() error {
+				return service.Start(ctx, readyCh)
+			})
 			<-readyCh
 		},
 		func(stopCtx context.Context) error {
