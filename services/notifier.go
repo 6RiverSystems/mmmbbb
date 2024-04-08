@@ -168,7 +168,7 @@ func (n *pgNotifier) Start(ctx context.Context, ready chan<- struct{}) error {
 			case s := <-subNotifies:
 				sn[s] = struct{}{}
 			case <-egCtx.Done():
-				return egCtx.Err()
+				return nil
 			}
 			// then get as much as is buffered up to their cap without blocking
 		DRAIN:
@@ -190,7 +190,7 @@ func (n *pgNotifier) Start(ctx context.Context, ready chan<- struct{}) error {
 						break DRAIN
 					}
 				case <-egCtx.Done():
-					return egCtx.Err()
+					return nil
 				default:
 					break DRAIN
 				}

@@ -133,7 +133,7 @@ func (ms *MessageStreamer) Go(ctx context.Context, conn StreamConnection) error 
 		<-ctx.Done()
 		conn.Close()
 		tryWake()
-		return ctx.Err()
+		return nil
 	})
 
 	// message reader
@@ -142,7 +142,7 @@ func (ms *MessageStreamer) Go(ctx context.Context, conn StreamConnection) error 
 			select {
 			case <-ctx.Done():
 				tryWake()
-				return ctx.Err()
+				return nil
 			default:
 			}
 			var msg *MessageStreamRequest
@@ -190,7 +190,7 @@ func (ms *MessageStreamer) Go(ctx context.Context, conn StreamConnection) error 
 				// need to re-check context cancellation every time
 				select {
 				case <-ctx.Done():
-					return ctx.Err()
+					return nil
 				default:
 				}
 				mu.Lock()
@@ -278,7 +278,7 @@ func (ms *MessageStreamer) Go(ctx context.Context, conn StreamConnection) error 
 		for {
 			select {
 			case <-ctx.Done():
-				return ctx.Err()
+				return nil
 			case <-pubNotify:
 				// single use, refresh it
 				pubNotify = PublishAwaiter(*ms.SubscriptionID)
@@ -351,7 +351,7 @@ func (ms *MessageStreamer) Go(ctx context.Context, conn StreamConnection) error 
 			for {
 				select {
 				case <-ctx.Done():
-					return ctx.Err()
+					return nil
 				case <-ticker.C:
 					// break & fall through
 				}
