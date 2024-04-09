@@ -27,11 +27,11 @@ import (
 
 	"github.com/google/uuid"
 
-	"go.6river.tech/gosix/ent/customtypes"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/subscription"
 	"go.6river.tech/mmmbbb/ent/topic"
 	"go.6river.tech/mmmbbb/filter"
+	"go.6river.tech/mmmbbb/internal/sqltypes"
 )
 
 type CreateSubscriptionParams struct {
@@ -118,18 +118,18 @@ func (a *CreateSubscription) Execute(ctx context.Context, tx *ent.Tx) error {
 	create := tx.Subscription.Create().
 		SetName(a.params.Name).
 		SetTopic(topic).
-		SetTTL(customtypes.Interval(a.params.TTL)).
+		SetTTL(sqltypes.Interval(a.params.TTL)).
 		SetExpiresAt(time.Now().Add(a.params.TTL)).
-		SetMessageTTL(customtypes.Interval(a.params.MessageTTL)).
+		SetMessageTTL(sqltypes.Interval(a.params.MessageTTL)).
 		SetOrderedDelivery(a.params.OrderedDelivery).
 		SetLabels(a.params.Labels).
 		SetNillablePushEndpoint(pushEndpoint).
 		SetNillableMessageFilter(messageFilter)
 	if a.params.MinBackoff > 0 {
-		create = create.SetMinBackoff(customtypes.IntervalPtr(a.params.MinBackoff))
+		create = create.SetMinBackoff(sqltypes.IntervalPtr(a.params.MinBackoff))
 	}
 	if a.params.MaxBackoff > 0 {
-		create = create.SetMaxBackoff(customtypes.IntervalPtr(a.params.MaxBackoff))
+		create = create.SetMaxBackoff(sqltypes.IntervalPtr(a.params.MaxBackoff))
 	}
 	if a.params.MaxDeliveryAttempts != 0 {
 		create = create.SetMaxDeliveryAttempts(a.params.MaxDeliveryAttempts)

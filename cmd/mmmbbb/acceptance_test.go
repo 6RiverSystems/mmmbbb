@@ -34,30 +34,30 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/sync/errgroup"
+	"go.uber.org/fx"
+	"go.uber.org/fx/fxtest"
 
-	"go.6river.tech/gosix/db/postgres"
-	"go.6river.tech/gosix/ent/customtypes"
-	"go.6river.tech/gosix/logging"
-	oastypes "go.6river.tech/gosix/oas"
-	"go.6river.tech/gosix/server"
-	"go.6river.tech/gosix/testutils"
 	"go.6river.tech/mmmbbb/defaults"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/enttest"
+	"go.6river.tech/mmmbbb/internal"
+	"go.6river.tech/mmmbbb/internal/oastypes"
+	"go.6river.tech/mmmbbb/internal/sqltypes"
+	"go.6river.tech/mmmbbb/internal/testutil"
+	"go.6river.tech/mmmbbb/logging"
 	"go.6river.tech/mmmbbb/oas"
 )
 
-func checkMainError(t *testing.T, err error) {
-	t.Helper()
-	// main died, errgroup will have called skip or fatal
-	// if db doesn't exist, count this as a skip instead of a fail
-	if _, ok := postgres.IsPostgreSQLErrorCode(err, postgres.InvalidCatalogName); ok {
-		// we can't call skip from here, we need to check this again higher up
-		t.Skip("Acceptance test DB does not exist, skipping test")
-	}
-	require.NoError(t, err, "main() should not panic")
-}
+// func checkMainError(t *testing.T, err error) {
+// 	t.Helper()
+// 	// main died, errgroup will have called skip or fatal
+// 	// if db doesn't exist, count this as a skip instead of a fail
+// 	if _, ok := postgres.IsPostgreSQLErrorCode(err, postgres.InvalidCatalogName); ok {
+// 		// we can't call skip from here, we need to check this again higher up
+// 		t.Skip("Acceptance test DB does not exist, skipping test")
+// 	}
+// 	require.NoError(t, err, "main() should not panic")
+// }
 
 func mustJSON(t *testing.T, value interface{}) []byte {
 	data, err := json.Marshal(value)
@@ -65,7 +65,7 @@ func mustJSON(t *testing.T, value interface{}) []byte {
 	return data
 }
 
-func mustBase64(t *testing.T, value []byte) string {
+func mustBase64(value []byte) string {
 	return base64.StdEncoding.EncodeToString(value)
 }
 
@@ -77,44 +77,30 @@ func mustUnBase64(t *testing.T, encoded string) []byte {
 
 func TestEndpoints(t *testing.T) {
 	logging.ConfigureDefaultLogging()
-	server.EnableRandomPorts()
+	internal.EnableRandomPorts()
 
 	// setup server
 	oldEnv := os.Getenv("NODE_ENV")
 	defer os.Setenv("NODE_ENV", oldEnv)
 	// this will target a postgresql db by default
 	os.Setenv("NODE_ENV", "acceptance")
-	eg, ctx := errgroup.WithContext(testutils.ContextForTest(t))
 	app := NewApp()
-	eg.Go(app.Main)
+	opts := append([]fx.Option(nil), app.opts...)
+	var data struct {
+		fx.In
+		Client     *ent.Client
+		Shutdowner fx.Shutdowner
+	}
+	opts = append(opts, fx.Populate(&data))
+	fxApp := fxtest.New(t, opts...)
+	fxApp.RequireStart()
+	t.Cleanup(fxApp.RequireStop)
 
 	client := http.DefaultClient
-	baseUrl := "http://localhost:" + strconv.Itoa(server.ResolvePort(defaults.Port, 0))
-
-	// wait for app to start
-	for {
-		delay := time.After(time.Millisecond)
-		select {
-		case <-ctx.Done():
-			checkMainError(t, eg.Wait())
-			return
-		case <-delay:
-			// continue with checks...
-		}
-
-		if !app.Registry.ServicesStarted() {
-			continue
-		}
-		if err := app.Registry.WaitAllReady(ctx); err != nil {
-			checkMainError(t, eg.Wait())
-		}
-		break
-	}
+	baseUrl := "http://localhost:" + strconv.Itoa(internal.ResolvePort(defaults.Port, 0))
 
 	// reset old db records
-	ec, ok := app.EntClient()
-	require.True(t, ok)
-	enttest.ResetTables(t, ec.(*ent.Client))
+	enttest.ResetTables(t, data.Client)
 
 	// load the OAS spec
 	swagger := oas.MustLoadSpec()
@@ -135,7 +121,7 @@ func TestEndpoints(t *testing.T) {
 		return mustJSON(t, msi{
 			"messages": []msi{
 				{
-					"data": mustBase64(t, mustJSON(t, msi{
+					"data": mustBase64(mustJSON(t, msi{
 						"hello": "world",
 					})),
 				},
@@ -355,7 +341,7 @@ func TestEndpoints(t *testing.T) {
 			fmt.Sprintf("/delays/projects/%s/subscriptions/%s", uniqueProject, uniqueSubscription),
 			http.MethodPut,
 			func(t *testing.T) json.RawMessage {
-				return mustJSON(t, oas.DeliveryDelay{Delay: customtypes.Interval(time.Second)})
+				return mustJSON(t, oas.DeliveryDelay{Delay: sqltypes.Interval(time.Second)})
 			},
 			func(t *testing.T, resp *http.Response) {
 				assert.Equal(t, http.StatusOK, resp.StatusCode)
@@ -363,7 +349,7 @@ func TestEndpoints(t *testing.T) {
 				bodyObject := oas.DeliveryDelay{}
 				err := json.NewDecoder(resp.Body).Decode(&bodyObject)
 				assert.NoError(t, err)
-				assert.Equal(t, bodyObject.Delay, customtypes.Interval(time.Second))
+				assert.Equal(t, bodyObject.Delay, sqltypes.Interval(time.Second))
 			},
 		},
 		{
@@ -421,9 +407,7 @@ func TestEndpoints(t *testing.T) {
 					bodyReader = bytes.NewReader(body)
 				}
 			}
-			// ctx is from the errgroup for running main(), so if that blows up the
-			// request (and thus tests) get canceled instead of hanging until the
-			// timeout.
+			ctx := testutil.Context(t)
 			req, err := http.NewRequestWithContext(ctx, tt.method, baseUrl+tt.url, bodyReader)
 			require.NoError(t, err)
 			if bodyReader != nil {
@@ -441,7 +425,6 @@ func TestEndpoints(t *testing.T) {
 		})
 	}
 
-	app.Registry.RequestStopServices()
-	err := eg.Wait()
-	assert.NoError(t, err, "main should not panic")
+	err := data.Shutdowner.Shutdown()
+	assert.NoError(t, err, "app should shutdown cleanly")
 }

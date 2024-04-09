@@ -21,38 +21,104 @@ package services
 
 import (
 	"context"
+	"errors"
+	"sync/atomic"
 
-	entcommon "go.6river.tech/gosix/ent"
-	"go.6river.tech/gosix/registry"
+	"go.uber.org/fx"
+	"golang.org/x/sync/errgroup"
+
 	"go.6river.tech/mmmbbb/ent"
 )
 
-// mmmbbbService is like registry.Service, but with common types replaced with
-// mmmbbb-specific ones
-type mmmbbbService interface {
+type Service interface {
+	// Name describes the specific service for use in logging and status reports
 	Name() string
-	Initialize(context.Context, *registry.Registry, *ent.Client) error
+
+	// Initialize should do any prep work for the service, but not actually start
+	// it yet. The context should only be used for the duration of the initialization.
+	Initialize(context.Context, *ent.Client) error
+
+	// Start runs the service. It will be invoked on a goroutine, so it should
+	// block and not return until the context is canceled, which is how the
+	// service is requested to stop. The service must close the ready channel once
+	// it is operational, so that any dependent services can know when they are OK
+	// to proceed.
 	Start(context.Context, chan<- struct{}) error
-	Cleanup(context.Context, *registry.Registry) error
+
+	// Cleanup should release any resources acquired during Initialize. If another
+	// service fails during Initialize, Cleanup may be called without Start ever
+	// being called. If Start is called, Cleanup will not be called until after it
+	// returns.
+	Cleanup(context.Context) error
 }
 
-type wrappedService struct {
-	mmmbbbService
+type serviceResults struct {
+	fx.Out
+	Service Service    `group:"services"`
+	Ready   ReadyCheck `group:"ready"`
 }
 
-func (s *wrappedService) Initialize(ctx context.Context, services *registry.Registry, client_ entcommon.EntClientBase) error {
-	client := client_.(*ent.Client)
-	return s.mmmbbbService.Initialize(ctx, services, client)
+func asService(service Service) fx.Option {
+	return fx.Provide(func(
+		ctx context.Context,
+		eg *errgroup.Group,
+		l fx.Lifecycle,
+		client *ent.Client,
+	) (serviceResults, error) {
+		return WrapService(ctx, eg, service, l, client)
+	})
 }
 
-func (s *wrappedService) Start(ctx context.Context, ready chan<- struct{}) error {
-	return s.mmmbbbService.Start(ctx, ready)
+func WrapService(
+	ctx context.Context,
+	eg *errgroup.Group,
+	service Service,
+	l fx.Lifecycle,
+	client *ent.Client,
+) (serviceResults, error) {
+	readyCh := make(chan struct{})
+	ready := &serviceReady{ch: readyCh}
+	res := serviceResults{
+		Service: service,
+		Ready:   ready,
+	}
+	if err := service.Initialize(ctx, client); err != nil {
+		return res, err
+	}
+	l.Append(fx.StartStopHook(
+		func() {
+			go ready.watch(ctx)
+			eg.Go(func() error {
+				return service.Start(ctx, readyCh)
+			})
+			<-readyCh
+		},
+		func(stopCtx context.Context) error {
+			return service.Cleanup(stopCtx)
+		},
+	))
+	return res, nil
 }
 
-func (s *wrappedService) Cleanup(ctx context.Context, reg *registry.Registry) error {
-	return s.mmmbbbService.Cleanup(ctx, reg)
+type serviceReady struct {
+	ch    <-chan struct{}
+	ready atomic.Bool
 }
 
-func wrapService(service mmmbbbService) registry.Service {
-	return &wrappedService{mmmbbbService: service}
+func (r *serviceReady) watch(ctx context.Context) {
+	select {
+	case <-ctx.Done():
+		return
+	case <-r.ch:
+		r.ready.Store(true)
+	}
 }
+
+func (r *serviceReady) Ready() error {
+	if r.ready.Load() {
+		return nil
+	}
+	return ErrNotReady
+}
+
+var ErrNotReady = errors.New("service not ready")

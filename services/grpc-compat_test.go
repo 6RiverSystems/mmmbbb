@@ -32,6 +32,7 @@ import (
 	"testing"
 	"time"
 
+	"cloud.google.com/go/pubsub"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/sync/errgroup"
@@ -39,11 +40,11 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"go.6river.tech/gosix/pubsub"
-	"go.6river.tech/gosix/testutils"
+	"go.6river.tech/mmmbbb/actions"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/subscription"
 	"go.6river.tech/mmmbbb/ent/topic"
+	"go.6river.tech/mmmbbb/internal/testutil"
 )
 
 // TestGrpcCompat is an acceptance-style test for checking the gRPC
@@ -53,35 +54,35 @@ func TestGrpcCompat(t *testing.T) {
 
 	type test struct {
 		name   string
-		before func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client)
+		before func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client)
 		// steps are run _concurrently_
-		steps []func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client)
+		steps []func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client)
 		after func(t *testing.T, ctx context.Context, client *ent.Client, tt *test)
 		// tests can fill these in to share state among before/step/concurrent/after
-		topics  []pubsub.Topic
-		subs    []pubsub.Subscription
+		topics  []*pubsub.Topic
+		subs    []*pubsub.Subscription
 		servers []*httptest.Server
 		errs    []error
 		waiters []chan struct{}
 		mu      sync.Mutex
 	}
-	type testStep = func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client)
+	type testStep = func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client)
 
 	tests := []*test{
 		{
 			name: "concurrent topic create",
-			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
-				tt.topics = make([]pubsub.Topic, 2)
+			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
+				tt.topics = make([]*pubsub.Topic, 2)
 				tt.errs = make([]error, 2)
 			},
 			steps: []testStep{
-				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 					tt.topics[0], tt.errs[0] = psc.CreateTopic(ctx, safeName(t))
 					if tt.errs[0] != nil {
 						assert.Equal(t, codes.AlreadyExists.String(), status.Code(tt.errs[0]).String(), "should be code AlreadyExists: %#v", tt.errs[0])
 					}
 				},
-				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 					tt.topics[1], tt.errs[1] = psc.CreateTopic(ctx, safeName(t))
 					if tt.errs[1] != nil {
 						assert.Equal(t, codes.AlreadyExists.String(), status.Code(tt.errs[1]).String(), "should be code AlreadyExists: %#v", tt.errs[1])
@@ -105,23 +106,23 @@ func TestGrpcCompat(t *testing.T) {
 		},
 		{
 			name: "concurrent sub create",
-			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
-				tt.topics = make([]pubsub.Topic, 1)
+			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
+				tt.topics = make([]*pubsub.Topic, 1)
 				var err error
 				tt.topics[0], err = psc.CreateTopic(ctx, safeName(t))
 				require.NoError(t, err)
 				tt.errs = make([]error, 2)
-				tt.subs = make([]pubsub.Subscription, 2)
+				tt.subs = make([]*pubsub.Subscription, 2)
 			},
 			steps: []testStep{
-				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
-					tt.subs[0], tt.errs[0] = tt.topics[0].CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{})
+				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
+					tt.subs[0], tt.errs[0] = psc.CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{Topic: tt.topics[0]})
 					if tt.errs[0] != nil {
 						assert.Equal(t, codes.AlreadyExists.String(), status.Code(tt.errs[0]).String(), "should be code AlreadyExists: %#v", tt.errs[0])
 					}
 				},
-				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
-					tt.subs[1], tt.errs[1] = tt.topics[0].CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{})
+				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
+					tt.subs[1], tt.errs[1] = psc.CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{Topic: tt.topics[0]})
 					if tt.errs[1] != nil {
 						assert.Equal(t, codes.AlreadyExists.String(), status.Code(tt.errs[1]).String(), "should be code AlreadyExists: %#v", tt.errs[1])
 					}
@@ -144,7 +145,7 @@ func TestGrpcCompat(t *testing.T) {
 		},
 		{
 			name: "list topics",
-			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 				// need to purge topics from prior tests
 				assert.NoError(t, client.Topic.Update().
 					Where(topic.DeletedAtIsNil()).
@@ -152,14 +153,14 @@ func TestGrpcCompat(t *testing.T) {
 					ClearLive().
 					Exec(ctx))
 				const numTopics = 5
-				tt.topics = make([]pubsub.Topic, numTopics)
+				tt.topics = make([]*pubsub.Topic, numTopics)
 				for i := range tt.topics {
 					var err error
 					tt.topics[i], err = psc.CreateTopic(ctx, safeName(t)+"_"+strconv.Itoa(i))
 					require.NoError(t, err)
 				}
 			},
-			steps: []testStep{func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+			steps: []testStep{func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 				expected := make([]string, len(tt.topics))
 				for i, t := range tt.topics {
 					expected[i] = t.ID()
@@ -180,19 +181,19 @@ func TestGrpcCompat(t *testing.T) {
 		},
 		{
 			name: "list subs on one topic",
-			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 				const numSubs = 5
-				tt.topics = make([]pubsub.Topic, 1)
-				tt.subs = make([]pubsub.Subscription, numSubs)
+				tt.topics = make([]*pubsub.Topic, 1)
+				tt.subs = make([]*pubsub.Subscription, numSubs)
 				var err error
 				tt.topics[0], err = psc.CreateTopic(ctx, safeName(t))
 				require.NoError(t, err)
 				for i := range tt.subs {
-					tt.subs[i], err = tt.topics[0].CreateSubscription(ctx, safeName(t)+"_"+strconv.Itoa(i), pubsub.SubscriptionConfig{})
+					tt.subs[i], err = psc.CreateSubscription(ctx, safeName(t)+"_"+strconv.Itoa(i), pubsub.SubscriptionConfig{Topic: tt.topics[0]})
 					require.NoError(t, err)
 				}
 			},
-			steps: []testStep{func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+			steps: []testStep{func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 				expected := make([]string, len(tt.subs))
 				for i, s := range tt.subs {
 					expected[i] = s.ID()
@@ -213,7 +214,7 @@ func TestGrpcCompat(t *testing.T) {
 		},
 		{
 			name: "list subs on all topics",
-			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 				// need to purge topics and subs from prior tests
 				assert.NoError(t, client.Topic.Update().
 					Where(topic.DeletedAtIsNil()).
@@ -227,8 +228,8 @@ func TestGrpcCompat(t *testing.T) {
 					Exec(ctx))
 				const numTopics = 2
 				const numSubs = 6
-				tt.topics = make([]pubsub.Topic, numTopics)
-				tt.subs = make([]pubsub.Subscription, numSubs)
+				tt.topics = make([]*pubsub.Topic, numTopics)
+				tt.subs = make([]*pubsub.Subscription, numSubs)
 				var err error
 				for i := range tt.topics {
 					var err error
@@ -236,11 +237,11 @@ func TestGrpcCompat(t *testing.T) {
 					require.NoError(t, err)
 				}
 				for i := range tt.subs {
-					tt.subs[i], err = tt.topics[i%numTopics].CreateSubscription(ctx, safeName(t)+"_"+strconv.Itoa(i), pubsub.SubscriptionConfig{})
+					tt.subs[i], err = psc.CreateSubscription(ctx, safeName(t)+"_"+strconv.Itoa(i), pubsub.SubscriptionConfig{Topic: tt.topics[i%numTopics]})
 					require.NoError(t, err)
 				}
 			},
-			steps: []testStep{func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+			steps: []testStep{func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 				expected := make([]string, len(tt.subs))
 				for i, s := range tt.subs {
 					expected[i] = s.ID()
@@ -262,7 +263,7 @@ func TestGrpcCompat(t *testing.T) {
 		{
 			// TODO: this isn't a very "unity" test
 			name: "topic lifecycle",
-			steps: []testStep{func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+			steps: []testStep{func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 				// Exists maps to GetTopic
 				exists, err := psc.Topic(safeName(t)).Exists(ctx)
 				require.NoError(t, err)
@@ -302,18 +303,18 @@ func TestGrpcCompat(t *testing.T) {
 		{
 			// TODO: this isn't a very "unity" test
 			name: "subscription lifecycle",
-			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 				topic, err := psc.CreateTopic(ctx, safeName(t))
 				require.NoError(t, err)
-				tt.topics = []pubsub.Topic{topic}
+				tt.topics = []*pubsub.Topic{topic}
 			},
-			steps: []testStep{func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+			steps: []testStep{func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 				// Exists maps to GetTopic
 				exists, err := psc.Subscription(safeName(t)).Exists(ctx)
 				require.NoError(t, err)
 				require.False(t, exists)
 
-				sub, err := tt.topics[0].CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{})
+				sub, err := psc.CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{Topic: tt.topics[0]})
 				require.NoError(t, err)
 
 				cfg, err := sub.Config(ctx)
@@ -375,24 +376,25 @@ func TestGrpcCompat(t *testing.T) {
 		},
 		{
 			name: "streaming pull",
-			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 				topic, err := psc.CreateTopic(ctx, safeName(t))
 				require.NoError(t, err)
-				sub, err := topic.CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{
+				sub, err := psc.CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{
+					Topic: topic,
 					RetryPolicy: &pubsub.RetryPolicy{
 						MinimumBackoff: 51 * time.Millisecond,
 					},
 				})
 				require.NoError(t, err)
 				// avoid wasting a lot of time spinning up extra gRPC connections
-				sub.ReceiveSettings().NumGoroutines = 1
-				tt.topics = []pubsub.Topic{topic}
-				tt.subs = []pubsub.Subscription{sub}
+				sub.ReceiveSettings.NumGoroutines = 1
+				tt.topics = []*pubsub.Topic{topic}
+				tt.subs = []*pubsub.Subscription{sub}
 			},
 			steps: []testStep{
 				// sender
-				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
-					id, err := tt.topics[0].Publish(ctx, &pubsub.RealMessage{
+				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
+					id, err := tt.topics[0].Publish(ctx, &pubsub.Message{
 						// bare numbers are valid json values
 						Data: json.RawMessage(`1`),
 					}).Get(ctx)
@@ -400,7 +402,7 @@ func TestGrpcCompat(t *testing.T) {
 					assert.NotEmpty(t, id)
 					// pause so the subscriber gets two separate "pulls"
 					time.Sleep(100 * time.Millisecond)
-					id, err = tt.topics[0].Publish(ctx, &pubsub.RealMessage{
+					id, err = tt.topics[0].Publish(ctx, &pubsub.Message{
 						Data: json.RawMessage(`2`),
 					}).Get(ctx)
 					assert.NoError(t, err)
@@ -408,16 +410,16 @@ func TestGrpcCompat(t *testing.T) {
 				},
 				// receiver
 				// TODO: this is slow because of sleeps needed to trigger modack behavior
-				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 					i := int32(0)
 					rCtx, cancel := context.WithCancel(ctx)
-					assert.NoError(t, tt.subs[0].Receive(rCtx, func(ctx context.Context, m pubsub.Message) {
+					assert.NoError(t, tt.subs[0].Receive(rCtx, func(ctx context.Context, m *pubsub.Message) {
 						counter := atomic.AddInt32(&i, 1)
 						expected := counter
 						if expected > 2 {
 							expected = 2
 						}
-						assert.Equal(t, strconv.Itoa(int(expected)), string(m.RealMessage().Data),
+						assert.Equal(t, strconv.Itoa(int(expected)), string(m.Data),
 							"should get expected message (in order)")
 						if counter == 1 {
 							// go fast
@@ -440,26 +442,27 @@ func TestGrpcCompat(t *testing.T) {
 		},
 		{
 			name: "synchronous pull",
-			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 				topic, err := psc.CreateTopic(ctx, safeName(t))
 				require.NoError(t, err)
-				sub, err := topic.CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{
+				sub, err := psc.CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{
+					Topic: topic,
 					RetryPolicy: &pubsub.RetryPolicy{
 						MinimumBackoff: 51 * time.Millisecond,
 					},
 				})
 				require.NoError(t, err)
 				// this should make it use the non-streaming pull endpoint
-				sub.ReceiveSettings().Synchronous = true
+				sub.ReceiveSettings.Synchronous = true
 				// avoid wasting a lot of time spinning up extra gRPC connections
-				sub.ReceiveSettings().NumGoroutines = 1
-				tt.topics = []pubsub.Topic{topic}
-				tt.subs = []pubsub.Subscription{sub}
+				sub.ReceiveSettings.NumGoroutines = 1
+				tt.topics = []*pubsub.Topic{topic}
+				tt.subs = []*pubsub.Subscription{sub}
 			},
 			steps: []testStep{
 				// sender
-				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
-					id, err := tt.topics[0].Publish(ctx, &pubsub.RealMessage{
+				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
+					id, err := tt.topics[0].Publish(ctx, &pubsub.Message{
 						// bare numbers are valid json values
 						Data: json.RawMessage(`1`),
 					}).Get(ctx)
@@ -467,7 +470,7 @@ func TestGrpcCompat(t *testing.T) {
 					assert.NotEmpty(t, id)
 					// pause so the subscriber gets two separate "pulls"
 					time.Sleep(100 * time.Millisecond)
-					id, err = tt.topics[0].Publish(ctx, &pubsub.RealMessage{
+					id, err = tt.topics[0].Publish(ctx, &pubsub.Message{
 						Data: json.RawMessage(`2`),
 					}).Get(ctx)
 					assert.NoError(t, err)
@@ -475,16 +478,16 @@ func TestGrpcCompat(t *testing.T) {
 				},
 				// receiver
 				// TODO: this is slow because of sleeps needed to trigger modack behavior
-				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 					i := int32(0)
 					rCtx, cancel := context.WithCancel(ctx)
-					err := tt.subs[0].Receive(rCtx, func(ctx context.Context, m pubsub.Message) {
+					err := tt.subs[0].Receive(rCtx, func(ctx context.Context, m *pubsub.Message) {
 						counter := atomic.AddInt32(&i, 1)
 						expected := counter
 						if expected > 2 {
 							expected = 2
 						}
-						assert.Equal(t, ([]byte)(strconv.Itoa(int(expected))), m.RealMessage().Data)
+						assert.Equal(t, ([]byte)(strconv.Itoa(int(expected))), m.Data)
 						if counter == 1 {
 							// go fast
 							defer m.Ack()
@@ -507,7 +510,7 @@ func TestGrpcCompat(t *testing.T) {
 		},
 		{
 			name: "subscription http push",
-			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 				srv := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					// test step will replace this with the real listener before starting the server
 					panic("should never be called")
@@ -519,7 +522,7 @@ func TestGrpcCompat(t *testing.T) {
 				t.Cleanup(srv.Close)
 
 				pusher := &httpPusher{}
-				err := pusher.Initialize(ctx, nil, client)
+				err := pusher.Initialize(ctx, client)
 				require.NoError(t, err)
 				pusherReady := make(chan struct{})
 				// waiter 0 is pusher end request, waiter 1 is pusher done notify
@@ -542,12 +545,13 @@ func TestGrpcCompat(t *testing.T) {
 				t.Cleanup(func() {
 					tt.mu.Lock()
 					defer tt.mu.Unlock()
-					_ = pusher.Cleanup(ctx, nil)
+					_ = pusher.Cleanup(ctx)
 				})
 
 				topic, err := psc.CreateTopic(ctx, safeName(t))
 				require.NoError(t, err)
-				sub, err := topic.CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{
+				sub, err := psc.CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{
+					Topic: topic,
 					RetryPolicy: &pubsub.RetryPolicy{
 						MinimumBackoff: 51 * time.Millisecond,
 					},
@@ -556,13 +560,13 @@ func TestGrpcCompat(t *testing.T) {
 					},
 				})
 				require.NoError(t, err)
-				tt.topics = []pubsub.Topic{topic}
-				tt.subs = []pubsub.Subscription{sub}
+				tt.topics = []*pubsub.Topic{topic}
+				tt.subs = []*pubsub.Subscription{sub}
 			},
 			steps: []testStep{
 				// sender
-				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
-					id, err := tt.topics[0].Publish(ctx, &pubsub.RealMessage{
+				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
+					id, err := tt.topics[0].Publish(ctx, &pubsub.Message{
 						// bare numbers are valid json values
 						Data: json.RawMessage(`1`),
 					}).Get(ctx)
@@ -570,14 +574,14 @@ func TestGrpcCompat(t *testing.T) {
 					assert.NotEmpty(t, id)
 					// pause so the subscriber gets two separate "pulls"
 					time.Sleep(100 * time.Millisecond)
-					id, err = tt.topics[0].Publish(ctx, &pubsub.RealMessage{
+					id, err = tt.topics[0].Publish(ctx, &pubsub.Message{
 						Data: json.RawMessage(`2`),
 					}).Get(ctx)
 					assert.NoError(t, err)
 					assert.NotEmpty(t, id)
 				},
 				// receiver
-				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 					i := int32(0)
 					rCtx, cancel := context.WithCancel(ctx)
 					tt.servers[0].Config.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -587,7 +591,7 @@ func TestGrpcCompat(t *testing.T) {
 						if expected > 2 {
 							expected = 2
 						}
-						var m pubsub.PushRequest
+						var m actions.PushRequest
 						dec := json.NewDecoder(r.Body)
 						assert.NoError(t, dec.Decode(&m))
 						decoded, err := base64.StdEncoding.DecodeString(m.Message.Data)
@@ -625,30 +629,31 @@ func TestGrpcCompat(t *testing.T) {
 		},
 		{
 			name: "subscription filter",
-			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 				topic, err := psc.CreateTopic(ctx, safeName(t))
 				require.NoError(t, err)
-				topic.EnableMessageOrdering()
-				tt.topics = []pubsub.Topic{topic}
+				topic.EnableMessageOrdering = true
+				tt.topics = []*pubsub.Topic{topic}
 			},
 			steps: []testStep{
-				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
-					sub, err := tt.topics[0].CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{
+				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
+					sub, err := psc.CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{
+						Topic:                 tt.topics[0],
 						Filter:                "attributes:deliver",
 						EnableMessageOrdering: true,
 					})
 					require.NoError(t, err)
-					tt.topics[0].Publish(ctx, &pubsub.RealMessage{
+					tt.topics[0].Publish(ctx, &pubsub.Message{
 						Data:        json.RawMessage(`1`),
 						OrderingKey: "x",
 						Attributes:  map[string]string{"deliver": ""},
 					})
-					tt.topics[0].Publish(ctx, &pubsub.RealMessage{
+					tt.topics[0].Publish(ctx, &pubsub.Message{
 						Data:        json.RawMessage(`2`),
 						OrderingKey: "x",
 						// Attributes: map[string]string{"skip":""},
 					})
-					tt.topics[0].Publish(ctx, &pubsub.RealMessage{
+					tt.topics[0].Publish(ctx, &pubsub.Message{
 						Data:        json.RawMessage(`3`),
 						OrderingKey: "x",
 						Attributes:  map[string]string{"deliver": ""},
@@ -656,7 +661,7 @@ func TestGrpcCompat(t *testing.T) {
 
 					i := int32(0)
 					rCtx, cancel := context.WithCancel(ctx)
-					err = sub.Receive(rCtx, func(ctx context.Context, m pubsub.Message) {
+					err = sub.Receive(rCtx, func(ctx context.Context, m *pubsub.Message) {
 						counter := atomic.AddInt32(&i, 1)
 						var expected string
 						// don't expect to get message 2
@@ -666,7 +671,7 @@ func TestGrpcCompat(t *testing.T) {
 							assert.Equal(t, int32(2), counter)
 							expected = "3"
 						}
-						assert.Equal(t, ([]byte)(expected), m.RealMessage().Data)
+						assert.Equal(t, ([]byte)(expected), m.Data)
 						defer m.Ack()
 						if counter >= 2 {
 							cancel()
@@ -678,28 +683,28 @@ func TestGrpcCompat(t *testing.T) {
 		},
 		{
 			name: "sub purge via seek",
-			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 				topic, err := psc.CreateTopic(ctx, safeName(t))
 				require.NoError(t, err)
-				sub, err := topic.CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{})
+				sub, err := psc.CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{Topic: topic})
 				require.NoError(t, err)
 				// this should make it use the non-streaming pull endpoint
-				sub.ReceiveSettings().Synchronous = true
+				sub.ReceiveSettings.Synchronous = true
 				// avoid wasting a lot of time spinning up extra gRPC connections
-				sub.ReceiveSettings().NumGoroutines = 1
-				tt.topics = []pubsub.Topic{topic}
-				tt.subs = []pubsub.Subscription{sub}
+				sub.ReceiveSettings.NumGoroutines = 1
+				tt.topics = []*pubsub.Topic{topic}
+				tt.subs = []*pubsub.Subscription{sub}
 
 				// send some messages that we're gonna purge
 				for i := 0; i < 10; i++ {
-					_, err := topic.Publish(ctx, &pubsub.RealMessage{
+					_, err := topic.Publish(ctx, &pubsub.Message{
 						Data: json.RawMessage(strconv.Itoa(i)),
 					}).Get(ctx)
 					assert.NoError(t, err)
 				}
 			},
 			steps: []testStep{
-				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc pubsub.Client) {
+				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 					// seek the sub to now to purge everything we published
 					err := tt.subs[0].SeekToTime(ctx, time.Now())
 					assert.NoError(t, err)
@@ -707,7 +712,7 @@ func TestGrpcCompat(t *testing.T) {
 					// do a synchronous pull and verify there are no messages
 					timeoutCtx, cancel := context.WithTimeout(ctx, time.Second)
 					defer cancel()
-					err = tt.subs[0].Receive(timeoutCtx, func(ctx context.Context, m pubsub.Message) {
+					err = tt.subs[0].Receive(timeoutCtx, func(ctx context.Context, m *pubsub.Message) {
 						assert.Fail(t, "should not have received a message")
 						m.Ack()
 						cancel()
@@ -719,7 +724,7 @@ func TestGrpcCompat(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := testutils.ContextForTest(t)
+			ctx := testutil.Context(t)
 			if tt.before != nil {
 				tt.before(t, ctx, client, tt, psClient)
 			}
@@ -778,11 +783,11 @@ func benchUsePg(b *testing.B) {
 
 func benchThroughput(b *testing.B, numTopics, subsPerTopic, maxMessages int, payload json.RawMessage) {
 	_, psClient := initGrpcTest(b)
-	ctx := testutils.ContextForTest(b)
+	ctx := testutil.Context(b)
 
-	topics := make([]pubsub.Topic, numTopics)
+	topics := make([]*pubsub.Topic, numTopics)
 	pubs := make([][]*pubsub.PublishResult, numTopics)
-	subs := make([]pubsub.Subscription, numTopics*subsPerTopic)
+	subs := make([]*pubsub.Subscription, numTopics*subsPerTopic)
 	for i := 0; i < numTopics; i++ {
 		var err error
 		topics[i], err = psClient.CreateTopic(ctx, safeName(b)+"_"+strconv.Itoa(i))
@@ -791,14 +796,14 @@ func benchThroughput(b *testing.B, numTopics, subsPerTopic, maxMessages int, pay
 	}
 	for i := 0; i < numTopics*subsPerTopic; i++ {
 		var err error
-		subs[i], err = topics[i%numTopics].CreateSubscription(ctx, safeName(b)+"_"+strconv.Itoa(i), pubsub.SubscriptionConfig{})
+		subs[i], err = psClient.CreateSubscription(ctx, safeName(b)+"_"+strconv.Itoa(i), pubsub.SubscriptionConfig{Topic: topics[i%numTopics]})
 		require.NoError(b, err)
 		// most of our apps constrain this from its default of 1000 down to 20, or
 		// even less. note that this has a _huge_ impact on per-sub throughput!
-		subs[i].ReceiveSettings().MaxOutstandingMessages = maxMessages
+		subs[i].ReceiveSettings.MaxOutstandingMessages = maxMessages
 	}
 
-	eg, egCtx := errgroup.WithContext(testutils.ContextForTest(b))
+	eg, egCtx := errgroup.WithContext(testutil.Context(b))
 	b.ResetTimer()
 	start := time.Now()
 	var pubDuration time.Duration
@@ -807,7 +812,7 @@ func benchThroughput(b *testing.B, numTopics, subsPerTopic, maxMessages int, pay
 		topic := topic
 		eg.Go(func() error {
 			for j := 0; j < b.N; j++ {
-				pubs[i][j] = topic.Publish(egCtx, &pubsub.RealMessage{
+				pubs[i][j] = topic.Publish(egCtx, &pubsub.Message{
 					Data:       payload,
 					Attributes: map[string]string{"n": strconv.Itoa(j)},
 				})
@@ -839,11 +844,11 @@ func benchThroughput(b *testing.B, numTopics, subsPerTopic, maxMessages int, pay
 			extraReceives := 0
 			ctx, cancel := context.WithCancel(egCtx)
 			defer cancel()
-			err := sub.Receive(ctx, func(c context.Context, m pubsub.Message) {
+			err := sub.Receive(ctx, func(c context.Context, m *pubsub.Message) {
 				m.Ack()
 				mu.Lock()
 				defer mu.Unlock()
-				n, err := strconv.Atoi(m.RealMessage().Attributes["n"])
+				n, err := strconv.Atoi(m.Attributes["n"])
 				if assert.NoError(b, err) {
 					// assert.NotContains(b, received, n, "should not double-receive %d/%d on %d", n, b.N, i)
 					if received[n] {

@@ -29,9 +29,6 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	health "google.golang.org/grpc/health/grpc_health_v1"
 
-	entcommon "go.6river.tech/gosix/ent"
-	"go.6river.tech/gosix/registry"
-
 	"go.6river.tech/mmmbbb/actions"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/grpc/pubsub"
@@ -75,11 +72,10 @@ func isValidSnapshotName(name string) bool {
 		segments[3] != ""
 }
 
-func InitializeGrpcServers(_ context.Context, server *grpc.Server, services *registry.Registry, client_ entcommon.EntClientBase) error {
-	client := client_.(*ent.Client)
+func InitializeGrpcServers(server *grpc.Server, client *ent.Client, readies []ReadyCheck) error {
 	pubsub.RegisterPublisherServer(server, &publisherServer{client: client})
 	pubsub.RegisterSubscriberServer(server, &subscriberServer{client: client})
-	health.RegisterHealthServer(server, &healthServer{client: client, services: services})
+	health.RegisterHealthServer(server, &healthServer{client: client, readies: readies})
 	return nil
 }
 

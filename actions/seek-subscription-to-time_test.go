@@ -27,10 +27,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 
-	"go.6river.tech/gosix/testutils"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/delivery"
 	"go.6river.tech/mmmbbb/ent/enttest"
+	"go.6river.tech/mmmbbb/internal/testutil"
 )
 
 func TestSeekSubscriptionToTime_Execute(t *testing.T) {
@@ -146,7 +146,7 @@ func TestSeekSubscriptionToTime_Execute(t *testing.T) {
 			// have to make this indirect as the expected notify may be generated in
 			// before
 			defer func() { CancelPublishAwaiter(tt.expectPublishNotify, pubNotify) }()
-			assert.NoError(t, client.DoCtxTx(testutils.ContextForTest(t), nil, func(ctx context.Context, tx *ent.Tx) error {
+			assert.NoError(t, client.DoCtxTx(testutil.Context(t), nil, func(ctx context.Context, tx *ent.Tx) error {
 				tt.topic = createTopic(t, ctx, tx, 0)
 				tt.sub = createSubscription(t, ctx, tx, tt.topic, 0)
 				if tt.before != nil {

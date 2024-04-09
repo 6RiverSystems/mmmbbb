@@ -24,10 +24,9 @@ import (
 	"math/rand"
 	"time"
 
-	"go.6river.tech/gosix/logging"
-	"go.6river.tech/gosix/registry"
 	"go.6river.tech/mmmbbb/actions"
 	"go.6river.tech/mmmbbb/ent"
+	"go.6river.tech/mmmbbb/logging"
 )
 
 type PruneCommonSettings struct {
@@ -73,6 +72,8 @@ type pruneService struct {
 	actionbuilder func(actions.PruneCommonParams) pruneAction
 	settings      PruneCommonSettings
 	logger        *logging.Logger
+	cancel        context.CancelFunc
+	done          chan struct{}
 	action        pruneAction
 	client        *ent.Client
 }
@@ -91,7 +92,7 @@ func (s *pruneService) Name() string {
 	return s.name
 }
 
-func (s *pruneService) Initialize(ctx context.Context, _ *registry.Registry, client *ent.Client) error {
+func (s *pruneService) Initialize(ctx context.Context, client *ent.Client) error {
 	// TODO: need a consistent way to inject configuration: could get config from
 	// the context, but that gets inefficient fast
 	s.settings.ApplyDefaults()
@@ -106,6 +107,12 @@ func (s *pruneService) Initialize(ctx context.Context, _ *registry.Registry, cli
 }
 
 func (s *pruneService) Start(ctx context.Context, ready chan<- struct{}) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	s.cancel = cancel
+	s.done = make(chan struct{})
+	defer close(s.done)
+
 	// do the initial run soon after startup
 	ticker := time.NewTicker(s.settings.Backoff)
 	s.logger.Trace().Msg("Service started")
@@ -175,9 +182,16 @@ func (s *pruneService) runOnce(
 	return 0, err
 }
 
-func (s *pruneService) Cleanup(context.Context, *registry.Registry) error {
+func (s *pruneService) Cleanup(context.Context) error {
 	logger := s.logger
-	// these aren't really necessary
+
+	if s.cancel != nil {
+		s.cancel()
+	}
+	if s.done != nil {
+		<-s.done
+	}
+
 	s.action = nil
 	s.client = nil
 	s.logger = nil

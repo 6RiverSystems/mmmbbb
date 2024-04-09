@@ -28,13 +28,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"go.6river.tech/gosix/testutils"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/delivery"
 	"go.6river.tech/mmmbbb/ent/enttest"
 	"go.6river.tech/mmmbbb/ent/message"
 	"go.6river.tech/mmmbbb/ent/subscription"
 	"go.6river.tech/mmmbbb/ent/topic"
+	"go.6river.tech/mmmbbb/internal/testutil"
 )
 
 func expectMessages(t *testing.T, ctx context.Context, tx *ent.Tx, topicOffset, num int) []*ent.Message {
@@ -497,7 +497,7 @@ func TestPublishMessage_Execute(t *testing.T) {
 					CancelPublishAwaiter(id, n)
 				}
 			}()
-			assert.NoError(t, client.DoCtxTx(testutils.ContextForTest(t), nil, func(ctx context.Context, tx *ent.Tx) error {
+			assert.NoError(t, client.DoCtxTx(testutil.Context(t), nil, func(ctx context.Context, tx *ent.Tx) error {
 				if tt.before != nil {
 					tt.before(t, ctx, tx, &tt)
 				}

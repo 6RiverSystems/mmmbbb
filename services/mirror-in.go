@@ -29,20 +29,18 @@ import (
 	"strings"
 	"time"
 
+	"cloud.google.com/go/pubsub"
 	"github.com/google/uuid"
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/zerolog"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/iterator"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"go.6river.tech/gosix/logging"
-	"go.6river.tech/gosix/pubsub"
-	"go.6river.tech/gosix/registry"
 	"go.6river.tech/mmmbbb/actions"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/topic"
+	"go.6river.tech/mmmbbb/logging"
 )
 
 // topicMirrorIn manages mirroring google pubsub topics to mmmbbb
@@ -59,7 +57,7 @@ type topicMirrorIn struct {
 	logger      *logging.Logger
 	hostName    string
 	client      *ent.Client
-	psClient    pubsub.Client
+	psClient    *pubsub.Client
 	subWatchers map[string]monitoredGroup
 }
 
@@ -67,7 +65,7 @@ func (s *topicMirrorIn) Name() string {
 	return fmt.Sprintf("topic-mirror-in(%s)", s.project)
 }
 
-func (s *topicMirrorIn) Initialize(ctx context.Context, _ *registry.Registry, client *ent.Client) error {
+func (s *topicMirrorIn) Initialize(ctx context.Context, client *ent.Client) error {
 	if s.project == "" {
 		return errors.New("project config missing")
 	}
@@ -96,7 +94,7 @@ func (s *topicMirrorIn) Initialize(ctx context.Context, _ *registry.Registry, cl
 	// context here is just for running initialization, whereas what we pass to
 	// NewClient will hang around, so we give that the background context and will
 	// handle stopping it differently
-	s.psClient, err = pubsub.NewClient(context.Background(), s.project, prometheus.DefaultRegisterer, "topic_mirror_in", nil)
+	s.psClient, err = pubsub.NewClient(context.Background(), s.project)
 	if err != nil {
 		return err
 	}
@@ -221,7 +219,8 @@ func (s *topicMirrorIn) startMirrorsOnce(ctx context.Context) error {
 		sn := s.subName(t.ID())
 		subs[sn] = struct{ name string }{t.ID()}
 
-		sub, err := t.CreateSubscription(ctx, sn, pubsub.SubscriptionConfig{
+		sub, err := s.psClient.CreateSubscription(ctx, sn, pubsub.SubscriptionConfig{
+			Topic: t,
 			// we need to enable message ordering on the google side in order to
 			// allow it to be used on the local side
 			EnableMessageOrdering: true,
@@ -244,10 +243,15 @@ func (s *topicMirrorIn) startMirrorsOnce(ctx context.Context) error {
 				Msg("Created remote mirror subscription")
 		}
 		// NOTE: we can't "fix" EnableMessageOrdering if it's wrong
-		if _, err = sub.EnsureDefaultConfig(ctx); err != nil {
+		cfg := pubsub.SubscriptionConfigToUpdate{
+			RetryPolicy: &pubsub.RetryPolicy{
+				MinimumBackoff: time.Second,
+				MaximumBackoff: 10 * time.Minute,
+			},
+		}
+		if _, err := sub.Update(ctx, cfg); err != nil {
 			return err
 		}
-
 		// TODO: check sub is not attached to a deleted sub, delete it and try
 		// again if so
 	}
@@ -301,15 +305,15 @@ func (s *topicMirrorIn) watchSub(ctx context.Context, psSubName, psTopicName str
 
 	sub := s.psClient.Subscription(psSubName)
 	// TODO: can we disable synchronous receive here?
-	sub.ReceiveSettings().Synchronous = true
+	sub.ReceiveSettings.Synchronous = true
 
 	// TODO: poll sub in case its topic gets deleted, abort if it does
 
 	// google pubsub will stop receive when the ctx completes
-	err := sub.Receive(ctx, func(ctx context.Context, m pubsub.Message) {
+	err := sub.Receive(ctx, func(ctx context.Context, m *pubsub.Message) {
 		// loop avoidance: don't copy any messages that came from topicMirrorOut
 		for _, a := range psMirrorAttrs {
-			if _, ok := m.RealMessage().Attributes[a]; ok {
+			if _, ok := m.Attributes[a]; ok {
 				messagesDroppedCounter.WithLabelValues(directionInbound, dropReasonLoop).Inc()
 				m.Ack()
 				return
@@ -320,18 +324,18 @@ func (s *topicMirrorIn) watchSub(ctx context.Context, psSubName, psTopicName str
 
 		// decode to a rawmessage just to validate json
 		var mp json.RawMessage
-		if err := json.Unmarshal(m.RealMessage().Data, &mp); err != nil {
+		if err := json.Unmarshal(m.Data, &mp); err != nil {
 			messagesDroppedCounter.WithLabelValues(directionInbound, dropReasonNotJSON).Inc()
-			logger.Error().Err(err).Str("messageID", m.RealMessage().ID).Msg("Got non-JSON message, dropping it")
+			logger.Error().Err(err).Str("messageID", m.ID).Msg("Got non-JSON message, dropping it")
 			m.Ack()
 			return
 		}
 
 		p := actions.NewPublishMessage(actions.PublishMessageParams{
 			TopicName:  localTopicName,
-			OrderKey:   m.RealMessage().OrderingKey,
+			OrderKey:   m.OrderingKey,
 			Payload:    mp,
-			Attributes: m.RealMessage().Attributes,
+			Attributes: m.Attributes,
 		})
 		if err := s.client.DoCtxTx(ctx, nil, p.Execute); err != nil {
 			logger.Error().Err(err).Msg("Failed to publish, NACKing for retry")
@@ -371,7 +375,7 @@ func (s *topicMirrorIn) subName(psTopicName string) string {
 	return subName
 }
 
-func (s *topicMirrorIn) Cleanup(ctx context.Context, _ *registry.Registry) error {
+func (s *topicMirrorIn) Cleanup(ctx context.Context) error {
 	if s.psClient != nil {
 		if err := s.psClient.Close(); err != nil {
 			return err
@@ -403,8 +407,12 @@ func init() {
 			}
 		}
 		shardFilter := parseShardConfig()
+		projectId := os.Getenv("PUBSUB_GCLOUD_PROJECT_ID")
+		if projectId == "" {
+			panic(fmt.Errorf("cannot use MIRROR_IN_SITE_NAME=%q without PUBSUB_GCLOUD_PROJECT_ID", site))
+		}
 		defaultServices = append(defaultServices, &topicMirrorIn{
-			project:           pubsub.DefaultProjectId(),
+			project:           projectId,
 			remoteToLocalName: remoteToLocalName,
 			localToRemoteName: func(name string) string {
 				return fmt.Sprintf("%s-%s", site, name)

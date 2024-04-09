@@ -25,9 +25,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"go.6river.tech/gosix/logging"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/topic"
+	"go.6river.tech/mmmbbb/logging"
 )
 
 type PruneDeletedTopics struct {

@@ -27,7 +27,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"go.6river.tech/gosix/faults"
+	"go.6river.tech/mmmbbb/faults"
 	"go.6river.tech/mmmbbb/oas"
 )
 

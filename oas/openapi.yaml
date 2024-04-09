@@ -317,4 +317,4 @@ components:
         delay:
           type: string
           description: Delivery delay, formatted as a Go Duration
-          x-go-type: customtypes.Interval
+          x-go-type: sqltypes.Interval

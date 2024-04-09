@@ -34,32 +34,32 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"go.6river.tech/gosix/ent/customtypes"
-	"go.6river.tech/gosix/ginmiddleware"
-	"go.6river.tech/gosix/testutils"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/enttest"
 	"go.6river.tech/mmmbbb/ent/subscription"
+	"go.6river.tech/mmmbbb/internal/sqltypes"
+	"go.6river.tech/mmmbbb/internal/testutil"
+	"go.6river.tech/mmmbbb/middleware"
 	"go.6river.tech/mmmbbb/oas"
 )
 
 func setupDelayInjectorController(
 	t *testing.T,
-	dbName ginmiddleware.EntKey[*ent.Client, *ent.Tx],
+	dbName middleware.EntKey,
 	ec *ent.Client,
 	cc *DelayInjectorController,
 ) *httptest.Server {
 	enttest.ResetTables(t, ec)
 	r := gin.New()
-	r.Use(ginmiddleware.WithEntClient(ec, dbName))
-	assert.NoError(t, cc.Register(nil, r))
+	r.Use(middleware.WithEntClient(ec, dbName))
+	assert.NoError(t, cc.Register(r))
 	s := httptest.NewServer(r)
 	return s
 }
 
 func createDelaySub(dd time.Duration) func(*testing.T, *ent.Client) {
 	return func(t *testing.T, c *ent.Client) {
-		ctx := testutils.ContextForTest(t)
+		ctx := testutil.Context(t)
 		topic, err := c.Topic.Create().
 			SetName(t.Name()).
 			Save(ctx)
@@ -67,10 +67,10 @@ func createDelaySub(dd time.Duration) func(*testing.T, *ent.Client) {
 		_, err = c.Subscription.Create().
 			SetName(t.Name()).
 			SetTopic(topic).
-			SetDeliveryDelay(customtypes.Interval(dd)).
+			SetDeliveryDelay(sqltypes.Interval(dd)).
 			SetExpiresAt(time.Now().Add(time.Hour)).
-			SetTTL(customtypes.Interval(time.Hour)).
-			SetMessageTTL(customtypes.Interval(time.Hour)).
+			SetTTL(sqltypes.Interval(time.Hour)).
+			SetMessageTTL(sqltypes.Interval(time.Hour)).
 			Save(ctx)
 		require.NoError(t, err)
 	}
@@ -89,19 +89,19 @@ func assertDelaySubFound(dd time.Duration) func(*testing.T, *http.Response, erro
 			assert.NoError(t, err)
 			var odd oas.DeliveryDelay
 			assert.NoError(t, json.Unmarshal(body, &odd))
-			assert.Equal(t, customtypes.Interval(dd), odd.Delay)
+			assert.Equal(t, sqltypes.Interval(dd), odd.Delay)
 		}
 	}
 }
 
 func assertDelaySubFoundDB(dd time.Duration) func(*testing.T, *ent.Client) {
 	return func(t *testing.T, c *ent.Client) {
-		ctx := testutils.ContextForTest(t)
+		ctx := testutil.Context(t)
 		sub, err := c.Subscription.Query().
 			Where(subscription.Name(t.Name())).
 			Only(ctx)
 		if assert.NoError(t, err) {
-			assert.Equal(t, sub.DeliveryDelay, customtypes.Interval(dd))
+			assert.Equal(t, sub.DeliveryDelay, sqltypes.Interval(dd))
 		}
 	}
 }
@@ -169,7 +169,7 @@ func TestDelayInjectorController_GetDelay(t *testing.T) {
 	}
 
 	client := enttest.ClientForTest(t)
-	dbName := ginmiddleware.EntKey[*ent.Client, *ent.Tx](t.Name())
+	dbName := middleware.EntKey(t.Name())
 	cc := &DelayInjectorController{dbName: dbName}
 	s := setupDelayInjectorController(t, dbName, client, cc)
 	defer s.Close()
@@ -179,7 +179,7 @@ func TestDelayInjectorController_GetDelay(t *testing.T) {
 			if tt.setup != nil {
 				tt.setup(t, client)
 			}
-			ctx := testutils.ContextForTest(t)
+			ctx := testutil.Context(t)
 			req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.URL+path.Join(delaysRootPath, t.Name()), nil)
 			assert.NoError(t, err)
 			cli := s.Client()
@@ -192,7 +192,7 @@ func TestDelayInjectorController_GetDelay(t *testing.T) {
 func TestDelayInjectorController_SetDelay(t *testing.T) {
 	oasBody := func(dd time.Duration) func(*testing.T, *http.Request) {
 		return func(t *testing.T, r *http.Request) {
-			body, err := json.Marshal(oas.DeliveryDelay{Delay: customtypes.Interval(dd)})
+			body, err := json.Marshal(oas.DeliveryDelay{Delay: sqltypes.Interval(dd)})
 			if assert.NoError(t, err) {
 				r.Body = io.NopCloser(bytes.NewReader(body))
 			}
@@ -232,7 +232,7 @@ func TestDelayInjectorController_SetDelay(t *testing.T) {
 	}
 
 	client := enttest.ClientForTest(t)
-	dbName := ginmiddleware.EntKey[*ent.Client, *ent.Tx](t.Name())
+	dbName := middleware.EntKey(t.Name())
 	cc := &DelayInjectorController{dbName: dbName}
 	s := setupDelayInjectorController(t, dbName, client, cc)
 	defer s.Close()
@@ -242,7 +242,7 @@ func TestDelayInjectorController_SetDelay(t *testing.T) {
 			if tt.setup != nil {
 				tt.setup(t, client)
 			}
-			ctx := testutils.ContextForTest(t)
+			ctx := testutil.Context(t)
 			req, err := http.NewRequestWithContext(ctx, http.MethodPut, s.URL+path.Join(delaysRootPath, t.Name()), nil)
 			assert.NoError(t, err)
 			tt.req(t, req)
@@ -277,7 +277,7 @@ func TestDelayInjectorController_DeleteDelay(t *testing.T) {
 	}
 
 	client := enttest.ClientForTest(t)
-	dbName := ginmiddleware.EntKey[*ent.Client, *ent.Tx](t.Name())
+	dbName := middleware.EntKey(t.Name())
 	cc := &DelayInjectorController{dbName: dbName}
 	s := setupDelayInjectorController(t, dbName, client, cc)
 	defer s.Close()
@@ -287,7 +287,7 @@ func TestDelayInjectorController_DeleteDelay(t *testing.T) {
 			if tt.setup != nil {
 				tt.setup(t, client)
 			}
-			ctx := testutils.ContextForTest(t)
+			ctx := testutil.Context(t)
 			req, err := http.NewRequestWithContext(ctx, http.MethodDelete, s.URL+path.Join(delaysRootPath, t.Name()), nil)
 			assert.NoError(t, err)
 			cli := s.Client()

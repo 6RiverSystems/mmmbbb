@@ -517,8 +517,17 @@ func (Lint) golangci(ctx context.Context, junit bool) error {
 }
 
 // AddLicense runs the addlicense tool in check mode
-func (Lint) AddLicense(ctx context.Context) error {
+func (Lint) AddLicense() error {
 	fmt.Println("Linting(addlicense)...")
+	return Lint{}.addLicense(false)
+}
+
+func (Lint) FixLicense() error {
+	fmt.Println("Linting(addlicense, fixing)...")
+	return Lint{}.addLicense(true)
+}
+
+func (Lint) addLicense(fix bool) error {
 	// like sh.Run, but with stderr to stdout, because addlicense generates
 	// non-error notices on stderr we don't want to see normally
 	var buf *bytes.Buffer
@@ -529,10 +538,8 @@ func (Lint) AddLicense(ctx context.Context) error {
 		buf = &bytes.Buffer{}
 		cmdout, cmderr = buf, buf
 	}
-	ran, err := sh.Exec(
-		nil,
-		cmdout, cmderr,
-		"go", "run", "github.com/google/addlicense",
+	args := []string{
+		"run", "github.com/google/addlicense",
 		"-c", "6 River Systems",
 		"-l", "mit",
 		"-ignore", "**/*.css",
@@ -541,8 +548,16 @@ func (Lint) AddLicense(ctx context.Context) error {
 		"-ignore", "**/*.html",
 		"-ignore", "version/version.go",
 		"-ignore", "internal/ts-compat/pnpm-lock.yaml",
-		"-check",
-		".",
+	}
+	if !fix {
+		args = append(args, "-check")
+	}
+	args = append(args, ".")
+	ran, err := sh.Exec(
+		nil,
+		cmdout, cmderr,
+		"go",
+		args...,
 	)
 	if ran && err != nil && buf != nil {
 		// print output to stderr (including what was originally stdout), can't do
@@ -700,9 +715,9 @@ func TestSmokeCore(ctx context.Context, cmd, hostPort string) error {
 			fmt.Printf("Trying %s %s ...\n", m, u)
 		}
 		if req, err := http.NewRequestWithContext(ctx, m, u.String(), nil); err != nil {
-			return err
+			return fmt.Errorf("failed to create req %s %s: %v", m, u, err)
 		} else if resp, err := http.DefaultClient.Do(req); err != nil {
-			return err
+			return fmt.Errorf("failed to run req %s %s: %v", m, u, err)
 		} else {
 			if resp.Body != nil {
 				defer resp.Body.Close()

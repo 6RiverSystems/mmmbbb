@@ -23,7 +23,7 @@ import (
 	"os"
 	"testing"
 
-	"go.6river.tech/gosix/db"
+	"go.6river.tech/mmmbbb/db"
 	"go.6river.tech/mmmbbb/version"
 )
 

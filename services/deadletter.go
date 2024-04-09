@@ -24,10 +24,9 @@ import (
 	"math/rand"
 	"time"
 
-	"go.6river.tech/gosix/logging"
-	"go.6river.tech/gosix/registry"
 	"go.6river.tech/mmmbbb/actions"
 	"go.6river.tech/mmmbbb/ent"
+	"go.6river.tech/mmmbbb/logging"
 )
 
 // this is _almost_ a pruning service, except it doesn't have an age parameter
@@ -71,6 +70,8 @@ type deadLetter struct {
 
 	// state
 
+	cancel context.CancelFunc
+	done   chan struct{}
 	logger *logging.Logger
 	client *ent.Client
 }
@@ -79,7 +80,7 @@ func (s *deadLetter) Name() string {
 	return "dead-letter"
 }
 
-func (s *deadLetter) Initialize(_ context.Context, _ *registry.Registry, client *ent.Client) error {
+func (s *deadLetter) Initialize(_ context.Context, client *ent.Client) error {
 	s.settings.ApplyDefaults()
 
 	s.logger = logging.GetLogger("services/" + s.Name())
@@ -91,6 +92,12 @@ func (s *deadLetter) Initialize(_ context.Context, _ *registry.Registry, client 
 }
 
 func (s *deadLetter) Start(ctx context.Context, ready chan<- struct{}) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	s.cancel = cancel
+	s.done = make(chan struct{})
+	defer close(s.done)
+
 	// do the initial run soon after startup
 	ticker := time.NewTicker(s.settings.Backoff)
 	s.logger.Trace().Msg("Service started")
@@ -133,9 +140,16 @@ LOOP:
 	return nil
 }
 
-func (s *deadLetter) Cleanup(context.Context, *registry.Registry) error {
+func (s *deadLetter) Cleanup(context.Context) error {
 	logger := s.logger
-	// these aren't really necessary
+
+	if s.cancel != nil {
+		s.cancel()
+	}
+	if s.done != nil {
+		<-s.done
+	}
+
 	s.client = nil
 	s.logger = nil
 	if logger != nil {

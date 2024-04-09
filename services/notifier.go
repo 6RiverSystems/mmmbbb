@@ -34,11 +34,10 @@ import (
 	"github.com/jackc/pgx/v5/stdlib"
 	"golang.org/x/sync/errgroup"
 
-	"go.6river.tech/gosix/db/postgres"
-	"go.6river.tech/gosix/logging"
-	"go.6river.tech/gosix/registry"
 	"go.6river.tech/mmmbbb/actions"
+	"go.6river.tech/mmmbbb/db/postgres"
 	"go.6river.tech/mmmbbb/ent"
+	"go.6river.tech/mmmbbb/logging"
 	"go.6river.tech/mmmbbb/version"
 )
 
@@ -57,6 +56,8 @@ const subModifiedChannelName = version.AppName + "_modified_sub"
 
 type pgNotifier struct {
 	db     *sql.DB
+	cancel context.CancelFunc
+	done   chan struct{}
 	logger *logging.Logger
 
 	publishHook     actions.PublishHookHandle
@@ -68,7 +69,7 @@ func (n *pgNotifier) Name() string {
 	return "pg-notifier"
 }
 
-func (n *pgNotifier) Initialize(ctx context.Context, _ *registry.Registry, client *ent.Client) error {
+func (n *pgNotifier) Initialize(ctx context.Context, client *ent.Client) error {
 	if client.Dialect() != dialect.Postgres {
 		n.db = nil
 		return nil
@@ -81,6 +82,12 @@ func (n *pgNotifier) Initialize(ctx context.Context, _ *registry.Registry, clien
 }
 
 func (n *pgNotifier) Start(ctx context.Context, ready chan<- struct{}) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	n.cancel = cancel
+	n.done = make(chan struct{})
+	defer close(n.done)
+
 	if n.db == nil {
 		// not postgres
 		close(ready)
@@ -161,7 +168,7 @@ func (n *pgNotifier) Start(ctx context.Context, ready chan<- struct{}) error {
 			case s := <-subNotifies:
 				sn[s] = struct{}{}
 			case <-egCtx.Done():
-				return egCtx.Err()
+				return nil
 			}
 			// then get as much as is buffered up to their cap without blocking
 		DRAIN:
@@ -183,7 +190,7 @@ func (n *pgNotifier) Start(ctx context.Context, ready chan<- struct{}) error {
 						break DRAIN
 					}
 				case <-egCtx.Done():
-					return egCtx.Err()
+					return nil
 				default:
 					break DRAIN
 				}
@@ -332,7 +339,14 @@ func parseUUIDName(s string) (uuid.UUID, string, error) {
 	return id, name, err
 }
 
-func (n *pgNotifier) Cleanup(context.Context, *registry.Registry) error {
+func (n *pgNotifier) Cleanup(context.Context) error {
+	if n.cancel != nil {
+		n.cancel()
+	}
+	if n.done != nil {
+		<-n.done
+	}
+
 	if n.publishHook != nil {
 		actions.RemovePublishHook(n.publishHook)
 		n.publishHook = nil

@@ -30,10 +30,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/sync/errgroup"
 
-	"go.6river.tech/gosix/testutils"
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/delivery"
 	"go.6river.tech/mmmbbb/ent/enttest"
+	"go.6river.tech/mmmbbb/internal/testutil"
 )
 
 func TestGetSubscriptionMessages_Execute(t *testing.T) {
@@ -462,7 +462,7 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			enttest.ResetTables(t, client)
-			ctx := testutils.ContextForTest(t)
+			ctx := testutil.Context(t)
 			if tt.before != nil {
 				tt.before(t, ctx, client, &tt)
 			}

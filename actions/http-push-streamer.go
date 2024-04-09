@@ -33,9 +33,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
 
-	"go.6river.tech/gosix/logging"
-	"go.6river.tech/gosix/pubsub"
+	pubsubv1 "google.golang.org/api/pubsub/v1"
+
 	"go.6river.tech/mmmbbb/ent"
+	"go.6river.tech/mmmbbb/logging"
 )
 
 type HttpPushStreamer struct {
@@ -229,11 +230,19 @@ func (c *httpPushStreamConn) nowFailing(newValue bool) (isChanged bool) {
 	return
 }
 
+type PushMessage = pubsubv1.PubsubMessage
+
+// surprisingly, google doesn't export a type for this
+type PushRequest struct {
+	Message      PushMessage `json:"message"`
+	Subscription string      `json:"subscription"`
+}
+
 func (c *httpPushStreamConn) Send(ctx context.Context, del *SubscriptionMessageDelivery) error {
 	// payload must be base64 encoded since the base API supports binary payloads
 	payload64 := base64.StdEncoding.EncodeToString(del.Payload)
-	bodyObject := pubsub.PushRequest{
-		Message: pubsub.PushMessage{
+	bodyObject := PushRequest{
+		Message: PushMessage{
 			Attributes: del.Attributes,
 			Data:       payload64,
 			MessageId:  del.MessageID.String(),
