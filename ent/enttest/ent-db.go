@@ -21,9 +21,11 @@ package enttest
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path"
+	"runtime/debug"
 	"strings"
 	"testing"
 	"time"
@@ -37,7 +39,8 @@ import (
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
 	"github.com/stretchr/testify/require"
-	_ "modernc.org/sqlite"
+	"modernc.org/sqlite"
+	sqlite3 "modernc.org/sqlite/lib"
 
 	"go.6river.tech/mmmbbb/db"
 	"go.6river.tech/mmmbbb/db/postgres"
@@ -103,6 +106,7 @@ func ClientForTest(t testing.TB, opts ...ent.Option) *ent.Client {
 		// cannot use memory DBs for this app due to
 		// https://github.com/mattn/go-sqlite3/issues/923
 		dsn = db.SQLiteDSN(path.Join(t.TempDir(), version.AppName+"_test"), true, false)
+		t.Logf("Using sqlite3 DB at %s", dsn)
 	}
 	conn, err := db.Open(driverName, dialectName, dsn)
 	if err != nil {
@@ -144,17 +148,32 @@ func ClientForTest(t testing.TB, opts ...ent.Option) *ent.Client {
 
 func ResetTables(t testing.TB, client *ent.Client) {
 	// just in case, make sure the tables are all empty
-	deletes := []func(context.Context) (int, error){
-		client.Delivery.Delete().Exec,
-		client.Message.Delete().Exec,
-		client.Subscription.Delete().Exec,
-		client.Snapshot.Delete().Exec,
-		client.Topic.Delete().Exec,
+	deletes := []struct {
+		typ any
+		f   func(context.Context) (int, error)
+	}{
+		{client.Delivery, client.Delivery.Delete().Exec},
+		{client.Message, client.Message.Delete().Exec},
+		{client.Subscription, client.Subscription.Delete().Exec},
+		{client.Snapshot, client.Snapshot.Delete().Exec},
+		{client.Topic, client.Topic.Delete().Exec},
 	}
 	ctx := testutil.Context(t)
 	for _, d := range deletes {
-		if _, err := d(ctx); err != nil {
-			t.Fatalf("Failed to cleanup old test data: (%T) %[1]v", err)
+		for {
+			if _, err := d.f(ctx); err != nil {
+				var se *sqlite.Error
+				if errors.As(err, &se) && se.Code() == sqlite3.SQLITE_INTERRUPT {
+					if ce := ctx.Err(); ce == nil {
+						t.Logf("Interrupted, retrying")
+						time.Sleep(100 * time.Millisecond)
+						continue
+					}
+				}
+				t.Fatalf("Failed to cleanup old %[1]T test data: (%[2]T) %[2]v\nat %s", d.typ, err, string(debug.Stack()))
+			} else {
+				break
+			}
 		}
 	}
 }

@@ -156,7 +156,7 @@ func TestMessageStreamer_Go(t *testing.T) {
 					// modernc.org/sqlite are sorted out
 					return assert.Equal(t, sqlite3.SQLITE_INTERRUPT, se.Code())
 				}
-				return assert.ErrorIs(t, err, context.Canceled)
+				return assert.ErrorIs(t, err, context.Canceled, "expected context.Canceled, got %v", err)
 			},
 			nil,
 		},
