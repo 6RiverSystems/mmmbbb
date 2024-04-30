@@ -21,7 +21,6 @@ package enttest
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -39,8 +38,6 @@ import (
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
 	"github.com/stretchr/testify/require"
-	"modernc.org/sqlite"
-	sqlite3 "modernc.org/sqlite/lib"
 
 	"go.6river.tech/mmmbbb/db"
 	"go.6river.tech/mmmbbb/db/postgres"
@@ -148,32 +145,26 @@ func ClientForTest(t testing.TB, opts ...ent.Option) *ent.Client {
 
 func ResetTables(t testing.TB, client *ent.Client) {
 	// just in case, make sure the tables are all empty
-	deletes := []struct {
-		typ any
-		f   func(context.Context) (int, error)
-	}{
-		{client.Delivery, client.Delivery.Delete().Exec},
-		{client.Message, client.Message.Delete().Exec},
-		{client.Subscription, client.Subscription.Delete().Exec},
-		{client.Snapshot, client.Snapshot.Delete().Exec},
-		{client.Topic, client.Topic.Delete().Exec},
-	}
+	// Do it in a transaction so that we get the busy timeout handling that seems
+	// to be missing from non-tx stuff sometimes?
 	ctx := testutil.Context(t)
-	for _, d := range deletes {
-		for {
+	err := client.DoCtxTx(ctx, nil, func(ctx context.Context, tx *ent.Tx) error {
+		deletes := []struct {
+			typ any
+			f   func(context.Context) (int, error)
+		}{
+			{tx.Delivery, tx.Delivery.Delete().Exec},
+			{tx.Message, tx.Message.Delete().Exec},
+			{tx.Subscription, tx.Subscription.Delete().Exec},
+			{tx.Snapshot, tx.Snapshot.Delete().Exec},
+			{tx.Topic, tx.Topic.Delete().Exec},
+		}
+		for _, d := range deletes {
 			if _, err := d.f(ctx); err != nil {
-				var se *sqlite.Error
-				if errors.As(err, &se) && se.Code() == sqlite3.SQLITE_INTERRUPT {
-					if ce := ctx.Err(); ce == nil {
-						t.Logf("Interrupted, retrying")
-						time.Sleep(100 * time.Millisecond)
-						continue
-					}
-				}
 				t.Fatalf("Failed to cleanup old %[1]T test data: (%[2]T) %[2]v\nat %s", d.typ, err, string(debug.Stack()))
-			} else {
-				break
 			}
 		}
-	}
+		return nil
+	})
+	require.NoError(t, err, "cleanup tables")
 }
