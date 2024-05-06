@@ -244,17 +244,16 @@ func (s *subscriberServer) UpdateSubscription(ctx context.Context, req *pubsub.U
 				}
 			case "dead_letter_policy":
 				dlp := req.Subscription.GetDeadLetterPolicy()
-				if dlp.DeadLetterTopic == "" {
+				if deadLetterTopicName = dlp.GetDeadLetterTopic(); deadLetterTopicName == "" {
 					subUpdate.ClearDeadLetterTopicID().ClearMaxDeliveryAttempts()
-					deadLetterTopicName = ""
 				} else {
 					dlt, err := tx.Topic.Query().
-						Where(topic.Name(dlp.DeadLetterTopic),
+						Where(topic.Name(deadLetterTopicName),
 							topic.DeletedAtIsNil()).
 						Only(ctx)
 					if err != nil {
 						if isNotFound(err) {
-							return status.Errorf(codes.NotFound, "Dead letter topic not found: %s", dlp.DeadLetterTopic)
+							return status.Errorf(codes.NotFound, "Dead letter topic not found: %s", deadLetterTopicName)
 						}
 						return grpc.AsStatusError(err)
 					}
