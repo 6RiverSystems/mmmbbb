@@ -22,6 +22,6 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@google-cloud/pubsub": "^4.3.3"
+    "@google-cloud/pubsub": "^4.4.0"
   }
 }
