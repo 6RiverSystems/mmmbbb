@@ -2,12 +2,8 @@
 	"editor.formatOnPaste": true,
 	"editor.formatOnSave": true,
 	"editor.formatOnSaveMode": "file",
-	"go.buildOnSave": "workspace",
-	"go.autocompleteUnimportedPackages": true,
 	"go.lintTool": "golangci-lint",
-	"go.generateTestsFlags": [
-		"-template=testify"
-	],
+	"go.generateTestsFlags": ["-template=testify"],
 	"cSpell.flagWords": [],
 	"cSpell.words": [
 		"Acks",
@@ -76,6 +72,7 @@
 	},
 	"go.formatTool": "gofumpt",
 	"go.testEnvVars": {
-		// "DEBUG": "sql"
-	}
+		"DEBUG": "sql"
+	},
+	"go.testFlags": ["-v", "-test.v", "-count=1"]
 }

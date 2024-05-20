@@ -45,6 +45,8 @@ require (
 	mvdan.cc/gofumpt v0.6.0
 )
 
+replace modernc.org/sqlite => ../../3psrc/modernc-sqlite/
+
 require (
 	4d63.com/gocheckcompilerdirectives v1.2.1 // indirect
 	4d63.com/gochecknoglobals v0.2.1 // indirect

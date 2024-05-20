@@ -108,6 +108,8 @@ func ClientForTest(t testing.TB, opts ...ent.Option) *ent.Client {
 	if err != nil {
 		t.Fatalf("Failed to open %s for ent: %v", driverName, err)
 	}
+	conn.SetConnMaxIdleTime(1)
+	conn.SetMaxOpenConns(1)
 	// provide a default logging function, so tests can just use `ent.Debug()` if
 	// they want simple logging
 	opts = append([]ent.Option{

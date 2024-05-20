@@ -444,6 +444,10 @@ func TestGrpcCompat(t *testing.T) {
 			name: "synchronous pull",
 			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 				topic, err := psc.CreateTopic(ctx, safeName(t))
+				if err != nil {
+					t.Log(client.DB().Stats())
+					panic(err)
+				}
 				require.NoError(t, err)
 				sub, err := psc.CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{
 					Topic: topic,
@@ -643,21 +647,30 @@ func TestGrpcCompat(t *testing.T) {
 						EnableMessageOrdering: true,
 					})
 					require.NoError(t, err)
-					tt.topics[0].Publish(ctx, &pubsub.Message{
-						Data:        json.RawMessage(`1`),
-						OrderingKey: "x",
-						Attributes:  map[string]string{"deliver": ""},
-					})
-					tt.topics[0].Publish(ctx, &pubsub.Message{
-						Data:        json.RawMessage(`2`),
-						OrderingKey: "x",
-						// Attributes: map[string]string{"skip":""},
-					})
-					tt.topics[0].Publish(ctx, &pubsub.Message{
-						Data:        json.RawMessage(`3`),
-						OrderingKey: "x",
-						Attributes:  map[string]string{"deliver": ""},
-					})
+					prs := []*pubsub.PublishResult{
+						tt.topics[0].Publish(ctx, &pubsub.Message{
+							Data:        json.RawMessage(`1`),
+							OrderingKey: "x",
+							Attributes:  map[string]string{"deliver": ""},
+						}),
+						tt.topics[0].Publish(ctx, &pubsub.Message{
+							Data:        json.RawMessage(`2`),
+							OrderingKey: "x",
+							// Attributes: map[string]string{"skip":""},
+						}),
+						tt.topics[0].Publish(ctx, &pubsub.Message{
+							Data:        json.RawMessage(`3`),
+							OrderingKey: "x",
+							Attributes:  map[string]string{"deliver": ""},
+						}),
+					}
+					for _, pr := range prs {
+						_, err := pr.Get(ctx)
+						if err != nil {
+							panic(err)
+						}
+						require.NoError(t, err)
+					}
 
 					i := int32(0)
 					rCtx, cancel := context.WithCancel(ctx)
@@ -677,6 +690,10 @@ func TestGrpcCompat(t *testing.T) {
 							cancel()
 						}
 					})
+					if err != nil {
+						t.Log(client.DB().Stats())
+						panic(err)
+					}
 					assert.NoError(t, err)
 				},
 			},

@@ -17,6 +17,8 @@ func TestSQLiteConcurrency(t *testing.T) {
 	dsn := SQLiteDSN(path.Join(t.TempDir(), t.Name()), true, false)
 	t.Logf("DSN=%q", dsn)
 	db, err := sql.Open(SQLiteDriverName, dsn)
+	db.SetMaxOpenConns(2)
+	db.SetConnMaxIdleTime(1)
 	require.NoError(t, err, "open sqlite")
 	t.Cleanup(func() { db.Close() })
 
