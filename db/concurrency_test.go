@@ -4,12 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"math/rand"
 	"path"
+	"strconv"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"golang.org/x/sync/errgroup"
 	_ "modernc.org/sqlite"
 
 	"go.6river.tech/mmmbbb/internal/testutil"
@@ -31,30 +32,32 @@ func TestSQLiteConcurrency(t *testing.T) {
 	_, err = db.ExecContext(ctx, "create table data (key text primary key, value text not null)")
 	require.NoError(t, err, "create table")
 
-	eg, ctx := errgroup.WithContext(ctx)
+	// load a bunch of data
+	for i := range 1000 {
+		_, err = db.ExecContext(ctx, "insert into data (key, value) values (?, ?)", strconv.Itoa(i), strconv.Itoa(rand.Intn(1000)))
+		require.NoError(t, err, "insert data")
+	}
 
-	// 1. Start a transaction to block things
-	// 2. Attempt to start a second transaction
-	// 3. Concurrently commit the first tx and cancel the context for the second
+	for range 1000 {
 
-	tx1, err := db.BeginTx(ctx, nil)
-	require.NoError(t, err, "begin tx1")
+		// try to cancel a query and then roll back the transaction
+		tx, err := db.BeginTx(ctx, nil)
+		require.NoError(t, err, "begin")
 
-	ctx2, cancel2 := context.WithCancel(ctx)
-	eg.Go(func() error {
-		tx2, err := db.BeginTx(ctx2, nil)
-		if err != nil {
+		// loop until we manage to do a cancel
+		for {
+			ccx, cancel := context.WithCancel(ctx)
+			go func() {
+				time.Sleep(100 * time.Nanosecond)
+				cancel()
+			}()
+			_, err := tx.QueryContext(ccx, "select * from data where key = value")
 			if errors.Is(err, context.Canceled) {
-				return nil
+				break
 			}
 		}
-		err = tx2.Rollback()
-		return err
-	})
 
-	time.Sleep(100 * time.Millisecond)
-
-	require.NoError(t, tx1.Commit())
-	cancel2()
-	require.NoError(t, eg.Wait())
+		err = tx.Rollback()
+		require.NoError(t, err, "rollback")
+	}
 }
