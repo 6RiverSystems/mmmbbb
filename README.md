@@ -70,9 +70,7 @@ Both PostgreSQL and SQLite are supported backends. With SQLite, only file-based
 storage is currently supported, not memory-based storage, due to issues with
 concurrency, locking, and some implementation issues with the Go SQLite drivers.
 
-Which SQLite driver is used depends on whether `mmmbbb` was compiled with CGo
-enabled or not. When enabled, `github.com/mattn/go-sqlite3` is used. When CGo is
-disabled, `modernc.org/sqlite` is used.
+The `modernc.org/sqlite` driver is used for SQLite support.
 
 To select a backend, set the `DATABASE_URL` appropriately (see above on
 environment variables).
@@ -80,13 +78,7 @@ environment variables).
 SQLite as a backend currently requires explicitly specifying several extra
 parameters in the `DATABASE_URL`.
 
-CGo enabled (`mattn` driver):
-
-```text
-?_fk=true&_journal_mode=wal&cache=private&_busy_timeout=10000&_txlock=immediate
-```
-
-CGo disabled (`modernc` driver):
+`modernc` driver:
 
 ```text
 ?_pragma=foreign_keys(1)&_pragma=journal_mode(wal)&_pragma=busy_timeout(10000)&_txlock=immediate

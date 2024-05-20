@@ -17,15 +17,14 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-//go:build !cgo
-// +build !cgo
-
 package db
 
 import (
 	"fmt"
 	"net/url"
 	"strings"
+
+	_ "modernc.org/sqlite"
 )
 
 // in non-CGO mode, use the modernc.org/sqlite driver
