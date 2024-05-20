@@ -1,7 +1,9 @@
 package db
 
 import (
+	"context"
 	"database/sql"
+	"errors"
 	"path"
 	"testing"
 	"time"
@@ -18,7 +20,7 @@ func TestSQLiteConcurrency(t *testing.T) {
 	t.Logf("DSN=%q", dsn)
 	db, err := sql.Open(SQLiteDriverName, dsn)
 	db.SetMaxOpenConns(2)
-	db.SetConnMaxIdleTime(1)
+	db.SetConnMaxIdleTime(time.Minute)
 	require.NoError(t, err, "open sqlite")
 	t.Cleanup(func() { db.Close() })
 
@@ -31,51 +33,28 @@ func TestSQLiteConcurrency(t *testing.T) {
 
 	eg, ctx := errgroup.WithContext(ctx)
 
-	// first goroutine starts a transaction, inserts some data, and sleeps so the
-	// others will block. Other goroutines try to start transactions to read this
-	// data.
+	// 1. Start a transaction to block things
+	// 2. Attempt to start a second transaction
+	// 3. Concurrently commit the first tx and cancel the context for the second
 
-	begun := make(chan struct{})
+	tx1, err := db.BeginTx(ctx, nil)
+	require.NoError(t, err, "begin tx1")
+
+	ctx2, cancel2 := context.WithCancel(ctx)
 	eg.Go(func() error {
-		tx, err := db.BeginTx(ctx, nil)
+		tx2, err := db.BeginTx(ctx2, nil)
 		if err != nil {
-			return err
-		}
-		close(begun)
-		_, err = tx.ExecContext(ctx, "insert into data (key, value) values ('key', 'value')")
-		if err != nil {
-			_ = tx.Rollback()
-			return err
-		}
-		time.Sleep(50 * time.Millisecond)
-		return tx.Commit()
-	})
-	// let it get going
-	select {
-	case <-begun:
-		// ok
-	case <-ctx.Done():
-		require.NoError(t, eg.Wait(), "table init")
-		t.Fatal("should have failed before this")
-	}
-
-	// start a handful of goroutines competing to access the data
-	for i := 0; i < 5; i++ {
-		eg.Go(func() error {
-			tx, err := db.BeginTx(ctx, nil)
-			if err != nil {
-				return err
+			if errors.Is(err, context.Canceled) {
+				return nil
 			}
-			rows, err := tx.QueryContext(ctx, "select value from data where key = 'key'")
-			require.NoError(t, err, "query")
-			defer rows.Close()
-			var value string
-			require.True(t, rows.Next(), "next")
-			require.NoError(t, rows.Scan(&value), "scan")
-			require.Equal(t, "value", value)
-			require.False(t, rows.Next(), "no more")
-			return tx.Commit()
-		})
-	}
-	require.NoError(t, eg.Wait(), "queries")
+		}
+		err = tx2.Rollback()
+		return err
+	})
+
+	time.Sleep(100 * time.Millisecond)
+
+	require.NoError(t, tx1.Commit())
+	cancel2()
+	require.NoError(t, eg.Wait())
 }

@@ -45,8 +45,8 @@ func SQLiteDSN(filename string, fileScheme, memory bool) string {
 	// WARNING: keep these in sync with the CGO version
 	q := url.Values{
 		"_pragma": []string{
-			"foreign_keys(1)",
 			"journal_mode(wal)",
+			"foreign_keys(1)",
 			"busy_timeout(10000)",
 		},
 		// ref: https://gitlab.com/cznic/sqlite/-/issues/92

@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -739,9 +740,12 @@ func TestGrpcCompat(t *testing.T) {
 			},
 		},
 	}
+forever:
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := testutil.Context(t)
+			tt.waiters = nil
+			tt.servers = nil
 			if tt.before != nil {
 				tt.before(t, ctx, client, tt, psClient)
 			}
@@ -760,6 +764,9 @@ func TestGrpcCompat(t *testing.T) {
 				tt.after(t, ctx, client, tt)
 			}
 		})
+	}
+	if os.Getenv("FOREVER") == "true" {
+		goto forever
 	}
 }
 

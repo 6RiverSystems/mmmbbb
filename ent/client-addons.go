@@ -55,6 +55,7 @@ func (c *Client) DoTx(ctx context.Context, opts *sql.TxOptions, inner func(tx *T
 			// transaction
 			if errors.Is(err, sql.ErrTxDone) && (errors.Is(finalErr, context.Canceled) || errors.Is(finalErr, context.DeadlineExceeded)) {
 				// leave finalErr as-is, ignore the sql error
+				_ = err
 			} else if finalErr == nil {
 				finalErr = err
 			} else {
