@@ -13,8 +13,6 @@ jobs:
     parameters:
       pgver:
         type: string
-      cgo:
-        type: string
     docker:
       - image: cimg/go:1.22
       - image: cimg/postgres:<< parameters.pgver >>
@@ -27,7 +25,7 @@ jobs:
       TEST_RESULTS: /tmp/test-results
       DATABASE_URL: "postgres://circle@localhost:5432/circle_test?sslmode=disable"
       GOPRIVATE: "go.6river.tech/*,github.com/6RiverSystems/*"
-      CGO_ENABLED: << parameters.cgo >>
+      CGO_ENABLED: "0"
 
     steps:
       - checkout
@@ -38,11 +36,6 @@ jobs:
           name: Restore module cache
           keys:
             - go-mod-v1-{{ checksum "go.sum" }}
-      # - restore_cache:
-      #     name: Restore similar AIO build cache
-      #     keys:
-      #       - go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
-      #       - go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-
 
       - run: ./mage -v get
       # gotestsum is included in the cimg/go image
@@ -66,19 +59,17 @@ jobs:
       # we only need to run lint on one build variant
       - when:
           condition:
-            and:
-              - equal: ["1", << parameters.cgo >>]
-              - equal: [*pg_default, << parameters.pgver >>]
+            equal: [*pg_default, << parameters.pgver >>]
           steps:
             - restore_cache:
                 name: Restore golangci-lint cache
                 keys:
-                  - go-lint-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
-                  - go-lint-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-
+                  - go-lint-v2-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
+                  - go-lint-v2-{{ checksum "/tmp/cache-time-limit" }}-
             - run: ./mage -v lint:ci
             - save_cache:
                 name: Save golangci-lint cache
-                key: go-lint-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
+                key: go-lint-v2-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
                 paths:
                   - ~/.cache/golangci-lint
       - run:
@@ -116,11 +107,6 @@ jobs:
           key: go-mod-v1-{{ checksum "go.sum" }}
           paths:
             - "/home/circleci/go/pkg"
-      # - save_cache:
-      #     name: Save AIO build cache
-      #     key: go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
-      #     paths:
-      #       - ~/.cache/go-build
 
       # post to slack if `main` fails to build
       - when:
@@ -137,6 +123,7 @@ jobs:
     resource_class: large
     environment:
       GOPRIVATE: "go.6river.tech/*,github.com/6RiverSystems/*"
+      CGO_ENABLED: "0"
     steps:
       - checkout
       - run:
@@ -202,7 +189,7 @@ jobs:
               pid=$!
               # can't contact the remote docker directly, so we have to build
               # the mage binary, copy it over, and exec it
-              CGO_ENABLED=0 ./mage -v -compile magebinary-$plat -goarch $plat
+              ./mage -v -compile magebinary-$plat -goarch $plat
               docker cp magebinary-$plat mmmbbb-smoke-$plat:/
               # this should ask the app to shut down at the end
               docker exec mmmbbb-smoke-$plat /magebinary-$plat -v testSmokeCore mmmbbb localhost:8084
@@ -228,9 +215,6 @@ workflows:
                 - *pg_default
                 - *pg_future
                 - *pg_latest
-              cgo:
-                - "1"
-                - "0"
       - publish-docker-multiarch:
           context: 6rs-circle
           requires:
