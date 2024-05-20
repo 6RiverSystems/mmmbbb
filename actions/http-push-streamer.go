@@ -232,10 +232,16 @@ func (c *httpPushStreamConn) nowFailing(newValue bool) (isChanged bool) {
 
 type PushMessage = pubsubv1.PubsubMessage
 
-// surprisingly, google doesn't export a type for this
+// PushRequest represents the type of the POST payload for a push subscription
+// operating in Wrapped mode.
+//
+// Surprisingly, google doesn't export a type for this.
+//
+// See: https://cloud.google.com/pubsub/docs/push#receive_push
 type PushRequest struct {
-	Message      PushMessage `json:"message"`
-	Subscription string      `json:"subscription"`
+	Message         PushMessage `json:"message"`
+	Subscription    string      `json:"subscription"`
+	DeliveryAttempt int         `json:"deliveryAttempt"`
 }
 
 func (c *httpPushStreamConn) Send(ctx context.Context, del *SubscriptionMessageDelivery) error {
@@ -250,7 +256,8 @@ func (c *httpPushStreamConn) Send(ctx context.Context, del *SubscriptionMessageD
 			// NOTE: format matters!?
 			PublishTime: del.PublishedAt.Format(time.RFC3339Nano),
 		},
-		Subscription: c.subscriptionName,
+		Subscription:    c.subscriptionName,
+		DeliveryAttempt: del.NumAttempts,
 	}
 	if del.OrderKey != nil {
 		bodyObject.Message.OrderingKey = *del.OrderKey
