@@ -82,9 +82,6 @@ func (s *gatewayService) Start(ctx context.Context, ready chan<- struct{}) error
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		// retry if we get connection refused, as this proxy might start before
-		// the grpc server starts ... this doesn't really seem to work however
-		grpc.FailOnNonTempDialError(false),
 	}
 
 	var err error
