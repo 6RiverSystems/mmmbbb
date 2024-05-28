@@ -172,9 +172,6 @@ func TestGrpc_healthServer_Check(t *testing.T) {
 
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		// retry if we get connection refused, as this proxy might start before
-		// the grpc server starts ... this doesn't really seem to work however
-		grpc.FailOnNonTempDialError(false),
 	}
 
 	for _, tt := range tests {
