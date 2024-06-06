@@ -754,7 +754,15 @@ func entSubscriptionToGrpc(subscription *ent.Subscription, topicName, deadLetter
 		ExpirationPolicy: &pubsub.ExpirationPolicy{
 			Ttl: durationpb.New(time.Duration(subscription.TTL)),
 		},
-		// not supported: PushConfig, Filter, Detached
+		// not supported: Detached
+	}
+	if subscription.PushEndpoint != nil {
+		ret.PushConfig = &pubsub.PushConfig{
+			PushEndpoint: *subscription.PushEndpoint,
+		}
+	}
+	if subscription.MessageFilter != nil {
+		ret.Filter = *subscription.MessageFilter
 	}
 	if subscription.DeadLetterTopicID != nil {
 		ret.DeadLetterPolicy = &pubsub.DeadLetterPolicy{}
