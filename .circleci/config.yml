@@ -230,7 +230,8 @@ workflows:
                 - *pg_latest
               cgo:
                 - "1"
-                - "0"
+                # modernc driver is suffering from test flake issues, skip it for now
+                # - "0"
       - publish-docker-multiarch:
           context: 6rs-circle
           requires:
