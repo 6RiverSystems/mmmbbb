@@ -152,7 +152,7 @@ func (Generate) Dir(ctx context.Context, dir string) error {
 	if err := sh.Run("go", "generate", "-x", dir); err != nil {
 		return err
 	}
-	mg.CtxDeps(ctx, mg.F(FormatDir, dir))
+	// mg.CtxDeps(ctx, mg.F(FormatDir, dir))
 	return nil
 }
 
