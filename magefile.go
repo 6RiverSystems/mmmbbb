@@ -330,7 +330,7 @@ func InstallCITools(ctx context.Context) error {
 
 // Format formats all the go source code
 func Format(ctx context.Context) error {
-	mg.CtxDeps(ctx, mg.F(FormatDir, "."))
+	mg.CtxDeps(ctx, mg.F(FormatDir, "./..."))
 	return nil
 }
 
