@@ -76,6 +76,7 @@ func main() {
 
 		if !testModeIgnoreArgs {
 			fmt.Fprintf(os.Stderr, "mmmbbb does not accept command line arguments: %v\n", os.Args[1:])
+			//nolint:forbidigo
 			os.Exit(1)
 		}
 	}
@@ -83,6 +84,7 @@ func main() {
 	if exitCode, err := NewApp().main(); err != nil {
 		panic(err)
 	} else if exitCode != 0 {
+		//nolint:forbidigo // this is the one and only instance of os.Exit we want to have
 		os.Exit(exitCode)
 	}
 }

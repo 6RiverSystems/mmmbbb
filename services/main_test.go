@@ -29,5 +29,6 @@ import (
 
 func TestMain(m *testing.M) {
 	db.SetDefaultDbName(version.AppName)
+	//nolint:forbidigo
 	os.Exit(m.Run())
 }

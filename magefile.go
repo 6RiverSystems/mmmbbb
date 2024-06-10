@@ -42,10 +42,12 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/magefile/mage/target"
+	"golang.org/x/exp/maps"
+	"golang.org/x/sync/errgroup"
 
 	// tools this needs, to keep `go mod tidy` from deleting lines
-	_ "github.com/golangci/golangci-lint/pkg/commands"
-	"golang.org/x/sync/errgroup"
+	_ "entgo.io/ent/entc/gen"
+	_ "github.com/spf13/cobra"
 	_ "golang.org/x/tools/imports"
 )
 
@@ -317,22 +319,14 @@ func InstallProtobufTools(ctx context.Context) error {
 func InstallCITools(ctx context.Context) error {
 	mg.CtxDeps(ctx, InstallProtobufTools)
 
-	if err := sh.Run("go", "install", "gotest.tools/gotestsum"); err != nil {
+	if err := sh.Run("go", "install", "gotest.tools/gotestsum@latest"); err != nil {
 		return err
 	}
-	if err := sh.Run("go", "install", "github.com/golangci/golangci-lint/cmd/golangci-lint"); err != nil {
+	if err := sh.Run("go", "install", "github.com/golangci/golangci-lint/cmd/golangci-lint@latest"); err != nil {
 		return err
 	}
 	return nil
 }
-
-/* TODO
-tools:
-	mkdir -p ./tools
-	GOBIN=$(PWD)/tools go install github.com/deepmap/oapi-codegen/v2/cmd/oapi-codegen
-	GOBIN=$(PWD)/tools go install entgo.io/ent/cmd/...
-	GOBIN=$(PWD)/tools go install github.com/golangci/golangci-lint/cmd/golangci-lint
-*/
 
 // Format formats all the go source code
 func Format(ctx context.Context) error {
@@ -342,16 +336,7 @@ func Format(ctx context.Context) error {
 
 func FormatDir(ctx context.Context, dir string) error {
 	fmt.Printf("Formatting(%s)...\n", dir)
-	if err := sh.Run("go", "run", "mvdan.cc/gofumpt", "-l", "-w", dir); err != nil {
-		return err
-	}
-	goImportsArgs := []string{"run", "golang.org/x/tools/cmd/goimports", "-l", "-w"}
-	goImportsArgs = append(goImportsArgs, goImportsFlags...)
-	goImportsArgs = append(goImportsArgs, dir)
-	if err := sh.Run("go", goImportsArgs...); err != nil {
-		return err
-	}
-	return nil
+	return Lint{}.golangci(ctx, gciOpts{fix: true, dir: dir})
 }
 
 // Format formats just the generated go source code
@@ -361,20 +346,15 @@ func FormatGenerated(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	var files []string
+	dirs := map[string]bool{}
 	for _, l := range strings.Split(out, "\x00") {
 		if strings.HasSuffix(l, ".go") {
-			files = append(files, l)
+			dirs[filepath.Dir(l)] = true
 		}
 	}
-	if err := sh.Run("go", append([]string{"run", "mvdan.cc/gofumpt", "-l", "-w", "."}, files...)...); err != nil {
-		return err
-	}
-	goImportsArgs := []string{"run", "golang.org/x/tools/cmd/goimports", "-l", "-w"}
-	goImportsArgs = append(goImportsArgs, goImportsFlags...)
-	goImportsArgs = append(goImportsArgs, files...)
-	if err := sh.Run("go", goImportsArgs...); err != nil {
-		return err
+	if len(dirs) > 0 {
+		dirList := maps.Keys(dirs)
+		return Lint{}.golangci(ctx, gciOpts{fix: true, dirs: dirList})
 	}
 	return nil
 }
@@ -385,7 +365,7 @@ type Lint mg.Namespace
 func LintDefault(ctx context.Context) error {
 	mg.CtxDeps(ctx, GenerateDefault)
 	// basic includes everything except golangci-lint and govulncheck
-	mg.CtxDeps(ctx, Lint{}.Basic, Lint{}.VulnCheck, Lint{}.Golangci)
+	mg.CtxDeps(ctx, Lint{}.Vet, Lint{}.AddLicense, Lint{}.VulnCheck, Lint{}.Golangci)
 	return nil
 }
 
@@ -394,14 +374,8 @@ func (Lint) Default(ctx context.Context) error {
 	return LintDefault(ctx)
 }
 
-// Basic runs all the lint targets except golangci-lint and govulncheck
-func (Lint) Basic(ctx context.Context) error {
-	mg.CtxDeps(ctx, Lint{}.Vet, Lint{}.Format, Lint{}.Imports, Lint{}.AddLicense)
-	return nil
-}
-
 func (Lint) Ci(ctx context.Context) error {
-	mg.CtxDeps(ctx, Lint{}.Basic, Lint{}.VulnCheck, Lint{}.GolangciJUnit)
+	mg.CtxDeps(ctx, Lint{}.Vet, Lint{}.AddLicense, Lint{}.VulnCheck, Lint{}.GolangciJUnit)
 	return nil
 }
 
@@ -410,83 +384,27 @@ func (Lint) Vet(ctx context.Context) error {
 	return sh.RunV("go", "vet", "./...")
 }
 
-// Format checks that all Go source code follows formatting rules
-func (Lint) Format(ctx context.Context) error {
-	fmt.Println("Linting(gofumpt)...")
-	outStr, err := runAndCapture("go", "run", "mvdan.cc/gofumpt", "-l", ".")
-	if err != nil {
-		return err
-	}
-	badFiles := splitWithoutBlanks(outStr)
-	// TODO: ignore git-ignored files equivalent to piping through `fgrep -xvf <(
-	// git ls-files --exclude-standard --others --ignored ) | grep .`
-	if len(badFiles) != 0 {
-		msg := &strings.Builder{}
-		fmt.Fprintln(msg, "The following files need to be re-formatted:")
-		for _, f := range badFiles {
-			fmt.Fprintf(msg, "%s\n", f)
-		}
-		return errors.New(msg.String())
-	}
-	return nil
-}
-
-// Imports runs the goimports linting tool
-func (Lint) Imports(ctx context.Context) error {
-	fmt.Println("Linting(goimports)...")
-	goImportsArgs := []string{"run"}
-	if os.Getenv("VERBOSE") != "" {
-		goImportsArgs = append(goImportsArgs, "-v")
-	}
-	goImportsArgs = append(goImportsArgs, "golang.org/x/tools/cmd/goimports", "-l")
-	goImportsArgs = append(goImportsArgs, goImportsFlags...)
-	goImportsArgs = append(goImportsArgs, ".")
-	outStr, err := runAndCapture("go", goImportsArgs...)
-	if err != nil {
-		return err
-	}
-	badFiles := splitWithoutBlanks(outStr)
-	// TODO: ignore git-ignored files equivalent to piping through `fgrep -xvf <(
-	// git ls-files --exclude-standard --others --ignored ) | grep .`
-	if len(badFiles) != 0 {
-		msg := &strings.Builder{}
-		fmt.Fprintln(msg, "The following files need to be re-formatted:")
-		for _, f := range badFiles {
-			fmt.Fprintf(msg, "%s\n", f)
-		}
-		return errors.New(msg.String())
-	}
-	return nil
-}
-
 // Golangci runs the golangci-lint tool
 func (Lint) Golangci(ctx context.Context) error {
 	fmt.Println("Linting(golangci)...")
-	return Lint{}.golangci(ctx, false)
+	return Lint{}.golangci(ctx, gciOpts{})
 }
 
 func (Lint) GolangciJUnit(ctx context.Context) error {
 	fmt.Println("Linting(golangci)...")
-	return Lint{}.golangci(ctx, true)
+	return Lint{}.golangci(ctx, gciOpts{junit: true})
 }
 
-func (Lint) golangci(ctx context.Context, junit bool) error {
-	// in CI, expect golangci-lint to be installed, so we don't need to use "go
-	// run" to build it from source
-	var cmd string
+type gciOpts struct {
+	junit bool
+	fix   bool
+	dir   string
+	dirs  []string
+}
+
+func (Lint) golangci(ctx context.Context, opts gciOpts) error {
+	cmd := "golangci-lint"
 	var args []string
-	if os.Getenv("CI") == "" {
-		cmd = "go"
-		// this "run" is for "go"
-		args = []string{"run"}
-		if os.Getenv("VERBOSE") != "" {
-			args = append(args, "-v")
-		}
-		args = append(args, "github.com/golangci/golangci-lint/cmd/golangci-lint")
-	} else {
-		cmd = "golangci-lint"
-	}
-	// this "run" is for "golangci-lint"
 	args = append(args, "run")
 	args = append(args, goLintArgs...)
 	if os.Getenv("VERBOSE") != "" {
@@ -499,7 +417,10 @@ func (Lint) golangci(ctx context.Context, junit bool) error {
 
 	var err error
 	outFile := os.Stdout
-	if junit {
+	if opts.fix {
+		args = append(args, "--fix")
+	}
+	if opts.junit {
 		args = append(args, "--out-format=junit-xml")
 		resultsDir := os.Getenv("TEST_RESULTS")
 		if resultsDir == "" {
@@ -511,6 +432,15 @@ func (Lint) golangci(ctx context.Context, junit bool) error {
 			return err
 		}
 		defer outFile.Close()
+	}
+	if opts.dir != "" || len(opts.dirs) != 0 {
+		args = append(args, "--allow-parallel-runners")
+		if opts.dir != "" {
+			args = append(args, opts.dir)
+		}
+		if len(opts.dirs) != 0 {
+			args = append(args, opts.dirs...)
+		}
 	}
 	_, err = sh.Exec(map[string]string{}, outFile, os.Stderr, cmd, args...)
 	return err

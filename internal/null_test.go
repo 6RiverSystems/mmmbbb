@@ -27,12 +27,10 @@
 package internal
 
 import (
-	_ "github.com/golangci/golangci-lint/pkg/commands"
 	_ "github.com/google/addlicense"
 	_ "golang.org/x/tools/imports"
 	_ "golang.org/x/vuln/cmd/govulncheck"
 	_ "gotest.tools/gotestsum/cmd"
-	_ "mvdan.cc/gofumpt"
 
 	_ "github.com/deepmap/oapi-codegen/v2/pkg/codegen"
 	// needed for golangci-lint
