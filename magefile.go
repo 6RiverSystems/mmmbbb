@@ -42,7 +42,6 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/magefile/mage/target"
-	"golang.org/x/exp/maps"
 	"golang.org/x/sync/errgroup"
 
 	// tools this needs, to keep `go mod tidy` from deleting lines
@@ -143,7 +142,6 @@ func (Generate) Force(ctx context.Context) error {
 	if err := sh.Run("go", "generate", "-x", "./..."); err != nil {
 		return err
 	}
-	mg.CtxDeps(ctx, FormatGenerated)
 	return nil
 }
 
@@ -152,7 +150,6 @@ func (Generate) Dir(ctx context.Context, dir string) error {
 	if err := sh.Run("go", "generate", "-x", dir); err != nil {
 		return err
 	}
-	// mg.CtxDeps(ctx, mg.F(FormatDir, dir))
 	return nil
 }
 
@@ -337,26 +334,6 @@ func Format(ctx context.Context) error {
 func FormatDir(ctx context.Context, dir string) error {
 	fmt.Printf("Formatting(%s)...\n", dir)
 	return Lint{}.golangci(ctx, gciOpts{fix: true, dir: dir})
-}
-
-// Format formats just the generated go source code
-func FormatGenerated(ctx context.Context) error {
-	fmt.Println("Formatting Generated...")
-	out, err := sh.Output("git", "ls-files", "--exclude-standard", "--others", "--ignored", "-z")
-	if err != nil {
-		return err
-	}
-	dirs := map[string]bool{}
-	for _, l := range strings.Split(out, "\x00") {
-		if strings.HasSuffix(l, ".go") {
-			dirs[filepath.Dir(l)] = true
-		}
-	}
-	if len(dirs) > 0 {
-		dirList := maps.Keys(dirs)
-		return Lint{}.golangci(ctx, gciOpts{fix: true, dirs: dirList})
-	}
-	return nil
 }
 
 type Lint mg.Namespace

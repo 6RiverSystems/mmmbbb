@@ -33,7 +33,6 @@ require (
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.9.0
 	go.uber.org/fx v1.22.0
-	golang.org/x/exp v0.0.0-20240604190554-fc45aab8b7f8
 	golang.org/x/sync v0.7.0
 	golang.org/x/tools v0.22.0
 	golang.org/x/vuln v1.1.2
