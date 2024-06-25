@@ -23,6 +23,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"sync"
 	"time"
 
 	"github.com/google/uuid"
@@ -572,6 +573,7 @@ func (s *subscriberServer) StreamingPull(stream pubsub.Subscriber_StreamingPullS
 }
 
 type streamWrapper struct {
+	mu       sync.Mutex
 	stream   pubsub.Subscriber_StreamingPullServer
 	initial  *pubsub.StreamingPullRequest
 	closed   chan struct{}
@@ -583,6 +585,8 @@ type streamReceiveItem struct {
 }
 
 func (w *streamWrapper) init() {
+	w.mu.Lock()
+	defer w.mu.Unlock()
 	if w.closed == nil {
 		w.closed = make(chan struct{})
 	}
@@ -595,7 +599,9 @@ func (w *streamWrapper) Close() error {
 	close(w.closed)
 	// we don't close the receives channel to avoid potential panic on send to a
 	// closed channel
+	w.mu.Lock()
 	w.receives = nil
+	w.mu.Unlock()
 	return nil
 }
 
@@ -609,19 +615,25 @@ func (w *streamWrapper) Receive(context.Context) (*actions.MessageStreamRequest,
 	// the stream until we return the final state to the client, so we have to
 	// fire it into the background and not directly wait for it
 	go func() {
+		w.mu.Lock()
+		r := w.receives
+		w.mu.Unlock()
 		m, err := w.stream.Recv()
 		select {
 		case <-w.closed:
 			// abandon
-		case w.receives <- streamReceiveItem{m, err}:
+		case r <- streamReceiveItem{m, err}:
 			// notified
 		}
 	}()
+	w.mu.Lock()
+	r := w.receives
+	w.mu.Unlock()
 	select {
 	case <-w.closed:
 		// this is equivalent to context cancellation
 		return nil, context.Canceled
-	case rm := <-w.receives:
+	case rm := <-r:
 		if rm.err != nil {
 			return nil, rm.err
 		}

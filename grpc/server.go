@@ -162,9 +162,9 @@ func (s *grpcServer) logStream(
 	evt.
 		Str("method", info.FullMethod).
 		Dur("latency", elapsed).
-		Uint64("sent", cs.numSent).
-		Uint64("received", cs.numReceived).
-		Uint64("errd", cs.numError).
+		Uint64("sent", atomic.LoadUint64(&cs.numSent)).
+		Uint64("received", atomic.LoadUint64(&cs.numReceived)).
+		Uint64("errd", atomic.LoadUint64(&cs.numError)).
 		Msg("stream")
 	return err
 }
