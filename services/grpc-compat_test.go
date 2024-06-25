@@ -374,6 +374,9 @@ func TestGrpcCompat(t *testing.T) {
 				require.False(t, exists)
 			}},
 		},
+	}
+	const pullTimeScale = 100 * time.Millisecond
+	tests = append(tests, []*test{
 		{
 			name: "streaming pull",
 			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
@@ -382,7 +385,7 @@ func TestGrpcCompat(t *testing.T) {
 				sub, err := psc.CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{
 					Topic: topic,
 					RetryPolicy: &pubsub.RetryPolicy{
-						MinimumBackoff: 51 * time.Millisecond,
+						MinimumBackoff: pullTimeScale * 5 / 4,
 					},
 				})
 				require.NoError(t, err)
@@ -400,13 +403,15 @@ func TestGrpcCompat(t *testing.T) {
 					}).Get(ctx)
 					assert.NoError(t, err)
 					assert.NotEmpty(t, id)
+					// t.Logf("published 1 as %q", id)
 					// pause so the subscriber gets two separate "pulls"
-					time.Sleep(100 * time.Millisecond)
+					time.Sleep(pullTimeScale * 3 / 2)
 					id, err = tt.topics[0].Publish(ctx, &pubsub.Message{
 						Data: json.RawMessage(`2`),
 					}).Get(ctx)
 					assert.NoError(t, err)
 					assert.NotEmpty(t, id)
+					// t.Logf("published 2 as %q", id)
 				},
 				// receiver
 				// TODO: this is slow because of sleeps needed to trigger modack behavior
@@ -415,6 +420,7 @@ func TestGrpcCompat(t *testing.T) {
 					rCtx, cancel := context.WithCancel(ctx)
 					assert.NoError(t, tt.subs[0].Receive(rCtx, func(ctx context.Context, m *pubsub.Message) {
 						counter := atomic.AddInt32(&i, 1)
+						// t.Logf("received %q as %q at %d", string(m.Data), m.ID, counter)
 						expected := counter
 						if expected > 2 {
 							expected = 2
@@ -427,15 +433,16 @@ func TestGrpcCompat(t *testing.T) {
 						} else if counter == 2 {
 							// delay and nack
 							defer m.Nack()
-							time.Sleep(50 * time.Millisecond)
+							time.Sleep(pullTimeScale)
 						} else if counter == 3 {
 							// delay and ack and done
 							defer m.Ack()
-							time.Sleep(150 * time.Millisecond)
+							time.Sleep(pullTimeScale * 3 / 2)
 							cancel()
 						} else {
 							assert.LessOrEqual(t, expected, int32(3))
 						}
+						// t.Logf("done with %q at %d", m.ID, counter)
 					}))
 				},
 			},
@@ -448,7 +455,7 @@ func TestGrpcCompat(t *testing.T) {
 				sub, err := psc.CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{
 					Topic: topic,
 					RetryPolicy: &pubsub.RetryPolicy{
-						MinimumBackoff: 51 * time.Millisecond,
+						MinimumBackoff: pullTimeScale * 5 / 4,
 					},
 				})
 				require.NoError(t, err)
@@ -469,7 +476,7 @@ func TestGrpcCompat(t *testing.T) {
 					assert.NoError(t, err)
 					assert.NotEmpty(t, id)
 					// pause so the subscriber gets two separate "pulls"
-					time.Sleep(100 * time.Millisecond)
+					time.Sleep(pullTimeScale * 3 / 2)
 					id, err = tt.topics[0].Publish(ctx, &pubsub.Message{
 						Data: json.RawMessage(`2`),
 					}).Get(ctx)
@@ -494,11 +501,11 @@ func TestGrpcCompat(t *testing.T) {
 						} else if counter == 2 {
 							// delay and nack
 							defer m.Nack()
-							time.Sleep(50 * time.Millisecond)
+							time.Sleep(pullTimeScale)
 						} else if counter == 3 {
 							// delay and ack and done
 							defer m.Ack()
-							time.Sleep(150 * time.Millisecond)
+							time.Sleep(pullTimeScale * 3 / 2)
 							cancel()
 						} else {
 							assert.LessOrEqual(t, expected, int32(3))
@@ -508,6 +515,8 @@ func TestGrpcCompat(t *testing.T) {
 				},
 			},
 		},
+	}...)
+	tests = append(tests, []*test{
 		{
 			name: "subscription http push",
 			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
@@ -721,7 +730,7 @@ func TestGrpcCompat(t *testing.T) {
 				},
 			},
 		},
-	}
+	}...)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := testutil.Context(t)
