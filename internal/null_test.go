@@ -32,7 +32,7 @@ import (
 	_ "golang.org/x/vuln/cmd/govulncheck"
 	_ "gotest.tools/gotestsum/cmd"
 
-	_ "github.com/deepmap/oapi-codegen/v2/pkg/codegen"
+	_ "github.com/oapi-codegen/oapi-codegen/v2/pkg/codegen"
 	// needed for golangci-lint
 	_ "github.com/quasilyte/go-ruleguard/dsl"
 
