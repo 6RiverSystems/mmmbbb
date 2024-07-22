@@ -35,7 +35,7 @@ require (
 	go.uber.org/fx v1.22.1
 	golang.org/x/sync v0.7.0
 	golang.org/x/tools v0.23.0
-	golang.org/x/vuln v1.1.2
+	golang.org/x/vuln v1.1.3
 	google.golang.org/api v0.188.0
 	google.golang.org/genproto v0.0.0-20240711142825-46eb208f015d
 	google.golang.org/grpc v1.65.0
