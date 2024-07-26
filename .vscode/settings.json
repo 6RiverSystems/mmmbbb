@@ -5,9 +5,7 @@
 	"go.buildOnSave": "workspace",
 	"go.autocompleteUnimportedPackages": true,
 	"go.lintTool": "golangci-lint",
-	"go.generateTestsFlags": [
-		"-template=testify"
-	],
+	"go.generateTestsFlags": ["-template=testify"],
 	"cSpell.flagWords": [],
 	"cSpell.words": [
 		"Acks",
@@ -54,6 +52,7 @@
 		"pgconn",
 		"pgsql",
 		"pprof",
+		"pubsubpb",
 		"Queryx",
 		"Rivs",
 		"sqlite",

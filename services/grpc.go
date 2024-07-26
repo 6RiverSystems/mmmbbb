@@ -31,7 +31,7 @@ import (
 
 	"go.6river.tech/mmmbbb/actions"
 	"go.6river.tech/mmmbbb/ent"
-	"go.6river.tech/mmmbbb/grpc/pubsub"
+	"go.6river.tech/mmmbbb/grpc/pubsubpb"
 )
 
 func projectTopicPrefix(project string) string {
@@ -73,8 +73,8 @@ func isValidSnapshotName(name string) bool {
 }
 
 func InitializeGrpcServers(server *grpc.Server, client *ent.Client, readies []ReadyCheck) error {
-	pubsub.RegisterPublisherServer(server, &publisherServer{client: client})
-	pubsub.RegisterSubscriberServer(server, &subscriberServer{client: client})
+	pubsubpb.RegisterPublisherServer(server, &publisherServer{client: client})
+	pubsubpb.RegisterSubscriberServer(server, &subscriberServer{client: client})
 	health.RegisterHealthServer(server, &healthServer{client: client, readies: readies})
 	return nil
 }
@@ -82,10 +82,10 @@ func InitializeGrpcServers(server *grpc.Server, client *ent.Client, readies []Re
 func BindGatewayHandlers(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
 	// TODO: it would be preferable to directly use the server objects here, but
 	// that requires some more complex changes to the base gosix setup
-	if err := pubsub.RegisterSubscriberHandler(ctx, mux, conn); err != nil {
+	if err := pubsubpb.RegisterSubscriberHandler(ctx, mux, conn); err != nil {
 		return err
 	}
-	if err := pubsub.RegisterPublisherHandler(ctx, mux, conn); err != nil {
+	if err := pubsubpb.RegisterPublisherHandler(ctx, mux, conn); err != nil {
 		return err
 	}
 	runtime.WithHealthzEndpoint(health.NewHealthClient(conn))(mux)

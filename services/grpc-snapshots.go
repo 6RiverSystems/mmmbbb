@@ -36,15 +36,15 @@ import (
 	"go.6river.tech/mmmbbb/ent/predicate"
 	"go.6river.tech/mmmbbb/ent/snapshot"
 	"go.6river.tech/mmmbbb/grpc"
-	"go.6river.tech/mmmbbb/grpc/pubsub"
+	"go.6river.tech/mmmbbb/grpc/pubsubpb"
 )
 
-func (s *subscriberServer) GetSnapshot(ctx context.Context, req *pubsub.GetSnapshotRequest) (*pubsub.Snapshot, error) {
+func (s *subscriberServer) GetSnapshot(ctx context.Context, req *pubsubpb.GetSnapshotRequest) (*pubsubpb.Snapshot, error) {
 	if !isValidSnapshotName(req.Snapshot) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / snapshot path %s", req.Snapshot)
 	}
 
-	var resp *pubsub.Snapshot
+	var resp *pubsubpb.Snapshot
 	err := s.client.DoTx(ctx, nil, func(tx *ent.Tx) error {
 		s, err := tx.Snapshot.Query().
 			Where(
@@ -67,13 +67,13 @@ func (s *subscriberServer) GetSnapshot(ctx context.Context, req *pubsub.GetSnaps
 	return resp, nil
 }
 
-func (s *subscriberServer) ListSnapshots(ctx context.Context, req *pubsub.ListSnapshotsRequest) (*pubsub.ListSnapshotsResponse, error) {
+func (s *subscriberServer) ListSnapshots(ctx context.Context, req *pubsubpb.ListSnapshotsRequest) (*pubsubpb.ListSnapshotsResponse, error) {
 	var pageSize int32 = 100
 	if req.PageSize > 0 && req.PageSize < pageSize {
 		pageSize = req.PageSize
 	}
 
-	var resp *pubsub.ListSnapshotsResponse
+	var resp *pubsubpb.ListSnapshotsResponse
 	err := s.client.DoTx(ctx, nil, func(tx *ent.Tx) error {
 		predicates := []predicate.Snapshot{
 			snapshot.NameHasPrefix(projectSubscriptionPrefix(req.Project)),
@@ -95,7 +95,7 @@ func (s *subscriberServer) ListSnapshots(ctx context.Context, req *pubsub.ListSn
 		if err != nil {
 			return grpc.AsStatusError(err)
 		}
-		grpcSnapshots := make([]*pubsub.Snapshot, len(snaps))
+		grpcSnapshots := make([]*pubsubpb.Snapshot, len(snaps))
 		for i, snap := range snaps {
 			grpcSnapshots[i] = entSnapshotToGrpc(snap, "")
 		}
@@ -103,7 +103,7 @@ func (s *subscriberServer) ListSnapshots(ctx context.Context, req *pubsub.ListSn
 		if len(snaps) >= int(pageSize) {
 			nextPageToken = snaps[len(snaps)-1].ID.String()
 		}
-		resp = &pubsub.ListSnapshotsResponse{Snapshots: grpcSnapshots, NextPageToken: nextPageToken}
+		resp = &pubsubpb.ListSnapshotsResponse{Snapshots: grpcSnapshots, NextPageToken: nextPageToken}
 		return nil
 	})
 	if err != nil {
@@ -112,7 +112,7 @@ func (s *subscriberServer) ListSnapshots(ctx context.Context, req *pubsub.ListSn
 	return resp, nil
 }
 
-func (s *subscriberServer) CreateSnapshot(ctx context.Context, req *pubsub.CreateSnapshotRequest) (*pubsub.Snapshot, error) {
+func (s *subscriberServer) CreateSnapshot(ctx context.Context, req *pubsubpb.CreateSnapshotRequest) (*pubsubpb.Snapshot, error) {
 	if !isValidSnapshotName(req.Name) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / snapshot path %s", req.Name)
 	}
@@ -142,12 +142,12 @@ func (s *subscriberServer) CreateSnapshot(ctx context.Context, req *pubsub.Creat
 	return entSnapshotToGrpc(results.Snapshot, results.TopicName), nil
 }
 
-func (s *subscriberServer) UpdateSnapshot(ctx context.Context, req *pubsub.UpdateSnapshotRequest) (*pubsub.Snapshot, error) {
+func (s *subscriberServer) UpdateSnapshot(ctx context.Context, req *pubsubpb.UpdateSnapshotRequest) (*pubsubpb.Snapshot, error) {
 	// TODO: implement this if we need to
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateSnapshot not implemented")
 }
 
-func (s *subscriberServer) DeleteSnapshot(ctx context.Context, req *pubsub.DeleteSnapshotRequest) (*empty.Empty, error) {
+func (s *subscriberServer) DeleteSnapshot(ctx context.Context, req *pubsubpb.DeleteSnapshotRequest) (*empty.Empty, error) {
 	if !isValidSnapshotName(req.Snapshot) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / snapshot path %s", req.Snapshot)
 	}
@@ -164,8 +164,8 @@ func (s *subscriberServer) DeleteSnapshot(ctx context.Context, req *pubsub.Delet
 	}
 }
 
-func entSnapshotToGrpc(snapshot *ent.Snapshot, topicName string) *pubsub.Snapshot {
-	ret := &pubsub.Snapshot{
+func entSnapshotToGrpc(snapshot *ent.Snapshot, topicName string) *pubsubpb.Snapshot {
+	ret := &pubsubpb.Snapshot{
 		Name:       snapshot.Name,
 		ExpireTime: timestamppb.New(snapshot.ExpiresAt),
 		Labels:     snapshot.Labels,

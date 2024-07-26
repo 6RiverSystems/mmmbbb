@@ -43,19 +43,19 @@ import (
 	"go.6river.tech/mmmbbb/filter"
 	"go.6river.tech/mmmbbb/grpc"
 	mbgrpc "go.6river.tech/mmmbbb/grpc"
-	"go.6river.tech/mmmbbb/grpc/pubsub"
+	"go.6river.tech/mmmbbb/grpc/pubsubpb"
 	"go.6river.tech/mmmbbb/internal/sqltypes"
 	"go.6river.tech/mmmbbb/logging"
 	"go.6river.tech/mmmbbb/parse"
 )
 
 type subscriberServer struct {
-	pubsub.UnimplementedSubscriberServer
+	pubsubpb.UnimplementedSubscriberServer
 
 	client *ent.Client
 }
 
-func (s *subscriberServer) CreateSubscription(ctx context.Context, req *pubsub.Subscription) (*pubsub.Subscription, error) {
+func (s *subscriberServer) CreateSubscription(ctx context.Context, req *pubsubpb.Subscription) (*pubsubpb.Subscription, error) {
 	if !isValidSubscriptionName(req.Name) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / subscription path %s", req.Name)
 	}
@@ -70,6 +70,11 @@ func (s *subscriberServer) CreateSubscription(ctx context.Context, req *pubsub.S
 		}
 		if req.PushConfig.AuthenticationMethod != nil {
 			return nil, status.Error(codes.Unimplemented, "Advanced features not supported (PushConfig.AuthenticationMethod)")
+		}
+		if req.PushConfig.Wrapper != nil {
+			if _, ok := req.PushConfig.Wrapper.(*pubsubpb.PushConfig_PubsubWrapper_); !ok {
+				return nil, status.Error(codes.Unimplemented, "Advanced features not supported (PushConfig.Wrapper unwrapped)")
+			}
 		}
 	}
 
@@ -120,12 +125,12 @@ func (s *subscriberServer) CreateSubscription(ctx context.Context, req *pubsub.S
 	return entSubscriptionToGrpc(results.Sub, params.TopicName, params.DeadLetterTopic), nil
 }
 
-func (s *subscriberServer) GetSubscription(ctx context.Context, req *pubsub.GetSubscriptionRequest) (*pubsub.Subscription, error) {
+func (s *subscriberServer) GetSubscription(ctx context.Context, req *pubsubpb.GetSubscriptionRequest) (*pubsubpb.Subscription, error) {
 	if !isValidSubscriptionName(req.Subscription) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / subscription path %s", req.Subscription)
 	}
 
-	var resp *pubsub.Subscription
+	var resp *pubsubpb.Subscription
 	err := s.client.DoTx(ctx, nil, func(tx *ent.Tx) error {
 		s, err := tx.Subscription.Query().
 			Where(
@@ -150,12 +155,12 @@ func (s *subscriberServer) GetSubscription(ctx context.Context, req *pubsub.GetS
 	return resp, nil
 }
 
-func (s *subscriberServer) UpdateSubscription(ctx context.Context, req *pubsub.UpdateSubscriptionRequest) (*pubsub.Subscription, error) {
+func (s *subscriberServer) UpdateSubscription(ctx context.Context, req *pubsubpb.UpdateSubscriptionRequest) (*pubsubpb.Subscription, error) {
 	if !isValidSubscriptionName(req.Subscription.Name) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / subscription path %s", req.Subscription.Name)
 	}
 
-	var resp *pubsub.Subscription
+	var resp *pubsubpb.Subscription
 	err := s.client.DoTx(ctx, nil, func(tx *ent.Tx) error {
 		sub, err := tx.Subscription.Query().
 			Where(
@@ -297,13 +302,13 @@ func (s *subscriberServer) UpdateSubscription(ctx context.Context, req *pubsub.U
 	return resp, nil
 }
 
-func (s *subscriberServer) ListSubscriptions(ctx context.Context, req *pubsub.ListSubscriptionsRequest) (*pubsub.ListSubscriptionsResponse, error) {
+func (s *subscriberServer) ListSubscriptions(ctx context.Context, req *pubsubpb.ListSubscriptionsRequest) (*pubsubpb.ListSubscriptionsResponse, error) {
 	var pageSize int32 = 100
 	if req.PageSize > 0 && req.PageSize < pageSize {
 		pageSize = req.PageSize
 	}
 
-	var resp *pubsub.ListSubscriptionsResponse
+	var resp *pubsubpb.ListSubscriptionsResponse
 	err := s.client.DoTx(ctx, nil, func(tx *ent.Tx) error {
 		predicates := []predicate.Subscription{
 			subscription.NameHasPrefix(projectSubscriptionPrefix(req.Project)),
@@ -327,7 +332,7 @@ func (s *subscriberServer) ListSubscriptions(ctx context.Context, req *pubsub.Li
 		if err != nil {
 			return grpc.AsStatusError(err)
 		}
-		grpcSubscriptions := make([]*pubsub.Subscription, len(subs))
+		grpcSubscriptions := make([]*pubsubpb.Subscription, len(subs))
 		for i, sub := range subs {
 			grpcSubscriptions[i] = entSubscriptionToGrpc(sub, "", "")
 		}
@@ -335,7 +340,7 @@ func (s *subscriberServer) ListSubscriptions(ctx context.Context, req *pubsub.Li
 		if len(subs) >= int(pageSize) {
 			nextPageToken = subs[len(subs)-1].ID.String()
 		}
-		resp = &pubsub.ListSubscriptionsResponse{Subscriptions: grpcSubscriptions, NextPageToken: nextPageToken}
+		resp = &pubsubpb.ListSubscriptionsResponse{Subscriptions: grpcSubscriptions, NextPageToken: nextPageToken}
 		return nil
 	})
 	if err != nil {
@@ -344,7 +349,7 @@ func (s *subscriberServer) ListSubscriptions(ctx context.Context, req *pubsub.Li
 	return resp, nil
 }
 
-func (s *subscriberServer) DeleteSubscription(ctx context.Context, req *pubsub.DeleteSubscriptionRequest) (*emptypb.Empty, error) {
+func (s *subscriberServer) DeleteSubscription(ctx context.Context, req *pubsubpb.DeleteSubscriptionRequest) (*emptypb.Empty, error) {
 	if !isValidSubscriptionName(req.Subscription) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / subscription path %s", req.Subscription)
 	}
@@ -360,7 +365,7 @@ func (s *subscriberServer) DeleteSubscription(ctx context.Context, req *pubsub.D
 	return &emptypb.Empty{}, nil
 }
 
-func (s *subscriberServer) ModifyAckDeadline(ctx context.Context, req *pubsub.ModifyAckDeadlineRequest) (*emptypb.Empty, error) {
+func (s *subscriberServer) ModifyAckDeadline(ctx context.Context, req *pubsubpb.ModifyAckDeadlineRequest) (*emptypb.Empty, error) {
 	if !isValidSubscriptionName(req.Subscription) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / subscription path %s", req.Subscription)
 	}
@@ -390,7 +395,7 @@ func (s *subscriberServer) ModifyAckDeadline(ctx context.Context, req *pubsub.Mo
 	return &emptypb.Empty{}, nil
 }
 
-func (s *subscriberServer) Acknowledge(ctx context.Context, req *pubsub.AcknowledgeRequest) (*emptypb.Empty, error) {
+func (s *subscriberServer) Acknowledge(ctx context.Context, req *pubsubpb.AcknowledgeRequest) (*emptypb.Empty, error) {
 	if !isValidSubscriptionName(req.Subscription) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / subscription path %s", req.Subscription)
 	}
@@ -418,7 +423,7 @@ func (s *subscriberServer) Acknowledge(ctx context.Context, req *pubsub.Acknowle
 	return &emptypb.Empty{}, nil
 }
 
-func (s *subscriberServer) Pull(ctx context.Context, req *pubsub.PullRequest) (*pubsub.PullResponse, error) {
+func (s *subscriberServer) Pull(ctx context.Context, req *pubsubpb.PullRequest) (*pubsubpb.PullResponse, error) {
 	if !isValidSubscriptionName(req.Subscription) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / subscription path %s", req.Subscription)
 	}
@@ -444,21 +449,21 @@ func (s *subscriberServer) Pull(ctx context.Context, req *pubsub.PullRequest) (*
 		return nil, grpc.AsStatusError(err)
 	}
 	results, _ := action.Results()
-	msgs := make([]*pubsub.ReceivedMessage, len(results.Deliveries))
+	msgs := make([]*pubsubpb.ReceivedMessage, len(results.Deliveries))
 	for i, d := range results.Deliveries {
 		msgs[i] = entDeliveryToGrpc(d)
 	}
 
-	return &pubsub.PullResponse{ReceivedMessages: msgs}, nil
+	return &pubsubpb.PullResponse{ReceivedMessages: msgs}, nil
 }
 
-func (s *subscriberServer) Seek(ctx context.Context, req *pubsub.SeekRequest) (*pubsub.SeekResponse, error) {
+func (s *subscriberServer) Seek(ctx context.Context, req *pubsubpb.SeekRequest) (*pubsubpb.SeekResponse, error) {
 	if !isValidSubscriptionName(req.Subscription) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / subscription path %s", req.Subscription)
 	}
 
 	switch target := req.Target.(type) {
-	case *pubsub.SeekRequest_Time:
+	case *pubsubpb.SeekRequest_Time:
 		// FUTURE: do we want to bound how far in the future or past the target can be?
 		action := actions.NewSeekSubscriptionToTime(actions.SeekSubscriptionToTimeParams{
 			Name: req.Subscription,
@@ -475,8 +480,8 @@ func (s *subscriberServer) Seek(ctx context.Context, req *pubsub.SeekRequest) (*
 			}
 			return nil, grpc.AsStatusError(err)
 		}
-		return &pubsub.SeekResponse{}, nil
-	case *pubsub.SeekRequest_Snapshot:
+		return &pubsubpb.SeekResponse{}, nil
+	case *pubsubpb.SeekRequest_Snapshot:
 		action := actions.NewSeekSubscriptionToSnapshot(actions.SeekSubscriptionToSnapshotParams{
 			SubscriptionName: req.Subscription,
 			SnapshotName:     target.Snapshot,
@@ -492,13 +497,13 @@ func (s *subscriberServer) Seek(ctx context.Context, req *pubsub.SeekRequest) (*
 			}
 			return nil, grpc.AsStatusError(err)
 		}
-		return &pubsub.SeekResponse{}, nil
+		return &pubsubpb.SeekResponse{}, nil
 	default:
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid type for SeekRequest.Target")
 	}
 }
 
-func (s *subscriberServer) StreamingPull(stream pubsub.Subscriber_StreamingPullServer) error {
+func (s *subscriberServer) StreamingPull(stream pubsubpb.Subscriber_StreamingPullServer) error {
 	// we require an initial message before we can start doing anything
 	initial, err := stream.Recv()
 	if err != nil {
@@ -574,13 +579,13 @@ func (s *subscriberServer) StreamingPull(stream pubsub.Subscriber_StreamingPullS
 
 type streamWrapper struct {
 	mu       sync.Mutex
-	stream   pubsub.Subscriber_StreamingPullServer
-	initial  *pubsub.StreamingPullRequest
+	stream   pubsubpb.Subscriber_StreamingPullServer
+	initial  *pubsubpb.StreamingPullRequest
 	closed   chan struct{}
 	receives chan streamReceiveItem
 }
 type streamReceiveItem struct {
-	msg *pubsub.StreamingPullRequest
+	msg *pubsubpb.StreamingPullRequest
 	err error
 }
 
@@ -642,24 +647,24 @@ func (w *streamWrapper) Receive(context.Context) (*actions.MessageStreamRequest,
 }
 
 func (w *streamWrapper) Send(ctx context.Context, m *actions.SubscriptionMessageDelivery) error {
-	return w.stream.Send(&pubsub.StreamingPullResponse{
-		ReceivedMessages: []*pubsub.ReceivedMessage{entDeliveryToGrpc(m)},
+	return w.stream.Send(&pubsubpb.StreamingPullResponse{
+		ReceivedMessages: []*pubsubpb.ReceivedMessage{entDeliveryToGrpc(m)},
 	})
 }
 
 func (w *streamWrapper) SendBatch(ctx context.Context, ms []*actions.SubscriptionMessageDelivery) error {
-	rm := make([]*pubsub.ReceivedMessage, len(ms))
+	rm := make([]*pubsubpb.ReceivedMessage, len(ms))
 	for i, m := range ms {
 		rm[i] = entDeliveryToGrpc(m)
 	}
-	return w.stream.Send(&pubsub.StreamingPullResponse{
+	return w.stream.Send(&pubsubpb.StreamingPullResponse{
 		ReceivedMessages: rm,
 	})
 }
 
 var _ actions.StreamConnectionBatchSend = (*streamWrapper)(nil)
 
-func (w *streamWrapper) adaptIn(m *pubsub.StreamingPullRequest) (*actions.MessageStreamRequest, error) {
+func (w *streamWrapper) adaptIn(m *pubsubpb.StreamingPullRequest) (*actions.MessageStreamRequest, error) {
 	ret := &actions.MessageStreamRequest{}
 	if m == w.initial {
 		// for Google PubSub, the flow control can only be set on the first request
@@ -694,7 +699,7 @@ func (w *streamWrapper) adaptIn(m *pubsub.StreamingPullRequest) (*actions.Messag
 	return ret, nil
 }
 
-func (s *subscriberServer) ModifyPushConfig(ctx context.Context, req *pubsub.ModifyPushConfigRequest) (*emptypb.Empty, error) {
+func (s *subscriberServer) ModifyPushConfig(ctx context.Context, req *pubsubpb.ModifyPushConfigRequest) (*emptypb.Empty, error) {
 	if !isValidSubscriptionName(req.Subscription) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / subscription path %s", req.Subscription)
 	}
@@ -724,7 +729,7 @@ func (s *subscriberServer) ModifyPushConfig(ctx context.Context, req *pubsub.Mod
 	return &emptypb.Empty{}, nil
 }
 
-func validatePushConfig(cfg *pubsub.PushConfig) error {
+func validatePushConfig(cfg *pubsubpb.PushConfig) error {
 	attrs := cfg.GetAttributes()
 	for k, v := range attrs {
 		if k != "x-goog-version" {
@@ -740,7 +745,7 @@ func validatePushConfig(cfg *pubsub.PushConfig) error {
 	return nil
 }
 
-func applyPushConfig(mut *ent.SubscriptionUpdateOne, cfg *pubsub.PushConfig) *ent.SubscriptionUpdateOne {
+func applyPushConfig(mut *ent.SubscriptionUpdateOne, cfg *pubsubpb.PushConfig) *ent.SubscriptionUpdateOne {
 	ep := cfg.GetPushEndpoint()
 	if ep == "" {
 		mut = mut.ClearPushEndpoint()
@@ -750,9 +755,9 @@ func applyPushConfig(mut *ent.SubscriptionUpdateOne, cfg *pubsub.PushConfig) *en
 	return mut
 }
 
-func entSubscriptionToGrpc(subscription *ent.Subscription, topicName, deadLetterTopicName string) *pubsub.Subscription {
+func entSubscriptionToGrpc(subscription *ent.Subscription, topicName, deadLetterTopicName string) *pubsubpb.Subscription {
 	nominalDelay, _ := actions.NextDelayFor(subscription, 0)
-	ret := &pubsub.Subscription{
+	ret := &pubsubpb.Subscription{
 		Name: subscription.Name,
 		// TODO: this is a fudge, based on the initial retry backoff (pubsub
 		// differentiates ack deadlines vs retry backoffs, we don't)
@@ -763,13 +768,13 @@ func entSubscriptionToGrpc(subscription *ent.Subscription, topicName, deadLetter
 		MessageRetentionDuration: durationpb.New(time.Duration(subscription.MessageTTL)),
 		Labels:                   subscription.Labels,
 		EnableMessageOrdering:    subscription.OrderedDelivery,
-		ExpirationPolicy: &pubsub.ExpirationPolicy{
+		ExpirationPolicy: &pubsubpb.ExpirationPolicy{
 			Ttl: durationpb.New(time.Duration(subscription.TTL)),
 		},
 		// not supported: Detached
 	}
 	if subscription.PushEndpoint != nil {
-		ret.PushConfig = &pubsub.PushConfig{
+		ret.PushConfig = &pubsubpb.PushConfig{
 			PushEndpoint: *subscription.PushEndpoint,
 		}
 	}
@@ -777,7 +782,7 @@ func entSubscriptionToGrpc(subscription *ent.Subscription, topicName, deadLetter
 		ret.Filter = *subscription.MessageFilter
 	}
 	if subscription.DeadLetterTopicID != nil {
-		ret.DeadLetterPolicy = &pubsub.DeadLetterPolicy{}
+		ret.DeadLetterPolicy = &pubsubpb.DeadLetterPolicy{}
 		if subscription.Edges.DeadLetterTopic != nil {
 			if subscription.Edges.DeadLetterTopic.DeletedAt != nil {
 				deadLetterTopicName = deletedTopicName
@@ -791,7 +796,7 @@ func entSubscriptionToGrpc(subscription *ent.Subscription, topicName, deadLetter
 		}
 	}
 	if subscription.MinBackoff != nil || subscription.MaxBackoff != nil {
-		ret.RetryPolicy = &pubsub.RetryPolicy{}
+		ret.RetryPolicy = &pubsubpb.RetryPolicy{}
 		if subscription.MinBackoff != nil {
 			ret.RetryPolicy.MinimumBackoff = durationpb.New(time.Duration(*subscription.MinBackoff))
 		}
@@ -814,10 +819,10 @@ func entSubscriptionToGrpc(subscription *ent.Subscription, topicName, deadLetter
 	return ret
 }
 
-func entDeliveryToGrpc(m *actions.SubscriptionMessageDelivery) *pubsub.ReceivedMessage {
-	ret := &pubsub.ReceivedMessage{
+func entDeliveryToGrpc(m *actions.SubscriptionMessageDelivery) *pubsubpb.ReceivedMessage {
+	ret := &pubsubpb.ReceivedMessage{
 		AckId: m.ID.String(),
-		Message: &pubsub.PubsubMessage{
+		Message: &pubsubpb.PubsubMessage{
 			MessageId:   m.MessageID.String(),
 			PublishTime: timestamppb.New(m.PublishedAt),
 			Data:        m.Payload,

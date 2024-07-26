@@ -37,22 +37,22 @@ import (
 	"go.6river.tech/mmmbbb/ent/subscription"
 	"go.6river.tech/mmmbbb/ent/topic"
 	"go.6river.tech/mmmbbb/grpc"
-	"go.6river.tech/mmmbbb/grpc/pubsub"
+	"go.6river.tech/mmmbbb/grpc/pubsubpb"
 )
 
 type publisherServer struct {
-	pubsub.UnimplementedPublisherServer
+	pubsubpb.UnimplementedPublisherServer
 
 	client *ent.Client
 }
 
-func (s *publisherServer) ListTopics(ctx context.Context, req *pubsub.ListTopicsRequest) (*pubsub.ListTopicsResponse, error) {
+func (s *publisherServer) ListTopics(ctx context.Context, req *pubsubpb.ListTopicsRequest) (*pubsubpb.ListTopicsResponse, error) {
 	var pageSize int32 = 100
 	if req.PageSize > 0 && req.PageSize < pageSize {
 		pageSize = req.PageSize
 	}
 
-	var resp *pubsub.ListTopicsResponse
+	var resp *pubsubpb.ListTopicsResponse
 	err := s.client.DoTx(ctx, nil, func(tx *ent.Tx) error {
 		predicates := []predicate.Topic{
 			topic.NameHasPrefix(projectTopicPrefix(req.Project)),
@@ -73,7 +73,7 @@ func (s *publisherServer) ListTopics(ctx context.Context, req *pubsub.ListTopics
 		if err != nil {
 			return grpc.AsStatusError(err)
 		}
-		grpcTopics := make([]*pubsub.Topic, len(topics))
+		grpcTopics := make([]*pubsubpb.Topic, len(topics))
 		for i, t := range topics {
 			grpcTopics[i] = entTopicToGrpc(t)
 		}
@@ -81,7 +81,7 @@ func (s *publisherServer) ListTopics(ctx context.Context, req *pubsub.ListTopics
 		if len(topics) >= int(pageSize) {
 			nextPageToken = topics[len(topics)-1].ID.String()
 		}
-		resp = &pubsub.ListTopicsResponse{Topics: grpcTopics, NextPageToken: nextPageToken}
+		resp = &pubsubpb.ListTopicsResponse{Topics: grpcTopics, NextPageToken: nextPageToken}
 		return nil
 	})
 	if err != nil {
@@ -91,7 +91,7 @@ func (s *publisherServer) ListTopics(ctx context.Context, req *pubsub.ListTopics
 	return resp, nil
 }
 
-func (s *publisherServer) CreateTopic(ctx context.Context, req *pubsub.Topic) (*pubsub.Topic, error) {
+func (s *publisherServer) CreateTopic(ctx context.Context, req *pubsubpb.Topic) (*pubsubpb.Topic, error) {
 	if !isValidTopicName(req.Name) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / topic path %s", req.Name)
 	}
@@ -118,16 +118,16 @@ func (s *publisherServer) CreateTopic(ctx context.Context, req *pubsub.Topic) (*
 		}
 		return nil, grpc.AsStatusError(err)
 	}
-	resp := proto.Clone(req).(*pubsub.Topic)
+	resp := proto.Clone(req).(*pubsubpb.Topic)
 	return resp, nil
 }
 
-func (s *publisherServer) GetTopic(ctx context.Context, req *pubsub.GetTopicRequest) (*pubsub.Topic, error) {
+func (s *publisherServer) GetTopic(ctx context.Context, req *pubsubpb.GetTopicRequest) (*pubsubpb.Topic, error) {
 	if !isValidTopicName(req.Topic) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / topic path %s", req.Topic)
 	}
 
-	var resp *pubsub.Topic
+	var resp *pubsubpb.Topic
 	err := s.client.DoTx(ctx, nil, func(tx *ent.Tx) error {
 		t, err := tx.Topic.Query().
 			Where(
@@ -150,12 +150,12 @@ func (s *publisherServer) GetTopic(ctx context.Context, req *pubsub.GetTopicRequ
 	return resp, nil
 }
 
-func (s *publisherServer) UpdateTopic(ctx context.Context, req *pubsub.UpdateTopicRequest) (*pubsub.Topic, error) {
+func (s *publisherServer) UpdateTopic(ctx context.Context, req *pubsubpb.UpdateTopicRequest) (*pubsubpb.Topic, error) {
 	if !isValidTopicName(req.Topic.Name) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / topic path %s", req.Topic.Name)
 	}
 
-	var resp *pubsub.Topic
+	var resp *pubsubpb.Topic
 	err := s.client.DoTx(ctx, nil, func(tx *ent.Tx) error {
 		t, err := tx.Topic.Query().
 			Where(
@@ -211,7 +211,7 @@ func (s *publisherServer) UpdateTopic(ctx context.Context, req *pubsub.UpdateTop
 	return resp, nil
 }
 
-func (s *publisherServer) DeleteTopic(ctx context.Context, req *pubsub.DeleteTopicRequest) (*emptypb.Empty, error) {
+func (s *publisherServer) DeleteTopic(ctx context.Context, req *pubsubpb.DeleteTopicRequest) (*emptypb.Empty, error) {
 	if !isValidTopicName(req.Topic) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / topic path %s", req.Topic)
 	}
@@ -229,8 +229,8 @@ func (s *publisherServer) DeleteTopic(ctx context.Context, req *pubsub.DeleteTop
 
 func (s *publisherServer) ListTopicSubscriptions(
 	ctx context.Context,
-	req *pubsub.ListTopicSubscriptionsRequest,
-) (*pubsub.ListTopicSubscriptionsResponse, error) {
+	req *pubsubpb.ListTopicSubscriptionsRequest,
+) (*pubsubpb.ListTopicSubscriptionsResponse, error) {
 	if !isValidTopicName(req.Topic) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / topic path %s", req.Topic)
 	}
@@ -240,7 +240,7 @@ func (s *publisherServer) ListTopicSubscriptions(
 		pageSize = req.PageSize
 	}
 
-	var resp *pubsub.ListTopicSubscriptionsResponse
+	var resp *pubsubpb.ListTopicSubscriptionsResponse
 	err := s.client.DoTx(ctx, nil, func(tx *ent.Tx) error {
 		topic, err := tx.Topic.Query().
 			Where(
@@ -282,7 +282,7 @@ func (s *publisherServer) ListTopicSubscriptions(
 		if len(subs) >= int(pageSize) {
 			nextPageToken = subs[len(subs)-1].ID.String()
 		}
-		resp = &pubsub.ListTopicSubscriptionsResponse{Subscriptions: subNames, NextPageToken: nextPageToken}
+		resp = &pubsubpb.ListTopicSubscriptionsResponse{Subscriptions: subNames, NextPageToken: nextPageToken}
 		return nil
 	})
 	if err != nil {
@@ -291,12 +291,12 @@ func (s *publisherServer) ListTopicSubscriptions(
 	return resp, nil
 }
 
-func (s *publisherServer) Publish(ctx context.Context, req *pubsub.PublishRequest) (*pubsub.PublishResponse, error) {
+func (s *publisherServer) Publish(ctx context.Context, req *pubsubpb.PublishRequest) (*pubsubpb.PublishResponse, error) {
 	if !isValidTopicName(req.Topic) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / topic path %s", req.Topic)
 	}
 
-	var resp *pubsub.PublishResponse
+	var resp *pubsubpb.PublishResponse
 	err := s.client.DoTx(ctx, nil, func(tx *ent.Tx) error {
 		t, err := tx.Topic.Query().
 			Where(
@@ -314,7 +314,7 @@ func (s *publisherServer) Publish(ctx context.Context, req *pubsub.PublishReques
 			return grpc.AsStatusError(err)
 		}
 
-		resp = &pubsub.PublishResponse{MessageIds: make([]string, len(req.Messages))}
+		resp = &pubsubpb.PublishResponse{MessageIds: make([]string, len(req.Messages))}
 
 		for i, m := range req.Messages {
 			// TODO: we don't expect to receive an m.PublishTime or m.MessageId, right?
@@ -347,8 +347,8 @@ func (s *publisherServer) Publish(ctx context.Context, req *pubsub.PublishReques
 
 // Don't intend to implement: DetachSubscription
 
-func entTopicToGrpc(topic *ent.Topic) *pubsub.Topic {
-	return &pubsub.Topic{
+func entTopicToGrpc(topic *ent.Topic) *pubsubpb.Topic {
+	return &pubsubpb.Topic{
 		Name:   topic.Name,
 		Labels: topic.Labels,
 	}
