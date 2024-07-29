@@ -4,7 +4,7 @@ go 1.22.5
 
 require (
 	cloud.google.com/go/pubsub v1.40.0
-	entgo.io/ent v0.13.1
+	entgo.io/ent v0.14.0
 	github.com/Depado/ginprom v1.8.1
 	github.com/alecthomas/participle/v2 v2.1.1
 	github.com/getkin/kin-openapi v0.126.0
@@ -38,7 +38,7 @@ require (
 	golang.org/x/vuln v1.1.3
 	google.golang.org/api v0.189.0
 	google.golang.org/grpc v1.65.0
-	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.4.0
+	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.5.0
 	google.golang.org/protobuf v1.34.2
 	gotest.tools/gotestsum v1.12.0
 	modernc.org/sqlite v1.31.1
