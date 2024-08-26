@@ -1,10 +1,9 @@
 module go.6river.tech/mmmbbb
 
 go 1.22.5
-
 require (
 	cloud.google.com/go/pubsub v1.42.0
-	entgo.io/ent v0.14.0
+	entgo.io/ent v0.14.1
 	github.com/Depado/ginprom v1.8.1
 	github.com/alecthomas/participle/v2 v2.1.1
 	github.com/getkin/kin-openapi v0.127.0
