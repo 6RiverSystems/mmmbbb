@@ -1,5 +1,5 @@
 {
-  "name": "@sixriver/srs-gonic-trial-mmmbbb-ts-compat",
+  "name": "@sixriver/mmmbbb-ts-compat",
   "version": "1.0.0",
   "description": "",
   "main": "dist/src/index.js",
