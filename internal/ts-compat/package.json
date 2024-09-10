@@ -18,10 +18,10 @@
   "author": "Matthew Gabeler-Lee <mgabeler-lee@6river.com>",
   "license": "PROPRIETARY",
   "devDependencies": {
-    "@types/node": "^22.5.2",
-    "typescript": "^5.5.4"
+    "@types/node": "^22.5.4",
+    "typescript": "^5.6.2"
   },
   "dependencies": {
-    "@google-cloud/pubsub": "^4.7.0"
+    "@google-cloud/pubsub": "^4.7.1"
   }
 }
