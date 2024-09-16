@@ -84,13 +84,13 @@ var generatedSimple = []string{
 }
 
 var generatedGrpc = []string{
-	"./grpc/pubsub/pubsub_grpc.pb.go",
-	"./grpc/pubsub/pubsub.pb.gw.go",
-	"./grpc/pubsub/pubsub-types.go",
+	"./grpc/pubsubpb/pubsub_grpc.pb.go",
+	"./grpc/pubsubpb/pubsub.pb.gw.go",
+	"./grpc/pubsubpb/pubsub-types.go",
 	"./grpc/pubsub.swagger.json",
-	"./grpc/pubsub/schema_grpc.pb.go",
-	"./grpc/pubsub/schema.pb.gw.go",
-	"./grpc/pubsub/schema-types.go",
+	"./grpc/pubsubpb/schema_grpc.pb.go",
+	"./grpc/pubsubpb/schema.pb.gw.go",
+	"./grpc/pubsubpb/schema-types.go",
 	"./grpc/schema.swagger.json",
 }
 
