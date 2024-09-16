@@ -195,7 +195,7 @@ func (s *publisherServer) UpdateTopic(ctx context.Context, req *pubsubpb.UpdateT
 		}
 
 		if t, err = topicUpdate.Save(ctx); err != nil {
-			return status.Errorf(codes.Unknown, err.Error())
+			return status.Error(codes.Unknown, err.Error())
 		}
 
 		actions.NotifyModifyTopic(tx, t.ID, t.Name)

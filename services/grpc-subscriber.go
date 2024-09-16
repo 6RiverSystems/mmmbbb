@@ -287,7 +287,7 @@ func (s *subscriberServer) UpdateSubscription(ctx context.Context, req *pubsubpb
 		}
 
 		if sub, err = subUpdate.Save(ctx); err != nil {
-			return status.Errorf(codes.Unknown, err.Error())
+			return status.Error(codes.Unknown, err.Error())
 		}
 
 		actions.NotifyModifySubscription(tx, sub.ID, sub.Name)

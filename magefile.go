@@ -455,6 +455,7 @@ func (Lint) addLicense(fix bool) error {
 		"-ignore", "**/*.html",
 		"-ignore", "version/version.go",
 		"-ignore", "internal/ts-compat/pnpm-lock.yaml",
+		"-ignore", "internal/ts-compat/node_modules/",
 	}
 	if !fix {
 		args = append(args, "-check")
