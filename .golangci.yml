@@ -1,5 +1,5 @@
 run:
-  go: "1.22"
+  go: "1.23"
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
