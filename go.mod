@@ -23,10 +23,10 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/magefile/mage v1.15.0
 	github.com/mattn/go-sqlite3 v1.14.23
-	github.com/oapi-codegen/oapi-codegen/v2 v2.3.1-0.20240712135225-f6622e749b8c
+	github.com/oapi-codegen/oapi-codegen/v2 v2.4.0
 	github.com/olekukonko/tablewriter v0.0.6-0.20230422125635-f6b4e4ae60d8
 	github.com/ory/dockertest/v3 v3.11.0
-	github.com/prometheus/client_golang v1.20.3
+	github.com/prometheus/client_golang v1.20.4
 	github.com/quasilyte/go-ruleguard/dsl v0.3.22
 	github.com/rs/cors/wrapper/gin v0.0.0-20240515105523-1562b1715b35
 	github.com/rs/zerolog v1.33.0
@@ -36,8 +36,8 @@ require (
 	golang.org/x/sync v0.8.0
 	golang.org/x/tools v0.25.0
 	golang.org/x/vuln v1.1.3
-	google.golang.org/api v0.197.0
-	google.golang.org/grpc v1.66.2
+	google.golang.org/api v0.198.0
+	google.golang.org/grpc v1.67.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.5.1
 	google.golang.org/protobuf v1.34.2
 	gotest.tools/gotestsum v1.12.0
@@ -47,9 +47,9 @@ require (
 require (
 	ariga.io/atlas v0.25.0 // indirect
 	cloud.google.com/go v0.115.1 // indirect
-	cloud.google.com/go/auth v0.9.3 // indirect
+	cloud.google.com/go/auth v0.9.4 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.4 // indirect
-	cloud.google.com/go/compute/metadata v0.5.0 // indirect
+	cloud.google.com/go/compute/metadata v0.5.1 // indirect
 	cloud.google.com/go/iam v1.2.0 // indirect
 	dario.cat/mergo v1.0.0 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 // indirect
@@ -73,6 +73,7 @@ require (
 	github.com/docker/docker v27.1.1+incompatible // indirect
 	github.com/docker/go-connections v0.5.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
+	github.com/dprotaso/go-yit v0.0.0-20220510233725-9ba8df137936 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/fatih/color v1.17.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
@@ -137,9 +138,11 @@ require (
 	github.com/rs/cors v1.11.0 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
+	github.com/speakeasy-api/openapi-overlay v0.9.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
+	github.com/vmware-labs/yaml-jsonpath v0.3.2 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
