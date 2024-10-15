@@ -26,7 +26,7 @@ require (
 	github.com/oapi-codegen/oapi-codegen/v2 v2.4.1
 	github.com/olekukonko/tablewriter v0.0.6-0.20230422125635-f6b4e4ae60d8
 	github.com/ory/dockertest/v3 v3.11.0
-	github.com/prometheus/client_golang v1.20.4
+	github.com/prometheus/client_golang v1.20.5
 	github.com/quasilyte/go-ruleguard/dsl v0.3.22
 	github.com/rs/cors/wrapper/gin v0.0.0-20240515105523-1562b1715b35
 	github.com/rs/zerolog v1.33.0
