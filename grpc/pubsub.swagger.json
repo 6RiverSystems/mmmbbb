@@ -81,7 +81,7 @@
                 },
                 "messageRetentionDuration": {
                   "type": "string",
-                  "description": "Optional. How long to retain unacknowledged messages in the subscription's\nbacklog, from the moment a message is published. If `retain_acked_messages`\nis true, then this also configures the retention of acknowledged messages,\nand thus configures how far back in time a `Seek` can be done. Defaults to\n7 days. Cannot be more than 7 days or less than 10 minutes."
+                  "description": "Optional. How long to retain unacknowledged messages in the subscription's\nbacklog, from the moment a message is published. If `retain_acked_messages`\nis true, then this also configures the retention of acknowledged messages,\nand thus configures how far back in time a `Seek` can be done. Defaults to\n7 days. Cannot be more than 31 days or less than 10 minutes."
                 },
                 "labels": {
                   "type": "object",
@@ -127,6 +127,11 @@
                 "state": {
                   "$ref": "#/definitions/v1SubscriptionState",
                   "description": "Output only. An output-only field indicating whether or not the\nsubscription can receive messages.",
+                  "readOnly": true
+                },
+                "analyticsHubSubscriptionInfo": {
+                  "$ref": "#/definitions/SubscriptionAnalyticsHubSubscriptionInfo",
+                  "description": "Output only. Information about the associated Analytics Hub subscription.\nOnly set if the subscritpion is created by Analytics Hub.",
                   "readOnly": true
                 }
               },
@@ -627,7 +632,7 @@
                     },
                     "messageRetentionDuration": {
                       "type": "string",
-                      "description": "Optional. How long to retain unacknowledged messages in the subscription's\nbacklog, from the moment a message is published. If `retain_acked_messages`\nis true, then this also configures the retention of acknowledged messages,\nand thus configures how far back in time a `Seek` can be done. Defaults to\n7 days. Cannot be more than 7 days or less than 10 minutes."
+                      "description": "Optional. How long to retain unacknowledged messages in the subscription's\nbacklog, from the moment a message is published. If `retain_acked_messages`\nis true, then this also configures the retention of acknowledged messages,\nand thus configures how far back in time a `Seek` can be done. Defaults to\n7 days. Cannot be more than 31 days or less than 10 minutes."
                     },
                     "labels": {
                       "type": "object",
@@ -673,6 +678,11 @@
                     "state": {
                       "$ref": "#/definitions/v1SubscriptionState",
                       "description": "Output only. An output-only field indicating whether or not the\nsubscription can receive messages.",
+                      "readOnly": true
+                    },
+                    "analyticsHubSubscriptionInfo": {
+                      "$ref": "#/definitions/SubscriptionAnalyticsHubSubscriptionInfo",
+                      "description": "Output only. Information about the associated Analytics Hub subscription.\nOnly set if the subscritpion is created by Analytics Hub.",
                       "readOnly": true
                     }
                   },
@@ -1386,6 +1396,10 @@
     }
   },
   "definitions": {
+    "CloudStorageAvroFormat": {
+      "type": "object",
+      "description": "Configuration for reading Cloud Storage data in Avro binary format. The\nbytes of each object will be set to the `data` field of a Pub/Sub\nmessage."
+    },
     "CloudStorageConfigAvroConfig": {
       "type": "object",
       "properties": {
@@ -1403,6 +1417,20 @@
     "CloudStorageConfigTextConfig": {
       "type": "object",
       "description": "Configuration for writing message data in text format.\nMessage payloads will be written to files as raw text, separated by a\nnewline."
+    },
+    "CloudStoragePubSubAvroFormat": {
+      "type": "object",
+      "description": "Configuration for reading Cloud Storage data written via [Cloud Storage\nsubscriptions](https://cloud.google.com/pubsub/docs/cloudstorage). The\ndata and attributes fields of the originally exported Pub/Sub message\nwill be restored when publishing."
+    },
+    "CloudStorageTextFormat": {
+      "type": "object",
+      "properties": {
+        "delimiter": {
+          "type": "string",
+          "description": "Optional. When unset, '\\n' is used."
+        }
+      },
+      "description": "Configuration for reading Cloud Storage data in text format. Each line of\ntext as specified by the delimiter will be set to the `data` field of a\nPub/Sub message."
     },
     "IngestionDataSourceSettingsAwsKinesis": {
       "type": "object",
@@ -1449,6 +1477,68 @@
       ],
       "default": "STATE_UNSPECIFIED",
       "description": "Possible states for ingestion from Amazon Kinesis Data Streams.\n\n - STATE_UNSPECIFIED: Default value. This value is unused.\n - ACTIVE: Ingestion is active.\n - KINESIS_PERMISSION_DENIED: Permission denied encountered while consuming data from Kinesis.\nThis can happen if:\n  - The provided `aws_role_arn` does not exist or does not have the\n    appropriate permissions attached.\n  - The provided `aws_role_arn` is not set up properly for Identity\n    Federation using `gcp_service_account`.\n  - The Pub/Sub SA is not granted the\n    `iam.serviceAccounts.getOpenIdToken` permission on\n    `gcp_service_account`.\n - PUBLISH_PERMISSION_DENIED: Permission denied encountered while publishing to the topic. This can\nhappen if the Pub/Sub SA has not been granted the [appropriate publish\npermissions](https://cloud.google.com/pubsub/docs/access-control#pubsub.publisher)\n - STREAM_NOT_FOUND: The Kinesis stream does not exist.\n - CONSUMER_NOT_FOUND: The Kinesis consumer does not exist."
+    },
+    "IngestionDataSourceSettingsCloudStorage": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "$ref": "#/definitions/IngestionDataSourceSettingsCloudStorageState",
+          "description": "Output only. An output-only field that indicates the state of the Cloud\nStorage ingestion source.",
+          "readOnly": true
+        },
+        "bucket": {
+          "type": "string",
+          "description": "Optional. Cloud Storage bucket. The bucket name must be without any\nprefix like \"gs://\". See the [bucket naming requirements]\n(https://cloud.google.com/storage/docs/buckets#naming)."
+        },
+        "textFormat": {
+          "$ref": "#/definitions/CloudStorageTextFormat",
+          "description": "Optional. Data from Cloud Storage will be interpreted as text."
+        },
+        "avroFormat": {
+          "$ref": "#/definitions/CloudStorageAvroFormat",
+          "description": "Optional. Data from Cloud Storage will be interpreted in Avro format."
+        },
+        "pubsubAvroFormat": {
+          "$ref": "#/definitions/CloudStoragePubSubAvroFormat",
+          "description": "Optional. It will be assumed data from Cloud Storage was written via\n[Cloud Storage\nsubscriptions](https://cloud.google.com/pubsub/docs/cloudstorage)."
+        },
+        "minimumObjectCreateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Optional. Only objects with a larger or equal creation timestamp will be\ningested."
+        },
+        "matchGlob": {
+          "type": "string",
+          "description": "Optional. Glob pattern used to match objects that will be ingested. If\nunset, all objects will be ingested. See the [supported\npatterns](https://cloud.google.com/storage/docs/json_api/v1/objects/list#list-objects-and-prefixes-using-glob)."
+        }
+      },
+      "description": "Ingestion settings for Cloud Storage."
+    },
+    "IngestionDataSourceSettingsCloudStorageState": {
+      "type": "string",
+      "enum": [
+        "STATE_UNSPECIFIED",
+        "ACTIVE",
+        "CLOUD_STORAGE_PERMISSION_DENIED",
+        "PUBLISH_PERMISSION_DENIED",
+        "BUCKET_NOT_FOUND",
+        "TOO_MANY_OBJECTS"
+      ],
+      "default": "STATE_UNSPECIFIED",
+      "description": "Possible states for ingestion from Cloud Storage.\n\n - STATE_UNSPECIFIED: Default value. This value is unused.\n - ACTIVE: Ingestion is active.\n - CLOUD_STORAGE_PERMISSION_DENIED: Permission denied encountered while calling the Cloud Storage API. This\ncan happen if the Pub/Sub SA has not been granted the\n[appropriate\npermissions](https://cloud.google.com/storage/docs/access-control/iam-permissions):\n- storage.objects.list: to list the objects in a bucket.\n- storage.objects.get: to read the objects in a bucket.\n- storage.buckets.get: to verify the bucket exists.\n - PUBLISH_PERMISSION_DENIED: Permission denied encountered while publishing to the topic. This can\nhappen if the Pub/Sub SA has not been granted the [appropriate publish\npermissions](https://cloud.google.com/pubsub/docs/access-control#pubsub.publisher)\n - BUCKET_NOT_FOUND: The provided Cloud Storage bucket doesn't exist.\n - TOO_MANY_OBJECTS: The Cloud Storage bucket has too many objects, ingestion will be\npaused."
+    },
+    "PlatformLogsSettingsSeverity": {
+      "type": "string",
+      "enum": [
+        "SEVERITY_UNSPECIFIED",
+        "DISABLED",
+        "DEBUG",
+        "INFO",
+        "WARNING",
+        "ERROR"
+      ],
+      "default": "SEVERITY_UNSPECIFIED",
+      "description": "Severity levels of Platform Logs.\n\n - SEVERITY_UNSPECIFIED: Default value. Logs level is unspecified. Logs will be disabled.\n - DISABLED: Logs will be disabled.\n - DEBUG: Debug logs and higher-severity logs will be written.\n - INFO: Info logs and higher-severity logs will be written.\n - WARNING: Warning logs and higher-severity logs will be written.\n - ERROR: Only error logs will be written."
     },
     "PushConfigNoWrapper": {
       "type": "object",
@@ -1552,6 +1642,20 @@
         }
       },
       "description": "Subscription properties sent as part of the response."
+    },
+    "SubscriptionAnalyticsHubSubscriptionInfo": {
+      "type": "object",
+      "properties": {
+        "listing": {
+          "type": "string",
+          "title": "Optional. The name of the associated Analytics Hub listing resource.\nPattern:\n\"projects/{project}/locations/{location}/dataExchanges/{data_exchange}/listings/{listing}\""
+        },
+        "subscription": {
+          "type": "string",
+          "title": "Optional. The name of the associated Analytics Hub subscription resource.\nPattern:\n\"projects/{project}/locations/{location}/subscriptions/{subscription}\""
+        }
+      },
+      "description": "Information about an associated Analytics Hub subscription\n(https://cloud.google.com/bigquery/docs/analytics-hub-manage-subscriptions)."
     },
     "protobufAny": {
       "type": "object",
@@ -1743,6 +1847,14 @@
         "awsKinesis": {
           "$ref": "#/definitions/IngestionDataSourceSettingsAwsKinesis",
           "description": "Optional. Amazon Kinesis Data Streams."
+        },
+        "cloudStorage": {
+          "$ref": "#/definitions/IngestionDataSourceSettingsCloudStorage",
+          "description": "Optional. Cloud Storage."
+        },
+        "platformLogsSettings": {
+          "$ref": "#/definitions/v1PlatformLogsSettings",
+          "description": "Optional. Platform Logs settings. If unset, no Platform Logs will be\ngenerated."
         }
       },
       "description": "Settings for an ingestion data source on a topic."
@@ -1851,6 +1963,16 @@
         }
       },
       "description": "A policy constraining the storage of messages published to the topic."
+    },
+    "v1PlatformLogsSettings": {
+      "type": "object",
+      "properties": {
+        "severity": {
+          "$ref": "#/definitions/PlatformLogsSettingsSeverity",
+          "description": "Optional. The minimum severity level of Platform Logs that will be written."
+        }
+      },
+      "description": "Settings for Platform Logs produced by Pub/Sub."
     },
     "v1PublishResponse": {
       "type": "object",
@@ -2087,7 +2209,7 @@
         },
         "messageRetentionDuration": {
           "type": "string",
-          "description": "Optional. How long to retain unacknowledged messages in the subscription's\nbacklog, from the moment a message is published. If `retain_acked_messages`\nis true, then this also configures the retention of acknowledged messages,\nand thus configures how far back in time a `Seek` can be done. Defaults to\n7 days. Cannot be more than 7 days or less than 10 minutes."
+          "description": "Optional. How long to retain unacknowledged messages in the subscription's\nbacklog, from the moment a message is published. If `retain_acked_messages`\nis true, then this also configures the retention of acknowledged messages,\nand thus configures how far back in time a `Seek` can be done. Defaults to\n7 days. Cannot be more than 31 days or less than 10 minutes."
         },
         "labels": {
           "type": "object",
@@ -2133,6 +2255,11 @@
         "state": {
           "$ref": "#/definitions/v1SubscriptionState",
           "description": "Output only. An output-only field indicating whether or not the\nsubscription can receive messages.",
+          "readOnly": true
+        },
+        "analyticsHubSubscriptionInfo": {
+          "$ref": "#/definitions/SubscriptionAnalyticsHubSubscriptionInfo",
+          "description": "Output only. Information about the associated Analytics Hub subscription.\nOnly set if the subscritpion is created by Analytics Hub.",
           "readOnly": true
         }
       },

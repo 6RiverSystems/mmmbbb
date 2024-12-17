@@ -218,7 +218,11 @@ func (Generate) Grpc(ctx context.Context) error {
 	dirty := false
 	for _, out := range generatedGrpc {
 		var err error
-		if dirty, err = target.Path(out, "./grpc/generate.go"); err != nil {
+		if dirty, err = target.Path(out,
+			"./grpc/generate.go",
+			"./grpc/generate.sh",
+			"./grpc/gen-types.sh",
+		); err != nil {
 			return err
 		} else if dirty {
 			break
