@@ -383,7 +383,7 @@ type gciOpts struct {
 	dirs  []string
 }
 
-func (Lint) golangci(ctx context.Context, opts gciOpts) error {
+func (Lint) golangci(_ context.Context, opts gciOpts) error {
 	cmd := "golangci-lint"
 	var args []string
 	args = append(args, "run")
@@ -771,7 +771,7 @@ func (Docker) MultiarchPush(ctx context.Context, cmd string) error {
 	return dockerRunMultiArch(ctx, cmd, "push")
 }
 
-func dockerRunMultiArch(ctx context.Context, cmd string, mode string, arches ...string) error {
+func dockerRunMultiArch(_ context.Context, cmd string, mode string, arches ...string) error {
 	switch mode {
 	case "build", "load", "push":
 		// OK
