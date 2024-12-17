@@ -126,17 +126,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "schema": {
-                  "$ref": "#/definitions/v1Schema",
-                  "description": "Required. The schema revision to commit."
-                }
-              },
-              "description": "Request for CommitSchema method.",
-              "required": [
-                "schema"
-              ]
+              "$ref": "#/definitions/SchemaServiceCommitSchemaBody"
             }
           }
         ],
@@ -278,17 +268,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "revisionId": {
-                  "type": "string",
-                  "description": "Required. The revision ID to roll back to.\nIt must be a revision of the same schema.\n\n  Example: c7cfa2a8"
-                }
-              },
-              "description": "Request for the `RollbackSchema` method.",
-              "required": [
-                "revisionId"
-              ]
+              "$ref": "#/definitions/SchemaServiceRollbackSchemaBody"
             }
           }
         ],
@@ -440,17 +420,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "schema": {
-                  "$ref": "#/definitions/v1Schema",
-                  "description": "Required. The schema object to validate."
-                }
-              },
-              "description": "Request for the `ValidateSchema` method.",
-              "required": [
-                "schema"
-              ]
+              "$ref": "#/definitions/SchemaServiceValidateSchemaBody"
             }
           }
         ],
@@ -491,27 +461,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "description": "Name of the schema against which to validate.\n\nFormat is `projects/{project}/schemas/{schema}`."
-                },
-                "schema": {
-                  "$ref": "#/definitions/v1Schema",
-                  "title": "Ad-hoc schema against which to validate"
-                },
-                "message": {
-                  "type": "string",
-                  "format": "byte",
-                  "description": "Message to validate against the provided `schema_spec`."
-                },
-                "encoding": {
-                  "$ref": "#/definitions/v1Encoding",
-                  "title": "The encoding expected for messages"
-                }
-              },
-              "description": "Request for the `ValidateMessage` method."
+              "$ref": "#/definitions/SchemaServiceValidateMessageBody"
             }
           }
         ],
@@ -522,6 +472,68 @@
     }
   },
   "definitions": {
+    "SchemaServiceCommitSchemaBody": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "$ref": "#/definitions/v1Schema",
+          "description": "Required. The schema revision to commit."
+        }
+      },
+      "description": "Request for CommitSchema method.",
+      "required": [
+        "schema"
+      ]
+    },
+    "SchemaServiceRollbackSchemaBody": {
+      "type": "object",
+      "properties": {
+        "revisionId": {
+          "type": "string",
+          "description": "Required. The revision ID to roll back to.\nIt must be a revision of the same schema.\n\n  Example: c7cfa2a8"
+        }
+      },
+      "description": "Request for the `RollbackSchema` method.",
+      "required": [
+        "revisionId"
+      ]
+    },
+    "SchemaServiceValidateMessageBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the schema against which to validate.\n\nFormat is `projects/{project}/schemas/{schema}`."
+        },
+        "schema": {
+          "$ref": "#/definitions/v1Schema",
+          "title": "Ad-hoc schema against which to validate"
+        },
+        "message": {
+          "type": "string",
+          "format": "byte",
+          "description": "Message to validate against the provided `schema_spec`."
+        },
+        "encoding": {
+          "$ref": "#/definitions/v1Encoding",
+          "title": "The encoding expected for messages"
+        }
+      },
+      "description": "Request for the `ValidateMessage` method."
+    },
+    "SchemaServiceValidateSchemaBody": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "$ref": "#/definitions/v1Schema",
+          "description": "Required. The schema object to validate."
+        }
+      },
+      "description": "Request for the `ValidateSchema` method.",
+      "required": [
+        "schema"
+      ]
+    },
     "protobufAny": {
       "type": "object",
       "properties": {
