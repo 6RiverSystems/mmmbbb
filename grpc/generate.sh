@@ -21,8 +21,15 @@
 
 set -xeuo pipefail
 
-rm -rf googleapis.tgz grpc-proto.tgz google/ grpc/ *.pb*.go *-types.go
+td=$(mktemp -d)
+cleanup() {
+	rm -rf "$td"
+}
+trap cleanup EXIT
 
+rm -vf pubsubpb/*{.pb.go,.pb.gw.go,-types.go} *.swagger.json
+
+pushd "$td"
 curl -s --location --fail -o googleapis.tgz \
 	https://github.com/googleapis/googleapis/archive/ea947de5d1fca3a75723d993815827e835aed7cf.tar.gz
 curl -s --location --fail -o grpc-proto.tgz \
@@ -43,16 +50,20 @@ protoc \
 	google/pubsub/v1/pubsub.proto \
 	google/pubsub/v1/schema.proto
 
+popd # back to source dir
+
 mkdir -p pubsubpb
-cp -a -v -f google/pubsub/v1/pubsub_grpc.pb.go google/pubsub/v1/pubsub.pb.gw.go pubsubpb/
-cp -a -v -f google/pubsub/v1/schema_grpc.pb.go google/pubsub/v1/schema.pb.gw.go pubsubpb/
+cp -avf \
+	"${td}/google/pubsub/v1/pubsub_grpc.pb.go" \
+	"${td}/google/pubsub/v1/pubsub.pb.gw.go" \
+	"${td}/google/pubsub/v1/schema_grpc.pb.go" \
+	"${td}/google/pubsub/v1/schema.pb.gw.go" \
+	pubsubpb/
 
 # we can use upstream types/codegen for the health service, and it has no HTTP
 # swagger types
 
-cp -a -v -f google/pubsub/v1/pubsub.swagger.json google/pubsub/v1/schema.swagger.json .
+cp -avf "${td}/google/pubsub/v1/pubsub.swagger.json" "${td}/google/pubsub/v1/schema.swagger.json" .
 
-./gen-types.sh pubsubpb cloud.google.com/go/pubsub/apiv1/pubsubpb google/pubsub/v1/pubsub.pb.go pubsubpb/pubsub-types.go
-./gen-types.sh pubsubpb cloud.google.com/go/pubsub/apiv1/pubsubpb google/pubsub/v1/schema.pb.go pubsubpb/schema-types.go
-
-rm -rf google/ grpc/ googleapis.tgz grpc-proto.tgz
+./gen-types.sh pubsubpb cloud.google.com/go/pubsub/apiv1/pubsubpb "${td}/google/pubsub/v1/pubsub.pb.go" pubsubpb/pubsub-types.go
+./gen-types.sh pubsubpb cloud.google.com/go/pubsub/apiv1/pubsubpb "${td}/google/pubsub/v1/schema.pb.go" pubsubpb/schema-types.go
