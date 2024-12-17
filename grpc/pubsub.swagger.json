@@ -1,0 +1,2215 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "google/pubsub/v1/pubsub.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Publisher"
+    },
+    {
+      "name": "Subscriber"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/{name_1}": {
+      "put": {
+        "summary": "Creates a subscription to a given topic. See the [resource name rules]\n(https://cloud.google.com/pubsub/docs/pubsub-basics#resource_names).\nIf the subscription already exists, returns `ALREADY_EXISTS`.\nIf the corresponding topic doesn't exist, returns `NOT_FOUND`.",
+        "description": "If the name is not provided in the request, the server will assign a random\nname for this subscription on the same project as the topic, conforming\nto the [resource name format]\n(https://cloud.google.com/pubsub/docs/pubsub-basics#resource_names). The\ngenerated name is populated in the returned Subscription object. Note that\nfor REST API requests, you must specify a name in the request.",
+        "operationId": "Subscriber_CreateSubscription",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Subscription"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name_1",
+            "description": "Required. The name of the subscription. It must have the format\n`\"projects/{project}/subscriptions/{subscription}\"`. `{subscription}` must\nstart with a letter, and contain only letters (`[A-Za-z]`), numbers\n(`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),\nplus (`+`) or percent signs (`%`). It must be between 3 and 255 characters\nin length, and it must not start with `\"goog\"`.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "projects/[^/]+/subscriptions/[^/]+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Required. The name of the topic from which this subscription is receiving\nmessages. Format is `projects/{project}/topics/{topic}`. The value of this\nfield will be `_deleted-topic_` if the topic has been deleted."
+                },
+                "pushConfig": {
+                  "$ref": "#/definitions/v1PushConfig",
+                  "description": "Optional. If push delivery is used with this subscription, this field is\nused to configure it."
+                },
+                "bigqueryConfig": {
+                  "$ref": "#/definitions/v1BigQueryConfig",
+                  "description": "Optional. If delivery to BigQuery is used with this subscription, this\nfield is used to configure it."
+                },
+                "cloudStorageConfig": {
+                  "$ref": "#/definitions/v1CloudStorageConfig",
+                  "description": "Optional. If delivery to Google Cloud Storage is used with this\nsubscription, this field is used to configure it."
+                },
+                "ackDeadlineSeconds": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "Optional. The approximate amount of time (on a best-effort basis) Pub/Sub\nwaits for the subscriber to acknowledge receipt before resending the\nmessage. In the interval after the message is delivered and before it is\nacknowledged, it is considered to be _outstanding_. During that time\nperiod, the message will not be redelivered (on a best-effort basis).\n\nFor pull subscriptions, this value is used as the initial value for the ack\ndeadline. To override this value for a given message, call\n`ModifyAckDeadline` with the corresponding `ack_id` if using\nnon-streaming pull or send the `ack_id` in a\n`StreamingModifyAckDeadlineRequest` if using streaming pull.\nThe minimum custom deadline you can specify is 10 seconds.\nThe maximum custom deadline you can specify is 600 seconds (10 minutes).\nIf this parameter is 0, a default value of 10 seconds is used.\n\nFor push delivery, this value is also used to set the request timeout for\nthe call to the push endpoint.\n\nIf the subscriber never acknowledges the message, the Pub/Sub\nsystem will eventually redeliver the message."
+                },
+                "retainAckedMessages": {
+                  "type": "boolean",
+                  "description": "Optional. Indicates whether to retain acknowledged messages. If true, then\nmessages are not expunged from the subscription's backlog, even if they are\nacknowledged, until they fall out of the `message_retention_duration`\nwindow. This must be true if you would like to [`Seek` to a timestamp]\n(https://cloud.google.com/pubsub/docs/replay-overview#seek_to_a_time) in\nthe past to replay previously-acknowledged messages."
+                },
+                "messageRetentionDuration": {
+                  "type": "string",
+                  "description": "Optional. How long to retain unacknowledged messages in the subscription's\nbacklog, from the moment a message is published. If `retain_acked_messages`\nis true, then this also configures the retention of acknowledged messages,\nand thus configures how far back in time a `Seek` can be done. Defaults to\n7 days. Cannot be more than 7 days or less than 10 minutes."
+                },
+                "labels": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "description": "Optional. See [Creating and managing\nlabels](https://cloud.google.com/pubsub/docs/labels)."
+                },
+                "enableMessageOrdering": {
+                  "type": "boolean",
+                  "description": "Optional. If true, messages published with the same `ordering_key` in\n`PubsubMessage` will be delivered to the subscribers in the order in which\nthey are received by the Pub/Sub system. Otherwise, they may be delivered\nin any order."
+                },
+                "expirationPolicy": {
+                  "$ref": "#/definitions/v1ExpirationPolicy",
+                  "description": "Optional. A policy that specifies the conditions for this subscription's\nexpiration. A subscription is considered active as long as any connected\nsubscriber is successfully consuming messages from the subscription or is\nissuing operations on the subscription. If `expiration_policy` is not set,\na *default policy* with `ttl` of 31 days will be used. The minimum allowed\nvalue for `expiration_policy.ttl` is 1 day. If `expiration_policy` is set,\nbut `expiration_policy.ttl` is not set, the subscription never expires."
+                },
+                "filter": {
+                  "type": "string",
+                  "description": "Optional. An expression written in the Pub/Sub [filter\nlanguage](https://cloud.google.com/pubsub/docs/filtering). If non-empty,\nthen only `PubsubMessage`s whose `attributes` field matches the filter are\ndelivered on this subscription. If empty, then no messages are filtered\nout."
+                },
+                "deadLetterPolicy": {
+                  "$ref": "#/definitions/v1DeadLetterPolicy",
+                  "description": "Optional. A policy that specifies the conditions for dead lettering\nmessages in this subscription. If dead_letter_policy is not set, dead\nlettering is disabled.\n\nThe Pub/Sub service account associated with this subscriptions's\nparent project (i.e.,\nservice-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com) must have\npermission to Acknowledge() messages on this subscription."
+                },
+                "retryPolicy": {
+                  "$ref": "#/definitions/v1RetryPolicy",
+                  "description": "Optional. A policy that specifies how Pub/Sub retries message delivery for\nthis subscription.\n\nIf not set, the default retry policy is applied. This generally implies\nthat messages will be retried as soon as possible for healthy subscribers.\nRetryPolicy will be triggered on NACKs or acknowledgement deadline\nexceeded events for a given message."
+                },
+                "detached": {
+                  "type": "boolean",
+                  "description": "Optional. Indicates whether the subscription is detached from its topic.\nDetached subscriptions don't receive messages from their topic and don't\nretain any backlog. `Pull` and `StreamingPull` requests will return\nFAILED_PRECONDITION. If the subscription is a push subscription, pushes to\nthe endpoint will not be made."
+                },
+                "enableExactlyOnceDelivery": {
+                  "type": "boolean",
+                  "description": "* The message sent to a subscriber is guaranteed not to be resent\nbefore the message's acknowledgement deadline expires.\n* An acknowledged message will not be resent to a subscriber.\n\nNote that subscribers may still receive multiple copies of a message\nwhen `enable_exactly_once_delivery` is true if the message was published\nmultiple times by a publisher client. These copies are  considered distinct\nby Pub/Sub and have distinct `message_id` values.",
+                  "title": "Optional. If true, Pub/Sub provides the following guarantees for the\ndelivery of a message with a given value of `message_id` on this\nsubscription:"
+                },
+                "topicMessageRetentionDuration": {
+                  "type": "string",
+                  "description": "Output only. Indicates the minimum duration for which a message is retained\nafter it is published to the subscription's topic. If this field is set,\nmessages published to the subscription's topic in the last\n`topic_message_retention_duration` are always available to subscribers. See\nthe `message_retention_duration` field in `Topic`. This field is set only\nin responses from the server; it is ignored if it is set in any requests.",
+                  "readOnly": true
+                },
+                "state": {
+                  "$ref": "#/definitions/v1SubscriptionState",
+                  "description": "Output only. An output-only field indicating whether or not the\nsubscription can receive messages.",
+                  "readOnly": true
+                }
+              },
+              "description": "A subscription resource. If none of `push_config`, `bigquery_config`, or\n`cloud_storage_config` is set, then the subscriber will pull and ack messages\nusing API methods. At most one of these fields may be set.",
+              "required": [
+                "topic"
+              ]
+            }
+          }
+        ],
+        "tags": [
+          "Subscriber"
+        ]
+      }
+    },
+    "/v1/{name_2}": {
+      "put": {
+        "summary": "Creates a snapshot from the requested subscription. Snapshots are used in\n[Seek](https://cloud.google.com/pubsub/docs/replay-overview) operations,\nwhich allow you to manage message acknowledgments in bulk. That is, you can\nset the acknowledgment state of messages in an existing subscription to the\nstate captured by a snapshot.\nIf the snapshot already exists, returns `ALREADY_EXISTS`.\nIf the requested subscription doesn't exist, returns `NOT_FOUND`.\nIf the backlog in the subscription is too old -- and the resulting snapshot\nwould expire in less than 1 hour -- then `FAILED_PRECONDITION` is returned.\nSee also the `Snapshot.expire_time` field. If the name is not provided in\nthe request, the server will assign a random\nname for this snapshot on the same project as the subscription, conforming\nto the [resource name format]\n(https://cloud.google.com/pubsub/docs/pubsub-basics#resource_names). The\ngenerated name is populated in the returned Snapshot object. Note that for\nREST API requests, you must specify a name in the request.",
+        "operationId": "Subscriber_CreateSnapshot",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Snapshot"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name_2",
+            "description": "Required. User-provided name for this snapshot. If the name is not provided\nin the request, the server will assign a random name for this snapshot on\nthe same project as the subscription. Note that for REST API requests, you\nmust specify a name.  See the [resource name\nrules](https://cloud.google.com/pubsub/docs/pubsub-basics#resource_names).\nFormat is `projects/{project}/snapshots/{snap}`.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "projects/[^/]+/snapshots/[^/]+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "subscription": {
+                  "type": "string",
+                  "description": "Required. The subscription whose backlog the snapshot retains.\nSpecifically, the created snapshot is guaranteed to retain:\n (a) The existing backlog on the subscription. More precisely, this is\n     defined as the messages in the subscription's backlog that are\n     unacknowledged upon the successful completion of the\n     `CreateSnapshot` request; as well as:\n (b) Any messages published to the subscription's topic following the\n     successful completion of the CreateSnapshot request.\nFormat is `projects/{project}/subscriptions/{sub}`."
+                },
+                "labels": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "description": "Optional. See [Creating and managing\nlabels](https://cloud.google.com/pubsub/docs/labels)."
+                }
+              },
+              "description": "Request for the `CreateSnapshot` method.",
+              "required": [
+                "subscription"
+              ]
+            }
+          }
+        ],
+        "tags": [
+          "Subscriber"
+        ]
+      }
+    },
+    "/v1/{name}": {
+      "put": {
+        "summary": "Creates the given topic with the given name. See the [resource name rules]\n(https://cloud.google.com/pubsub/docs/pubsub-basics#resource_names).",
+        "operationId": "Publisher_CreateTopic",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Topic"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "description": "Required. The name of the topic. It must have the format\n`\"projects/{project}/topics/{topic}\"`. `{topic}` must start with a letter,\nand contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),\nunderscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent\nsigns (`%`). It must be between 3 and 255 characters in length, and it\nmust not start with `\"goog\"`.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "projects/[^/]+/topics/[^/]+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "labels": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "description": "Optional. See [Creating and managing labels]\n(https://cloud.google.com/pubsub/docs/labels)."
+                },
+                "messageStoragePolicy": {
+                  "$ref": "#/definitions/v1MessageStoragePolicy",
+                  "description": "Optional. Policy constraining the set of Google Cloud Platform regions\nwhere messages published to the topic may be stored. If not present, then\nno constraints are in effect."
+                },
+                "kmsKeyName": {
+                  "type": "string",
+                  "description": "Optional. The resource name of the Cloud KMS CryptoKey to be used to\nprotect access to messages published on this topic.\n\nThe expected format is `projects/*/locations/*/keyRings/*/cryptoKeys/*`."
+                },
+                "schemaSettings": {
+                  "$ref": "#/definitions/v1SchemaSettings",
+                  "description": "Optional. Settings for validating messages published against a schema."
+                },
+                "satisfiesPzs": {
+                  "type": "boolean",
+                  "description": "Optional. Reserved for future use. This field is set only in responses from\nthe server; it is ignored if it is set in any requests."
+                },
+                "messageRetentionDuration": {
+                  "type": "string",
+                  "description": "Optional. Indicates the minimum duration to retain a message after it is\npublished to the topic. If this field is set, messages published to the\ntopic in the last `message_retention_duration` are always available to\nsubscribers. For instance, it allows any attached subscription to [seek to\na\ntimestamp](https://cloud.google.com/pubsub/docs/replay-overview#seek_to_a_time)\nthat is up to `message_retention_duration` in the past. If this field is\nnot set, message retention is controlled by settings on individual\nsubscriptions. Cannot be more than 31 days or less than 10 minutes."
+                },
+                "state": {
+                  "$ref": "#/definitions/v1TopicState",
+                  "description": "Output only. An output-only field indicating the state of the topic.",
+                  "readOnly": true
+                },
+                "ingestionDataSourceSettings": {
+                  "$ref": "#/definitions/v1IngestionDataSourceSettings",
+                  "description": "Optional. Settings for ingestion from a data source into this topic."
+                }
+              },
+              "description": "A topic resource."
+            }
+          }
+        ],
+        "tags": [
+          "Publisher"
+        ]
+      }
+    },
+    "/v1/{project}/snapshots": {
+      "get": {
+        "summary": "Lists the existing snapshots. Snapshots are used in [Seek](\nhttps://cloud.google.com/pubsub/docs/replay-overview) operations, which\nallow you to manage message acknowledgments in bulk. That is, you can set\nthe acknowledgment state of messages in an existing subscription to the\nstate captured by a snapshot.",
+        "operationId": "Subscriber_ListSnapshots",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListSnapshotsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project",
+            "description": "Required. The name of the project in which to list snapshots.\nFormat is `projects/{project-id}`.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "projects/[^/]+"
+          },
+          {
+            "name": "pageSize",
+            "description": "Optional. Maximum number of snapshots to return.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageToken",
+            "description": "Optional. The value returned by the last `ListSnapshotsResponse`; indicates\nthat this is a continuation of a prior `ListSnapshots` call, and that the\nsystem should return the next page of data.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Subscriber"
+        ]
+      }
+    },
+    "/v1/{project}/subscriptions": {
+      "get": {
+        "summary": "Lists matching subscriptions.",
+        "operationId": "Subscriber_ListSubscriptions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListSubscriptionsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project",
+            "description": "Required. The name of the project in which to list subscriptions.\nFormat is `projects/{project-id}`.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "projects/[^/]+"
+          },
+          {
+            "name": "pageSize",
+            "description": "Optional. Maximum number of subscriptions to return.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageToken",
+            "description": "Optional. The value returned by the last `ListSubscriptionsResponse`;\nindicates that this is a continuation of a prior `ListSubscriptions` call,\nand that the system should return the next page of data.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Subscriber"
+        ]
+      }
+    },
+    "/v1/{project}/topics": {
+      "get": {
+        "summary": "Lists matching topics.",
+        "operationId": "Publisher_ListTopics",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListTopicsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project",
+            "description": "Required. The name of the project in which to list topics.\nFormat is `projects/{project-id}`.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "projects/[^/]+"
+          },
+          {
+            "name": "pageSize",
+            "description": "Optional. Maximum number of topics to return.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageToken",
+            "description": "Optional. The value returned by the last `ListTopicsResponse`; indicates\nthat this is a continuation of a prior `ListTopics` call, and that the\nsystem should return the next page of data.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Publisher"
+        ]
+      }
+    },
+    "/v1/{snapshot.name}": {
+      "patch": {
+        "summary": "Updates an existing snapshot by updating the fields specified in the update\nmask. Snapshots are used in\n[Seek](https://cloud.google.com/pubsub/docs/replay-overview) operations,\nwhich allow you to manage message acknowledgments in bulk. That is, you can\nset the acknowledgment state of messages in an existing subscription to the\nstate captured by a snapshot.",
+        "operationId": "Subscriber_UpdateSnapshot",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Snapshot"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "snapshot.name",
+            "description": "Optional. The name of the snapshot.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "projects/[^/]+/snapshots/[^/]+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "snapshot": {
+                  "type": "object",
+                  "properties": {
+                    "topic": {
+                      "type": "string",
+                      "description": "Optional. The name of the topic from which this snapshot is retaining\nmessages."
+                    },
+                    "expireTime": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Optional. The snapshot is guaranteed to exist up until this time.\nA newly-created snapshot expires no later than 7 days from the time of its\ncreation. Its exact lifetime is determined at creation by the existing\nbacklog in the source subscription. Specifically, the lifetime of the\nsnapshot is `7 days - (age of oldest unacked message in the subscription)`.\nFor example, consider a subscription whose oldest unacked message is 3 days\nold. If a snapshot is created from this subscription, the snapshot -- which\nwill always capture this 3-day-old backlog as long as the snapshot\nexists -- will expire in 4 days. The service will refuse to create a\nsnapshot that would expire in less than 1 hour after creation."
+                    },
+                    "labels": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "description": "Optional. See [Creating and managing labels]\n(https://cloud.google.com/pubsub/docs/labels)."
+                    }
+                  },
+                  "description": "Required. The updated snapshot object.",
+                  "title": "Required. The updated snapshot object."
+                },
+                "updateMask": {
+                  "type": "string",
+                  "description": "Required. Indicates which fields in the provided snapshot to update.\nMust be specified and non-empty."
+                }
+              },
+              "description": "Request for the UpdateSnapshot method.",
+              "required": [
+                "updateMask"
+              ]
+            }
+          }
+        ],
+        "tags": [
+          "Subscriber"
+        ]
+      }
+    },
+    "/v1/{snapshot}": {
+      "get": {
+        "summary": "Gets the configuration details of a snapshot. Snapshots are used in\n[Seek](https://cloud.google.com/pubsub/docs/replay-overview) operations,\nwhich allow you to manage message acknowledgments in bulk. That is, you can\nset the acknowledgment state of messages in an existing subscription to the\nstate captured by a snapshot.",
+        "operationId": "Subscriber_GetSnapshot",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Snapshot"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "snapshot",
+            "description": "Required. The name of the snapshot to get.\nFormat is `projects/{project}/snapshots/{snap}`.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "projects/[^/]+/snapshots/[^/]+"
+          }
+        ],
+        "tags": [
+          "Subscriber"
+        ]
+      },
+      "delete": {
+        "summary": "Removes an existing snapshot. Snapshots are used in [Seek]\n(https://cloud.google.com/pubsub/docs/replay-overview) operations, which\nallow you to manage message acknowledgments in bulk. That is, you can set\nthe acknowledgment state of messages in an existing subscription to the\nstate captured by a snapshot.\nWhen the snapshot is deleted, all messages retained in the snapshot\nare immediately dropped. After a snapshot is deleted, a new one may be\ncreated with the same name, but the new one has no association with the old\nsnapshot or its subscription, unless the same subscription is specified.",
+        "operationId": "Subscriber_DeleteSnapshot",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "snapshot",
+            "description": "Required. The name of the snapshot to delete.\nFormat is `projects/{project}/snapshots/{snap}`.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "projects/[^/]+/snapshots/[^/]+"
+          }
+        ],
+        "tags": [
+          "Subscriber"
+        ]
+      }
+    },
+    "/v1/{subscription.name}": {
+      "patch": {
+        "summary": "Updates an existing subscription by updating the fields specified in the\nupdate mask. Note that certain properties of a subscription, such as its\ntopic, are not modifiable.",
+        "operationId": "Subscriber_UpdateSubscription",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Subscription"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "subscription.name",
+            "description": "Required. The name of the subscription. It must have the format\n`\"projects/{project}/subscriptions/{subscription}\"`. `{subscription}` must\nstart with a letter, and contain only letters (`[A-Za-z]`), numbers\n(`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),\nplus (`+`) or percent signs (`%`). It must be between 3 and 255 characters\nin length, and it must not start with `\"goog\"`.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "projects/[^/]+/subscriptions/[^/]+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "subscription": {
+                  "type": "object",
+                  "properties": {
+                    "topic": {
+                      "type": "string",
+                      "description": "Required. The name of the topic from which this subscription is receiving\nmessages. Format is `projects/{project}/topics/{topic}`. The value of this\nfield will be `_deleted-topic_` if the topic has been deleted."
+                    },
+                    "pushConfig": {
+                      "$ref": "#/definitions/v1PushConfig",
+                      "description": "Optional. If push delivery is used with this subscription, this field is\nused to configure it."
+                    },
+                    "bigqueryConfig": {
+                      "$ref": "#/definitions/v1BigQueryConfig",
+                      "description": "Optional. If delivery to BigQuery is used with this subscription, this\nfield is used to configure it."
+                    },
+                    "cloudStorageConfig": {
+                      "$ref": "#/definitions/v1CloudStorageConfig",
+                      "description": "Optional. If delivery to Google Cloud Storage is used with this\nsubscription, this field is used to configure it."
+                    },
+                    "ackDeadlineSeconds": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "Optional. The approximate amount of time (on a best-effort basis) Pub/Sub\nwaits for the subscriber to acknowledge receipt before resending the\nmessage. In the interval after the message is delivered and before it is\nacknowledged, it is considered to be _outstanding_. During that time\nperiod, the message will not be redelivered (on a best-effort basis).\n\nFor pull subscriptions, this value is used as the initial value for the ack\ndeadline. To override this value for a given message, call\n`ModifyAckDeadline` with the corresponding `ack_id` if using\nnon-streaming pull or send the `ack_id` in a\n`StreamingModifyAckDeadlineRequest` if using streaming pull.\nThe minimum custom deadline you can specify is 10 seconds.\nThe maximum custom deadline you can specify is 600 seconds (10 minutes).\nIf this parameter is 0, a default value of 10 seconds is used.\n\nFor push delivery, this value is also used to set the request timeout for\nthe call to the push endpoint.\n\nIf the subscriber never acknowledges the message, the Pub/Sub\nsystem will eventually redeliver the message."
+                    },
+                    "retainAckedMessages": {
+                      "type": "boolean",
+                      "description": "Optional. Indicates whether to retain acknowledged messages. If true, then\nmessages are not expunged from the subscription's backlog, even if they are\nacknowledged, until they fall out of the `message_retention_duration`\nwindow. This must be true if you would like to [`Seek` to a timestamp]\n(https://cloud.google.com/pubsub/docs/replay-overview#seek_to_a_time) in\nthe past to replay previously-acknowledged messages."
+                    },
+                    "messageRetentionDuration": {
+                      "type": "string",
+                      "description": "Optional. How long to retain unacknowledged messages in the subscription's\nbacklog, from the moment a message is published. If `retain_acked_messages`\nis true, then this also configures the retention of acknowledged messages,\nand thus configures how far back in time a `Seek` can be done. Defaults to\n7 days. Cannot be more than 7 days or less than 10 minutes."
+                    },
+                    "labels": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "description": "Optional. See [Creating and managing\nlabels](https://cloud.google.com/pubsub/docs/labels)."
+                    },
+                    "enableMessageOrdering": {
+                      "type": "boolean",
+                      "description": "Optional. If true, messages published with the same `ordering_key` in\n`PubsubMessage` will be delivered to the subscribers in the order in which\nthey are received by the Pub/Sub system. Otherwise, they may be delivered\nin any order."
+                    },
+                    "expirationPolicy": {
+                      "$ref": "#/definitions/v1ExpirationPolicy",
+                      "description": "Optional. A policy that specifies the conditions for this subscription's\nexpiration. A subscription is considered active as long as any connected\nsubscriber is successfully consuming messages from the subscription or is\nissuing operations on the subscription. If `expiration_policy` is not set,\na *default policy* with `ttl` of 31 days will be used. The minimum allowed\nvalue for `expiration_policy.ttl` is 1 day. If `expiration_policy` is set,\nbut `expiration_policy.ttl` is not set, the subscription never expires."
+                    },
+                    "filter": {
+                      "type": "string",
+                      "description": "Optional. An expression written in the Pub/Sub [filter\nlanguage](https://cloud.google.com/pubsub/docs/filtering). If non-empty,\nthen only `PubsubMessage`s whose `attributes` field matches the filter are\ndelivered on this subscription. If empty, then no messages are filtered\nout."
+                    },
+                    "deadLetterPolicy": {
+                      "$ref": "#/definitions/v1DeadLetterPolicy",
+                      "description": "Optional. A policy that specifies the conditions for dead lettering\nmessages in this subscription. If dead_letter_policy is not set, dead\nlettering is disabled.\n\nThe Pub/Sub service account associated with this subscriptions's\nparent project (i.e.,\nservice-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com) must have\npermission to Acknowledge() messages on this subscription."
+                    },
+                    "retryPolicy": {
+                      "$ref": "#/definitions/v1RetryPolicy",
+                      "description": "Optional. A policy that specifies how Pub/Sub retries message delivery for\nthis subscription.\n\nIf not set, the default retry policy is applied. This generally implies\nthat messages will be retried as soon as possible for healthy subscribers.\nRetryPolicy will be triggered on NACKs or acknowledgement deadline\nexceeded events for a given message."
+                    },
+                    "detached": {
+                      "type": "boolean",
+                      "description": "Optional. Indicates whether the subscription is detached from its topic.\nDetached subscriptions don't receive messages from their topic and don't\nretain any backlog. `Pull` and `StreamingPull` requests will return\nFAILED_PRECONDITION. If the subscription is a push subscription, pushes to\nthe endpoint will not be made."
+                    },
+                    "enableExactlyOnceDelivery": {
+                      "type": "boolean",
+                      "description": "* The message sent to a subscriber is guaranteed not to be resent\nbefore the message's acknowledgement deadline expires.\n* An acknowledged message will not be resent to a subscriber.\n\nNote that subscribers may still receive multiple copies of a message\nwhen `enable_exactly_once_delivery` is true if the message was published\nmultiple times by a publisher client. These copies are  considered distinct\nby Pub/Sub and have distinct `message_id` values.",
+                      "title": "Optional. If true, Pub/Sub provides the following guarantees for the\ndelivery of a message with a given value of `message_id` on this\nsubscription:"
+                    },
+                    "topicMessageRetentionDuration": {
+                      "type": "string",
+                      "description": "Output only. Indicates the minimum duration for which a message is retained\nafter it is published to the subscription's topic. If this field is set,\nmessages published to the subscription's topic in the last\n`topic_message_retention_duration` are always available to subscribers. See\nthe `message_retention_duration` field in `Topic`. This field is set only\nin responses from the server; it is ignored if it is set in any requests.",
+                      "readOnly": true
+                    },
+                    "state": {
+                      "$ref": "#/definitions/v1SubscriptionState",
+                      "description": "Output only. An output-only field indicating whether or not the\nsubscription can receive messages.",
+                      "readOnly": true
+                    }
+                  },
+                  "description": "Required. The updated subscription object.",
+                  "title": "Required. The updated subscription object."
+                },
+                "updateMask": {
+                  "type": "string",
+                  "description": "Required. Indicates which fields in the provided subscription to update.\nMust be specified and non-empty."
+                }
+              },
+              "description": "Request for the UpdateSubscription method.",
+              "required": [
+                "topic",
+                "updateMask"
+              ]
+            }
+          }
+        ],
+        "tags": [
+          "Subscriber"
+        ]
+      }
+    },
+    "/v1/{subscription}": {
+      "get": {
+        "summary": "Gets the configuration details of a subscription.",
+        "operationId": "Subscriber_GetSubscription",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Subscription"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "subscription",
+            "description": "Required. The name of the subscription to get.\nFormat is `projects/{project}/subscriptions/{sub}`.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "projects/[^/]+/subscriptions/[^/]+"
+          }
+        ],
+        "tags": [
+          "Subscriber"
+        ]
+      },
+      "delete": {
+        "summary": "Deletes an existing subscription. All messages retained in the subscription\nare immediately dropped. Calls to `Pull` after deletion will return\n`NOT_FOUND`. After a subscription is deleted, a new one may be created with\nthe same name, but the new one has no association with the old\nsubscription or its topic unless the same topic is specified.",
+        "operationId": "Subscriber_DeleteSubscription",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "subscription",
+            "description": "Required. The subscription to delete.\nFormat is `projects/{project}/subscriptions/{sub}`.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "projects/[^/]+/subscriptions/[^/]+"
+          }
+        ],
+        "tags": [
+          "Subscriber"
+        ]
+      }
+    },
+    "/v1/{subscription}:acknowledge": {
+      "post": {
+        "summary": "Acknowledges the messages associated with the `ack_ids` in the\n`AcknowledgeRequest`. The Pub/Sub system can remove the relevant messages\nfrom the subscription.",
+        "description": "Acknowledging a message whose ack deadline has expired may succeed,\nbut such a message may be redelivered later. Acknowledging a message more\nthan once will not result in an error.",
+        "operationId": "Subscriber_Acknowledge",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "subscription",
+            "description": "Required. The subscription whose message is being acknowledged.\nFormat is `projects/{project}/subscriptions/{sub}`.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "projects/[^/]+/subscriptions/[^/]+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "ackIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Required. The acknowledgment ID for the messages being acknowledged that\nwas returned by the Pub/Sub system in the `Pull` response. Must not be\nempty."
+                }
+              },
+              "description": "Request for the Acknowledge method.",
+              "required": [
+                "ackIds"
+              ]
+            }
+          }
+        ],
+        "tags": [
+          "Subscriber"
+        ]
+      }
+    },
+    "/v1/{subscription}:detach": {
+      "post": {
+        "summary": "Detaches a subscription from this topic. All messages retained in the\nsubscription are dropped. Subsequent `Pull` and `StreamingPull` requests\nwill return FAILED_PRECONDITION. If the subscription is a push\nsubscription, pushes to the endpoint will stop.",
+        "operationId": "Publisher_DetachSubscription",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DetachSubscriptionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "subscription",
+            "description": "Required. The subscription to detach.\nFormat is `projects/{project}/subscriptions/{subscription}`.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "projects/[^/]+/subscriptions/[^/]+"
+          }
+        ],
+        "tags": [
+          "Publisher"
+        ]
+      }
+    },
+    "/v1/{subscription}:modifyAckDeadline": {
+      "post": {
+        "summary": "Modifies the ack deadline for a specific message. This method is useful\nto indicate that more time is needed to process a message by the\nsubscriber, or to make the message available for redelivery if the\nprocessing was interrupted. Note that this does not modify the\nsubscription-level `ackDeadlineSeconds` used for subsequent messages.",
+        "operationId": "Subscriber_ModifyAckDeadline",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "subscription",
+            "description": "Required. The name of the subscription.\nFormat is `projects/{project}/subscriptions/{sub}`.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "projects/[^/]+/subscriptions/[^/]+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "ackIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Required. List of acknowledgment IDs."
+                },
+                "ackDeadlineSeconds": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "Required. The new ack deadline with respect to the time this request was\nsent to the Pub/Sub system. For example, if the value is 10, the new ack\ndeadline will expire 10 seconds after the `ModifyAckDeadline` call was\nmade. Specifying zero might immediately make the message available for\ndelivery to another subscriber client. This typically results in an\nincrease in the rate of message redeliveries (that is, duplicates).\nThe minimum deadline you can specify is 0 seconds.\nThe maximum deadline you can specify in a single request is 600 seconds\n(10 minutes)."
+                }
+              },
+              "description": "Request for the ModifyAckDeadline method.",
+              "required": [
+                "ackIds",
+                "ackDeadlineSeconds"
+              ]
+            }
+          }
+        ],
+        "tags": [
+          "Subscriber"
+        ]
+      }
+    },
+    "/v1/{subscription}:modifyPushConfig": {
+      "post": {
+        "summary": "Modifies the `PushConfig` for a specified subscription.",
+        "description": "This may be used to change a push subscription to a pull one (signified by\nan empty `PushConfig`) or vice versa, or change the endpoint URL and other\nattributes of a push subscription. Messages will accumulate for delivery\ncontinuously through the call regardless of changes to the `PushConfig`.",
+        "operationId": "Subscriber_ModifyPushConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "subscription",
+            "description": "Required. The name of the subscription.\nFormat is `projects/{project}/subscriptions/{sub}`.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "projects/[^/]+/subscriptions/[^/]+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "pushConfig": {
+                  "$ref": "#/definitions/v1PushConfig",
+                  "description": "Required. The push configuration for future deliveries.\n\nAn empty `pushConfig` indicates that the Pub/Sub system should\nstop pushing messages from the given subscription and allow\nmessages to be pulled and acknowledged - effectively pausing\nthe subscription if `Pull` or `StreamingPull` is not called."
+                }
+              },
+              "description": "Request for the ModifyPushConfig method.",
+              "required": [
+                "pushConfig"
+              ]
+            }
+          }
+        ],
+        "tags": [
+          "Subscriber"
+        ]
+      }
+    },
+    "/v1/{subscription}:pull": {
+      "post": {
+        "summary": "Pulls messages from the server.",
+        "operationId": "Subscriber_Pull",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PullResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "subscription",
+            "description": "Required. The subscription from which messages should be pulled.\nFormat is `projects/{project}/subscriptions/{sub}`.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "projects/[^/]+/subscriptions/[^/]+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "returnImmediately": {
+                  "type": "boolean",
+                  "description": "Optional. If this field set to true, the system will respond immediately\neven if it there are no messages available to return in the `Pull`\nresponse. Otherwise, the system may wait (for a bounded amount of time)\nuntil at least one message is available, rather than returning no messages.\nWarning: setting this field to `true` is discouraged because it adversely\nimpacts the performance of `Pull` operations. We recommend that users do\nnot set this field."
+                },
+                "maxMessages": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "Required. The maximum number of messages to return for this request. Must\nbe a positive integer. The Pub/Sub system may return fewer than the number\nspecified."
+                }
+              },
+              "description": "Request for the `Pull` method.",
+              "required": [
+                "maxMessages"
+              ]
+            }
+          }
+        ],
+        "tags": [
+          "Subscriber"
+        ]
+      }
+    },
+    "/v1/{subscription}:seek": {
+      "post": {
+        "summary": "Seeks an existing subscription to a point in time or to a given snapshot,\nwhichever is provided in the request. Snapshots are used in [Seek]\n(https://cloud.google.com/pubsub/docs/replay-overview) operations, which\nallow you to manage message acknowledgments in bulk. That is, you can set\nthe acknowledgment state of messages in an existing subscription to the\nstate captured by a snapshot. Note that both the subscription and the\nsnapshot must be on the same topic.",
+        "operationId": "Subscriber_Seek",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1SeekResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "subscription",
+            "description": "Required. The subscription to affect.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "projects/[^/]+/subscriptions/[^/]+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "time": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Optional. The time to seek to.\nMessages retained in the subscription that were published before this\ntime are marked as acknowledged, and messages retained in the\nsubscription that were published after this time are marked as\nunacknowledged. Note that this operation affects only those messages\nretained in the subscription (configured by the combination of\n`message_retention_duration` and `retain_acked_messages`). For example,\nif `time` corresponds to a point before the message retention\nwindow (or to a point before the system's notion of the subscription\ncreation time), only retained messages will be marked as unacknowledged,\nand already-expunged messages will not be restored."
+                },
+                "snapshot": {
+                  "type": "string",
+                  "description": "Optional. The snapshot to seek to. The snapshot's topic must be the same\nas that of the provided subscription. Format is\n`projects/{project}/snapshots/{snap}`."
+                }
+              },
+              "description": "Request for the `Seek` method."
+            }
+          }
+        ],
+        "tags": [
+          "Subscriber"
+        ]
+      }
+    },
+    "/v1/{topic.name}": {
+      "patch": {
+        "summary": "Updates an existing topic by updating the fields specified in the update\nmask. Note that certain properties of a topic are not modifiable.",
+        "operationId": "Publisher_UpdateTopic",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Topic"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "topic.name",
+            "description": "Required. The name of the topic. It must have the format\n`\"projects/{project}/topics/{topic}\"`. `{topic}` must start with a letter,\nand contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),\nunderscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent\nsigns (`%`). It must be between 3 and 255 characters in length, and it\nmust not start with `\"goog\"`.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "projects/[^/]+/topics/[^/]+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "object",
+                  "properties": {
+                    "labels": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "description": "Optional. See [Creating and managing labels]\n(https://cloud.google.com/pubsub/docs/labels)."
+                    },
+                    "messageStoragePolicy": {
+                      "$ref": "#/definitions/v1MessageStoragePolicy",
+                      "description": "Optional. Policy constraining the set of Google Cloud Platform regions\nwhere messages published to the topic may be stored. If not present, then\nno constraints are in effect."
+                    },
+                    "kmsKeyName": {
+                      "type": "string",
+                      "description": "Optional. The resource name of the Cloud KMS CryptoKey to be used to\nprotect access to messages published on this topic.\n\nThe expected format is `projects/*/locations/*/keyRings/*/cryptoKeys/*`."
+                    },
+                    "schemaSettings": {
+                      "$ref": "#/definitions/v1SchemaSettings",
+                      "description": "Optional. Settings for validating messages published against a schema."
+                    },
+                    "satisfiesPzs": {
+                      "type": "boolean",
+                      "description": "Optional. Reserved for future use. This field is set only in responses from\nthe server; it is ignored if it is set in any requests."
+                    },
+                    "messageRetentionDuration": {
+                      "type": "string",
+                      "description": "Optional. Indicates the minimum duration to retain a message after it is\npublished to the topic. If this field is set, messages published to the\ntopic in the last `message_retention_duration` are always available to\nsubscribers. For instance, it allows any attached subscription to [seek to\na\ntimestamp](https://cloud.google.com/pubsub/docs/replay-overview#seek_to_a_time)\nthat is up to `message_retention_duration` in the past. If this field is\nnot set, message retention is controlled by settings on individual\nsubscriptions. Cannot be more than 31 days or less than 10 minutes."
+                    },
+                    "state": {
+                      "$ref": "#/definitions/v1TopicState",
+                      "description": "Output only. An output-only field indicating the state of the topic.",
+                      "readOnly": true
+                    },
+                    "ingestionDataSourceSettings": {
+                      "$ref": "#/definitions/v1IngestionDataSourceSettings",
+                      "description": "Optional. Settings for ingestion from a data source into this topic."
+                    }
+                  },
+                  "description": "Required. The updated topic object.",
+                  "title": "Required. The updated topic object."
+                },
+                "updateMask": {
+                  "type": "string",
+                  "description": "Required. Indicates which fields in the provided topic to update. Must be\nspecified and non-empty. Note that if `update_mask` contains\n\"message_storage_policy\" but the `message_storage_policy` is not set in\nthe `topic` provided above, then the updated value is determined by the\npolicy configured at the project or organization level."
+                }
+              },
+              "description": "Request for the UpdateTopic method.",
+              "required": [
+                "updateMask"
+              ]
+            }
+          }
+        ],
+        "tags": [
+          "Publisher"
+        ]
+      }
+    },
+    "/v1/{topic}": {
+      "get": {
+        "summary": "Gets the configuration of a topic.",
+        "operationId": "Publisher_GetTopic",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Topic"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "topic",
+            "description": "Required. The name of the topic to get.\nFormat is `projects/{project}/topics/{topic}`.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "projects/[^/]+/topics/[^/]+"
+          }
+        ],
+        "tags": [
+          "Publisher"
+        ]
+      },
+      "delete": {
+        "summary": "Deletes the topic with the given name. Returns `NOT_FOUND` if the topic\ndoes not exist. After a topic is deleted, a new topic may be created with\nthe same name; this is an entirely new topic with none of the old\nconfiguration or subscriptions. Existing subscriptions to this topic are\nnot deleted, but their `topic` field is set to `_deleted-topic_`.",
+        "operationId": "Publisher_DeleteTopic",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "topic",
+            "description": "Required. Name of the topic to delete.\nFormat is `projects/{project}/topics/{topic}`.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "projects/[^/]+/topics/[^/]+"
+          }
+        ],
+        "tags": [
+          "Publisher"
+        ]
+      }
+    },
+    "/v1/{topic}/snapshots": {
+      "get": {
+        "summary": "Lists the names of the snapshots on this topic. Snapshots are used in\n[Seek](https://cloud.google.com/pubsub/docs/replay-overview) operations,\nwhich allow you to manage message acknowledgments in bulk. That is, you can\nset the acknowledgment state of messages in an existing subscription to the\nstate captured by a snapshot.",
+        "operationId": "Publisher_ListTopicSnapshots",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListTopicSnapshotsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "topic",
+            "description": "Required. The name of the topic that snapshots are attached to.\nFormat is `projects/{project}/topics/{topic}`.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "projects/[^/]+/topics/[^/]+"
+          },
+          {
+            "name": "pageSize",
+            "description": "Optional. Maximum number of snapshot names to return.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageToken",
+            "description": "Optional. The value returned by the last `ListTopicSnapshotsResponse`;\nindicates that this is a continuation of a prior `ListTopicSnapshots` call,\nand that the system should return the next page of data.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Publisher"
+        ]
+      }
+    },
+    "/v1/{topic}/subscriptions": {
+      "get": {
+        "summary": "Lists the names of the attached subscriptions on this topic.",
+        "operationId": "Publisher_ListTopicSubscriptions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListTopicSubscriptionsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "topic",
+            "description": "Required. The name of the topic that subscriptions are attached to.\nFormat is `projects/{project}/topics/{topic}`.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "projects/[^/]+/topics/[^/]+"
+          },
+          {
+            "name": "pageSize",
+            "description": "Optional. Maximum number of subscription names to return.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageToken",
+            "description": "Optional. The value returned by the last `ListTopicSubscriptionsResponse`;\nindicates that this is a continuation of a prior `ListTopicSubscriptions`\ncall, and that the system should return the next page of data.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Publisher"
+        ]
+      }
+    },
+    "/v1/{topic}:publish": {
+      "post": {
+        "summary": "Adds one or more messages to the topic. Returns `NOT_FOUND` if the topic\ndoes not exist.",
+        "operationId": "Publisher_Publish",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PublishResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "topic",
+            "description": "Required. The messages in the request will be published on this topic.\nFormat is `projects/{project}/topics/{topic}`.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "projects/[^/]+/topics/[^/]+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "messages": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/v1PubsubMessage"
+                  },
+                  "description": "Required. The messages to publish."
+                }
+              },
+              "description": "Request for the Publish method.",
+              "required": [
+                "messages"
+              ]
+            }
+          }
+        ],
+        "tags": [
+          "Publisher"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "CloudStorageConfigAvroConfig": {
+      "type": "object",
+      "properties": {
+        "writeMetadata": {
+          "type": "boolean",
+          "description": "Optional. When true, write the subscription name, message_id,\npublish_time, attributes, and ordering_key as additional fields in the\noutput. The subscription name, message_id, and publish_time fields are\nput in their own fields while all other message properties other than\ndata (for example, an ordering_key, if present) are added as entries in\nthe attributes map."
+        },
+        "useTopicSchema": {
+          "type": "boolean",
+          "description": "Optional. When true, the output Cloud Storage file will be serialized\nusing the topic schema, if it exists."
+        }
+      },
+      "description": "Configuration for writing message data in Avro format.\nMessage payloads and metadata will be written to files as an Avro binary."
+    },
+    "CloudStorageConfigTextConfig": {
+      "type": "object",
+      "description": "Configuration for writing message data in text format.\nMessage payloads will be written to files as raw text, separated by a\nnewline."
+    },
+    "IngestionDataSourceSettingsAwsKinesis": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "$ref": "#/definitions/IngestionDataSourceSettingsAwsKinesisState",
+          "description": "Output only. An output-only field that indicates the state of the Kinesis\ningestion source.",
+          "readOnly": true
+        },
+        "streamArn": {
+          "type": "string",
+          "description": "Required. The Kinesis stream ARN to ingest data from."
+        },
+        "consumerArn": {
+          "type": "string",
+          "description": "Required. The Kinesis consumer ARN to used for ingestion in Enhanced\nFan-Out mode. The consumer must be already created and ready to be used."
+        },
+        "awsRoleArn": {
+          "type": "string",
+          "description": "Required. AWS role ARN to be used for Federated Identity authentication\nwith Kinesis. Check the Pub/Sub docs for how to set up this role and the\nrequired permissions that need to be attached to it."
+        },
+        "gcpServiceAccount": {
+          "type": "string",
+          "description": "Required. The GCP service account to be used for Federated Identity\nauthentication with Kinesis (via a `AssumeRoleWithWebIdentity` call for\nthe provided role). The `aws_role_arn` must be set up with\n`accounts.google.com:sub` equals to this service account number."
+        }
+      },
+      "description": "Ingestion settings for Amazon Kinesis Data Streams.",
+      "required": [
+        "streamArn",
+        "consumerArn",
+        "awsRoleArn",
+        "gcpServiceAccount"
+      ]
+    },
+    "IngestionDataSourceSettingsAwsKinesisState": {
+      "type": "string",
+      "enum": [
+        "STATE_UNSPECIFIED",
+        "ACTIVE",
+        "KINESIS_PERMISSION_DENIED",
+        "PUBLISH_PERMISSION_DENIED",
+        "STREAM_NOT_FOUND",
+        "CONSUMER_NOT_FOUND"
+      ],
+      "default": "STATE_UNSPECIFIED",
+      "description": "Possible states for ingestion from Amazon Kinesis Data Streams.\n\n - STATE_UNSPECIFIED: Default value. This value is unused.\n - ACTIVE: Ingestion is active.\n - KINESIS_PERMISSION_DENIED: Permission denied encountered while consuming data from Kinesis.\nThis can happen if:\n  - The provided `aws_role_arn` does not exist or does not have the\n    appropriate permissions attached.\n  - The provided `aws_role_arn` is not set up properly for Identity\n    Federation using `gcp_service_account`.\n  - The Pub/Sub SA is not granted the\n    `iam.serviceAccounts.getOpenIdToken` permission on\n    `gcp_service_account`.\n - PUBLISH_PERMISSION_DENIED: Permission denied encountered while publishing to the topic. This can\nhappen if the Pub/Sub SA has not been granted the [appropriate publish\npermissions](https://cloud.google.com/pubsub/docs/access-control#pubsub.publisher)\n - STREAM_NOT_FOUND: The Kinesis stream does not exist.\n - CONSUMER_NOT_FOUND: The Kinesis consumer does not exist."
+    },
+    "PushConfigNoWrapper": {
+      "type": "object",
+      "properties": {
+        "writeMetadata": {
+          "type": "boolean",
+          "description": "Optional. When true, writes the Pub/Sub message metadata to\n`x-goog-pubsub-\u003cKEY\u003e:\u003cVAL\u003e` headers of the HTTP request. Writes the\nPub/Sub message attributes to `\u003cKEY\u003e:\u003cVAL\u003e` headers of the HTTP request."
+        }
+      },
+      "description": "Sets the `data` field as the HTTP body for delivery."
+    },
+    "PushConfigOidcToken": {
+      "type": "object",
+      "properties": {
+        "serviceAccountEmail": {
+          "type": "string",
+          "description": "Optional. [Service account\nemail](https://cloud.google.com/iam/docs/service-accounts)\nused for generating the OIDC token. For more information\non setting up authentication, see\n[Push subscriptions](https://cloud.google.com/pubsub/docs/push)."
+        },
+        "audience": {
+          "type": "string",
+          "description": "Optional. Audience to be used when generating OIDC token. The audience\nclaim identifies the recipients that the JWT is intended for. The\naudience value is a single case-sensitive string. Having multiple values\n(array) for the audience field is not supported. More info about the OIDC\nJWT token audience here:\nhttps://tools.ietf.org/html/rfc7519#section-4.1.3 Note: if not specified,\nthe Push endpoint URL will be used."
+        }
+      },
+      "description": "Contains information needed for generating an\n[OpenID Connect\ntoken](https://developers.google.com/identity/protocols/OpenIDConnect)."
+    },
+    "PushConfigPubsubWrapper": {
+      "type": "object",
+      "description": "The payload to the push endpoint is in the form of the JSON representation\nof a PubsubMessage\n(https://cloud.google.com/pubsub/docs/reference/rpc/google.pubsub.v1#pubsubmessage)."
+    },
+    "StreamingPullResponseAcknowledgeConfirmation": {
+      "type": "object",
+      "properties": {
+        "ackIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional. Successfully processed acknowledgement IDs."
+        },
+        "invalidAckIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional. List of acknowledgement IDs that were malformed or whose\nacknowledgement deadline has expired."
+        },
+        "unorderedAckIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional. List of acknowledgement IDs that were out of order."
+        },
+        "temporaryFailedAckIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional. List of acknowledgement IDs that failed processing with\ntemporary issues."
+        }
+      },
+      "description": "Acknowledgement IDs sent in one or more previous requests to acknowledge a\npreviously received message."
+    },
+    "StreamingPullResponseModifyAckDeadlineConfirmation": {
+      "type": "object",
+      "properties": {
+        "ackIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional. Successfully processed acknowledgement IDs."
+        },
+        "invalidAckIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional. List of acknowledgement IDs that were malformed or whose\nacknowledgement deadline has expired."
+        },
+        "temporaryFailedAckIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional. List of acknowledgement IDs that failed processing with\ntemporary issues."
+        }
+      },
+      "description": "Acknowledgement IDs sent in one or more previous requests to modify the\ndeadline for a specific message."
+    },
+    "StreamingPullResponseSubscriptionProperties": {
+      "type": "object",
+      "properties": {
+        "exactlyOnceDeliveryEnabled": {
+          "type": "boolean",
+          "description": "Optional. True iff exactly once delivery is enabled for this\nsubscription."
+        },
+        "messageOrderingEnabled": {
+          "type": "boolean",
+          "description": "Optional. True iff message ordering is enabled for this subscription."
+        }
+      },
+      "description": "Subscription properties sent as part of the response."
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1BigQueryConfig": {
+      "type": "object",
+      "properties": {
+        "table": {
+          "type": "string",
+          "title": "Optional. The name of the table to which to write data, of the form\n{projectId}.{datasetId}.{tableId}"
+        },
+        "useTopicSchema": {
+          "type": "boolean",
+          "description": "Optional. When true, use the topic's schema as the columns to write to in\nBigQuery, if it exists. `use_topic_schema` and `use_table_schema` cannot be\nenabled at the same time."
+        },
+        "writeMetadata": {
+          "type": "boolean",
+          "description": "Optional. When true, write the subscription name, message_id, publish_time,\nattributes, and ordering_key to additional columns in the table. The\nsubscription name, message_id, and publish_time fields are put in their own\ncolumns while all other message properties (other than data) are written to\na JSON object in the attributes column."
+        },
+        "dropUnknownFields": {
+          "type": "boolean",
+          "description": "Optional. When true and use_topic_schema is true, any fields that are a\npart of the topic schema that are not part of the BigQuery table schema are\ndropped when writing to BigQuery. Otherwise, the schemas must be kept in\nsync and any messages with extra fields are not written and remain in the\nsubscription's backlog."
+        },
+        "state": {
+          "$ref": "#/definitions/v1BigQueryConfigState",
+          "description": "Output only. An output-only field that indicates whether or not the\nsubscription can receive messages.",
+          "readOnly": true
+        },
+        "useTableSchema": {
+          "type": "boolean",
+          "description": "Optional. When true, use the BigQuery table's schema as the columns to\nwrite to in BigQuery. `use_table_schema` and `use_topic_schema` cannot be\nenabled at the same time."
+        },
+        "serviceAccountEmail": {
+          "type": "string",
+          "description": "Optional. The service account to use to write to BigQuery. The subscription\ncreator or updater that specifies this field must have\n`iam.serviceAccounts.actAs` permission on the service account. If not\nspecified, the Pub/Sub [service\nagent](https://cloud.google.com/iam/docs/service-agents),\nservice-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com, is used."
+        }
+      },
+      "description": "Configuration for a BigQuery subscription."
+    },
+    "v1BigQueryConfigState": {
+      "type": "string",
+      "enum": [
+        "STATE_UNSPECIFIED",
+        "ACTIVE",
+        "PERMISSION_DENIED",
+        "NOT_FOUND",
+        "SCHEMA_MISMATCH",
+        "IN_TRANSIT_LOCATION_RESTRICTION"
+      ],
+      "default": "STATE_UNSPECIFIED",
+      "description": "Possible states for a BigQuery subscription.\n\n - STATE_UNSPECIFIED: Default value. This value is unused.\n - ACTIVE: The subscription can actively send messages to BigQuery\n - PERMISSION_DENIED: Cannot write to the BigQuery table because of permission denied errors.\nThis can happen if\n- Pub/Sub SA has not been granted the [appropriate BigQuery IAM\npermissions](https://cloud.google.com/pubsub/docs/create-subscription#assign_bigquery_service_account)\n- bigquery.googleapis.com API is not enabled for the project\n([instructions](https://cloud.google.com/service-usage/docs/enable-disable))\n - NOT_FOUND: Cannot write to the BigQuery table because it does not exist.\n - SCHEMA_MISMATCH: Cannot write to the BigQuery table due to a schema mismatch.\n - IN_TRANSIT_LOCATION_RESTRICTION: Cannot write to the destination because enforce_in_transit is set to true\nand the destination locations are not in the allowed regions."
+    },
+    "v1CloudStorageConfig": {
+      "type": "object",
+      "properties": {
+        "bucket": {
+          "type": "string",
+          "description": "Required. User-provided name for the Cloud Storage bucket.\nThe bucket must be created by the user. The bucket name must be without\nany prefix like \"gs://\". See the [bucket naming\nrequirements] (https://cloud.google.com/storage/docs/buckets#naming)."
+        },
+        "filenamePrefix": {
+          "type": "string",
+          "description": "Optional. User-provided prefix for Cloud Storage filename. See the [object\nnaming requirements](https://cloud.google.com/storage/docs/objects#naming)."
+        },
+        "filenameSuffix": {
+          "type": "string",
+          "description": "Optional. User-provided suffix for Cloud Storage filename. See the [object\nnaming requirements](https://cloud.google.com/storage/docs/objects#naming).\nMust not end in \"/\"."
+        },
+        "filenameDatetimeFormat": {
+          "type": "string",
+          "description": "Optional. User-provided format string specifying how to represent datetimes\nin Cloud Storage filenames. See the [datetime format\nguidance](https://cloud.google.com/pubsub/docs/create-cloudstorage-subscription#file_names)."
+        },
+        "textConfig": {
+          "$ref": "#/definitions/CloudStorageConfigTextConfig",
+          "description": "Optional. If set, message data will be written to Cloud Storage in text\nformat."
+        },
+        "avroConfig": {
+          "$ref": "#/definitions/CloudStorageConfigAvroConfig",
+          "description": "Optional. If set, message data will be written to Cloud Storage in Avro\nformat."
+        },
+        "maxDuration": {
+          "type": "string",
+          "description": "Optional. The maximum duration that can elapse before a new Cloud Storage\nfile is created. Min 1 minute, max 10 minutes, default 5 minutes. May not\nexceed the subscription's acknowledgement deadline."
+        },
+        "maxBytes": {
+          "type": "string",
+          "format": "int64",
+          "description": "Optional. The maximum bytes that can be written to a Cloud Storage file\nbefore a new file is created. Min 1 KB, max 10 GiB. The max_bytes limit may\nbe exceeded in cases where messages are larger than the limit."
+        },
+        "maxMessages": {
+          "type": "string",
+          "format": "int64",
+          "description": "Optional. The maximum number of messages that can be written to a Cloud\nStorage file before a new file is created. Min 1000 messages."
+        },
+        "state": {
+          "$ref": "#/definitions/v1CloudStorageConfigState",
+          "description": "Output only. An output-only field that indicates whether or not the\nsubscription can receive messages.",
+          "readOnly": true
+        },
+        "serviceAccountEmail": {
+          "type": "string",
+          "description": "Optional. The service account to use to write to Cloud Storage. The\nsubscription creator or updater that specifies this field must have\n`iam.serviceAccounts.actAs` permission on the service account. If not\nspecified, the Pub/Sub\n[service agent](https://cloud.google.com/iam/docs/service-agents),\nservice-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com, is used."
+        }
+      },
+      "description": "Configuration for a Cloud Storage subscription.",
+      "required": [
+        "bucket"
+      ]
+    },
+    "v1CloudStorageConfigState": {
+      "type": "string",
+      "enum": [
+        "STATE_UNSPECIFIED",
+        "ACTIVE",
+        "PERMISSION_DENIED",
+        "NOT_FOUND",
+        "IN_TRANSIT_LOCATION_RESTRICTION",
+        "SCHEMA_MISMATCH"
+      ],
+      "default": "STATE_UNSPECIFIED",
+      "description": "Possible states for a Cloud Storage subscription.\n\n - STATE_UNSPECIFIED: Default value. This value is unused.\n - ACTIVE: The subscription can actively send messages to Cloud Storage.\n - PERMISSION_DENIED: Cannot write to the Cloud Storage bucket because of permission denied\nerrors.\n - NOT_FOUND: Cannot write to the Cloud Storage bucket because it does not exist.\n - IN_TRANSIT_LOCATION_RESTRICTION: Cannot write to the destination because enforce_in_transit is set to true\nand the destination locations are not in the allowed regions.\n - SCHEMA_MISMATCH: Cannot write to the Cloud Storage bucket due to an incompatibility\nbetween the topic schema and subscription settings."
+    },
+    "v1DeadLetterPolicy": {
+      "type": "object",
+      "properties": {
+        "deadLetterTopic": {
+          "type": "string",
+          "description": "Optional. The name of the topic to which dead letter messages should be\npublished. Format is `projects/{project}/topics/{topic}`.The Pub/Sub\nservice account associated with the enclosing subscription's parent project\n(i.e., service-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com) must\nhave permission to Publish() to this topic.\n\nThe operation will fail if the topic does not exist.\nUsers should ensure that there is a subscription attached to this topic\nsince messages published to a topic with no subscriptions are lost."
+        },
+        "maxDeliveryAttempts": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Optional. The maximum number of delivery attempts for any message. The\nvalue must be between 5 and 100.\n\nThe number of delivery attempts is defined as 1 + (the sum of number of\nNACKs and number of times the acknowledgement deadline has been exceeded\nfor the message).\n\nA NACK is any call to ModifyAckDeadline with a 0 deadline. Note that\nclient libraries may automatically extend ack_deadlines.\n\nThis field will be honored on a best effort basis.\n\nIf this parameter is 0, a default value of 5 is used."
+        }
+      },
+      "description": "Dead lettering is done on a best effort basis. The same message might be\ndead lettered multiple times.\n\nIf validation on any of the fields fails at subscription creation/updation,\nthe create/update subscription request will fail."
+    },
+    "v1DetachSubscriptionResponse": {
+      "type": "object",
+      "description": "Response for the DetachSubscription method.\nReserved for future use."
+    },
+    "v1Encoding": {
+      "type": "string",
+      "enum": [
+        "ENCODING_UNSPECIFIED",
+        "JSON",
+        "BINARY"
+      ],
+      "default": "ENCODING_UNSPECIFIED",
+      "description": "Possible encoding types for messages.\n\n - ENCODING_UNSPECIFIED: Unspecified\n - JSON: JSON encoding\n - BINARY: Binary encoding, as defined by the schema type. For some schema types,\nbinary encoding may not be available."
+    },
+    "v1ExpirationPolicy": {
+      "type": "object",
+      "properties": {
+        "ttl": {
+          "type": "string",
+          "description": "Optional. Specifies the \"time-to-live\" duration for an associated resource.\nThe resource expires if it is not active for a period of `ttl`. The\ndefinition of \"activity\" depends on the type of the associated resource.\nThe minimum and maximum allowed values for `ttl` depend on the type of the\nassociated resource, as well. If `ttl` is not set, the associated resource\nnever expires."
+        }
+      },
+      "description": "A policy that specifies the conditions for resource expiration (i.e.,\nautomatic resource deletion)."
+    },
+    "v1IngestionDataSourceSettings": {
+      "type": "object",
+      "properties": {
+        "awsKinesis": {
+          "$ref": "#/definitions/IngestionDataSourceSettingsAwsKinesis",
+          "description": "Optional. Amazon Kinesis Data Streams."
+        }
+      },
+      "description": "Settings for an ingestion data source on a topic."
+    },
+    "v1ListSnapshotsResponse": {
+      "type": "object",
+      "properties": {
+        "snapshots": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Snapshot"
+          },
+          "description": "Optional. The resulting snapshots."
+        },
+        "nextPageToken": {
+          "type": "string",
+          "description": "Optional. If not empty, indicates that there may be more snapshot that\nmatch the request; this value should be passed in a new\n`ListSnapshotsRequest`."
+        }
+      },
+      "description": "Response for the `ListSnapshots` method."
+    },
+    "v1ListSubscriptionsResponse": {
+      "type": "object",
+      "properties": {
+        "subscriptions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Subscription"
+          },
+          "description": "Optional. The subscriptions that match the request."
+        },
+        "nextPageToken": {
+          "type": "string",
+          "description": "Optional. If not empty, indicates that there may be more subscriptions that\nmatch the request; this value should be passed in a new\n`ListSubscriptionsRequest` to get more subscriptions."
+        }
+      },
+      "description": "Response for the `ListSubscriptions` method."
+    },
+    "v1ListTopicSnapshotsResponse": {
+      "type": "object",
+      "properties": {
+        "snapshots": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional. The names of the snapshots that match the request."
+        },
+        "nextPageToken": {
+          "type": "string",
+          "description": "Optional. If not empty, indicates that there may be more snapshots that\nmatch the request; this value should be passed in a new\n`ListTopicSnapshotsRequest` to get more snapshots."
+        }
+      },
+      "description": "Response for the `ListTopicSnapshots` method."
+    },
+    "v1ListTopicSubscriptionsResponse": {
+      "type": "object",
+      "properties": {
+        "subscriptions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional. The names of subscriptions attached to the topic specified in the\nrequest."
+        },
+        "nextPageToken": {
+          "type": "string",
+          "description": "Optional. If not empty, indicates that there may be more subscriptions that\nmatch the request; this value should be passed in a new\n`ListTopicSubscriptionsRequest` to get more subscriptions."
+        }
+      },
+      "description": "Response for the `ListTopicSubscriptions` method."
+    },
+    "v1ListTopicsResponse": {
+      "type": "object",
+      "properties": {
+        "topics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Topic"
+          },
+          "description": "Optional. The resulting topics."
+        },
+        "nextPageToken": {
+          "type": "string",
+          "description": "Optional. If not empty, indicates that there may be more topics that match\nthe request; this value should be passed in a new `ListTopicsRequest`."
+        }
+      },
+      "description": "Response for the `ListTopics` method."
+    },
+    "v1MessageStoragePolicy": {
+      "type": "object",
+      "properties": {
+        "allowedPersistenceRegions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional. A list of IDs of Google Cloud regions where messages that are\npublished to the topic may be persisted in storage. Messages published by\npublishers running in non-allowed Google Cloud regions (or running outside\nof Google Cloud altogether) are routed for storage in one of the allowed\nregions. An empty list means that no regions are allowed, and is not a\nvalid configuration."
+        },
+        "enforceInTransit": {
+          "type": "boolean",
+          "description": "Optional. If true, `allowed_persistence_regions` is also used to enforce\nin-transit guarantees for messages. That is, Pub/Sub will fail\nPublish operations on this topic and subscribe operations\non any subscription attached to this topic in any region that is\nnot in `allowed_persistence_regions`."
+        }
+      },
+      "description": "A policy constraining the storage of messages published to the topic."
+    },
+    "v1PublishResponse": {
+      "type": "object",
+      "properties": {
+        "messageIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional. The server-assigned ID of each published message, in the same\norder as the messages in the request. IDs are guaranteed to be unique\nwithin the topic."
+        }
+      },
+      "description": "Response for the `Publish` method."
+    },
+    "v1PubsubMessage": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "string",
+          "format": "byte",
+          "description": "Optional. The message data field. If this field is empty, the message must\ncontain at least one attribute."
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Optional. Attributes for this message. If this field is empty, the message\nmust contain non-empty data. This can be used to filter messages on the\nsubscription."
+        },
+        "messageId": {
+          "type": "string",
+          "description": "ID of this message, assigned by the server when the message is published.\nGuaranteed to be unique within the topic. This value may be read by a\nsubscriber that receives a `PubsubMessage` via a `Pull` call or a push\ndelivery. It must not be populated by the publisher in a `Publish` call."
+        },
+        "publishTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time at which the message was published, populated by the server when\nit receives the `Publish` call. It must not be populated by the\npublisher in a `Publish` call."
+        },
+        "orderingKey": {
+          "type": "string",
+          "description": "Optional. If non-empty, identifies related messages for which publish order\nshould be respected. If a `Subscription` has `enable_message_ordering` set\nto `true`, messages published with the same non-empty `ordering_key` value\nwill be delivered to subscribers in the order in which they are received by\nthe Pub/Sub system. All `PubsubMessage`s published in a given\n`PublishRequest` must specify the same `ordering_key` value. For more\ninformation, see [ordering\nmessages](https://cloud.google.com/pubsub/docs/ordering)."
+        }
+      },
+      "description": "A message that is published by publishers and consumed by subscribers. The\nmessage must contain either a non-empty data field or at least one attribute.\nNote that client libraries represent this object differently\ndepending on the language. See the corresponding [client library\ndocumentation](https://cloud.google.com/pubsub/docs/reference/libraries) for\nmore information. See [quotas and limits]\n(https://cloud.google.com/pubsub/quotas) for more information about message\nlimits."
+    },
+    "v1PullResponse": {
+      "type": "object",
+      "properties": {
+        "receivedMessages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ReceivedMessage"
+          },
+          "description": "Optional. Received Pub/Sub messages. The list will be empty if there are no\nmore messages available in the backlog, or if no messages could be returned\nbefore the request timeout. For JSON, the response can be entirely\nempty. The Pub/Sub system may return fewer than the `maxMessages` requested\neven if there are more messages available in the backlog."
+        }
+      },
+      "description": "Response for the `Pull` method."
+    },
+    "v1PushConfig": {
+      "type": "object",
+      "properties": {
+        "pushEndpoint": {
+          "type": "string",
+          "description": "Optional. A URL locating the endpoint to which messages should be pushed.\nFor example, a Webhook endpoint might use `https://example.com/push`."
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Optional. Endpoint configuration attributes that can be used to control\ndifferent aspects of the message delivery.\n\nThe only currently supported attribute is `x-goog-version`, which you can\nuse to change the format of the pushed message. This attribute\nindicates the version of the data expected by the endpoint. This\ncontrols the shape of the pushed message (i.e., its fields and metadata).\n\nIf not present during the `CreateSubscription` call, it will default to\nthe version of the Pub/Sub API used to make such call. If not present in a\n`ModifyPushConfig` call, its value will not be changed. `GetSubscription`\ncalls will always return a valid version, even if the subscription was\ncreated without this attribute.\n\nThe only supported values for the `x-goog-version` attribute are:\n\n* `v1beta1`: uses the push format defined in the v1beta1 Pub/Sub API.\n* `v1` or `v1beta2`: uses the push format defined in the v1 Pub/Sub API.\n\nFor example:\n`attributes { \"x-goog-version\": \"v1\" }`"
+        },
+        "oidcToken": {
+          "$ref": "#/definitions/PushConfigOidcToken",
+          "description": "Optional. If specified, Pub/Sub will generate and attach an OIDC JWT\ntoken as an `Authorization` header in the HTTP request for every pushed\nmessage."
+        },
+        "pubsubWrapper": {
+          "$ref": "#/definitions/PushConfigPubsubWrapper",
+          "description": "Optional. When set, the payload to the push endpoint is in the form of\nthe JSON representation of a PubsubMessage\n(https://cloud.google.com/pubsub/docs/reference/rpc/google.pubsub.v1#pubsubmessage)."
+        },
+        "noWrapper": {
+          "$ref": "#/definitions/PushConfigNoWrapper",
+          "description": "Optional. When set, the payload to the push endpoint is not wrapped."
+        }
+      },
+      "description": "Configuration for a push delivery endpoint."
+    },
+    "v1ReceivedMessage": {
+      "type": "object",
+      "properties": {
+        "ackId": {
+          "type": "string",
+          "description": "Optional. This ID can be used to acknowledge the received message."
+        },
+        "message": {
+          "$ref": "#/definitions/v1PubsubMessage",
+          "description": "Optional. The message."
+        },
+        "deliveryAttempt": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Optional. The approximate number of times that Pub/Sub has attempted to\ndeliver the associated message to a subscriber.\n\nMore precisely, this is 1 + (number of NACKs) +\n(number of ack_deadline exceeds) for this message.\n\nA NACK is any call to ModifyAckDeadline with a 0 deadline. An ack_deadline\nexceeds event is whenever a message is not acknowledged within\nack_deadline. Note that ack_deadline is initially\nSubscription.ackDeadlineSeconds, but may get extended automatically by\nthe client library.\n\nUpon the first delivery of a given message, `delivery_attempt` will have a\nvalue of 1. The value is calculated at best effort and is approximate.\n\nIf a DeadLetterPolicy is not set on the subscription, this will be 0."
+        }
+      },
+      "description": "A message and its corresponding acknowledgment ID."
+    },
+    "v1RetryPolicy": {
+      "type": "object",
+      "properties": {
+        "minimumBackoff": {
+          "type": "string",
+          "description": "Optional. The minimum delay between consecutive deliveries of a given\nmessage. Value should be between 0 and 600 seconds. Defaults to 10 seconds."
+        },
+        "maximumBackoff": {
+          "type": "string",
+          "description": "Optional. The maximum delay between consecutive deliveries of a given\nmessage. Value should be between 0 and 600 seconds. Defaults to 600\nseconds."
+        }
+      },
+      "description": "A policy that specifies how Pub/Sub retries message delivery.\n\nRetry delay will be exponential based on provided minimum and maximum\nbackoffs. https://en.wikipedia.org/wiki/Exponential_backoff.\n\nRetryPolicy will be triggered on NACKs or acknowledgement deadline exceeded\nevents for a given message.\n\nRetry Policy is implemented on a best effort basis. At times, the delay\nbetween consecutive deliveries may not match the configuration. That is,\ndelay can be more or less than configured backoff."
+    },
+    "v1SchemaSettings": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "type": "string",
+          "description": "Required. The name of the schema that messages published should be\nvalidated against. Format is `projects/{project}/schemas/{schema}`. The\nvalue of this field will be `_deleted-schema_` if the schema has been\ndeleted."
+        },
+        "encoding": {
+          "$ref": "#/definitions/v1Encoding",
+          "description": "Optional. The encoding of messages validated against `schema`."
+        },
+        "firstRevisionId": {
+          "type": "string",
+          "description": "Optional. The minimum (inclusive) revision allowed for validating messages.\nIf empty or not present, allow any revision to be validated against\nlast_revision or any revision created before."
+        },
+        "lastRevisionId": {
+          "type": "string",
+          "description": "Optional. The maximum (inclusive) revision allowed for validating messages.\nIf empty or not present, allow any revision to be validated against\nfirst_revision or any revision created after."
+        }
+      },
+      "description": "Settings for validating messages published against a schema.",
+      "required": [
+        "schema"
+      ]
+    },
+    "v1SeekResponse": {
+      "type": "object",
+      "description": "Response for the `Seek` method (this response is empty)."
+    },
+    "v1Snapshot": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Optional. The name of the snapshot."
+        },
+        "topic": {
+          "type": "string",
+          "description": "Optional. The name of the topic from which this snapshot is retaining\nmessages."
+        },
+        "expireTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Optional. The snapshot is guaranteed to exist up until this time.\nA newly-created snapshot expires no later than 7 days from the time of its\ncreation. Its exact lifetime is determined at creation by the existing\nbacklog in the source subscription. Specifically, the lifetime of the\nsnapshot is `7 days - (age of oldest unacked message in the subscription)`.\nFor example, consider a subscription whose oldest unacked message is 3 days\nold. If a snapshot is created from this subscription, the snapshot -- which\nwill always capture this 3-day-old backlog as long as the snapshot\nexists -- will expire in 4 days. The service will refuse to create a\nsnapshot that would expire in less than 1 hour after creation."
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Optional. See [Creating and managing labels]\n(https://cloud.google.com/pubsub/docs/labels)."
+        }
+      },
+      "description": "A snapshot resource. Snapshots are used in\n[Seek](https://cloud.google.com/pubsub/docs/replay-overview)\noperations, which allow you to manage message acknowledgments in bulk. That\nis, you can set the acknowledgment state of messages in an existing\nsubscription to the state captured by a snapshot."
+    },
+    "v1StreamingPullResponse": {
+      "type": "object",
+      "properties": {
+        "receivedMessages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ReceivedMessage"
+          },
+          "description": "Optional. Received Pub/Sub messages. This will not be empty."
+        },
+        "acknowledgeConfirmation": {
+          "$ref": "#/definitions/StreamingPullResponseAcknowledgeConfirmation",
+          "description": "Optional. This field will only be set if `enable_exactly_once_delivery` is\nset to `true`."
+        },
+        "modifyAckDeadlineConfirmation": {
+          "$ref": "#/definitions/StreamingPullResponseModifyAckDeadlineConfirmation",
+          "description": "Optional. This field will only be set if `enable_exactly_once_delivery` is\nset to `true`."
+        },
+        "subscriptionProperties": {
+          "$ref": "#/definitions/StreamingPullResponseSubscriptionProperties",
+          "description": "Optional. Properties associated with this subscription."
+        }
+      },
+      "description": "Response for the `StreamingPull` method. This response is used to stream\nmessages from the server to the client."
+    },
+    "v1Subscription": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Required. The name of the subscription. It must have the format\n`\"projects/{project}/subscriptions/{subscription}\"`. `{subscription}` must\nstart with a letter, and contain only letters (`[A-Za-z]`), numbers\n(`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),\nplus (`+`) or percent signs (`%`). It must be between 3 and 255 characters\nin length, and it must not start with `\"goog\"`."
+        },
+        "topic": {
+          "type": "string",
+          "description": "Required. The name of the topic from which this subscription is receiving\nmessages. Format is `projects/{project}/topics/{topic}`. The value of this\nfield will be `_deleted-topic_` if the topic has been deleted."
+        },
+        "pushConfig": {
+          "$ref": "#/definitions/v1PushConfig",
+          "description": "Optional. If push delivery is used with this subscription, this field is\nused to configure it."
+        },
+        "bigqueryConfig": {
+          "$ref": "#/definitions/v1BigQueryConfig",
+          "description": "Optional. If delivery to BigQuery is used with this subscription, this\nfield is used to configure it."
+        },
+        "cloudStorageConfig": {
+          "$ref": "#/definitions/v1CloudStorageConfig",
+          "description": "Optional. If delivery to Google Cloud Storage is used with this\nsubscription, this field is used to configure it."
+        },
+        "ackDeadlineSeconds": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Optional. The approximate amount of time (on a best-effort basis) Pub/Sub\nwaits for the subscriber to acknowledge receipt before resending the\nmessage. In the interval after the message is delivered and before it is\nacknowledged, it is considered to be _outstanding_. During that time\nperiod, the message will not be redelivered (on a best-effort basis).\n\nFor pull subscriptions, this value is used as the initial value for the ack\ndeadline. To override this value for a given message, call\n`ModifyAckDeadline` with the corresponding `ack_id` if using\nnon-streaming pull or send the `ack_id` in a\n`StreamingModifyAckDeadlineRequest` if using streaming pull.\nThe minimum custom deadline you can specify is 10 seconds.\nThe maximum custom deadline you can specify is 600 seconds (10 minutes).\nIf this parameter is 0, a default value of 10 seconds is used.\n\nFor push delivery, this value is also used to set the request timeout for\nthe call to the push endpoint.\n\nIf the subscriber never acknowledges the message, the Pub/Sub\nsystem will eventually redeliver the message."
+        },
+        "retainAckedMessages": {
+          "type": "boolean",
+          "description": "Optional. Indicates whether to retain acknowledged messages. If true, then\nmessages are not expunged from the subscription's backlog, even if they are\nacknowledged, until they fall out of the `message_retention_duration`\nwindow. This must be true if you would like to [`Seek` to a timestamp]\n(https://cloud.google.com/pubsub/docs/replay-overview#seek_to_a_time) in\nthe past to replay previously-acknowledged messages."
+        },
+        "messageRetentionDuration": {
+          "type": "string",
+          "description": "Optional. How long to retain unacknowledged messages in the subscription's\nbacklog, from the moment a message is published. If `retain_acked_messages`\nis true, then this also configures the retention of acknowledged messages,\nand thus configures how far back in time a `Seek` can be done. Defaults to\n7 days. Cannot be more than 7 days or less than 10 minutes."
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Optional. See [Creating and managing\nlabels](https://cloud.google.com/pubsub/docs/labels)."
+        },
+        "enableMessageOrdering": {
+          "type": "boolean",
+          "description": "Optional. If true, messages published with the same `ordering_key` in\n`PubsubMessage` will be delivered to the subscribers in the order in which\nthey are received by the Pub/Sub system. Otherwise, they may be delivered\nin any order."
+        },
+        "expirationPolicy": {
+          "$ref": "#/definitions/v1ExpirationPolicy",
+          "description": "Optional. A policy that specifies the conditions for this subscription's\nexpiration. A subscription is considered active as long as any connected\nsubscriber is successfully consuming messages from the subscription or is\nissuing operations on the subscription. If `expiration_policy` is not set,\na *default policy* with `ttl` of 31 days will be used. The minimum allowed\nvalue for `expiration_policy.ttl` is 1 day. If `expiration_policy` is set,\nbut `expiration_policy.ttl` is not set, the subscription never expires."
+        },
+        "filter": {
+          "type": "string",
+          "description": "Optional. An expression written in the Pub/Sub [filter\nlanguage](https://cloud.google.com/pubsub/docs/filtering). If non-empty,\nthen only `PubsubMessage`s whose `attributes` field matches the filter are\ndelivered on this subscription. If empty, then no messages are filtered\nout."
+        },
+        "deadLetterPolicy": {
+          "$ref": "#/definitions/v1DeadLetterPolicy",
+          "description": "Optional. A policy that specifies the conditions for dead lettering\nmessages in this subscription. If dead_letter_policy is not set, dead\nlettering is disabled.\n\nThe Pub/Sub service account associated with this subscriptions's\nparent project (i.e.,\nservice-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com) must have\npermission to Acknowledge() messages on this subscription."
+        },
+        "retryPolicy": {
+          "$ref": "#/definitions/v1RetryPolicy",
+          "description": "Optional. A policy that specifies how Pub/Sub retries message delivery for\nthis subscription.\n\nIf not set, the default retry policy is applied. This generally implies\nthat messages will be retried as soon as possible for healthy subscribers.\nRetryPolicy will be triggered on NACKs or acknowledgement deadline\nexceeded events for a given message."
+        },
+        "detached": {
+          "type": "boolean",
+          "description": "Optional. Indicates whether the subscription is detached from its topic.\nDetached subscriptions don't receive messages from their topic and don't\nretain any backlog. `Pull` and `StreamingPull` requests will return\nFAILED_PRECONDITION. If the subscription is a push subscription, pushes to\nthe endpoint will not be made."
+        },
+        "enableExactlyOnceDelivery": {
+          "type": "boolean",
+          "description": "* The message sent to a subscriber is guaranteed not to be resent\nbefore the message's acknowledgement deadline expires.\n* An acknowledged message will not be resent to a subscriber.\n\nNote that subscribers may still receive multiple copies of a message\nwhen `enable_exactly_once_delivery` is true if the message was published\nmultiple times by a publisher client. These copies are  considered distinct\nby Pub/Sub and have distinct `message_id` values.",
+          "title": "Optional. If true, Pub/Sub provides the following guarantees for the\ndelivery of a message with a given value of `message_id` on this\nsubscription:"
+        },
+        "topicMessageRetentionDuration": {
+          "type": "string",
+          "description": "Output only. Indicates the minimum duration for which a message is retained\nafter it is published to the subscription's topic. If this field is set,\nmessages published to the subscription's topic in the last\n`topic_message_retention_duration` are always available to subscribers. See\nthe `message_retention_duration` field in `Topic`. This field is set only\nin responses from the server; it is ignored if it is set in any requests.",
+          "readOnly": true
+        },
+        "state": {
+          "$ref": "#/definitions/v1SubscriptionState",
+          "description": "Output only. An output-only field indicating whether or not the\nsubscription can receive messages.",
+          "readOnly": true
+        }
+      },
+      "description": "A subscription resource. If none of `push_config`, `bigquery_config`, or\n`cloud_storage_config` is set, then the subscriber will pull and ack messages\nusing API methods. At most one of these fields may be set.",
+      "required": [
+        "name",
+        "topic"
+      ]
+    },
+    "v1SubscriptionState": {
+      "type": "string",
+      "enum": [
+        "STATE_UNSPECIFIED",
+        "ACTIVE",
+        "RESOURCE_ERROR"
+      ],
+      "default": "STATE_UNSPECIFIED",
+      "description": "Possible states for a subscription.\n\n - STATE_UNSPECIFIED: Default value. This value is unused.\n - ACTIVE: The subscription can actively receive messages\n - RESOURCE_ERROR: The subscription cannot receive messages because of an error with the\nresource to which it pushes messages. See the more detailed error state\nin the corresponding configuration."
+    },
+    "v1Topic": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Required. The name of the topic. It must have the format\n`\"projects/{project}/topics/{topic}\"`. `{topic}` must start with a letter,\nand contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),\nunderscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent\nsigns (`%`). It must be between 3 and 255 characters in length, and it\nmust not start with `\"goog\"`."
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Optional. See [Creating and managing labels]\n(https://cloud.google.com/pubsub/docs/labels)."
+        },
+        "messageStoragePolicy": {
+          "$ref": "#/definitions/v1MessageStoragePolicy",
+          "description": "Optional. Policy constraining the set of Google Cloud Platform regions\nwhere messages published to the topic may be stored. If not present, then\nno constraints are in effect."
+        },
+        "kmsKeyName": {
+          "type": "string",
+          "description": "Optional. The resource name of the Cloud KMS CryptoKey to be used to\nprotect access to messages published on this topic.\n\nThe expected format is `projects/*/locations/*/keyRings/*/cryptoKeys/*`."
+        },
+        "schemaSettings": {
+          "$ref": "#/definitions/v1SchemaSettings",
+          "description": "Optional. Settings for validating messages published against a schema."
+        },
+        "satisfiesPzs": {
+          "type": "boolean",
+          "description": "Optional. Reserved for future use. This field is set only in responses from\nthe server; it is ignored if it is set in any requests."
+        },
+        "messageRetentionDuration": {
+          "type": "string",
+          "description": "Optional. Indicates the minimum duration to retain a message after it is\npublished to the topic. If this field is set, messages published to the\ntopic in the last `message_retention_duration` are always available to\nsubscribers. For instance, it allows any attached subscription to [seek to\na\ntimestamp](https://cloud.google.com/pubsub/docs/replay-overview#seek_to_a_time)\nthat is up to `message_retention_duration` in the past. If this field is\nnot set, message retention is controlled by settings on individual\nsubscriptions. Cannot be more than 31 days or less than 10 minutes."
+        },
+        "state": {
+          "$ref": "#/definitions/v1TopicState",
+          "description": "Output only. An output-only field indicating the state of the topic.",
+          "readOnly": true
+        },
+        "ingestionDataSourceSettings": {
+          "$ref": "#/definitions/v1IngestionDataSourceSettings",
+          "description": "Optional. Settings for ingestion from a data source into this topic."
+        }
+      },
+      "description": "A topic resource.",
+      "required": [
+        "name"
+      ]
+    },
+    "v1TopicState": {
+      "type": "string",
+      "enum": [
+        "STATE_UNSPECIFIED",
+        "ACTIVE",
+        "INGESTION_RESOURCE_ERROR"
+      ],
+      "default": "STATE_UNSPECIFIED",
+      "description": "The state of the topic.\n\n - STATE_UNSPECIFIED: Default value. This value is unused.\n - ACTIVE: The topic does not have any persistent errors.\n - INGESTION_RESOURCE_ERROR: Ingestion from the data source has encountered a permanent error.\nSee the more detailed error state in the corresponding ingestion\nsource configuration."
+    }
+  }
+}

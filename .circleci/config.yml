@@ -50,6 +50,8 @@ jobs:
       # however protobuf is not
       - run: ./mage -v installProtobufTools
       - run: ./mage -v generate:force
+      # make sure committed generated code was up to date
+      - run: git diff --exit-code
 
       - run:
           name: Compile code

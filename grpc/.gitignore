@@ -1,6 +1,4 @@
-*.swagger.json
 pubsub/
-pubsubpb/
 health/
 googleapis.tgz
 grpc-proto.tgz
