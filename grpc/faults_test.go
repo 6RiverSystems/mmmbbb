@@ -43,7 +43,7 @@ func Benchmark_UnaryFaultInjection_empty_miss(b *testing.B) {
 	set := faults.NewSet(b.Name())
 	injector := UnaryFaultInjector(set)
 	b.ResetTimer()
-	for n := 0; n < b.N; n++ {
+	for range b.N {
 		if ret, err := injector(ctx, req, info, unaryNoOp); err != nil {
 			b.Fatal("check of empty set returned error")
 		} else if ret != nil {

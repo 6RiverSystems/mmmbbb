@@ -172,7 +172,7 @@ func TestSet_Check_Race(t *testing.T) {
 	}
 	fails := 0
 
-	for n := 0; n < attempts; n++ {
+	for n := range attempts {
 		c := int64(0)
 		onFault := func(Description, Parameters) error {
 			atomic.AddInt64(&c, 1)
@@ -185,7 +185,7 @@ func TestSet_Check_Race(t *testing.T) {
 		// use a wee spinlock to get all the goroutines to wake up as close to the
 		// same time as possible
 		spin := int32(1)
-		for i := 0; i < concurrent; i++ {
+		for range concurrent {
 			go func() {
 				for atomic.LoadInt32(&spin) != 0 {
 				}

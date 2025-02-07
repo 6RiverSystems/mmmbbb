@@ -47,7 +47,7 @@ func TestCreateSnapshot_Execute(t *testing.T) {
 			"everything acked",
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test, topic *ent.Topic, sub *ent.Subscription) {
 				// create several already-acked messages in the past
-				for offset := 0; offset < 10; offset++ {
+				for offset := range 10 {
 					m := createMessage(t, ctx, tx, topic, offset, func(mc *ent.MessageCreate) *ent.MessageCreate {
 						return mc.SetPublishedAt(refTime.Add(time.Duration(offset) * time.Second))
 					})
@@ -78,7 +78,7 @@ func TestCreateSnapshot_Execute(t *testing.T) {
 			"nothing acked",
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test, topic *ent.Topic, sub *ent.Subscription) {
 				// create several not-acked messages in the past
-				for offset := 0; offset < 10; offset++ {
+				for offset := range 10 {
 					m := createMessage(t, ctx, tx, topic, offset, func(mc *ent.MessageCreate) *ent.MessageCreate {
 						return mc.SetPublishedAt(refTime.Add(time.Duration(offset) * time.Second))
 					})
@@ -107,7 +107,7 @@ func TestCreateSnapshot_Execute(t *testing.T) {
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test, topic *ent.Topic, sub *ent.Subscription) {
 				// ack even messages, so the first un-acked is the first odd one, and
 				// thus the zero message doesn't appear in the override list
-				for offset := 0; offset < 10; offset++ {
+				for offset := range 10 {
 					m := createMessage(t, ctx, tx, topic, offset, func(mc *ent.MessageCreate) *ent.MessageCreate {
 						return mc.SetPublishedAt(refTime.Add(time.Duration(offset) * time.Second))
 					})

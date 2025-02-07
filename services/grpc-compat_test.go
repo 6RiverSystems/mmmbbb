@@ -755,7 +755,7 @@ func TestGrpcCompat(t *testing.T) {
 				tt.subs = []*pubsub.Subscription{sub}
 
 				// send some messages that we're gonna purge
-				for i := 0; i < 10; i++ {
+				for i := range 10 {
 					_, err := topic.Publish(ctx, &pubsub.Message{
 						Data: json.RawMessage(strconv.Itoa(i)),
 					}).Get(ctx)
@@ -847,13 +847,13 @@ func benchThroughput(b *testing.B, numTopics, subsPerTopic, maxMessages int, pay
 	topics := make([]*pubsub.Topic, numTopics)
 	pubs := make([][]*pubsub.PublishResult, numTopics)
 	subs := make([]*pubsub.Subscription, numTopics*subsPerTopic)
-	for i := 0; i < numTopics; i++ {
+	for i := range numTopics {
 		var err error
 		topics[i], err = psClient.CreateTopic(ctx, safeName(b)+"_"+strconv.Itoa(i))
 		require.NoError(b, err)
 		pubs[i] = make([]*pubsub.PublishResult, b.N)
 	}
-	for i := 0; i < numTopics*subsPerTopic; i++ {
+	for i := range numTopics * subsPerTopic {
 		var err error
 		subs[i], err = psClient.CreateSubscription(
 			ctx,
@@ -874,13 +874,13 @@ func benchThroughput(b *testing.B, numTopics, subsPerTopic, maxMessages int, pay
 		i := i
 		topic := topic
 		eg.Go(func() error {
-			for j := 0; j < b.N; j++ {
+			for j := range b.N {
 				pubs[i][j] = topic.Publish(egCtx, &pubsub.Message{
 					Data:       payload,
 					Attributes: map[string]string{"n": strconv.Itoa(j)},
 				})
 			}
-			for j := 0; j < b.N; j++ {
+			for j := range b.N {
 				_, err := pubs[i][j].Get(egCtx)
 				assert.NoError(b, err, "publish should not fail on topic/message %d/%d", i, j)
 			}

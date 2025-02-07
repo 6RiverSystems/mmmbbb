@@ -36,7 +36,7 @@ func UUIDsFromStrings(values []string) ([]uuid.UUID, error) {
 }
 
 func UUIDLess(a, b uuid.UUID) bool {
-	for n := 0; n < len(a); n++ {
+	for n := range a {
 		if a[n] < b[n] {
 			return true
 		}

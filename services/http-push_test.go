@@ -195,7 +195,7 @@ func TestHttpPush(t *testing.T) {
 			"accelerating flow control",
 			true,
 			func(t *testing.T, client *ent.Client, endpoint string) error {
-				for i := 0; i < 100; i++ {
+				for i := range 100 {
 					if err := publishMarker(t, client, i); err != nil {
 						return err
 					}
@@ -246,7 +246,7 @@ func TestHttpPush(t *testing.T) {
 			"decelerating flow control",
 			true,
 			func(t *testing.T, client *ent.Client, endpoint string) error {
-				for i := 0; i < 4; i++ {
+				for i := range 4 {
 					if err := publishMarker(t, client, i); err != nil {
 						return err
 					}
@@ -302,7 +302,7 @@ func TestHttpPush(t *testing.T) {
 			"nack flow control",
 			true,
 			func(t *testing.T, client *ent.Client, endpoint string) error {
-				for i := 0; i < 11; i++ {
+				for i := range 11 {
 					if err := publishMarker(t, client, i); err != nil {
 						return err
 					}
@@ -394,7 +394,7 @@ func TestHttpPush(t *testing.T) {
 				w.WriteHeader(http.StatusInternalServerError)
 			},
 			func(t *testing.T, msgs chan *actions.PushRequest) error {
-				for i := 0; i < 2; i++ {
+				for range 2 {
 					m := <-msgs
 					assert.Equal(t, safeName(t), m.Subscription)
 					var mm struct {

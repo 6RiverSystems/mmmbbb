@@ -207,7 +207,7 @@ func TestMessageStreamer_Go(t *testing.T) {
 				topic := client.Topic.GetX(ctx, xID(t, &ent.Topic{}, 0))
 				sub := client.Subscription.GetX(ctx, xID(t, &ent.Subscription{}, 0))
 				// send a short sequence of messages, make sure they are received
-				for m := 0; m < 2; m++ {
+				for m := range 2 {
 					var msgID, delID uuid.UUID
 					assert.NoError(t, client.DoCtxTx(ctx, nil, func(ctx context.Context, tx *ent.Tx) error {
 						msg := createMessage(t, ctx, tx, topic, m)
@@ -253,7 +253,7 @@ func TestMessageStreamer_Go(t *testing.T) {
 				sub := client.Subscription.GetX(ctx, xID(t, &ent.Subscription{}, 0))
 				assert.NoError(t, client.DoCtxTx(ctx, nil, func(ctx context.Context, tx *ent.Tx) error {
 					// send one more message than FC will allow
-					for m := 0; m < 3; m++ {
+					for m := range 3 {
 						msg := createMessage(t, ctx, tx, topic, m)
 						createDelivery(t, ctx, tx, sub, msg, m)
 					}
@@ -261,7 +261,7 @@ func TestMessageStreamer_Go(t *testing.T) {
 					return nil
 				}))
 				// receive up to flow control limit
-				for m := 0; m < 2; m++ {
+				for m := range 2 {
 					select {
 					case <-ctx.Done():
 						assert.NoError(t, ctx.Err(), "context canceled waiting for delivery")
@@ -321,7 +321,7 @@ func TestMessageStreamer_Go(t *testing.T) {
 				sub := client.Subscription.GetX(ctx, xID(t, &ent.Subscription{}, 0))
 				assert.NoError(t, client.DoCtxTx(ctx, nil, func(ctx context.Context, tx *ent.Tx) error {
 					// send many more messages than FC will allow
-					for m := 0; m < 10; m++ {
+					for m := range 10 {
 						msg := createMessage(t, ctx, tx, topic, m)
 						createDelivery(t, ctx, tx, sub, msg, m)
 					}
@@ -332,7 +332,7 @@ func TestMessageStreamer_Go(t *testing.T) {
 				// receive, ack in batches sized based on the flow control
 				acks := []uuid.UUID{}
 				lastDelivery := time.Now()
-				for m := 0; m < 10; m++ {
+				for m := range 10 {
 					del := <-conn.outbound
 					now := time.Now()
 					delay := now.Sub(lastDelivery)

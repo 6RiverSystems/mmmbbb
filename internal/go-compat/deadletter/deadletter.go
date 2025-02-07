@@ -120,7 +120,7 @@ func main() {
 	eg.Go(func() error {
 		defer close(pubs)
 		payload := json.RawMessage(`{"hello":"world"}`)
-		for i := 0; i < numMessages; i++ {
+		for i := range numMessages {
 			todo(i)
 			select {
 			case <-egCtx.Done():

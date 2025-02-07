@@ -54,7 +54,7 @@ func TestSeekSubscriptionToTime_Execute(t *testing.T) {
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
 				tt.params.ID = &tt.sub.ID
 				tt.expectPublishNotify = tt.sub.ID
-				for i := 0; i < 10; i++ {
+				for i := range 10 {
 					m := createMessage(t, ctx, tx, tt.topic, i)
 					d := createDelivery(t, ctx, tx, tt.sub, m, i)
 					tt.expectAcked = append(tt.expectAcked, d.ID)
@@ -75,7 +75,7 @@ func TestSeekSubscriptionToTime_Execute(t *testing.T) {
 				begin := time.Now()
 				tt.params.ID = &tt.sub.ID
 				tt.expectPublishNotify = tt.sub.ID
-				for i := 0; i < 10; i++ {
+				for i := range 10 {
 					m := createMessage(t, ctx, tx, tt.topic, i)
 					d := createDelivery(t, ctx, tx, tt.sub, m, i, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
 						return dc.SetCompletedAt(begin)
@@ -98,7 +98,7 @@ func TestSeekSubscriptionToTime_Execute(t *testing.T) {
 				tt.params.ID = &tt.sub.ID
 				// don't set tt.expectPublishNotify -- we expect no changes, so we don't
 				// expect any notifications
-				for i := 0; i < 10; i++ {
+				for i := range 10 {
 					m := createMessage(t, ctx, tx, tt.topic, i)
 					d := createDelivery(t, ctx, tx, tt.sub, m, i, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
 						return dc.SetCompletedAt(time.Now())
@@ -122,7 +122,7 @@ func TestSeekSubscriptionToTime_Execute(t *testing.T) {
 				tt.params.ID = &tt.sub.ID
 				// don't set tt.expectPublishNotify -- we expect no changes, so we don't
 				// expect any notifications
-				for i := 0; i < 10; i++ {
+				for i := range 10 {
 					m := createMessage(t, ctx, tx, tt.topic, i)
 					d := createDelivery(t, ctx, tx, tt.sub, m, i)
 					tt.expectNotAcked = append(tt.expectNotAcked, d.ID)
