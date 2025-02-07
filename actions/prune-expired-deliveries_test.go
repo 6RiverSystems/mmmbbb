@@ -82,9 +82,16 @@ func TestPrunedExpiredDeliveries_Execute(t *testing.T) {
 			"wake ordered",
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
 				topic := createTopic(t, ctx, tx, 0)
-				sub := createSubscription(t, ctx, tx, topic, 0, func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
-					return sc.SetOrderedDelivery(true)
-				})
+				sub := createSubscription(
+					t,
+					ctx,
+					tx,
+					topic,
+					0,
+					func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
+						return sc.SetOrderedDelivery(true)
+					},
+				)
 				tt.expectPublishNotify = sub.ID
 				msg := createMessage(t, ctx, tx, topic, 0)
 				createDelivery(t, ctx, tx, sub, msg, 0, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {

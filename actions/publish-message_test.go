@@ -229,9 +229,16 @@ func TestPublishMessage_Execute(t *testing.T) {
 			"ordered sub",
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
 				topic := createTopic(t, ctx, tx, 0)
-				sub := createSubscription(t, ctx, tx, topic, 0, func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
-					return sc.SetOrderedDelivery(true)
-				})
+				sub := createSubscription(
+					t,
+					ctx,
+					tx,
+					topic,
+					0,
+					func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
+						return sc.SetOrderedDelivery(true)
+					},
+				)
 				// create an earlier delivery, new message should be "after" it
 				msg := createMessage(t, ctx, tx, topic, 0, func(mc *ent.MessageCreate) *ent.MessageCreate {
 					return mc.SetOrderKey(t.Name())
@@ -267,12 +274,26 @@ func TestPublishMessage_Execute(t *testing.T) {
 			"multiple ordered sub",
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
 				topic := createTopic(t, ctx, tx, 0)
-				sub1 := createSubscription(t, ctx, tx, topic, 0, func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
-					return sc.SetOrderedDelivery(true)
-				})
-				sub2 := createSubscription(t, ctx, tx, topic, 1, func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
-					return sc.SetOrderedDelivery(true)
-				})
+				sub1 := createSubscription(
+					t,
+					ctx,
+					tx,
+					topic,
+					0,
+					func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
+						return sc.SetOrderedDelivery(true)
+					},
+				)
+				sub2 := createSubscription(
+					t,
+					ctx,
+					tx,
+					topic,
+					1,
+					func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
+						return sc.SetOrderedDelivery(true)
+					},
+				)
 				// create an earlier delivery, new message should be "after" it
 				msg := createMessage(t, ctx, tx, topic, 0, func(mc *ent.MessageCreate) *ent.MessageCreate {
 					return mc.SetOrderKey(t.Name())
@@ -318,9 +339,16 @@ func TestPublishMessage_Execute(t *testing.T) {
 			"mixed ordered sub",
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
 				topic := createTopic(t, ctx, tx, 0)
-				sub1 := createSubscription(t, ctx, tx, topic, 0, func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
-					return sc.SetOrderedDelivery(true)
-				})
+				sub1 := createSubscription(
+					t,
+					ctx,
+					tx,
+					topic,
+					0,
+					func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
+						return sc.SetOrderedDelivery(true)
+					},
+				)
 				sub2 := createSubscription(t, ctx, tx, topic, 1)
 				// create an earlier delivery, new message should be "after" it
 				msg := createMessage(t, ctx, tx, topic, 0, func(mc *ent.MessageCreate) *ent.MessageCreate {
@@ -366,9 +394,16 @@ func TestPublishMessage_Execute(t *testing.T) {
 			"filtered sub, match",
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
 				topic := createTopic(t, ctx, tx, 0)
-				sub := createSubscription(t, ctx, tx, topic, 0, func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
-					return sc.SetMessageFilter("attributes:deliver")
-				})
+				sub := createSubscription(
+					t,
+					ctx,
+					tx,
+					topic,
+					0,
+					func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
+						return sc.SetMessageFilter("attributes:deliver")
+					},
+				)
 				tt.params.TopicName = topic.Name
 				tt.params.OrderKey = t.Name()
 				tt.expectPublishNotify = append(tt.expectPublishNotify, sub.ID)

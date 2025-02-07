@@ -76,10 +76,21 @@ const (
 	waitMonitorEnded
 )
 
-func waitMonitors(ctx context.Context, timeout time.Duration, notifier <-chan struct{}, mons map[string]monitoredGroup) waitMonitorResult {
+func waitMonitors(
+	ctx context.Context,
+	timeout time.Duration,
+	notifier <-chan struct{},
+	mons map[string]monitoredGroup,
+) waitMonitorResult {
 	selects := make([]reflect.SelectCase, 3, 3+len(mons))
-	selects[waitMonitorTimeout] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(time.After(timeout))}
-	selects[waitMonitorContextDone] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(ctx.Done())}
+	selects[waitMonitorTimeout] = reflect.SelectCase{
+		Dir:  reflect.SelectRecv,
+		Chan: reflect.ValueOf(time.After(timeout)),
+	}
+	selects[waitMonitorContextDone] = reflect.SelectCase{
+		Dir:  reflect.SelectRecv,
+		Chan: reflect.ValueOf(ctx.Done()),
+	}
 	selects[waitMonitorNotified] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(notifier)}
 	for _, mg := range mons {
 		selects = append(selects, reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(mg.Done())})

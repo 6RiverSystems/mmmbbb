@@ -39,7 +39,10 @@ import (
 	"go.6river.tech/mmmbbb/grpc/pubsubpb"
 )
 
-func (s *subscriberServer) GetSnapshot(ctx context.Context, req *pubsubpb.GetSnapshotRequest) (*pubsubpb.Snapshot, error) {
+func (s *subscriberServer) GetSnapshot(
+	ctx context.Context,
+	req *pubsubpb.GetSnapshotRequest,
+) (*pubsubpb.Snapshot, error) {
 	if !isValidSnapshotName(req.Snapshot) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / snapshot path %s", req.Snapshot)
 	}
@@ -67,7 +70,10 @@ func (s *subscriberServer) GetSnapshot(ctx context.Context, req *pubsubpb.GetSna
 	return resp, nil
 }
 
-func (s *subscriberServer) ListSnapshots(ctx context.Context, req *pubsubpb.ListSnapshotsRequest) (*pubsubpb.ListSnapshotsResponse, error) {
+func (s *subscriberServer) ListSnapshots(
+	ctx context.Context,
+	req *pubsubpb.ListSnapshotsRequest,
+) (*pubsubpb.ListSnapshotsResponse, error) {
 	var pageSize int32 = 100
 	if req.PageSize > 0 && req.PageSize < pageSize {
 		pageSize = req.PageSize
@@ -112,12 +118,19 @@ func (s *subscriberServer) ListSnapshots(ctx context.Context, req *pubsubpb.List
 	return resp, nil
 }
 
-func (s *subscriberServer) CreateSnapshot(ctx context.Context, req *pubsubpb.CreateSnapshotRequest) (*pubsubpb.Snapshot, error) {
+func (s *subscriberServer) CreateSnapshot(
+	ctx context.Context,
+	req *pubsubpb.CreateSnapshotRequest,
+) (*pubsubpb.Snapshot, error) {
 	if !isValidSnapshotName(req.Name) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / snapshot path %s", req.Name)
 	}
 	if !isValidSubscriptionName(req.Subscription) {
-		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / subscription path %s", req.Subscription)
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"Unsupported project / subscription path %s",
+			req.Subscription,
+		)
 	}
 
 	params := actions.CreateSnapshotParams{
@@ -142,12 +155,18 @@ func (s *subscriberServer) CreateSnapshot(ctx context.Context, req *pubsubpb.Cre
 	return entSnapshotToGrpc(results.Snapshot, results.TopicName), nil
 }
 
-func (s *subscriberServer) UpdateSnapshot(ctx context.Context, req *pubsubpb.UpdateSnapshotRequest) (*pubsubpb.Snapshot, error) {
+func (s *subscriberServer) UpdateSnapshot(
+	ctx context.Context,
+	req *pubsubpb.UpdateSnapshotRequest,
+) (*pubsubpb.Snapshot, error) {
 	// TODO: implement this if we need to
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateSnapshot not implemented")
 }
 
-func (s *subscriberServer) DeleteSnapshot(ctx context.Context, req *pubsubpb.DeleteSnapshotRequest) (*empty.Empty, error) {
+func (s *subscriberServer) DeleteSnapshot(
+	ctx context.Context,
+	req *pubsubpb.DeleteSnapshotRequest,
+) (*empty.Empty, error) {
 	if !isValidSnapshotName(req.Snapshot) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / snapshot path %s", req.Snapshot)
 	}

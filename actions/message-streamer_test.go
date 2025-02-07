@@ -123,12 +123,26 @@ func TestMessageStreamer_Go(t *testing.T) {
 			"err no sub by id+name",
 			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test) {
 				topic := createTopicClient(t, ctx, client, 0)
-				sub1 := createSubscriptionClient(t, ctx, client, topic, 0, func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
-					return sc.SetName(t.Name() + ":1")
-				})
-				sub2 := createSubscriptionClient(t, ctx, client, topic, 1, func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
-					return sc.SetName(t.Name() + ":2")
-				})
+				sub1 := createSubscriptionClient(
+					t,
+					ctx,
+					client,
+					topic,
+					0,
+					func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
+						return sc.SetName(t.Name() + ":1")
+					},
+				)
+				sub2 := createSubscriptionClient(
+					t,
+					ctx,
+					client,
+					topic,
+					1,
+					func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
+						return sc.SetName(t.Name() + ":2")
+					},
+				)
 				tt.params.subscriptionName = sub2.Name
 				tt.params.subscriptionID = sub1.ID
 			},

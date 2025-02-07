@@ -30,7 +30,8 @@ import (
 
 func isSqliteDuplicateKeyError(err error) bool {
 	var se *sqlite3.Error
-	if errors.As(err, &se) && se.Code == sqlite3.ErrConstraint && se.ExtendedCode == sqlite3.ErrConstraintUnique {
+	if errors.As(err, &se) && se.Code == sqlite3.ErrConstraint &&
+		se.ExtendedCode == sqlite3.ErrConstraintUnique {
 		return true
 	}
 	return false

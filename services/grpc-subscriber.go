@@ -55,7 +55,10 @@ type subscriberServer struct {
 	client *ent.Client
 }
 
-func (s *subscriberServer) CreateSubscription(ctx context.Context, req *pubsubpb.Subscription) (*pubsubpb.Subscription, error) {
+func (s *subscriberServer) CreateSubscription(
+	ctx context.Context,
+	req *pubsubpb.Subscription,
+) (*pubsubpb.Subscription, error) {
 	if !isValidSubscriptionName(req.Name) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / subscription path %s", req.Name)
 	}
@@ -69,11 +72,17 @@ func (s *subscriberServer) CreateSubscription(ctx context.Context, req *pubsubpb
 			return nil, status.Error(codes.Unimplemented, "Advanced features not supported (PushConfig.Attributes)")
 		}
 		if req.PushConfig.AuthenticationMethod != nil {
-			return nil, status.Error(codes.Unimplemented, "Advanced features not supported (PushConfig.AuthenticationMethod)")
+			return nil, status.Error(
+				codes.Unimplemented,
+				"Advanced features not supported (PushConfig.AuthenticationMethod)",
+			)
 		}
 		if req.PushConfig.Wrapper != nil {
 			if _, ok := req.PushConfig.Wrapper.(*pubsubpb.PushConfig_PubsubWrapper_); !ok {
-				return nil, status.Error(codes.Unimplemented, "Advanced features not supported (PushConfig.Wrapper unwrapped)")
+				return nil, status.Error(
+					codes.Unimplemented,
+					"Advanced features not supported (PushConfig.Wrapper unwrapped)",
+				)
 			}
 		}
 	}
@@ -125,9 +134,16 @@ func (s *subscriberServer) CreateSubscription(ctx context.Context, req *pubsubpb
 	return entSubscriptionToGrpc(results.Sub, params.TopicName, params.DeadLetterTopic), nil
 }
 
-func (s *subscriberServer) GetSubscription(ctx context.Context, req *pubsubpb.GetSubscriptionRequest) (*pubsubpb.Subscription, error) {
+func (s *subscriberServer) GetSubscription(
+	ctx context.Context,
+	req *pubsubpb.GetSubscriptionRequest,
+) (*pubsubpb.Subscription, error) {
 	if !isValidSubscriptionName(req.Subscription) {
-		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / subscription path %s", req.Subscription)
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"Unsupported project / subscription path %s",
+			req.Subscription,
+		)
 	}
 
 	var resp *pubsubpb.Subscription
@@ -155,9 +171,16 @@ func (s *subscriberServer) GetSubscription(ctx context.Context, req *pubsubpb.Ge
 	return resp, nil
 }
 
-func (s *subscriberServer) UpdateSubscription(ctx context.Context, req *pubsubpb.UpdateSubscriptionRequest) (*pubsubpb.Subscription, error) {
+func (s *subscriberServer) UpdateSubscription(
+	ctx context.Context,
+	req *pubsubpb.UpdateSubscriptionRequest,
+) (*pubsubpb.Subscription, error) {
 	if !isValidSubscriptionName(req.Subscription.Name) {
-		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / subscription path %s", req.Subscription.Name)
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"Unsupported project / subscription path %s",
+			req.Subscription.Name,
+		)
 	}
 
 	var resp *pubsubpb.Subscription
@@ -275,7 +298,11 @@ func (s *subscriberServer) UpdateSubscription(ctx context.Context, req *pubsubpb
 				// these are valid paths, we just don't support changing them
 				return status.Errorf(codes.InvalidArgument, "Modifying Subscription.%s is not supported", p)
 			default:
-				return status.Errorf(codes.InvalidArgument, "Modifying Subscription.%s is not a recognized subscription property", p)
+				return status.Errorf(
+					codes.InvalidArgument,
+					"Modifying Subscription.%s is not a recognized subscription property",
+					p,
+				)
 			}
 		}
 
@@ -302,7 +329,10 @@ func (s *subscriberServer) UpdateSubscription(ctx context.Context, req *pubsubpb
 	return resp, nil
 }
 
-func (s *subscriberServer) ListSubscriptions(ctx context.Context, req *pubsubpb.ListSubscriptionsRequest) (*pubsubpb.ListSubscriptionsResponse, error) {
+func (s *subscriberServer) ListSubscriptions(
+	ctx context.Context,
+	req *pubsubpb.ListSubscriptionsRequest,
+) (*pubsubpb.ListSubscriptionsResponse, error) {
 	var pageSize int32 = 100
 	if req.PageSize > 0 && req.PageSize < pageSize {
 		pageSize = req.PageSize
@@ -349,9 +379,16 @@ func (s *subscriberServer) ListSubscriptions(ctx context.Context, req *pubsubpb.
 	return resp, nil
 }
 
-func (s *subscriberServer) DeleteSubscription(ctx context.Context, req *pubsubpb.DeleteSubscriptionRequest) (*emptypb.Empty, error) {
+func (s *subscriberServer) DeleteSubscription(
+	ctx context.Context,
+	req *pubsubpb.DeleteSubscriptionRequest,
+) (*emptypb.Empty, error) {
 	if !isValidSubscriptionName(req.Subscription) {
-		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / subscription path %s", req.Subscription)
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"Unsupported project / subscription path %s",
+			req.Subscription,
+		)
 	}
 
 	action := actions.NewDeleteSubscription(req.Subscription)
@@ -365,9 +402,16 @@ func (s *subscriberServer) DeleteSubscription(ctx context.Context, req *pubsubpb
 	return &emptypb.Empty{}, nil
 }
 
-func (s *subscriberServer) ModifyAckDeadline(ctx context.Context, req *pubsubpb.ModifyAckDeadlineRequest) (*emptypb.Empty, error) {
+func (s *subscriberServer) ModifyAckDeadline(
+	ctx context.Context,
+	req *pubsubpb.ModifyAckDeadlineRequest,
+) (*emptypb.Empty, error) {
 	if !isValidSubscriptionName(req.Subscription) {
-		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / subscription path %s", req.Subscription)
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"Unsupported project / subscription path %s",
+			req.Subscription,
+		)
 	}
 
 	// NOTE: other than the format validation, we ignore req.Subscription, as it
@@ -395,9 +439,16 @@ func (s *subscriberServer) ModifyAckDeadline(ctx context.Context, req *pubsubpb.
 	return &emptypb.Empty{}, nil
 }
 
-func (s *subscriberServer) Acknowledge(ctx context.Context, req *pubsubpb.AcknowledgeRequest) (*emptypb.Empty, error) {
+func (s *subscriberServer) Acknowledge(
+	ctx context.Context,
+	req *pubsubpb.AcknowledgeRequest,
+) (*emptypb.Empty, error) {
 	if !isValidSubscriptionName(req.Subscription) {
-		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / subscription path %s", req.Subscription)
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"Unsupported project / subscription path %s",
+			req.Subscription,
+		)
 	}
 
 	// NOTE: other than the format validation, we ignore req.Subscription, as it
@@ -423,9 +474,16 @@ func (s *subscriberServer) Acknowledge(ctx context.Context, req *pubsubpb.Acknow
 	return &emptypb.Empty{}, nil
 }
 
-func (s *subscriberServer) Pull(ctx context.Context, req *pubsubpb.PullRequest) (*pubsubpb.PullResponse, error) {
+func (s *subscriberServer) Pull(
+	ctx context.Context,
+	req *pubsubpb.PullRequest,
+) (*pubsubpb.PullResponse, error) {
 	if !isValidSubscriptionName(req.Subscription) {
-		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / subscription path %s", req.Subscription)
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"Unsupported project / subscription path %s",
+			req.Subscription,
+		)
 	}
 
 	p := actions.GetSubscriptionMessagesParams{
@@ -457,9 +515,16 @@ func (s *subscriberServer) Pull(ctx context.Context, req *pubsubpb.PullRequest) 
 	return &pubsubpb.PullResponse{ReceivedMessages: msgs}, nil
 }
 
-func (s *subscriberServer) Seek(ctx context.Context, req *pubsubpb.SeekRequest) (*pubsubpb.SeekResponse, error) {
+func (s *subscriberServer) Seek(
+	ctx context.Context,
+	req *pubsubpb.SeekRequest,
+) (*pubsubpb.SeekResponse, error) {
 	if !isValidSubscriptionName(req.Subscription) {
-		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / subscription path %s", req.Subscription)
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"Unsupported project / subscription path %s",
+			req.Subscription,
+		)
 	}
 
 	switch target := req.Target.(type) {
@@ -511,7 +576,11 @@ func (s *subscriberServer) StreamingPull(stream pubsubpb.Subscriber_StreamingPul
 	}
 
 	if !isValidSubscriptionName(initial.Subscription) {
-		return status.Errorf(codes.InvalidArgument, "Unsupported project / subscription path %s", initial.Subscription)
+		return status.Errorf(
+			codes.InvalidArgument,
+			"Unsupported project / subscription path %s",
+			initial.Subscription,
+		)
 	}
 
 	ctx := stream.Context()
@@ -681,7 +750,10 @@ func (w *streamWrapper) adaptIn(m *pubsubpb.StreamingPullRequest) (*actions.Mess
 	}
 	// we could actually skip this for how we work, but better to implement the spec where we can
 	if len(m.ModifyDeadlineSeconds) != len(m.ModifyDeadlineAckIds) {
-		return nil, status.Error(codes.InvalidArgument, "Must have same len for ModifyDeadlineSeconds and ModifyDeadlineAckIds")
+		return nil, status.Error(
+			codes.InvalidArgument,
+			"Must have same len for ModifyDeadlineSeconds and ModifyDeadlineAckIds",
+		)
 	}
 	if len(m.ModifyDeadlineAckIds) != 0 {
 		var err error
@@ -699,9 +771,16 @@ func (w *streamWrapper) adaptIn(m *pubsubpb.StreamingPullRequest) (*actions.Mess
 	return ret, nil
 }
 
-func (s *subscriberServer) ModifyPushConfig(ctx context.Context, req *pubsubpb.ModifyPushConfigRequest) (*emptypb.Empty, error) {
+func (s *subscriberServer) ModifyPushConfig(
+	ctx context.Context,
+	req *pubsubpb.ModifyPushConfigRequest,
+) (*emptypb.Empty, error) {
 	if !isValidSubscriptionName(req.Subscription) {
-		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / subscription path %s", req.Subscription)
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"Unsupported project / subscription path %s",
+			req.Subscription,
+		)
 	}
 	if err := validatePushConfig(req.PushConfig); err != nil {
 		return nil, err
@@ -755,7 +834,10 @@ func applyPushConfig(mut *ent.SubscriptionUpdateOne, cfg *pubsubpb.PushConfig) *
 	return mut
 }
 
-func entSubscriptionToGrpc(subscription *ent.Subscription, topicName, deadLetterTopicName string) *pubsubpb.Subscription {
+func entSubscriptionToGrpc(
+	subscription *ent.Subscription,
+	topicName, deadLetterTopicName string,
+) *pubsubpb.Subscription {
 	nominalDelay, _ := actions.NextDelayFor(subscription, 0)
 	ret := &pubsubpb.Subscription{
 		Name: subscription.Name,

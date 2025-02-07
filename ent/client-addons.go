@@ -53,7 +53,8 @@ func (c *Client) DoTx(ctx context.Context, opts *sql.TxOptions, inner func(tx *T
 			// if we get a context cancellation, we may also expect to often get an
 			// ErrTxDone, due to the db package racing with us to rollback the
 			// transaction
-			if errors.Is(err, sql.ErrTxDone) && (errors.Is(finalErr, context.Canceled) || errors.Is(finalErr, context.DeadlineExceeded)) {
+			if errors.Is(err, sql.ErrTxDone) &&
+				(errors.Is(finalErr, context.Canceled) || errors.Is(finalErr, context.DeadlineExceeded)) {
 				// leave finalErr as-is, ignore the sql error
 			} else if finalErr == nil {
 				finalErr = err
@@ -72,7 +73,11 @@ func (c *Client) DoTx(ctx context.Context, opts *sql.TxOptions, inner func(tx *T
 
 // DoCtxTx is a wrapper for DoTx, for handlers that take the context argument.
 // This is particularly useful for actions.Action.Execute implementations
-func (c *Client) DoCtxTx(ctx context.Context, opts *sql.TxOptions, inner func(ctx context.Context, tx *Tx) error) error {
+func (c *Client) DoCtxTx(
+	ctx context.Context,
+	opts *sql.TxOptions,
+	inner func(ctx context.Context, tx *Tx) error,
+) error {
 	return c.DoTx(ctx, opts, func(tx *Tx) error { return inner(ctx, tx) })
 }
 

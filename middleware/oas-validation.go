@@ -134,7 +134,10 @@ func DefaultOASErrorHandler(c *gin.Context, err error) {
 	case errors.As(err, &requestErr):
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": requestErr.Reason, "details": requestErr.Err})
 	case errors.As(err, &responseErr):
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": responseErr.Reason, "details": responseErr.Err})
+		c.AbortWithStatusJSON(
+			http.StatusInternalServerError,
+			gin.H{"error": responseErr.Reason, "details": responseErr.Err},
+		)
 	case errors.As(err, &parseErr):
 		// TODO: this may not be right
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error(), "details": err})

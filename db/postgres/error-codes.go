@@ -46,7 +46,10 @@ func IsPostgreSQLErrorCode(err error, code PostgreSQLErrorCode) (*pgconn.PgError
 	return pgErr, match
 }
 
-func RetryOnErrorCode(code PostgreSQLErrorCode, codes ...PostgreSQLErrorCode) func(context.Context, error) bool {
+func RetryOnErrorCode(
+	code PostgreSQLErrorCode,
+	codes ...PostgreSQLErrorCode,
+) func(context.Context, error) bool {
 	allCodes := append([]PostgreSQLErrorCode{code}, codes...)
 	return func(ctx context.Context, err error) bool {
 		var pgErr *pgconn.PgError

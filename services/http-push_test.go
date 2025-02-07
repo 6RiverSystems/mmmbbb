@@ -366,7 +366,12 @@ func TestHttpPush(t *testing.T) {
 					Only(testutil.Context(t)); assert.NoError(t, err) {
 					assert.Equal(t, 1, del.Attempts)
 					// should be in the future, too, by at least ~50% of the min backoff
-					assert.Greater(t, del.AttemptAt.UnixNano(), time.Now().Add(50*time.Millisecond).UnixNano(), "next attempt should be in the future after NACKs")
+					assert.Greater(
+						t,
+						del.AttemptAt.UnixNano(),
+						time.Now().Add(50*time.Millisecond).UnixNano(),
+						"next attempt should be in the future after NACKs",
+					)
 				}
 			},
 		},
@@ -423,7 +428,12 @@ func TestHttpPush(t *testing.T) {
 					Only(testutil.Context(t)); assert.NoError(t, err) {
 					assert.Equal(t, 2, del.Attempts)
 					// should be in the future, too, by at least ~50% of the min backoff
-					assert.Greater(t, del.AttemptAt.UnixNano(), time.Now().Add(50*time.Millisecond).UnixNano(), "next attempt should be in the future after NACKs")
+					assert.Greater(
+						t,
+						del.AttemptAt.UnixNano(),
+						time.Now().Add(50*time.Millisecond).UnixNano(),
+						"next attempt should be in the future after NACKs",
+					)
 				}
 			},
 		},
@@ -449,15 +459,18 @@ func TestHttpPush(t *testing.T) {
 			if tt.initialEnable {
 				initialEndpoint = pushEndpoint
 			}
-			require.NoError(t, client.DoCtxTx(ctx, nil, actions.NewCreateSubscription(actions.CreateSubscriptionParams{
-				TopicName:    safeName(t),
-				Name:         safeName(t),
-				PushEndpoint: initialEndpoint,
-				TTL:          time.Minute,
-				MessageTTL:   time.Minute,
-				MinBackoff:   200 * time.Millisecond,
-				MaxBackoff:   2000 * time.Millisecond,
-			}).Execute))
+			require.NoError(
+				t,
+				client.DoCtxTx(ctx, nil, actions.NewCreateSubscription(actions.CreateSubscriptionParams{
+					TopicName:    safeName(t),
+					Name:         safeName(t),
+					PushEndpoint: initialEndpoint,
+					TTL:          time.Minute,
+					MessageTTL:   time.Minute,
+					MinBackoff:   200 * time.Millisecond,
+					MaxBackoff:   2000 * time.Millisecond,
+				}).Execute),
+			)
 
 			s := &httpPusher{}
 			require.NoError(t, s.Initialize(ctx, client))
@@ -493,7 +506,10 @@ func TestHttpPush(t *testing.T) {
 
 type pushResponder func(testing.TB, http.ResponseWriter, *http.Request, *actions.PushRequest)
 
-func newPushReceiver(t testing.TB, responder pushResponder) (*http.Server, *net.TCPAddr, chan *actions.PushRequest, *sync.WaitGroup) {
+func newPushReceiver(
+	t testing.TB,
+	responder pushResponder,
+) (*http.Server, *net.TCPAddr, chan *actions.PushRequest, *sync.WaitGroup) {
 	ctx := testutil.Context(t)
 
 	received := make(chan *actions.PushRequest, 1)
@@ -544,7 +560,12 @@ func assertNoMore(t testing.TB, msgs chan *actions.PushRequest) {
 		select {
 		case msg, ok := <-msgs:
 			if ok {
-				assert.Failf(t, "receive on expected-open-empty channel should not receive a value", "got unexpected message: %#v", msg)
+				assert.Failf(
+					t,
+					"receive on expected-open-empty channel should not receive a value",
+					"got unexpected message: %#v",
+					msg,
+				)
 			} else {
 				assert.Fail(t, "receive on expected-open-empty channel should not confirm closed")
 				return

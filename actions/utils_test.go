@@ -70,7 +70,10 @@ func createSubscription(
 	return createSubscriptionClient(t, ctx, tx.Client(), topic, offset, opts...)
 }
 
-func withDeadLetter(dlTopic *ent.Topic, maxAttempts int32) func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
+func withDeadLetter(
+	dlTopic *ent.Topic,
+	maxAttempts int32,
+) func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
 	return func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
 		return sc.SetDeadLetterTopic(dlTopic).SetMaxDeliveryAttempts(maxAttempts)
 	}

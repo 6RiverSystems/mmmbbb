@@ -57,7 +57,11 @@ func NewDeadLetterDeliveries(params DeadLetterDeliveriesParams) *DeadLetterDeliv
 // separate counter from the (shared) counter for the number of deliveries
 // deadlettered overall. we keep this counter so we can tell how much was
 // dead-lettered live on pull/nack vs. on this background service
-var deadLetterDeliveriesActionCounter, deadLetterDeliveriesHistogram = actionMetrics("deadletter_deliveries", "deliveries", "deadlettered")
+var deadLetterDeliveriesActionCounter, deadLetterDeliveriesHistogram = actionMetrics(
+	"deadletter_deliveries",
+	"deliveries",
+	"deadlettered",
+)
 
 func (a *DeadLetterDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 	timer := startActionTimer(deadLetterDeliveriesHistogram, tx)

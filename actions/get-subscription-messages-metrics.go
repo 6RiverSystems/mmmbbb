@@ -19,4 +19,8 @@
 
 package actions
 
-var getSubscriptionMessagesCounter, getSubscriptionMessagesHistogram = actionMetrics("get_subscription_messages", "messages", "delivered")
+var getSubscriptionMessagesCounter, getSubscriptionMessagesHistogram = actionMetrics(
+	"get_subscription_messages",
+	"messages",
+	"delivered",
+)

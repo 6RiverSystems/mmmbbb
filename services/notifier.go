@@ -212,13 +212,25 @@ func (n *pgNotifier) Start(ctx context.Context, ready chan<- struct{}) error {
 					}
 				}
 				for idn := range tn {
-					_, err := conn.ExecContext(egCtx, `SELECT pg_notify($1, $2 || ' ' || $3)`, topicModifiedChannelName, idn.id.String(), idn.name)
+					_, err := conn.ExecContext(
+						egCtx,
+						`SELECT pg_notify($1, $2 || ' ' || $3)`,
+						topicModifiedChannelName,
+						idn.id.String(),
+						idn.name,
+					)
 					if err != nil {
 						n.logger.Error().Err(err).Msg("Failed to send notify for topic modify")
 					}
 				}
 				for idn := range sn {
-					_, err := conn.ExecContext(egCtx, `SELECT pg_notify($1, $2 || ' ' || $3)`, subModifiedChannelName, idn.id.String(), idn.name)
+					_, err := conn.ExecContext(
+						egCtx,
+						`SELECT pg_notify($1, $2 || ' ' || $3)`,
+						subModifiedChannelName,
+						idn.id.String(),
+						idn.name,
+					)
 					if err != nil {
 						n.logger.Error().Err(err).Msg("Failed to send notify for sub modify")
 					}

@@ -455,7 +455,10 @@ func (a *GetSubscriptionMessages) applyResults(
 	// so is non-trivial.
 	sortedDeliveries := make([]*SubscriptionMessageDelivery, len(results.Deliveries))
 	copy(sortedDeliveries, results.Deliveries)
-	sort.Slice(sortedDeliveries, func(i, j int) bool { return parse.UUIDLess(deliveries[i].ID, deliveries[j].ID) })
+	sort.Slice(
+		sortedDeliveries,
+		func(i, j int) bool { return parse.UUIDLess(deliveries[i].ID, deliveries[j].ID) },
+	)
 
 	for _, d := range sortedDeliveries {
 		if err := tx.Delivery.UpdateOneID(d.ID).

@@ -42,7 +42,9 @@ func NewDeleteExpiredSubscriptions(params PruneCommonParams) *DeleteExpiredSubsc
 	}
 }
 
-var DeleteExpiredSubscriptionsCounter, DeleteExpiredSubscriptionsHistogram = pruneMetrics("expired_subscriptions")
+var DeleteExpiredSubscriptionsCounter, DeleteExpiredSubscriptionsHistogram = pruneMetrics(
+	"expired_subscriptions",
+)
 
 func (a *DeleteExpiredSubscriptions) Execute(ctx context.Context, tx *ent.Tx) error {
 	timer := startActionTimer(DeleteExpiredSubscriptionsHistogram, tx)

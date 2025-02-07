@@ -61,9 +61,17 @@ func TestSeekSubscriptionToSnapshot_Execute(t *testing.T) {
 					m := createMessage(t, ctx, tx, tt.topic, offset, func(m *ent.MessageCreate) *ent.MessageCreate {
 						return m.SetPublishedAt(refTime.Add(time.Duration(offset) * time.Second))
 					})
-					d := createDelivery(t, ctx, tx, tt.sub, m, offset, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
-						return dc.SetCompletedAt(refTime)
-					})
+					d := createDelivery(
+						t,
+						ctx,
+						tx,
+						tt.sub,
+						m,
+						offset,
+						func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
+							return dc.SetCompletedAt(refTime)
+						},
+					)
 					tt.expectAcked = append(tt.expectAcked, d.ID)
 				}
 			},
@@ -101,9 +109,17 @@ func TestSeekSubscriptionToSnapshot_Execute(t *testing.T) {
 					m := createMessage(t, ctx, tx, tt.topic, offset, func(m *ent.MessageCreate) *ent.MessageCreate {
 						return m.SetPublishedAt(refTime.Add(time.Duration(offset) * time.Second))
 					})
-					d := createDelivery(t, ctx, tx, tt.sub, m, offset, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
-						return dc.SetCompletedAt(refTime)
-					})
+					d := createDelivery(
+						t,
+						ctx,
+						tx,
+						tt.sub,
+						m,
+						offset,
+						func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
+							return dc.SetCompletedAt(refTime)
+						},
+					)
 					// we will seek to the ref time and de-ack these
 					tt.expectNotAcked = append(tt.expectNotAcked, d.ID)
 				}
@@ -141,12 +157,20 @@ func TestSeekSubscriptionToSnapshot_Execute(t *testing.T) {
 					m := createMessage(t, ctx, tx, tt.topic, offset, func(m *ent.MessageCreate) *ent.MessageCreate {
 						return m.SetPublishedAt(refTime.Add(time.Duration(offset) * time.Second))
 					})
-					d := createDelivery(t, ctx, tx, tt.sub, m, offset, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
-						if offset%2 == 0 {
-							dc = dc.SetCompletedAt(refTime)
-						}
-						return dc
-					})
+					d := createDelivery(
+						t,
+						ctx,
+						tx,
+						tt.sub,
+						m,
+						offset,
+						func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
+							if offset%2 == 0 {
+								dc = dc.SetCompletedAt(refTime)
+							}
+							return dc
+						},
+					)
 					if offset < 0 {
 						tt.expectAcked = append(tt.expectAcked, d.ID)
 					} else if d.CompletedAt != nil {

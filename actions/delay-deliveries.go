@@ -57,7 +57,11 @@ func NewDelayDeliveries(params DelayDeliveriesParams) *DelayDeliveries {
 	}
 }
 
-var delayDeliveriesCounter, delayDeliveriesHistogram = actionMetrics("delay_deliveries", "deliveries", "delayed")
+var delayDeliveriesCounter, delayDeliveriesHistogram = actionMetrics(
+	"delay_deliveries",
+	"deliveries",
+	"delayed",
+)
 
 func (a *DelayDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 	timer := startActionTimer(delayDeliveriesHistogram, tx)

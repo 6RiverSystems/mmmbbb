@@ -180,7 +180,12 @@ func TestDelayInjectorController_GetDelay(t *testing.T) {
 				tt.setup(t, client)
 			}
 			ctx := testutil.Context(t)
-			req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.URL+path.Join(delaysRootPath, t.Name()), nil)
+			req, err := http.NewRequestWithContext(
+				ctx,
+				http.MethodGet,
+				s.URL+path.Join(delaysRootPath, t.Name()),
+				nil,
+			)
 			assert.NoError(t, err)
 			cli := s.Client()
 			resp, err := cli.Do(req)
@@ -243,7 +248,12 @@ func TestDelayInjectorController_SetDelay(t *testing.T) {
 				tt.setup(t, client)
 			}
 			ctx := testutil.Context(t)
-			req, err := http.NewRequestWithContext(ctx, http.MethodPut, s.URL+path.Join(delaysRootPath, t.Name()), nil)
+			req, err := http.NewRequestWithContext(
+				ctx,
+				http.MethodPut,
+				s.URL+path.Join(delaysRootPath, t.Name()),
+				nil,
+			)
 			assert.NoError(t, err)
 			tt.req(t, req)
 			cli := s.Client()
@@ -288,7 +298,12 @@ func TestDelayInjectorController_DeleteDelay(t *testing.T) {
 				tt.setup(t, client)
 			}
 			ctx := testutil.Context(t)
-			req, err := http.NewRequestWithContext(ctx, http.MethodDelete, s.URL+path.Join(delaysRootPath, t.Name()), nil)
+			req, err := http.NewRequestWithContext(
+				ctx,
+				http.MethodDelete,
+				s.URL+path.Join(delaysRootPath, t.Name()),
+				nil,
+			)
 			assert.NoError(t, err)
 			cli := s.Client()
 			resp, err := cli.Do(req)

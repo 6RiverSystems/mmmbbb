@@ -51,7 +51,11 @@ func NewDeleteSubscription(name string) *DeleteSubscription {
 	}
 }
 
-var deleteSubscriptionsCounter, deleteSubscriptionsHistogram = actionMetrics("delete_subscription", "subscriptions", "deleted")
+var deleteSubscriptionsCounter, deleteSubscriptionsHistogram = actionMetrics(
+	"delete_subscription",
+	"subscriptions",
+	"deleted",
+)
 
 func (a *DeleteSubscription) Execute(ctx context.Context, tx *ent.Tx) error {
 	timer := startActionTimer(deleteSubscriptionsHistogram, tx)

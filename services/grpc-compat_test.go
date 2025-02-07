@@ -79,13 +79,25 @@ func TestGrpcCompat(t *testing.T) {
 				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 					tt.topics[0], tt.errs[0] = psc.CreateTopic(ctx, safeName(t))
 					if tt.errs[0] != nil {
-						assert.Equal(t, codes.AlreadyExists.String(), status.Code(tt.errs[0]).String(), "should be code AlreadyExists: %#v", tt.errs[0])
+						assert.Equal(
+							t,
+							codes.AlreadyExists.String(),
+							status.Code(tt.errs[0]).String(),
+							"should be code AlreadyExists: %#v",
+							tt.errs[0],
+						)
 					}
 				},
 				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 					tt.topics[1], tt.errs[1] = psc.CreateTopic(ctx, safeName(t))
 					if tt.errs[1] != nil {
-						assert.Equal(t, codes.AlreadyExists.String(), status.Code(tt.errs[1]).String(), "should be code AlreadyExists: %#v", tt.errs[1])
+						assert.Equal(
+							t,
+							codes.AlreadyExists.String(),
+							status.Code(tt.errs[1]).String(),
+							"should be code AlreadyExists: %#v",
+							tt.errs[1],
+						)
 					}
 				},
 			},
@@ -116,15 +128,35 @@ func TestGrpcCompat(t *testing.T) {
 			},
 			steps: []testStep{
 				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
-					tt.subs[0], tt.errs[0] = psc.CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{Topic: tt.topics[0]})
+					tt.subs[0], tt.errs[0] = psc.CreateSubscription(
+						ctx,
+						safeName(t),
+						pubsub.SubscriptionConfig{Topic: tt.topics[0]},
+					)
 					if tt.errs[0] != nil {
-						assert.Equal(t, codes.AlreadyExists.String(), status.Code(tt.errs[0]).String(), "should be code AlreadyExists: %#v", tt.errs[0])
+						assert.Equal(
+							t,
+							codes.AlreadyExists.String(),
+							status.Code(tt.errs[0]).String(),
+							"should be code AlreadyExists: %#v",
+							tt.errs[0],
+						)
 					}
 				},
 				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
-					tt.subs[1], tt.errs[1] = psc.CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{Topic: tt.topics[0]})
+					tt.subs[1], tt.errs[1] = psc.CreateSubscription(
+						ctx,
+						safeName(t),
+						pubsub.SubscriptionConfig{Topic: tt.topics[0]},
+					)
 					if tt.errs[1] != nil {
-						assert.Equal(t, codes.AlreadyExists.String(), status.Code(tt.errs[1]).String(), "should be code AlreadyExists: %#v", tt.errs[1])
+						assert.Equal(
+							t,
+							codes.AlreadyExists.String(),
+							status.Code(tt.errs[1]).String(),
+							"should be code AlreadyExists: %#v",
+							tt.errs[1],
+						)
 					}
 				},
 			},
@@ -160,24 +192,26 @@ func TestGrpcCompat(t *testing.T) {
 					require.NoError(t, err)
 				}
 			},
-			steps: []testStep{func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
-				expected := make([]string, len(tt.topics))
-				for i, t := range tt.topics {
-					expected[i] = t.ID()
-				}
-				ti := psc.Topics(ctx)
-				var actual []string
-				for topic, err := ti.Next(); ; topic, err = ti.Next() {
-					if err == iterator.Done {
-						assert.Nil(t, topic)
-						break
+			steps: []testStep{
+				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
+					expected := make([]string, len(tt.topics))
+					for i, t := range tt.topics {
+						expected[i] = t.ID()
 					}
-					assert.NoError(t, err)
-					require.NotNil(t, topic)
-					actual = append(actual, topic.ID())
-				}
-				assert.ElementsMatch(t, expected, actual)
-			}},
+					ti := psc.Topics(ctx)
+					var actual []string
+					for topic, err := ti.Next(); ; topic, err = ti.Next() {
+						if err == iterator.Done {
+							assert.Nil(t, topic)
+							break
+						}
+						assert.NoError(t, err)
+						require.NotNil(t, topic)
+						actual = append(actual, topic.ID())
+					}
+					assert.ElementsMatch(t, expected, actual)
+				},
+			},
 		},
 		{
 			name: "list subs on one topic",
@@ -189,28 +223,34 @@ func TestGrpcCompat(t *testing.T) {
 				tt.topics[0], err = psc.CreateTopic(ctx, safeName(t))
 				require.NoError(t, err)
 				for i := range tt.subs {
-					tt.subs[i], err = psc.CreateSubscription(ctx, safeName(t)+"_"+strconv.Itoa(i), pubsub.SubscriptionConfig{Topic: tt.topics[0]})
+					tt.subs[i], err = psc.CreateSubscription(
+						ctx,
+						safeName(t)+"_"+strconv.Itoa(i),
+						pubsub.SubscriptionConfig{Topic: tt.topics[0]},
+					)
 					require.NoError(t, err)
 				}
 			},
-			steps: []testStep{func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
-				expected := make([]string, len(tt.subs))
-				for i, s := range tt.subs {
-					expected[i] = s.ID()
-				}
-				si := tt.topics[0].Subscriptions(ctx)
-				var actual []string
-				for sub, err := si.Next(); ; sub, err = si.Next() {
-					if err == iterator.Done {
-						assert.Nil(t, sub)
-						break
+			steps: []testStep{
+				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
+					expected := make([]string, len(tt.subs))
+					for i, s := range tt.subs {
+						expected[i] = s.ID()
 					}
-					assert.NoError(t, err)
-					require.NotNil(t, sub)
-					actual = append(actual, sub.ID())
-				}
-				assert.ElementsMatch(t, expected, actual)
-			}},
+					si := tt.topics[0].Subscriptions(ctx)
+					var actual []string
+					for sub, err := si.Next(); ; sub, err = si.Next() {
+						if err == iterator.Done {
+							assert.Nil(t, sub)
+							break
+						}
+						assert.NoError(t, err)
+						require.NotNil(t, sub)
+						actual = append(actual, sub.ID())
+					}
+					assert.ElementsMatch(t, expected, actual)
+				},
+			},
 		},
 		{
 			name: "list subs on all topics",
@@ -237,68 +277,76 @@ func TestGrpcCompat(t *testing.T) {
 					require.NoError(t, err)
 				}
 				for i := range tt.subs {
-					tt.subs[i], err = psc.CreateSubscription(ctx, safeName(t)+"_"+strconv.Itoa(i), pubsub.SubscriptionConfig{Topic: tt.topics[i%numTopics]})
+					tt.subs[i], err = psc.CreateSubscription(
+						ctx,
+						safeName(t)+"_"+strconv.Itoa(i),
+						pubsub.SubscriptionConfig{Topic: tt.topics[i%numTopics]},
+					)
 					require.NoError(t, err)
 				}
 			},
-			steps: []testStep{func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
-				expected := make([]string, len(tt.subs))
-				for i, s := range tt.subs {
-					expected[i] = s.ID()
-				}
-				si := psc.Subscriptions(ctx)
-				var actual []string
-				for sub, err := si.Next(); ; sub, err = si.Next() {
-					if err == iterator.Done {
-						assert.Nil(t, sub)
-						break
+			steps: []testStep{
+				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
+					expected := make([]string, len(tt.subs))
+					for i, s := range tt.subs {
+						expected[i] = s.ID()
 					}
-					assert.NoError(t, err)
-					require.NotNil(t, sub)
-					actual = append(actual, sub.ID())
-				}
-				assert.ElementsMatch(t, expected, actual)
-			}},
+					si := psc.Subscriptions(ctx)
+					var actual []string
+					for sub, err := si.Next(); ; sub, err = si.Next() {
+						if err == iterator.Done {
+							assert.Nil(t, sub)
+							break
+						}
+						assert.NoError(t, err)
+						require.NotNil(t, sub)
+						actual = append(actual, sub.ID())
+					}
+					assert.ElementsMatch(t, expected, actual)
+				},
+			},
 		},
 		{
 			// TODO: this isn't a very "unity" test
 			name: "topic lifecycle",
-			steps: []testStep{func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
-				// Exists maps to GetTopic
-				exists, err := psc.Topic(safeName(t)).Exists(ctx)
-				require.NoError(t, err)
-				require.False(t, exists)
+			steps: []testStep{
+				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
+					// Exists maps to GetTopic
+					exists, err := psc.Topic(safeName(t)).Exists(ctx)
+					require.NoError(t, err)
+					require.False(t, exists)
 
-				topic, err := psc.CreateTopic(ctx, safeName(t))
-				require.NoError(t, err)
+					topic, err := psc.CreateTopic(ctx, safeName(t))
+					require.NoError(t, err)
 
-				cfg, err := topic.Config(ctx)
-				require.NoError(t, err)
-				assert.Empty(t, cfg.KMSKeyName)
-				assert.Empty(t, cfg.Labels)
-				assert.Empty(t, cfg.MessageStoragePolicy.AllowedPersistenceRegions)
+					cfg, err := topic.Config(ctx)
+					require.NoError(t, err)
+					assert.Empty(t, cfg.KMSKeyName)
+					assert.Empty(t, cfg.Labels)
+					assert.Empty(t, cfg.MessageStoragePolicy.AllowedPersistenceRegions)
 
-				cfg, err = topic.Update(ctx, pubsub.TopicConfigToUpdate{
-					Labels: map[string]string{
-						"forTest": t.Name(),
-					},
-				})
-				require.NoError(t, err)
-				assert.Empty(t, cfg.KMSKeyName)
-				assert.Equal(t, map[string]string{"forTest": t.Name()}, cfg.Labels)
-				assert.Empty(t, cfg.MessageStoragePolicy.AllowedPersistenceRegions)
+					cfg, err = topic.Update(ctx, pubsub.TopicConfigToUpdate{
+						Labels: map[string]string{
+							"forTest": t.Name(),
+						},
+					})
+					require.NoError(t, err)
+					assert.Empty(t, cfg.KMSKeyName)
+					assert.Equal(t, map[string]string{"forTest": t.Name()}, cfg.Labels)
+					assert.Empty(t, cfg.MessageStoragePolicy.AllowedPersistenceRegions)
 
-				exists, err = topic.Exists(ctx)
-				require.NoError(t, err)
-				require.True(t, exists)
+					exists, err = topic.Exists(ctx)
+					require.NoError(t, err)
+					require.True(t, exists)
 
-				err = topic.Delete(ctx)
-				require.NoError(t, err)
+					err = topic.Delete(ctx)
+					require.NoError(t, err)
 
-				exists, err = topic.Exists(ctx)
-				require.NoError(t, err)
-				require.False(t, exists)
-			}},
+					exists, err = topic.Exists(ctx)
+					require.NoError(t, err)
+					require.False(t, exists)
+				},
+			},
 		},
 		{
 			// TODO: this isn't a very "unity" test
@@ -308,71 +356,73 @@ func TestGrpcCompat(t *testing.T) {
 				require.NoError(t, err)
 				tt.topics = []*pubsub.Topic{topic}
 			},
-			steps: []testStep{func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
-				// Exists maps to GetTopic
-				exists, err := psc.Subscription(safeName(t)).Exists(ctx)
-				require.NoError(t, err)
-				require.False(t, exists)
+			steps: []testStep{
+				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
+					// Exists maps to GetTopic
+					exists, err := psc.Subscription(safeName(t)).Exists(ctx)
+					require.NoError(t, err)
+					require.False(t, exists)
 
-				sub, err := psc.CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{Topic: tt.topics[0]})
-				require.NoError(t, err)
+					sub, err := psc.CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{Topic: tt.topics[0]})
+					require.NoError(t, err)
 
-				cfg, err := sub.Config(ctx)
-				require.NoError(t, err)
-				// cfg.AckDeadline // is some default value here
-				assert.Nil(t, cfg.DeadLetterPolicy)
-				assert.False(t, cfg.Detached)
-				assert.False(t, cfg.EnableMessageOrdering)
-				// cfg.ExpirationPolicy // is some default value here
-				assert.Empty(t, cfg.Filter)
-				assert.Empty(t, cfg.Labels)
-				assert.Zero(t, cfg.PushConfig)
-				assert.False(t, cfg.RetainAckedMessages)
-				// cfg.RetentionDuration // is some default value here
-				assert.Nil(t, cfg.RetryPolicy)
-				assert.Equal(t, cfg.Topic.ID(), tt.topics[0].ID())
+					cfg, err := sub.Config(ctx)
+					require.NoError(t, err)
+					// cfg.AckDeadline // is some default value here
+					assert.Nil(t, cfg.DeadLetterPolicy)
+					assert.False(t, cfg.Detached)
+					assert.False(t, cfg.EnableMessageOrdering)
+					// cfg.ExpirationPolicy // is some default value here
+					assert.Empty(t, cfg.Filter)
+					assert.Empty(t, cfg.Labels)
+					assert.Zero(t, cfg.PushConfig)
+					assert.False(t, cfg.RetainAckedMessages)
+					// cfg.RetentionDuration // is some default value here
+					assert.Nil(t, cfg.RetryPolicy)
+					assert.Equal(t, cfg.Topic.ID(), tt.topics[0].ID())
 
-				cfg, err = sub.Update(ctx, pubsub.SubscriptionConfigToUpdate{
-					ExpirationPolicy: 42 * time.Hour,
-					Labels: map[string]string{
-						"forTest": t.Name(),
-					},
-					// can't change EnableMessageOrdering on the fly with the google
-					// client, even though our code supports it
-					RetentionDuration: time.Hour,
-					RetryPolicy: &pubsub.RetryPolicy{
+					cfg, err = sub.Update(ctx, pubsub.SubscriptionConfigToUpdate{
+						ExpirationPolicy: 42 * time.Hour,
+						Labels: map[string]string{
+							"forTest": t.Name(),
+						},
+						// can't change EnableMessageOrdering on the fly with the google
+						// client, even though our code supports it
+						RetentionDuration: time.Hour,
+						RetryPolicy: &pubsub.RetryPolicy{
+							MinimumBackoff: 4200 * time.Millisecond,
+							MaximumBackoff: 42420 * time.Millisecond,
+						},
+					})
+					require.NoError(t, err)
+					// cfg.AckDeadline // we don't allow setting this
+					assert.Nil(t, cfg.DeadLetterPolicy)
+					assert.False(t, cfg.Detached)
+					assert.False(t, cfg.EnableMessageOrdering)
+					assert.Equal(t, 42*time.Hour, cfg.ExpirationPolicy)
+					assert.Empty(t, cfg.Filter)
+					assert.Equal(t, map[string]string{"forTest": t.Name()}, cfg.Labels)
+					assert.Zero(t, cfg.PushConfig)
+					assert.False(t, cfg.RetainAckedMessages)
+					assert.Equal(t, time.Hour, cfg.RetentionDuration)
+					assert.Equal(t, &pubsub.RetryPolicy{
 						MinimumBackoff: 4200 * time.Millisecond,
 						MaximumBackoff: 42420 * time.Millisecond,
-					},
-				})
-				require.NoError(t, err)
-				// cfg.AckDeadline // we don't allow setting this
-				assert.Nil(t, cfg.DeadLetterPolicy)
-				assert.False(t, cfg.Detached)
-				assert.False(t, cfg.EnableMessageOrdering)
-				assert.Equal(t, 42*time.Hour, cfg.ExpirationPolicy)
-				assert.Empty(t, cfg.Filter)
-				assert.Equal(t, map[string]string{"forTest": t.Name()}, cfg.Labels)
-				assert.Zero(t, cfg.PushConfig)
-				assert.False(t, cfg.RetainAckedMessages)
-				assert.Equal(t, time.Hour, cfg.RetentionDuration)
-				assert.Equal(t, &pubsub.RetryPolicy{
-					MinimumBackoff: 4200 * time.Millisecond,
-					MaximumBackoff: 42420 * time.Millisecond,
-				}, cfg.RetryPolicy)
-				assert.Equal(t, cfg.Topic.ID(), tt.topics[0].ID())
+					}, cfg.RetryPolicy)
+					assert.Equal(t, cfg.Topic.ID(), tt.topics[0].ID())
 
-				exists, err = sub.Exists(ctx)
-				require.NoError(t, err)
-				require.True(t, exists)
+					exists, err = sub.Exists(ctx)
+					require.NoError(t, err)
+					require.True(t, exists)
 
-				err = sub.Delete(ctx)
-				require.NoError(t, err)
+					err = sub.Delete(ctx)
+					require.NoError(t, err)
 
-				exists, err = sub.Exists(ctx)
-				require.NoError(t, err)
-				require.False(t, exists)
-			}},
+					exists, err = sub.Exists(ctx)
+					require.NoError(t, err)
+					require.False(t, exists)
+				},
+			},
 		},
 	}
 	const pullTimeScale = 100 * time.Millisecond
@@ -805,7 +855,11 @@ func benchThroughput(b *testing.B, numTopics, subsPerTopic, maxMessages int, pay
 	}
 	for i := 0; i < numTopics*subsPerTopic; i++ {
 		var err error
-		subs[i], err = psClient.CreateSubscription(ctx, safeName(b)+"_"+strconv.Itoa(i), pubsub.SubscriptionConfig{Topic: topics[i%numTopics]})
+		subs[i], err = psClient.CreateSubscription(
+			ctx,
+			safeName(b)+"_"+strconv.Itoa(i),
+			pubsub.SubscriptionConfig{Topic: topics[i%numTopics]},
+		)
 		require.NoError(b, err)
 		// most of our apps constrain this from its default of 1000 down to 20, or
 		// even less. note that this has a _huge_ impact on per-sub throughput!

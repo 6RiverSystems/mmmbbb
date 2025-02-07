@@ -38,7 +38,10 @@ type healthServer struct {
 	readies []ReadyCheck
 }
 
-func (s *healthServer) Check(ctx context.Context, req *health.HealthCheckRequest) (*health.HealthCheckResponse, error) {
+func (s *healthServer) Check(
+	ctx context.Context,
+	req *health.HealthCheckRequest,
+) (*health.HealthCheckResponse, error) {
 	if s.client == nil || s.readies == nil {
 		return &health.HealthCheckResponse{
 			Status: health.HealthCheckResponse_NOT_SERVING,

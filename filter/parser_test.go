@@ -34,7 +34,11 @@ func TestParserBinding(t *testing.T) {
 	}{
 		{"hasAttribute", `attributes:x`, &Filter{Term: &Term{Basic: &BasicExpression{Has: &HasAttribute{"x"}}}}},
 		{"attrEqual", `attributes.x = "a"`, nil},
-		{"attrEqualEscape", `attributes.x = "\n\u000a"`, &Filter{Term: &Term{Basic: &BasicExpression{Value: &HasAttributeValue{"x", OpEqual, "\n\n"}}}}},
+		{
+			"attrEqualEscape",
+			`attributes.x = "\n\u000a"`,
+			&Filter{Term: &Term{Basic: &BasicExpression{Value: &HasAttributeValue{"x", OpEqual, "\n\n"}}}},
+		},
 		{"attrNotEqual", `attributes.x != "a"`, nil},
 		{"hasPrefix", `hasPrefix(attributes.x, "a")`, nil},
 		{
@@ -67,7 +71,9 @@ func TestParserBinding(t *testing.T) {
 						And: []*Term{{
 							Sub: &Condition{
 								Term: &Term{Basic: &BasicExpression{Value: &HasAttributeValue{"p", OpEqual, "z"}}},
-								Or:   []*Term{{Basic: &BasicExpression{Predicate: &HasAttributePredicate{PredicateHasPrefix, "n", "\n"}}}},
+								Or: []*Term{
+									{Basic: &BasicExpression{Predicate: &HasAttributePredicate{PredicateHasPrefix, "n", "\n"}}},
+								},
 							},
 						}},
 					}},

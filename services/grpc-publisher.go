@@ -46,7 +46,10 @@ type publisherServer struct {
 	client *ent.Client
 }
 
-func (s *publisherServer) ListTopics(ctx context.Context, req *pubsubpb.ListTopicsRequest) (*pubsubpb.ListTopicsResponse, error) {
+func (s *publisherServer) ListTopics(
+	ctx context.Context,
+	req *pubsubpb.ListTopicsRequest,
+) (*pubsubpb.ListTopicsResponse, error) {
 	var pageSize int32 = 100
 	if req.PageSize > 0 && req.PageSize < pageSize {
 		pageSize = req.PageSize
@@ -122,7 +125,10 @@ func (s *publisherServer) CreateTopic(ctx context.Context, req *pubsubpb.Topic) 
 	return resp, nil
 }
 
-func (s *publisherServer) GetTopic(ctx context.Context, req *pubsubpb.GetTopicRequest) (*pubsubpb.Topic, error) {
+func (s *publisherServer) GetTopic(
+	ctx context.Context,
+	req *pubsubpb.GetTopicRequest,
+) (*pubsubpb.Topic, error) {
 	if !isValidTopicName(req.Topic) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / topic path %s", req.Topic)
 	}
@@ -150,7 +156,10 @@ func (s *publisherServer) GetTopic(ctx context.Context, req *pubsubpb.GetTopicRe
 	return resp, nil
 }
 
-func (s *publisherServer) UpdateTopic(ctx context.Context, req *pubsubpb.UpdateTopicRequest) (*pubsubpb.Topic, error) {
+func (s *publisherServer) UpdateTopic(
+	ctx context.Context,
+	req *pubsubpb.UpdateTopicRequest,
+) (*pubsubpb.Topic, error) {
 	if !isValidTopicName(req.Topic.Name) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / topic path %s", req.Topic.Name)
 	}
@@ -185,7 +194,11 @@ func (s *publisherServer) UpdateTopic(ctx context.Context, req *pubsubpb.UpdateT
 				// these are valid paths, we just don't support changing them
 				return status.Errorf(codes.Unimplemented, "Modifying Topic.%s is not supported", p)
 			default:
-				return status.Errorf(codes.InvalidArgument, "Modifying Topic.%s is not a recognized topic property", p)
+				return status.Errorf(
+					codes.InvalidArgument,
+					"Modifying Topic.%s is not a recognized topic property",
+					p,
+				)
 			}
 		}
 
@@ -211,7 +224,10 @@ func (s *publisherServer) UpdateTopic(ctx context.Context, req *pubsubpb.UpdateT
 	return resp, nil
 }
 
-func (s *publisherServer) DeleteTopic(ctx context.Context, req *pubsubpb.DeleteTopicRequest) (*emptypb.Empty, error) {
+func (s *publisherServer) DeleteTopic(
+	ctx context.Context,
+	req *pubsubpb.DeleteTopicRequest,
+) (*emptypb.Empty, error) {
 	if !isValidTopicName(req.Topic) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / topic path %s", req.Topic)
 	}
@@ -291,7 +307,10 @@ func (s *publisherServer) ListTopicSubscriptions(
 	return resp, nil
 }
 
-func (s *publisherServer) Publish(ctx context.Context, req *pubsubpb.PublishRequest) (*pubsubpb.PublishResponse, error) {
+func (s *publisherServer) Publish(
+	ctx context.Context,
+	req *pubsubpb.PublishRequest,
+) (*pubsubpb.PublishResponse, error) {
 	if !isValidTopicName(req.Topic) {
 		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / topic path %s", req.Topic)
 	}

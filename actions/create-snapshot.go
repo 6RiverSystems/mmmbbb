@@ -68,7 +68,11 @@ func NewCreateSnapshot(params CreateSnapshotParams) *CreateSnapshot {
 	}
 }
 
-var createSnapshotsCounter, createSnapshotsHistogram = actionMetrics("create_snapshot", "snapshots", "created")
+var createSnapshotsCounter, createSnapshotsHistogram = actionMetrics(
+	"create_snapshot",
+	"snapshots",
+	"created",
+)
 
 func (a *CreateSnapshot) Execute(ctx context.Context, tx *ent.Tx) error {
 	timer := startActionTimer(createSnapshotsHistogram, tx)

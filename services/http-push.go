@@ -47,10 +47,21 @@ func monitorPusher(ctx context.Context, pusher *actions.HttpPushStreamer) monito
 	return monitoredPusher{eg, egCtx, pusher, cancel}
 }
 
-func waitPusherMonitors(ctx context.Context, timeout time.Duration, notifier <-chan struct{}, mons map[uuid.UUID]monitoredPusher) waitMonitorResult {
+func waitPusherMonitors(
+	ctx context.Context,
+	timeout time.Duration,
+	notifier <-chan struct{},
+	mons map[uuid.UUID]monitoredPusher,
+) waitMonitorResult {
 	selects := make([]reflect.SelectCase, 3, 3+len(mons))
-	selects[waitMonitorTimeout] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(time.After(timeout))}
-	selects[waitMonitorContextDone] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(ctx.Done())}
+	selects[waitMonitorTimeout] = reflect.SelectCase{
+		Dir:  reflect.SelectRecv,
+		Chan: reflect.ValueOf(time.After(timeout)),
+	}
+	selects[waitMonitorContextDone] = reflect.SelectCase{
+		Dir:  reflect.SelectRecv,
+		Chan: reflect.ValueOf(ctx.Done()),
+	}
 	selects[waitMonitorNotified] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(notifier)}
 	for _, mp := range mons {
 		selects = append(selects, reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(mp.Done())})

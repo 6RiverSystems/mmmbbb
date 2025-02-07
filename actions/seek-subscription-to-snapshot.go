@@ -46,7 +46,9 @@ type SeekSubscriptionToSnapshot struct {
 	actionBase[SeekSubscriptionToSnapshotParams, seekSubscriptionToSnapshotResults]
 }
 
-var _ Action[SeekSubscriptionToSnapshotParams, seekSubscriptionToSnapshotResults] = (*SeekSubscriptionToSnapshot)(nil)
+var _ Action[SeekSubscriptionToSnapshotParams, seekSubscriptionToSnapshotResults] = (*SeekSubscriptionToSnapshot)(
+	nil,
+)
 
 func NewSeekSubscriptionToSnapshot(params SeekSubscriptionToSnapshotParams) *SeekSubscriptionToSnapshot {
 	if params.SubscriptionName == "" && params.SubscriptionID == nil {

@@ -22,6 +22,7 @@ package pubsubpb
 
 import (
 	context "context"
+
 	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -57,21 +58,41 @@ type SchemaServiceClient interface {
 	// Gets a schema.
 	GetSchema(ctx context.Context, in *GetSchemaRequest, opts ...grpc.CallOption) (*Schema, error)
 	// Lists schemas in a project.
-	ListSchemas(ctx context.Context, in *ListSchemasRequest, opts ...grpc.CallOption) (*ListSchemasResponse, error)
+	ListSchemas(
+		ctx context.Context,
+		in *ListSchemasRequest,
+		opts ...grpc.CallOption,
+	) (*ListSchemasResponse, error)
 	// Lists all schema revisions for the named schema.
-	ListSchemaRevisions(ctx context.Context, in *ListSchemaRevisionsRequest, opts ...grpc.CallOption) (*ListSchemaRevisionsResponse, error)
+	ListSchemaRevisions(
+		ctx context.Context,
+		in *ListSchemaRevisionsRequest,
+		opts ...grpc.CallOption,
+	) (*ListSchemaRevisionsResponse, error)
 	// Commits a new schema revision to an existing schema.
 	CommitSchema(ctx context.Context, in *CommitSchemaRequest, opts ...grpc.CallOption) (*Schema, error)
 	// Creates a new schema revision that is a copy of the provided revision_id.
 	RollbackSchema(ctx context.Context, in *RollbackSchemaRequest, opts ...grpc.CallOption) (*Schema, error)
 	// Deletes a specific schema revision.
-	DeleteSchemaRevision(ctx context.Context, in *DeleteSchemaRevisionRequest, opts ...grpc.CallOption) (*Schema, error)
+	DeleteSchemaRevision(
+		ctx context.Context,
+		in *DeleteSchemaRevisionRequest,
+		opts ...grpc.CallOption,
+	) (*Schema, error)
 	// Deletes a schema.
 	DeleteSchema(ctx context.Context, in *DeleteSchemaRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	// Validates a schema.
-	ValidateSchema(ctx context.Context, in *ValidateSchemaRequest, opts ...grpc.CallOption) (*ValidateSchemaResponse, error)
+	ValidateSchema(
+		ctx context.Context,
+		in *ValidateSchemaRequest,
+		opts ...grpc.CallOption,
+	) (*ValidateSchemaResponse, error)
 	// Validates a message against a schema.
-	ValidateMessage(ctx context.Context, in *ValidateMessageRequest, opts ...grpc.CallOption) (*ValidateMessageResponse, error)
+	ValidateMessage(
+		ctx context.Context,
+		in *ValidateMessageRequest,
+		opts ...grpc.CallOption,
+	) (*ValidateMessageResponse, error)
 }
 
 type schemaServiceClient struct {
@@ -82,7 +103,11 @@ func NewSchemaServiceClient(cc grpc.ClientConnInterface) SchemaServiceClient {
 	return &schemaServiceClient{cc}
 }
 
-func (c *schemaServiceClient) CreateSchema(ctx context.Context, in *CreateSchemaRequest, opts ...grpc.CallOption) (*Schema, error) {
+func (c *schemaServiceClient) CreateSchema(
+	ctx context.Context,
+	in *CreateSchemaRequest,
+	opts ...grpc.CallOption,
+) (*Schema, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Schema)
 	err := c.cc.Invoke(ctx, SchemaService_CreateSchema_FullMethodName, in, out, cOpts...)
@@ -92,7 +117,11 @@ func (c *schemaServiceClient) CreateSchema(ctx context.Context, in *CreateSchema
 	return out, nil
 }
 
-func (c *schemaServiceClient) GetSchema(ctx context.Context, in *GetSchemaRequest, opts ...grpc.CallOption) (*Schema, error) {
+func (c *schemaServiceClient) GetSchema(
+	ctx context.Context,
+	in *GetSchemaRequest,
+	opts ...grpc.CallOption,
+) (*Schema, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Schema)
 	err := c.cc.Invoke(ctx, SchemaService_GetSchema_FullMethodName, in, out, cOpts...)
@@ -102,7 +131,11 @@ func (c *schemaServiceClient) GetSchema(ctx context.Context, in *GetSchemaReques
 	return out, nil
 }
 
-func (c *schemaServiceClient) ListSchemas(ctx context.Context, in *ListSchemasRequest, opts ...grpc.CallOption) (*ListSchemasResponse, error) {
+func (c *schemaServiceClient) ListSchemas(
+	ctx context.Context,
+	in *ListSchemasRequest,
+	opts ...grpc.CallOption,
+) (*ListSchemasResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListSchemasResponse)
 	err := c.cc.Invoke(ctx, SchemaService_ListSchemas_FullMethodName, in, out, cOpts...)
@@ -112,7 +145,11 @@ func (c *schemaServiceClient) ListSchemas(ctx context.Context, in *ListSchemasRe
 	return out, nil
 }
 
-func (c *schemaServiceClient) ListSchemaRevisions(ctx context.Context, in *ListSchemaRevisionsRequest, opts ...grpc.CallOption) (*ListSchemaRevisionsResponse, error) {
+func (c *schemaServiceClient) ListSchemaRevisions(
+	ctx context.Context,
+	in *ListSchemaRevisionsRequest,
+	opts ...grpc.CallOption,
+) (*ListSchemaRevisionsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListSchemaRevisionsResponse)
 	err := c.cc.Invoke(ctx, SchemaService_ListSchemaRevisions_FullMethodName, in, out, cOpts...)
@@ -122,7 +159,11 @@ func (c *schemaServiceClient) ListSchemaRevisions(ctx context.Context, in *ListS
 	return out, nil
 }
 
-func (c *schemaServiceClient) CommitSchema(ctx context.Context, in *CommitSchemaRequest, opts ...grpc.CallOption) (*Schema, error) {
+func (c *schemaServiceClient) CommitSchema(
+	ctx context.Context,
+	in *CommitSchemaRequest,
+	opts ...grpc.CallOption,
+) (*Schema, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Schema)
 	err := c.cc.Invoke(ctx, SchemaService_CommitSchema_FullMethodName, in, out, cOpts...)
@@ -132,7 +173,11 @@ func (c *schemaServiceClient) CommitSchema(ctx context.Context, in *CommitSchema
 	return out, nil
 }
 
-func (c *schemaServiceClient) RollbackSchema(ctx context.Context, in *RollbackSchemaRequest, opts ...grpc.CallOption) (*Schema, error) {
+func (c *schemaServiceClient) RollbackSchema(
+	ctx context.Context,
+	in *RollbackSchemaRequest,
+	opts ...grpc.CallOption,
+) (*Schema, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Schema)
 	err := c.cc.Invoke(ctx, SchemaService_RollbackSchema_FullMethodName, in, out, cOpts...)
@@ -142,7 +187,11 @@ func (c *schemaServiceClient) RollbackSchema(ctx context.Context, in *RollbackSc
 	return out, nil
 }
 
-func (c *schemaServiceClient) DeleteSchemaRevision(ctx context.Context, in *DeleteSchemaRevisionRequest, opts ...grpc.CallOption) (*Schema, error) {
+func (c *schemaServiceClient) DeleteSchemaRevision(
+	ctx context.Context,
+	in *DeleteSchemaRevisionRequest,
+	opts ...grpc.CallOption,
+) (*Schema, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Schema)
 	err := c.cc.Invoke(ctx, SchemaService_DeleteSchemaRevision_FullMethodName, in, out, cOpts...)
@@ -152,7 +201,11 @@ func (c *schemaServiceClient) DeleteSchemaRevision(ctx context.Context, in *Dele
 	return out, nil
 }
 
-func (c *schemaServiceClient) DeleteSchema(ctx context.Context, in *DeleteSchemaRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *schemaServiceClient) DeleteSchema(
+	ctx context.Context,
+	in *DeleteSchemaRequest,
+	opts ...grpc.CallOption,
+) (*empty.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, SchemaService_DeleteSchema_FullMethodName, in, out, cOpts...)
@@ -162,7 +215,11 @@ func (c *schemaServiceClient) DeleteSchema(ctx context.Context, in *DeleteSchema
 	return out, nil
 }
 
-func (c *schemaServiceClient) ValidateSchema(ctx context.Context, in *ValidateSchemaRequest, opts ...grpc.CallOption) (*ValidateSchemaResponse, error) {
+func (c *schemaServiceClient) ValidateSchema(
+	ctx context.Context,
+	in *ValidateSchemaRequest,
+	opts ...grpc.CallOption,
+) (*ValidateSchemaResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ValidateSchemaResponse)
 	err := c.cc.Invoke(ctx, SchemaService_ValidateSchema_FullMethodName, in, out, cOpts...)
@@ -172,7 +229,11 @@ func (c *schemaServiceClient) ValidateSchema(ctx context.Context, in *ValidateSc
 	return out, nil
 }
 
-func (c *schemaServiceClient) ValidateMessage(ctx context.Context, in *ValidateMessageRequest, opts ...grpc.CallOption) (*ValidateMessageResponse, error) {
+func (c *schemaServiceClient) ValidateMessage(
+	ctx context.Context,
+	in *ValidateMessageRequest,
+	opts ...grpc.CallOption,
+) (*ValidateMessageResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ValidateMessageResponse)
 	err := c.cc.Invoke(ctx, SchemaService_ValidateMessage_FullMethodName, in, out, cOpts...)
@@ -224,28 +285,56 @@ func (UnimplementedSchemaServiceServer) CreateSchema(context.Context, *CreateSch
 func (UnimplementedSchemaServiceServer) GetSchema(context.Context, *GetSchemaRequest) (*Schema, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSchema not implemented")
 }
-func (UnimplementedSchemaServiceServer) ListSchemas(context.Context, *ListSchemasRequest) (*ListSchemasResponse, error) {
+
+func (UnimplementedSchemaServiceServer) ListSchemas(
+	context.Context,
+	*ListSchemasRequest,
+) (*ListSchemasResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListSchemas not implemented")
 }
-func (UnimplementedSchemaServiceServer) ListSchemaRevisions(context.Context, *ListSchemaRevisionsRequest) (*ListSchemaRevisionsResponse, error) {
+
+func (UnimplementedSchemaServiceServer) ListSchemaRevisions(
+	context.Context,
+	*ListSchemaRevisionsRequest,
+) (*ListSchemaRevisionsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListSchemaRevisions not implemented")
 }
 func (UnimplementedSchemaServiceServer) CommitSchema(context.Context, *CommitSchemaRequest) (*Schema, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CommitSchema not implemented")
 }
-func (UnimplementedSchemaServiceServer) RollbackSchema(context.Context, *RollbackSchemaRequest) (*Schema, error) {
+
+func (UnimplementedSchemaServiceServer) RollbackSchema(
+	context.Context,
+	*RollbackSchemaRequest,
+) (*Schema, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RollbackSchema not implemented")
 }
-func (UnimplementedSchemaServiceServer) DeleteSchemaRevision(context.Context, *DeleteSchemaRevisionRequest) (*Schema, error) {
+
+func (UnimplementedSchemaServiceServer) DeleteSchemaRevision(
+	context.Context,
+	*DeleteSchemaRevisionRequest,
+) (*Schema, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteSchemaRevision not implemented")
 }
-func (UnimplementedSchemaServiceServer) DeleteSchema(context.Context, *DeleteSchemaRequest) (*empty.Empty, error) {
+
+func (UnimplementedSchemaServiceServer) DeleteSchema(
+	context.Context,
+	*DeleteSchemaRequest,
+) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteSchema not implemented")
 }
-func (UnimplementedSchemaServiceServer) ValidateSchema(context.Context, *ValidateSchemaRequest) (*ValidateSchemaResponse, error) {
+
+func (UnimplementedSchemaServiceServer) ValidateSchema(
+	context.Context,
+	*ValidateSchemaRequest,
+) (*ValidateSchemaResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ValidateSchema not implemented")
 }
-func (UnimplementedSchemaServiceServer) ValidateMessage(context.Context, *ValidateMessageRequest) (*ValidateMessageResponse, error) {
+
+func (UnimplementedSchemaServiceServer) ValidateMessage(
+	context.Context,
+	*ValidateMessageRequest,
+) (*ValidateMessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ValidateMessage not implemented")
 }
 func (UnimplementedSchemaServiceServer) mustEmbedUnimplementedSchemaServiceServer() {}
@@ -269,7 +358,12 @@ func RegisterSchemaServiceServer(s grpc.ServiceRegistrar, srv SchemaServiceServe
 	s.RegisterService(&SchemaService_ServiceDesc, srv)
 }
 
-func _SchemaService_CreateSchema_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SchemaService_CreateSchema_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(CreateSchemaRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -287,7 +381,12 @@ func _SchemaService_CreateSchema_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SchemaService_GetSchema_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SchemaService_GetSchema_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(GetSchemaRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -305,7 +404,12 @@ func _SchemaService_GetSchema_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SchemaService_ListSchemas_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SchemaService_ListSchemas_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(ListSchemasRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -323,7 +427,12 @@ func _SchemaService_ListSchemas_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SchemaService_ListSchemaRevisions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SchemaService_ListSchemaRevisions_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(ListSchemaRevisionsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -341,7 +450,12 @@ func _SchemaService_ListSchemaRevisions_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SchemaService_CommitSchema_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SchemaService_CommitSchema_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(CommitSchemaRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -359,7 +473,12 @@ func _SchemaService_CommitSchema_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SchemaService_RollbackSchema_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SchemaService_RollbackSchema_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(RollbackSchemaRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -377,7 +496,12 @@ func _SchemaService_RollbackSchema_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SchemaService_DeleteSchemaRevision_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SchemaService_DeleteSchemaRevision_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(DeleteSchemaRevisionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -395,7 +519,12 @@ func _SchemaService_DeleteSchemaRevision_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SchemaService_DeleteSchema_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SchemaService_DeleteSchema_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(DeleteSchemaRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -413,7 +542,12 @@ func _SchemaService_DeleteSchema_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SchemaService_ValidateSchema_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SchemaService_ValidateSchema_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(ValidateSchemaRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -431,7 +565,12 @@ func _SchemaService_ValidateSchema_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SchemaService_ValidateMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SchemaService_ValidateMessage_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(ValidateMessageRequest)
 	if err := dec(in); err != nil {
 		return nil, err

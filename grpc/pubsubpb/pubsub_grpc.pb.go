@@ -22,6 +22,7 @@ package pubsubpb
 
 import (
 	context "context"
+
 	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -66,13 +67,21 @@ type PublisherClient interface {
 	// Lists matching topics.
 	ListTopics(ctx context.Context, in *ListTopicsRequest, opts ...grpc.CallOption) (*ListTopicsResponse, error)
 	// Lists the names of the attached subscriptions on this topic.
-	ListTopicSubscriptions(ctx context.Context, in *ListTopicSubscriptionsRequest, opts ...grpc.CallOption) (*ListTopicSubscriptionsResponse, error)
+	ListTopicSubscriptions(
+		ctx context.Context,
+		in *ListTopicSubscriptionsRequest,
+		opts ...grpc.CallOption,
+	) (*ListTopicSubscriptionsResponse, error)
 	// Lists the names of the snapshots on this topic. Snapshots are used in
 	// [Seek](https://cloud.google.com/pubsub/docs/replay-overview) operations,
 	// which allow you to manage message acknowledgments in bulk. That is, you can
 	// set the acknowledgment state of messages in an existing subscription to the
 	// state captured by a snapshot.
-	ListTopicSnapshots(ctx context.Context, in *ListTopicSnapshotsRequest, opts ...grpc.CallOption) (*ListTopicSnapshotsResponse, error)
+	ListTopicSnapshots(
+		ctx context.Context,
+		in *ListTopicSnapshotsRequest,
+		opts ...grpc.CallOption,
+	) (*ListTopicSnapshotsResponse, error)
 	// Deletes the topic with the given name. Returns `NOT_FOUND` if the topic
 	// does not exist. After a topic is deleted, a new topic may be created with
 	// the same name; this is an entirely new topic with none of the old
@@ -83,7 +92,11 @@ type PublisherClient interface {
 	// subscription are dropped. Subsequent `Pull` and `StreamingPull` requests
 	// will return FAILED_PRECONDITION. If the subscription is a push
 	// subscription, pushes to the endpoint will stop.
-	DetachSubscription(ctx context.Context, in *DetachSubscriptionRequest, opts ...grpc.CallOption) (*DetachSubscriptionResponse, error)
+	DetachSubscription(
+		ctx context.Context,
+		in *DetachSubscriptionRequest,
+		opts ...grpc.CallOption,
+	) (*DetachSubscriptionResponse, error)
 }
 
 type publisherClient struct {
@@ -94,7 +107,11 @@ func NewPublisherClient(cc grpc.ClientConnInterface) PublisherClient {
 	return &publisherClient{cc}
 }
 
-func (c *publisherClient) CreateTopic(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Topic, error) {
+func (c *publisherClient) CreateTopic(
+	ctx context.Context,
+	in *Topic,
+	opts ...grpc.CallOption,
+) (*Topic, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Topic)
 	err := c.cc.Invoke(ctx, Publisher_CreateTopic_FullMethodName, in, out, cOpts...)
@@ -104,7 +121,11 @@ func (c *publisherClient) CreateTopic(ctx context.Context, in *Topic, opts ...gr
 	return out, nil
 }
 
-func (c *publisherClient) UpdateTopic(ctx context.Context, in *UpdateTopicRequest, opts ...grpc.CallOption) (*Topic, error) {
+func (c *publisherClient) UpdateTopic(
+	ctx context.Context,
+	in *UpdateTopicRequest,
+	opts ...grpc.CallOption,
+) (*Topic, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Topic)
 	err := c.cc.Invoke(ctx, Publisher_UpdateTopic_FullMethodName, in, out, cOpts...)
@@ -114,7 +135,11 @@ func (c *publisherClient) UpdateTopic(ctx context.Context, in *UpdateTopicReques
 	return out, nil
 }
 
-func (c *publisherClient) Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*PublishResponse, error) {
+func (c *publisherClient) Publish(
+	ctx context.Context,
+	in *PublishRequest,
+	opts ...grpc.CallOption,
+) (*PublishResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(PublishResponse)
 	err := c.cc.Invoke(ctx, Publisher_Publish_FullMethodName, in, out, cOpts...)
@@ -124,7 +149,11 @@ func (c *publisherClient) Publish(ctx context.Context, in *PublishRequest, opts 
 	return out, nil
 }
 
-func (c *publisherClient) GetTopic(ctx context.Context, in *GetTopicRequest, opts ...grpc.CallOption) (*Topic, error) {
+func (c *publisherClient) GetTopic(
+	ctx context.Context,
+	in *GetTopicRequest,
+	opts ...grpc.CallOption,
+) (*Topic, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Topic)
 	err := c.cc.Invoke(ctx, Publisher_GetTopic_FullMethodName, in, out, cOpts...)
@@ -134,7 +163,11 @@ func (c *publisherClient) GetTopic(ctx context.Context, in *GetTopicRequest, opt
 	return out, nil
 }
 
-func (c *publisherClient) ListTopics(ctx context.Context, in *ListTopicsRequest, opts ...grpc.CallOption) (*ListTopicsResponse, error) {
+func (c *publisherClient) ListTopics(
+	ctx context.Context,
+	in *ListTopicsRequest,
+	opts ...grpc.CallOption,
+) (*ListTopicsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListTopicsResponse)
 	err := c.cc.Invoke(ctx, Publisher_ListTopics_FullMethodName, in, out, cOpts...)
@@ -144,7 +177,11 @@ func (c *publisherClient) ListTopics(ctx context.Context, in *ListTopicsRequest,
 	return out, nil
 }
 
-func (c *publisherClient) ListTopicSubscriptions(ctx context.Context, in *ListTopicSubscriptionsRequest, opts ...grpc.CallOption) (*ListTopicSubscriptionsResponse, error) {
+func (c *publisherClient) ListTopicSubscriptions(
+	ctx context.Context,
+	in *ListTopicSubscriptionsRequest,
+	opts ...grpc.CallOption,
+) (*ListTopicSubscriptionsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListTopicSubscriptionsResponse)
 	err := c.cc.Invoke(ctx, Publisher_ListTopicSubscriptions_FullMethodName, in, out, cOpts...)
@@ -154,7 +191,11 @@ func (c *publisherClient) ListTopicSubscriptions(ctx context.Context, in *ListTo
 	return out, nil
 }
 
-func (c *publisherClient) ListTopicSnapshots(ctx context.Context, in *ListTopicSnapshotsRequest, opts ...grpc.CallOption) (*ListTopicSnapshotsResponse, error) {
+func (c *publisherClient) ListTopicSnapshots(
+	ctx context.Context,
+	in *ListTopicSnapshotsRequest,
+	opts ...grpc.CallOption,
+) (*ListTopicSnapshotsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListTopicSnapshotsResponse)
 	err := c.cc.Invoke(ctx, Publisher_ListTopicSnapshots_FullMethodName, in, out, cOpts...)
@@ -164,7 +205,11 @@ func (c *publisherClient) ListTopicSnapshots(ctx context.Context, in *ListTopicS
 	return out, nil
 }
 
-func (c *publisherClient) DeleteTopic(ctx context.Context, in *DeleteTopicRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *publisherClient) DeleteTopic(
+	ctx context.Context,
+	in *DeleteTopicRequest,
+	opts ...grpc.CallOption,
+) (*empty.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, Publisher_DeleteTopic_FullMethodName, in, out, cOpts...)
@@ -174,7 +219,11 @@ func (c *publisherClient) DeleteTopic(ctx context.Context, in *DeleteTopicReques
 	return out, nil
 }
 
-func (c *publisherClient) DetachSubscription(ctx context.Context, in *DetachSubscriptionRequest, opts ...grpc.CallOption) (*DetachSubscriptionResponse, error) {
+func (c *publisherClient) DetachSubscription(
+	ctx context.Context,
+	in *DetachSubscriptionRequest,
+	opts ...grpc.CallOption,
+) (*DetachSubscriptionResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(DetachSubscriptionResponse)
 	err := c.cc.Invoke(ctx, Publisher_DetachSubscription_FullMethodName, in, out, cOpts...)
@@ -205,7 +254,10 @@ type PublisherServer interface {
 	// Lists matching topics.
 	ListTopics(context.Context, *ListTopicsRequest) (*ListTopicsResponse, error)
 	// Lists the names of the attached subscriptions on this topic.
-	ListTopicSubscriptions(context.Context, *ListTopicSubscriptionsRequest) (*ListTopicSubscriptionsResponse, error)
+	ListTopicSubscriptions(
+		context.Context,
+		*ListTopicSubscriptionsRequest,
+	) (*ListTopicSubscriptionsResponse, error)
 	// Lists the names of the snapshots on this topic. Snapshots are used in
 	// [Seek](https://cloud.google.com/pubsub/docs/replay-overview) operations,
 	// which allow you to manage message acknowledgments in bulk. That is, you can
@@ -245,19 +297,35 @@ func (UnimplementedPublisherServer) Publish(context.Context, *PublishRequest) (*
 func (UnimplementedPublisherServer) GetTopic(context.Context, *GetTopicRequest) (*Topic, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTopic not implemented")
 }
-func (UnimplementedPublisherServer) ListTopics(context.Context, *ListTopicsRequest) (*ListTopicsResponse, error) {
+
+func (UnimplementedPublisherServer) ListTopics(
+	context.Context,
+	*ListTopicsRequest,
+) (*ListTopicsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListTopics not implemented")
 }
-func (UnimplementedPublisherServer) ListTopicSubscriptions(context.Context, *ListTopicSubscriptionsRequest) (*ListTopicSubscriptionsResponse, error) {
+
+func (UnimplementedPublisherServer) ListTopicSubscriptions(
+	context.Context,
+	*ListTopicSubscriptionsRequest,
+) (*ListTopicSubscriptionsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListTopicSubscriptions not implemented")
 }
-func (UnimplementedPublisherServer) ListTopicSnapshots(context.Context, *ListTopicSnapshotsRequest) (*ListTopicSnapshotsResponse, error) {
+
+func (UnimplementedPublisherServer) ListTopicSnapshots(
+	context.Context,
+	*ListTopicSnapshotsRequest,
+) (*ListTopicSnapshotsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListTopicSnapshots not implemented")
 }
 func (UnimplementedPublisherServer) DeleteTopic(context.Context, *DeleteTopicRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteTopic not implemented")
 }
-func (UnimplementedPublisherServer) DetachSubscription(context.Context, *DetachSubscriptionRequest) (*DetachSubscriptionResponse, error) {
+
+func (UnimplementedPublisherServer) DetachSubscription(
+	context.Context,
+	*DetachSubscriptionRequest,
+) (*DetachSubscriptionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DetachSubscription not implemented")
 }
 func (UnimplementedPublisherServer) mustEmbedUnimplementedPublisherServer() {}
@@ -281,7 +349,12 @@ func RegisterPublisherServer(s grpc.ServiceRegistrar, srv PublisherServer) {
 	s.RegisterService(&Publisher_ServiceDesc, srv)
 }
 
-func _Publisher_CreateTopic_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Publisher_CreateTopic_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(Topic)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -299,7 +372,12 @@ func _Publisher_CreateTopic_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Publisher_UpdateTopic_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Publisher_UpdateTopic_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(UpdateTopicRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -317,7 +395,12 @@ func _Publisher_UpdateTopic_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Publisher_Publish_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Publisher_Publish_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(PublishRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -335,7 +418,12 @@ func _Publisher_Publish_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Publisher_GetTopic_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Publisher_GetTopic_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(GetTopicRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -353,7 +441,12 @@ func _Publisher_GetTopic_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Publisher_ListTopics_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Publisher_ListTopics_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(ListTopicsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -371,7 +464,12 @@ func _Publisher_ListTopics_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Publisher_ListTopicSubscriptions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Publisher_ListTopicSubscriptions_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(ListTopicSubscriptionsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -389,7 +487,12 @@ func _Publisher_ListTopicSubscriptions_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Publisher_ListTopicSnapshots_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Publisher_ListTopicSnapshots_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(ListTopicSnapshotsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -407,7 +510,12 @@ func _Publisher_ListTopicSnapshots_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Publisher_DeleteTopic_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Publisher_DeleteTopic_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(DeleteTopicRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -425,7 +533,12 @@ func _Publisher_DeleteTopic_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Publisher_DetachSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Publisher_DetachSubscription_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(DetachSubscriptionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -531,25 +644,45 @@ type SubscriberClient interface {
 	// for REST API requests, you must specify a name in the request.
 	CreateSubscription(ctx context.Context, in *Subscription, opts ...grpc.CallOption) (*Subscription, error)
 	// Gets the configuration details of a subscription.
-	GetSubscription(ctx context.Context, in *GetSubscriptionRequest, opts ...grpc.CallOption) (*Subscription, error)
+	GetSubscription(
+		ctx context.Context,
+		in *GetSubscriptionRequest,
+		opts ...grpc.CallOption,
+	) (*Subscription, error)
 	// Updates an existing subscription by updating the fields specified in the
 	// update mask. Note that certain properties of a subscription, such as its
 	// topic, are not modifiable.
-	UpdateSubscription(ctx context.Context, in *UpdateSubscriptionRequest, opts ...grpc.CallOption) (*Subscription, error)
+	UpdateSubscription(
+		ctx context.Context,
+		in *UpdateSubscriptionRequest,
+		opts ...grpc.CallOption,
+	) (*Subscription, error)
 	// Lists matching subscriptions.
-	ListSubscriptions(ctx context.Context, in *ListSubscriptionsRequest, opts ...grpc.CallOption) (*ListSubscriptionsResponse, error)
+	ListSubscriptions(
+		ctx context.Context,
+		in *ListSubscriptionsRequest,
+		opts ...grpc.CallOption,
+	) (*ListSubscriptionsResponse, error)
 	// Deletes an existing subscription. All messages retained in the subscription
 	// are immediately dropped. Calls to `Pull` after deletion will return
 	// `NOT_FOUND`. After a subscription is deleted, a new one may be created with
 	// the same name, but the new one has no association with the old
 	// subscription or its topic unless the same topic is specified.
-	DeleteSubscription(ctx context.Context, in *DeleteSubscriptionRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	DeleteSubscription(
+		ctx context.Context,
+		in *DeleteSubscriptionRequest,
+		opts ...grpc.CallOption,
+	) (*empty.Empty, error)
 	// Modifies the ack deadline for a specific message. This method is useful
 	// to indicate that more time is needed to process a message by the
 	// subscriber, or to make the message available for redelivery if the
 	// processing was interrupted. Note that this does not modify the
 	// subscription-level `ackDeadlineSeconds` used for subsequent messages.
-	ModifyAckDeadline(ctx context.Context, in *ModifyAckDeadlineRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	ModifyAckDeadline(
+		ctx context.Context,
+		in *ModifyAckDeadlineRequest,
+		opts ...grpc.CallOption,
+	) (*empty.Empty, error)
 	// Acknowledges the messages associated with the `ack_ids` in the
 	// `AcknowledgeRequest`. The Pub/Sub system can remove the relevant messages
 	// from the subscription.
@@ -567,14 +700,21 @@ type SubscriberClient interface {
 	// reassign server-side resources, in which case, the client should
 	// re-establish the stream. Flow control can be achieved by configuring the
 	// underlying RPC channel.
-	StreamingPull(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[StreamingPullRequest, StreamingPullResponse], error)
+	StreamingPull(
+		ctx context.Context,
+		opts ...grpc.CallOption,
+	) (grpc.BidiStreamingClient[StreamingPullRequest, StreamingPullResponse], error)
 	// Modifies the `PushConfig` for a specified subscription.
 	//
 	// This may be used to change a push subscription to a pull one (signified by
 	// an empty `PushConfig`) or vice versa, or change the endpoint URL and other
 	// attributes of a push subscription. Messages will accumulate for delivery
 	// continuously through the call regardless of changes to the `PushConfig`.
-	ModifyPushConfig(ctx context.Context, in *ModifyPushConfigRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	ModifyPushConfig(
+		ctx context.Context,
+		in *ModifyPushConfigRequest,
+		opts ...grpc.CallOption,
+	) (*empty.Empty, error)
 	// Gets the configuration details of a snapshot. Snapshots are used in
 	// [Seek](https://cloud.google.com/pubsub/docs/replay-overview) operations,
 	// which allow you to manage message acknowledgments in bulk. That is, you can
@@ -586,7 +726,11 @@ type SubscriberClient interface {
 	// allow you to manage message acknowledgments in bulk. That is, you can set
 	// the acknowledgment state of messages in an existing subscription to the
 	// state captured by a snapshot.
-	ListSnapshots(ctx context.Context, in *ListSnapshotsRequest, opts ...grpc.CallOption) (*ListSnapshotsResponse, error)
+	ListSnapshots(
+		ctx context.Context,
+		in *ListSnapshotsRequest,
+		opts ...grpc.CallOption,
+	) (*ListSnapshotsResponse, error)
 	// Creates a snapshot from the requested subscription. Snapshots are used in
 	// [Seek](https://cloud.google.com/pubsub/docs/replay-overview) operations,
 	// which allow you to manage message acknowledgments in bulk. That is, you can
@@ -620,7 +764,11 @@ type SubscriberClient interface {
 	// are immediately dropped. After a snapshot is deleted, a new one may be
 	// created with the same name, but the new one has no association with the old
 	// snapshot or its subscription, unless the same subscription is specified.
-	DeleteSnapshot(ctx context.Context, in *DeleteSnapshotRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	DeleteSnapshot(
+		ctx context.Context,
+		in *DeleteSnapshotRequest,
+		opts ...grpc.CallOption,
+	) (*empty.Empty, error)
 	// Seeks an existing subscription to a point in time or to a given snapshot,
 	// whichever is provided in the request. Snapshots are used in [Seek]
 	// (https://cloud.google.com/pubsub/docs/replay-overview) operations, which
@@ -639,7 +787,11 @@ func NewSubscriberClient(cc grpc.ClientConnInterface) SubscriberClient {
 	return &subscriberClient{cc}
 }
 
-func (c *subscriberClient) CreateSubscription(ctx context.Context, in *Subscription, opts ...grpc.CallOption) (*Subscription, error) {
+func (c *subscriberClient) CreateSubscription(
+	ctx context.Context,
+	in *Subscription,
+	opts ...grpc.CallOption,
+) (*Subscription, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Subscription)
 	err := c.cc.Invoke(ctx, Subscriber_CreateSubscription_FullMethodName, in, out, cOpts...)
@@ -649,7 +801,11 @@ func (c *subscriberClient) CreateSubscription(ctx context.Context, in *Subscript
 	return out, nil
 }
 
-func (c *subscriberClient) GetSubscription(ctx context.Context, in *GetSubscriptionRequest, opts ...grpc.CallOption) (*Subscription, error) {
+func (c *subscriberClient) GetSubscription(
+	ctx context.Context,
+	in *GetSubscriptionRequest,
+	opts ...grpc.CallOption,
+) (*Subscription, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Subscription)
 	err := c.cc.Invoke(ctx, Subscriber_GetSubscription_FullMethodName, in, out, cOpts...)
@@ -659,7 +815,11 @@ func (c *subscriberClient) GetSubscription(ctx context.Context, in *GetSubscript
 	return out, nil
 }
 
-func (c *subscriberClient) UpdateSubscription(ctx context.Context, in *UpdateSubscriptionRequest, opts ...grpc.CallOption) (*Subscription, error) {
+func (c *subscriberClient) UpdateSubscription(
+	ctx context.Context,
+	in *UpdateSubscriptionRequest,
+	opts ...grpc.CallOption,
+) (*Subscription, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Subscription)
 	err := c.cc.Invoke(ctx, Subscriber_UpdateSubscription_FullMethodName, in, out, cOpts...)
@@ -669,7 +829,11 @@ func (c *subscriberClient) UpdateSubscription(ctx context.Context, in *UpdateSub
 	return out, nil
 }
 
-func (c *subscriberClient) ListSubscriptions(ctx context.Context, in *ListSubscriptionsRequest, opts ...grpc.CallOption) (*ListSubscriptionsResponse, error) {
+func (c *subscriberClient) ListSubscriptions(
+	ctx context.Context,
+	in *ListSubscriptionsRequest,
+	opts ...grpc.CallOption,
+) (*ListSubscriptionsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListSubscriptionsResponse)
 	err := c.cc.Invoke(ctx, Subscriber_ListSubscriptions_FullMethodName, in, out, cOpts...)
@@ -679,7 +843,11 @@ func (c *subscriberClient) ListSubscriptions(ctx context.Context, in *ListSubscr
 	return out, nil
 }
 
-func (c *subscriberClient) DeleteSubscription(ctx context.Context, in *DeleteSubscriptionRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *subscriberClient) DeleteSubscription(
+	ctx context.Context,
+	in *DeleteSubscriptionRequest,
+	opts ...grpc.CallOption,
+) (*empty.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, Subscriber_DeleteSubscription_FullMethodName, in, out, cOpts...)
@@ -689,7 +857,11 @@ func (c *subscriberClient) DeleteSubscription(ctx context.Context, in *DeleteSub
 	return out, nil
 }
 
-func (c *subscriberClient) ModifyAckDeadline(ctx context.Context, in *ModifyAckDeadlineRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *subscriberClient) ModifyAckDeadline(
+	ctx context.Context,
+	in *ModifyAckDeadlineRequest,
+	opts ...grpc.CallOption,
+) (*empty.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, Subscriber_ModifyAckDeadline_FullMethodName, in, out, cOpts...)
@@ -699,7 +871,11 @@ func (c *subscriberClient) ModifyAckDeadline(ctx context.Context, in *ModifyAckD
 	return out, nil
 }
 
-func (c *subscriberClient) Acknowledge(ctx context.Context, in *AcknowledgeRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *subscriberClient) Acknowledge(
+	ctx context.Context,
+	in *AcknowledgeRequest,
+	opts ...grpc.CallOption,
+) (*empty.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, Subscriber_Acknowledge_FullMethodName, in, out, cOpts...)
@@ -709,7 +885,11 @@ func (c *subscriberClient) Acknowledge(ctx context.Context, in *AcknowledgeReque
 	return out, nil
 }
 
-func (c *subscriberClient) Pull(ctx context.Context, in *PullRequest, opts ...grpc.CallOption) (*PullResponse, error) {
+func (c *subscriberClient) Pull(
+	ctx context.Context,
+	in *PullRequest,
+	opts ...grpc.CallOption,
+) (*PullResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(PullResponse)
 	err := c.cc.Invoke(ctx, Subscriber_Pull_FullMethodName, in, out, cOpts...)
@@ -719,9 +899,16 @@ func (c *subscriberClient) Pull(ctx context.Context, in *PullRequest, opts ...gr
 	return out, nil
 }
 
-func (c *subscriberClient) StreamingPull(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[StreamingPullRequest, StreamingPullResponse], error) {
+func (c *subscriberClient) StreamingPull(
+	ctx context.Context,
+	opts ...grpc.CallOption,
+) (grpc.BidiStreamingClient[StreamingPullRequest, StreamingPullResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &Subscriber_ServiceDesc.Streams[0], Subscriber_StreamingPull_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(
+		ctx,
+		&Subscriber_ServiceDesc.Streams[0],
+		Subscriber_StreamingPull_FullMethodName,
+		cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -732,7 +919,11 @@ func (c *subscriberClient) StreamingPull(ctx context.Context, opts ...grpc.CallO
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type Subscriber_StreamingPullClient = grpc.BidiStreamingClient[StreamingPullRequest, StreamingPullResponse]
 
-func (c *subscriberClient) ModifyPushConfig(ctx context.Context, in *ModifyPushConfigRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *subscriberClient) ModifyPushConfig(
+	ctx context.Context,
+	in *ModifyPushConfigRequest,
+	opts ...grpc.CallOption,
+) (*empty.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, Subscriber_ModifyPushConfig_FullMethodName, in, out, cOpts...)
@@ -742,7 +933,11 @@ func (c *subscriberClient) ModifyPushConfig(ctx context.Context, in *ModifyPushC
 	return out, nil
 }
 
-func (c *subscriberClient) GetSnapshot(ctx context.Context, in *GetSnapshotRequest, opts ...grpc.CallOption) (*Snapshot, error) {
+func (c *subscriberClient) GetSnapshot(
+	ctx context.Context,
+	in *GetSnapshotRequest,
+	opts ...grpc.CallOption,
+) (*Snapshot, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Snapshot)
 	err := c.cc.Invoke(ctx, Subscriber_GetSnapshot_FullMethodName, in, out, cOpts...)
@@ -752,7 +947,11 @@ func (c *subscriberClient) GetSnapshot(ctx context.Context, in *GetSnapshotReque
 	return out, nil
 }
 
-func (c *subscriberClient) ListSnapshots(ctx context.Context, in *ListSnapshotsRequest, opts ...grpc.CallOption) (*ListSnapshotsResponse, error) {
+func (c *subscriberClient) ListSnapshots(
+	ctx context.Context,
+	in *ListSnapshotsRequest,
+	opts ...grpc.CallOption,
+) (*ListSnapshotsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListSnapshotsResponse)
 	err := c.cc.Invoke(ctx, Subscriber_ListSnapshots_FullMethodName, in, out, cOpts...)
@@ -762,7 +961,11 @@ func (c *subscriberClient) ListSnapshots(ctx context.Context, in *ListSnapshotsR
 	return out, nil
 }
 
-func (c *subscriberClient) CreateSnapshot(ctx context.Context, in *CreateSnapshotRequest, opts ...grpc.CallOption) (*Snapshot, error) {
+func (c *subscriberClient) CreateSnapshot(
+	ctx context.Context,
+	in *CreateSnapshotRequest,
+	opts ...grpc.CallOption,
+) (*Snapshot, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Snapshot)
 	err := c.cc.Invoke(ctx, Subscriber_CreateSnapshot_FullMethodName, in, out, cOpts...)
@@ -772,7 +975,11 @@ func (c *subscriberClient) CreateSnapshot(ctx context.Context, in *CreateSnapsho
 	return out, nil
 }
 
-func (c *subscriberClient) UpdateSnapshot(ctx context.Context, in *UpdateSnapshotRequest, opts ...grpc.CallOption) (*Snapshot, error) {
+func (c *subscriberClient) UpdateSnapshot(
+	ctx context.Context,
+	in *UpdateSnapshotRequest,
+	opts ...grpc.CallOption,
+) (*Snapshot, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Snapshot)
 	err := c.cc.Invoke(ctx, Subscriber_UpdateSnapshot_FullMethodName, in, out, cOpts...)
@@ -782,7 +989,11 @@ func (c *subscriberClient) UpdateSnapshot(ctx context.Context, in *UpdateSnapsho
 	return out, nil
 }
 
-func (c *subscriberClient) DeleteSnapshot(ctx context.Context, in *DeleteSnapshotRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *subscriberClient) DeleteSnapshot(
+	ctx context.Context,
+	in *DeleteSnapshotRequest,
+	opts ...grpc.CallOption,
+) (*empty.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, Subscriber_DeleteSnapshot_FullMethodName, in, out, cOpts...)
@@ -792,7 +1003,11 @@ func (c *subscriberClient) DeleteSnapshot(ctx context.Context, in *DeleteSnapsho
 	return out, nil
 }
 
-func (c *subscriberClient) Seek(ctx context.Context, in *SeekRequest, opts ...grpc.CallOption) (*SeekResponse, error) {
+func (c *subscriberClient) Seek(
+	ctx context.Context,
+	in *SeekRequest,
+	opts ...grpc.CallOption,
+) (*SeekResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(SeekResponse)
 	err := c.cc.Invoke(ctx, Subscriber_Seek_FullMethodName, in, out, cOpts...)
@@ -931,22 +1146,45 @@ type SubscriberServer interface {
 // pointer dereference when methods are called.
 type UnimplementedSubscriberServer struct{}
 
-func (UnimplementedSubscriberServer) CreateSubscription(context.Context, *Subscription) (*Subscription, error) {
+func (UnimplementedSubscriberServer) CreateSubscription(
+	context.Context,
+	*Subscription,
+) (*Subscription, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateSubscription not implemented")
 }
-func (UnimplementedSubscriberServer) GetSubscription(context.Context, *GetSubscriptionRequest) (*Subscription, error) {
+
+func (UnimplementedSubscriberServer) GetSubscription(
+	context.Context,
+	*GetSubscriptionRequest,
+) (*Subscription, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSubscription not implemented")
 }
-func (UnimplementedSubscriberServer) UpdateSubscription(context.Context, *UpdateSubscriptionRequest) (*Subscription, error) {
+
+func (UnimplementedSubscriberServer) UpdateSubscription(
+	context.Context,
+	*UpdateSubscriptionRequest,
+) (*Subscription, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateSubscription not implemented")
 }
-func (UnimplementedSubscriberServer) ListSubscriptions(context.Context, *ListSubscriptionsRequest) (*ListSubscriptionsResponse, error) {
+
+func (UnimplementedSubscriberServer) ListSubscriptions(
+	context.Context,
+	*ListSubscriptionsRequest,
+) (*ListSubscriptionsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListSubscriptions not implemented")
 }
-func (UnimplementedSubscriberServer) DeleteSubscription(context.Context, *DeleteSubscriptionRequest) (*empty.Empty, error) {
+
+func (UnimplementedSubscriberServer) DeleteSubscription(
+	context.Context,
+	*DeleteSubscriptionRequest,
+) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteSubscription not implemented")
 }
-func (UnimplementedSubscriberServer) ModifyAckDeadline(context.Context, *ModifyAckDeadlineRequest) (*empty.Empty, error) {
+
+func (UnimplementedSubscriberServer) ModifyAckDeadline(
+	context.Context,
+	*ModifyAckDeadlineRequest,
+) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ModifyAckDeadline not implemented")
 }
 func (UnimplementedSubscriberServer) Acknowledge(context.Context, *AcknowledgeRequest) (*empty.Empty, error) {
@@ -955,25 +1193,48 @@ func (UnimplementedSubscriberServer) Acknowledge(context.Context, *AcknowledgeRe
 func (UnimplementedSubscriberServer) Pull(context.Context, *PullRequest) (*PullResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Pull not implemented")
 }
-func (UnimplementedSubscriberServer) StreamingPull(grpc.BidiStreamingServer[StreamingPullRequest, StreamingPullResponse]) error {
+
+func (UnimplementedSubscriberServer) StreamingPull(
+	grpc.BidiStreamingServer[StreamingPullRequest, StreamingPullResponse],
+) error {
 	return status.Errorf(codes.Unimplemented, "method StreamingPull not implemented")
 }
-func (UnimplementedSubscriberServer) ModifyPushConfig(context.Context, *ModifyPushConfigRequest) (*empty.Empty, error) {
+
+func (UnimplementedSubscriberServer) ModifyPushConfig(
+	context.Context,
+	*ModifyPushConfigRequest,
+) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ModifyPushConfig not implemented")
 }
 func (UnimplementedSubscriberServer) GetSnapshot(context.Context, *GetSnapshotRequest) (*Snapshot, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSnapshot not implemented")
 }
-func (UnimplementedSubscriberServer) ListSnapshots(context.Context, *ListSnapshotsRequest) (*ListSnapshotsResponse, error) {
+
+func (UnimplementedSubscriberServer) ListSnapshots(
+	context.Context,
+	*ListSnapshotsRequest,
+) (*ListSnapshotsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListSnapshots not implemented")
 }
-func (UnimplementedSubscriberServer) CreateSnapshot(context.Context, *CreateSnapshotRequest) (*Snapshot, error) {
+
+func (UnimplementedSubscriberServer) CreateSnapshot(
+	context.Context,
+	*CreateSnapshotRequest,
+) (*Snapshot, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateSnapshot not implemented")
 }
-func (UnimplementedSubscriberServer) UpdateSnapshot(context.Context, *UpdateSnapshotRequest) (*Snapshot, error) {
+
+func (UnimplementedSubscriberServer) UpdateSnapshot(
+	context.Context,
+	*UpdateSnapshotRequest,
+) (*Snapshot, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateSnapshot not implemented")
 }
-func (UnimplementedSubscriberServer) DeleteSnapshot(context.Context, *DeleteSnapshotRequest) (*empty.Empty, error) {
+
+func (UnimplementedSubscriberServer) DeleteSnapshot(
+	context.Context,
+	*DeleteSnapshotRequest,
+) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteSnapshot not implemented")
 }
 func (UnimplementedSubscriberServer) Seek(context.Context, *SeekRequest) (*SeekResponse, error) {
@@ -1000,7 +1261,12 @@ func RegisterSubscriberServer(s grpc.ServiceRegistrar, srv SubscriberServer) {
 	s.RegisterService(&Subscriber_ServiceDesc, srv)
 }
 
-func _Subscriber_CreateSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Subscriber_CreateSubscription_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(Subscription)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1018,7 +1284,12 @@ func _Subscriber_CreateSubscription_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Subscriber_GetSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Subscriber_GetSubscription_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(GetSubscriptionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1036,7 +1307,12 @@ func _Subscriber_GetSubscription_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Subscriber_UpdateSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Subscriber_UpdateSubscription_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(UpdateSubscriptionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1054,7 +1330,12 @@ func _Subscriber_UpdateSubscription_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Subscriber_ListSubscriptions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Subscriber_ListSubscriptions_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(ListSubscriptionsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1072,7 +1353,12 @@ func _Subscriber_ListSubscriptions_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Subscriber_DeleteSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Subscriber_DeleteSubscription_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(DeleteSubscriptionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1090,7 +1376,12 @@ func _Subscriber_DeleteSubscription_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Subscriber_ModifyAckDeadline_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Subscriber_ModifyAckDeadline_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(ModifyAckDeadlineRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1108,7 +1399,12 @@ func _Subscriber_ModifyAckDeadline_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Subscriber_Acknowledge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Subscriber_Acknowledge_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(AcknowledgeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1126,7 +1422,12 @@ func _Subscriber_Acknowledge_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Subscriber_Pull_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Subscriber_Pull_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(PullRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1145,13 +1446,20 @@ func _Subscriber_Pull_Handler(srv interface{}, ctx context.Context, dec func(int
 }
 
 func _Subscriber_StreamingPull_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(SubscriberServer).StreamingPull(&grpc.GenericServerStream[StreamingPullRequest, StreamingPullResponse]{ServerStream: stream})
+	return srv.(SubscriberServer).StreamingPull(
+		&grpc.GenericServerStream[StreamingPullRequest, StreamingPullResponse]{ServerStream: stream},
+	)
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type Subscriber_StreamingPullServer = grpc.BidiStreamingServer[StreamingPullRequest, StreamingPullResponse]
 
-func _Subscriber_ModifyPushConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Subscriber_ModifyPushConfig_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(ModifyPushConfigRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1169,7 +1477,12 @@ func _Subscriber_ModifyPushConfig_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Subscriber_GetSnapshot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Subscriber_GetSnapshot_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(GetSnapshotRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1187,7 +1500,12 @@ func _Subscriber_GetSnapshot_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Subscriber_ListSnapshots_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Subscriber_ListSnapshots_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(ListSnapshotsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1205,7 +1523,12 @@ func _Subscriber_ListSnapshots_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Subscriber_CreateSnapshot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Subscriber_CreateSnapshot_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(CreateSnapshotRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1223,7 +1546,12 @@ func _Subscriber_CreateSnapshot_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Subscriber_UpdateSnapshot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Subscriber_UpdateSnapshot_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(UpdateSnapshotRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1241,7 +1569,12 @@ func _Subscriber_UpdateSnapshot_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Subscriber_DeleteSnapshot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Subscriber_DeleteSnapshot_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(DeleteSnapshotRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1259,7 +1592,12 @@ func _Subscriber_DeleteSnapshot_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Subscriber_Seek_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Subscriber_Seek_Handler(
+	srv interface{},
+	ctx context.Context,
+	dec func(interface{}) error,
+	interceptor grpc.UnaryServerInterceptor,
+) (interface{}, error) {
 	in := new(SeekRequest)
 	if err := dec(in); err != nil {
 		return nil, err

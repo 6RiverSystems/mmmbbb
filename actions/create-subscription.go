@@ -80,7 +80,11 @@ func NewCreateSubscription(params CreateSubscriptionParams) *CreateSubscription 
 	}
 }
 
-var createSubscriptionsCounter, createSubscriptionsHistogram = actionMetrics("create_subscription", "subscriptions", "created")
+var createSubscriptionsCounter, createSubscriptionsHistogram = actionMetrics(
+	"create_subscription",
+	"subscriptions",
+	"created",
+)
 
 func (a *CreateSubscription) Execute(ctx context.Context, tx *ent.Tx) error {
 	timer := startActionTimer(createSubscriptionsHistogram, tx)

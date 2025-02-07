@@ -93,17 +93,32 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 			"unsatisfied order, instantaneous",
 			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test) {
 				topic := createTopicClient(t, ctx, client, 0)
-				sub := createSubscriptionClient(t, ctx, client, topic, 0, func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
-					return sc.SetOrderedDelivery(true)
-				})
+				sub := createSubscriptionClient(
+					t,
+					ctx,
+					client,
+					topic,
+					0,
+					func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
+						return sc.SetOrderedDelivery(true)
+					},
+				)
 				msg1 := createMessageClient(t, ctx, client, topic, 0, func(mc *ent.MessageCreate) *ent.MessageCreate {
 					return mc.SetOrderKey(t.Name())
 				})
-				del1 := createDeliveryClient(t, ctx, client, sub, msg1, 0, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
-					// have to set this one as not ready to attempt, to prevent it from
-					// being delivered in the request
-					return dc.SetAttemptAt(time.Now().Add(time.Hour))
-				})
+				del1 := createDeliveryClient(
+					t,
+					ctx,
+					client,
+					sub,
+					msg1,
+					0,
+					func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
+						// have to set this one as not ready to attempt, to prevent it from
+						// being delivered in the request
+						return dc.SetAttemptAt(time.Now().Add(time.Hour))
+					},
+				)
 				msg2 := createMessageClient(t, ctx, client, topic, 1, func(mc *ent.MessageCreate) *ent.MessageCreate {
 					return mc.SetOrderKey(t.Name())
 				})
@@ -126,15 +141,30 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 			"satisfied order, instantaneous",
 			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test) {
 				topic := createTopicClient(t, ctx, client, 0)
-				sub := createSubscriptionClient(t, ctx, client, topic, 0, func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
-					return sc.SetOrderedDelivery(true)
-				})
+				sub := createSubscriptionClient(
+					t,
+					ctx,
+					client,
+					topic,
+					0,
+					func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
+						return sc.SetOrderedDelivery(true)
+					},
+				)
 				msg1 := createMessageClient(t, ctx, client, topic, 0, func(mc *ent.MessageCreate) *ent.MessageCreate {
 					return mc.SetOrderKey(t.Name())
 				})
-				del1 := createDeliveryClient(t, ctx, client, sub, msg1, 0, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
-					return dc.SetAttemptAt(time.Now().Add(time.Hour)).SetCompletedAt(time.Now())
-				})
+				del1 := createDeliveryClient(
+					t,
+					ctx,
+					client,
+					sub,
+					msg1,
+					0,
+					func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
+						return dc.SetAttemptAt(time.Now().Add(time.Hour)).SetCompletedAt(time.Now())
+					},
+				)
 				msg2 := createMessageClient(t, ctx, client, topic, 1, func(mc *ent.MessageCreate) *ent.MessageCreate {
 					return mc.SetOrderKey(t.Name())
 				})
@@ -161,15 +191,30 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 			"expired order, instantaneous",
 			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test) {
 				topic := createTopicClient(t, ctx, client, 0)
-				sub := createSubscriptionClient(t, ctx, client, topic, 0, func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
-					return sc.SetOrderedDelivery(true)
-				})
+				sub := createSubscriptionClient(
+					t,
+					ctx,
+					client,
+					topic,
+					0,
+					func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
+						return sc.SetOrderedDelivery(true)
+					},
+				)
 				msg1 := createMessageClient(t, ctx, client, topic, 0, func(mc *ent.MessageCreate) *ent.MessageCreate {
 					return mc.SetOrderKey(t.Name())
 				})
-				del1 := createDeliveryClient(t, ctx, client, sub, msg1, 0, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
-					return dc.SetAttemptAt(time.Now().Add(time.Hour)).SetExpiresAt(time.Now())
-				})
+				del1 := createDeliveryClient(
+					t,
+					ctx,
+					client,
+					sub,
+					msg1,
+					0,
+					func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
+						return dc.SetAttemptAt(time.Now().Add(time.Hour)).SetExpiresAt(time.Now())
+					},
+				)
 				msg2 := createMessageClient(t, ctx, client, topic, 1, func(mc *ent.MessageCreate) *ent.MessageCreate {
 					return mc.SetOrderKey(t.Name())
 				})
@@ -325,15 +370,30 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 			"satisfied order, delayed",
 			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test) {
 				topic := createTopicClient(t, ctx, client, 0)
-				sub := createSubscriptionClient(t, ctx, client, topic, 0, func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
-					return sc.SetOrderedDelivery(true)
-				})
+				sub := createSubscriptionClient(
+					t,
+					ctx,
+					client,
+					topic,
+					0,
+					func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
+						return sc.SetOrderedDelivery(true)
+					},
+				)
 				msg1 := createMessageClient(t, ctx, client, topic, 0, func(mc *ent.MessageCreate) *ent.MessageCreate {
 					return mc.SetOrderKey(t.Name())
 				})
-				del1 := createDeliveryClient(t, ctx, client, sub, msg1, 0, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
-					return dc.SetAttemptAt(time.Now().Add(time.Hour))
-				})
+				del1 := createDeliveryClient(
+					t,
+					ctx,
+					client,
+					sub,
+					msg1,
+					0,
+					func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
+						return dc.SetAttemptAt(time.Now().Add(time.Hour))
+					},
+				)
 				msg2 := createMessageClient(t, ctx, client, topic, 1, func(mc *ent.MessageCreate) *ent.MessageCreate {
 					return mc.SetOrderKey(t.Name())
 				})
@@ -376,15 +436,31 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 			"expired order, delayed",
 			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test) {
 				topic := createTopicClient(t, ctx, client, 0)
-				sub := createSubscriptionClient(t, ctx, client, topic, 0, func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
-					return sc.SetOrderedDelivery(true)
-				})
+				sub := createSubscriptionClient(
+					t,
+					ctx,
+					client,
+					topic,
+					0,
+					func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
+						return sc.SetOrderedDelivery(true)
+					},
+				)
 				msg1 := createMessageClient(t, ctx, client, topic, 0, func(mc *ent.MessageCreate) *ent.MessageCreate {
 					return mc.SetOrderKey(t.Name())
 				})
-				del1 := createDeliveryClient(t, ctx, client, sub, msg1, 0, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
-					return dc.SetAttemptAt(time.Now().Add(time.Hour)).SetExpiresAt(time.Now().Add(100 * time.Millisecond))
-				})
+				del1 := createDeliveryClient(
+					t,
+					ctx,
+					client,
+					sub,
+					msg1,
+					0,
+					func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
+						return dc.SetAttemptAt(time.Now().Add(time.Hour)).
+							SetExpiresAt(time.Now().Add(100 * time.Millisecond))
+					},
+				)
 				msg2 := createMessageClient(t, ctx, client, topic, 1, func(mc *ent.MessageCreate) *ent.MessageCreate {
 					return mc.SetOrderKey(t.Name())
 				})

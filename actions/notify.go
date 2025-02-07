@@ -225,7 +225,14 @@ func WakePublishListeners(onlyInternal bool, subIDs ...uuid.UUID) {
 }
 
 func WakeTopicListeners(onlyInternal bool, topicID uuid.UUID, topicName string) {
-	wakeModifyListeners(topicModifyHooks, topicModifyWaiters, anyTopicModifiedWaiters, onlyInternal, topicID, topicName)
+	wakeModifyListeners(
+		topicModifyHooks,
+		topicModifyWaiters,
+		anyTopicModifiedWaiters,
+		onlyInternal,
+		topicID,
+		topicName,
+	)
 }
 
 func WakeSubscriptionListeners(
@@ -233,7 +240,14 @@ func WakeSubscriptionListeners(
 	subscriptionID uuid.UUID,
 	subscriptionName string,
 ) {
-	wakeModifyListeners(subModifyHooks, subModifyWaiters, anySubModifiedWaiters, onlyInternal, subscriptionID, subscriptionName)
+	wakeModifyListeners(
+		subModifyHooks,
+		subModifyWaiters,
+		anySubModifiedWaiters,
+		onlyInternal,
+		subscriptionID,
+		subscriptionName,
+	)
 }
 
 func wakeModifyListeners(
@@ -355,7 +369,11 @@ func SubModifiedAwaiter(subID uuid.UUID, subName string) SubModifiedNotifier { /
 }
 
 // this has to take a two-way channel so that it can find it in the map
-func CancelSubModifiedAwaiter(subID uuid.UUID, subName string, c SubModifiedNotifier) { // nolint:deadcode,unused
+func CancelSubModifiedAwaiter(
+	subID uuid.UUID,
+	subName string,
+	c SubModifiedNotifier,
+) { // nolint:deadcode,unused
 	if c == nil {
 		return
 	}
