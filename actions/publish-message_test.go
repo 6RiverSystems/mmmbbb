@@ -37,6 +37,7 @@ import (
 	"go.6river.tech/mmmbbb/internal/testutil"
 )
 
+//nolint:unparam
 func expectMessages(t *testing.T, ctx context.Context, tx *ent.Tx, topicOffset, num int) []*ent.Message {
 	topicID := xID(t, &ent.Topic{}, topicOffset)
 	messages, err := tx.Message.Query().

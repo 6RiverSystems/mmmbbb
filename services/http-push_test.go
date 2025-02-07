@@ -44,6 +44,7 @@ import (
 	"go.6river.tech/mmmbbb/logging"
 )
 
+//nolint:unparam
 func assertEqualJSON(t testing.TB, expected any, actual []byte) bool {
 	// JSON normalization differs between PG & SQLite, we don't care about that,
 	// we just want to assert on the value equality.

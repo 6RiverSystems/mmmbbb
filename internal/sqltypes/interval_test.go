@@ -54,7 +54,13 @@ func TestParsePostgreSQLInterval(t *testing.T) {
 		{
 			"y m d hh:mm:ss.ssssss",
 			"1 year 2 mons 3 days 08:09:10.123456",
-			365*24*time.Hour + 2*30*24*time.Hour + 3*24*time.Hour + 8*time.Hour + 9*time.Minute + 10*time.Second + 123456*time.Microsecond,
+			365*24*time.Hour +
+				2*30*24*time.Hour +
+				3*24*time.Hour +
+				8*time.Hour +
+				9*time.Minute +
+				10*time.Second +
+				123456*time.Microsecond,
 			assert.NoError,
 		},
 		{

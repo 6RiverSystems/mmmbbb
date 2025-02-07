@@ -253,13 +253,13 @@ func (n *pgNotifier) runOnce(ctx context.Context, ready *chan<- struct{}) error 
 		pgc := driverConn.(*stdlib.Conn).Conn()
 
 		for _, c := range []string{subPublishedChannelName, topicModifiedChannelName, subModifiedChannelName} {
-			c := c // reset closure for defer below
 			_, err := pgc.Exec(ctx, fmt.Sprintf(`LISTEN %s`, postgres.QuoteIdentifier(c)))
 			if err != nil {
 				return err
 			}
 			defer func() {
-				// if we are exiting due to context cancellation, we don't want this to be canceled, so we use the background ctx here
+				// if we are exiting due to context cancellation, we don't want this to
+				// be canceled, so we use the background ctx here
 				_, err := pgc.Exec(context.Background(), fmt.Sprintf(`UNLISTEN %s`, postgres.QuoteIdentifier(c)))
 				if err != nil {
 					n.logger.Error().Err(err).Msg("Unable to UNLISTEN")
@@ -329,7 +329,9 @@ func (n *pgNotifier) runOnce(ctx context.Context, ready *chan<- struct{}) error 
 					// wake publish listeners too, as this likely affects them
 					go actions.WakePublishListeners(true, id)
 				default:
-					n.logger.Error().Str("channelName", notification.Channel).Msg("Got LISTEN notification from unexpected channel")
+					n.logger.Error().
+						Str("channelName", notification.Channel).
+						Msg("Got LISTEN notification from unexpected channel")
 				}
 			}
 		}

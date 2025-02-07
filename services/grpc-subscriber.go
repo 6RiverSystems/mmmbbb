@@ -558,7 +558,10 @@ func (s *subscriberServer) Seek(
 			postgres.RetryOnErrorCode(postgres.DeadlockDetected),
 		); err != nil {
 			if isNotFound(err) {
-				return nil, status.Errorf(codes.NotFound, "Subscription or snapshot not found: %s / %s", req.Subscription, target.Snapshot)
+				return nil, status.Errorf(codes.NotFound,
+					"Subscription or snapshot not found: %s / %s",
+					req.Subscription, target.Snapshot,
+				)
 			}
 			return nil, grpc.AsStatusError(err)
 		}

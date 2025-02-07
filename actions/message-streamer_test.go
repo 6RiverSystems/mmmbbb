@@ -92,9 +92,16 @@ func TestMessageStreamer_Go(t *testing.T) {
 		name       string
 		before     func(t *testing.T, ctx context.Context, client *ent.Client, tt *test)
 		params     params
-		concurrent func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, conn *mockConn, cancel context.CancelFunc)
-		assertion  assert.ErrorAssertionFunc
-		after      func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, conn *mockConn)
+		concurrent func(
+			t *testing.T,
+			ctx context.Context,
+			client *ent.Client,
+			tt *test,
+			conn *mockConn,
+			cancel context.CancelFunc,
+		)
+		assertion assert.ErrorAssertionFunc
+		after     func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, conn *mockConn)
 	}
 	tests := []test{
 		{

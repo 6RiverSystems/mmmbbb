@@ -790,7 +790,6 @@ func TestGrpcCompat(t *testing.T) {
 			teg, tegCtx := errgroup.WithContext(ctx)
 			require.NotEmpty(t, tt.steps)
 			for _, s := range tt.steps {
-				s := s
 				require.NotNil(t, s)
 				teg.Go(func() error {
 					s(t, tegCtx, client, tt, psClient)
@@ -871,8 +870,6 @@ func benchThroughput(b *testing.B, numTopics, subsPerTopic, maxMessages int, pay
 	start := time.Now()
 	var pubDuration time.Duration
 	for i, topic := range topics {
-		i := i
-		topic := topic
 		eg.Go(func() error {
 			for j := range b.N {
 				pubs[i][j] = topic.Publish(egCtx, &pubsub.Message{
@@ -899,8 +896,6 @@ func benchThroughput(b *testing.B, numTopics, subsPerTopic, maxMessages int, pay
 	}
 	var totalExtra int32
 	for i, sub := range subs {
-		i := i
-		sub := sub
 		eg.Go(func() error {
 			var mu sync.Mutex
 			received := make(map[int]bool, b.N)

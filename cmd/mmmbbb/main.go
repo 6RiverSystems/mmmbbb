@@ -374,7 +374,9 @@ func (app *app) provideGrpc(params grpcParams) (grpcResults, error) {
 		[]string{"/v1/projects/*grpcPath", "/healthz"},
 		services.BindGatewayHandlers,
 	)
-	if gsr, err := services.WrapService(params.Ctx, params.EG, results.GatewayService, params.L, params.Client); err != nil {
+	if gsr, err := services.WrapService(
+		params.Ctx, params.EG, results.GatewayService, params.L, params.Client,
+	); err != nil {
 		return results, err
 	} else {
 		// results.GatewayReady = gsr.Ready

@@ -172,7 +172,7 @@ func (ms *MessageStreamer) Go(ctx context.Context, conn StreamConnection) error 
 				mu.Unlock()
 			}
 			if len(msg.Delay) != 0 {
-				if _, err := ms.doDelay(ctx, msg.Delay, time.Duration(msg.DelaySeconds*float64(time.Second))); err != nil {
+				if err := ms.doDelay(ctx, msg.Delay, time.Duration(msg.DelaySeconds*float64(time.Second))); err != nil {
 					return err
 				}
 			}
@@ -372,7 +372,7 @@ func (ms *MessageStreamer) Go(ctx context.Context, conn StreamConnection) error 
 					continue
 				}
 
-				if _, err := ms.doDelay(ctx, ids, delayAmount); err != nil {
+				if err := ms.doDelay(ctx, ids, delayAmount); err != nil {
 					return err
 				}
 				messageStreamerAutoDelays.Add(float64(len(ids)))
@@ -430,9 +430,9 @@ func (ms *MessageStreamer) doAcksNacks(ctx context.Context, ackIDs, nackIDs []uu
 	return err
 }
 
-func (ms *MessageStreamer) doDelay(ctx context.Context, ids []uuid.UUID, delay time.Duration) (int, error) {
+func (ms *MessageStreamer) doDelay(ctx context.Context, ids []uuid.UUID, delay time.Duration) error {
 	if len(ids) == 0 {
-		return 0, nil
+		return nil
 	}
 
 	dd := NewDelayDeliveries(DelayDeliveriesParams{
@@ -451,5 +451,5 @@ func (ms *MessageStreamer) doDelay(ctx context.Context, ids []uuid.UUID, delay t
 		evt = evt.Int("delayed", numDelayed)
 	}
 	evt.Msg("Processed delays")
-	return numDelayed, err
+	return /*numDelayed,*/ err
 }

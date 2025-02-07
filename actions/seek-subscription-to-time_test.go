@@ -179,6 +179,7 @@ func TestSeekSubscriptionToTime_Execute(t *testing.T) {
 	}
 }
 
+//nolint:unparam
 func expectAckState(t *testing.T, ctx context.Context, tx *ent.Tx, ids []uuid.UUID, acked bool) bool {
 	numAcked, err := tx.Delivery.Query().
 		Where(delivery.IDIn(ids...), delivery.CompletedAtNotNil()).

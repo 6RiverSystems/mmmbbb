@@ -214,6 +214,7 @@ func checkSnapEqual(t *testing.T, expected, actual *ent.Snapshot, timeEpsilon ti
 	assert.ElementsMatch(t, expected.AckedMessageIDs, actual.AckedMessageIDs)
 }
 
+//nolint:unparam
 func checkNullableIntervalEqual(t *testing.T, expected, actual *sqltypes.Interval) bool {
 	return assert.Equal(t, expected, actual)
 }
