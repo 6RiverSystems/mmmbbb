@@ -3,23 +3,20 @@ run:
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
-output:
   uniq-by-line: false
 linters:
   enable:
     - forbidigo
     - gofumpt
     - goimports
-
-    # govulncheck is waiting on https://github.com/golangci/golangci-lint/pull/3199
+    - unparam
+    - lll
+    - copyloopvar
+    - intrange
 
     # this is useful, but it is a MONSTROUS yak shave, don't have time for doing
     # this 100% for now
     # - wrapcheck
-
-    # unparam temporarily broken:
-    # https://github.com/golangci/golangci-lint/issues/3426
-    #- unparam
 
 linters-settings:
   forbidigo:
@@ -32,6 +29,9 @@ linters-settings:
   goimports:
     # keep in sync with magefile
     local-prefixes: github.com/6RiverSystems,go.6river.tech
+  lll:
+    line-length: 120
+    tab-width: 2
   wrapcheck:
     ignorePackageGlobs:
       # context errors are generally just propagated and something else has the

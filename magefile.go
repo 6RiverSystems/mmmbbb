@@ -28,6 +28,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"net"
 	"net/http"
 	"net/url"
@@ -37,6 +38,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/magefile/mage/mg"
@@ -489,6 +491,66 @@ func (Lint) VulnCheck(ctx context.Context) error {
 	)
 }
 
+func (Lint) GoLines(ctx context.Context) error {
+	var wwg, ewg sync.WaitGroup
+	queue := make(chan string, 10)
+	errCh := make(chan error)
+	const chunkSize = 10
+	doChunk := func(chunk []string) {
+		args := append([]string{"--max-len=110", "--tab-len=2", "--ignore-generated", "--write-output"}, chunk...)
+		if err := sh.Run("golines", args...); err != nil {
+			errCh <- err
+		}
+	}
+	for range runtime.GOMAXPROCS(0) {
+		wwg.Add(1)
+		go func() {
+			defer wwg.Done()
+			chunk := make([]string, 0, chunkSize)
+			for f := range queue {
+				chunk = append(chunk, f)
+				if len(chunk) == chunkSize {
+					doChunk(chunk)
+					chunk = chunk[:0]
+				}
+			}
+			if len(chunk) != 0 {
+				doChunk(chunk)
+			}
+		}()
+	}
+	var errs []error
+	ewg.Add(1)
+	go func() { defer ewg.Done(); wwg.Wait(); close(errCh) }()
+	ewg.Add(1)
+	go func() {
+		defer ewg.Done()
+		for err := range errCh {
+			errs = append(errs, err)
+		}
+	}()
+	walkErr := filepath.WalkDir(".", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		} else if d.IsDir() || !strings.HasSuffix(d.Name(), ".go") {
+			return nil
+		}
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case queue <- path:
+			return nil
+		}
+	})
+	close(queue)
+	ewg.Wait() // waits for wwg
+	if walkErr != nil {
+		// this really ought to go first
+		errs = append(errs, walkErr)
+	}
+	return errors.Join(errs...)
+}
+
 type Compile mg.Namespace
 
 func CompileDefault(ctx context.Context) error {
@@ -542,7 +604,13 @@ func TestGoCISplit(ctx context.Context) error {
 	if len(packageNames) == 0 || packageNames[0] == "" {
 		packageNames = []string{"./..."}
 	}
-	args := []string{"--format", "standard-verbose", "--junitfile", filepath.Join(resultsDir, "gotestsum-report.xml"), "--"}
+	args := []string{
+		"--format",
+		"standard-verbose",
+		"--junitfile",
+		filepath.Join(resultsDir, "gotestsum-report.xml"),
+		"--",
+	}
 	args = append(args, goBuildArgs...)
 	args = append(args, goTestArgs...)
 	args = append(args, "-coverprofile="+filepath.Join(resultsDir, "coverage.out"))
