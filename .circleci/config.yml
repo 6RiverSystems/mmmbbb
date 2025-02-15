@@ -38,11 +38,6 @@ jobs:
           name: Restore module cache
           keys:
             - go-mod-v1-{{ checksum "go.sum" }}
-      # - restore_cache:
-      #     name: Restore similar AIO build cache
-      #     keys:
-      #       - go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
-      #       - go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-
 
       - run: go mod download
       - run: go mod verify
@@ -125,11 +120,6 @@ jobs:
           key: go-mod-v1-{{ checksum "go.sum" }}
           paths:
             - "/home/circleci/go/pkg"
-      # - save_cache:
-      #     name: Save AIO build cache
-      #     key: go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
-      #     paths:
-      #       - ~/.cache/go-build
 
       # post to slack if `main` fails to build
       - when:
@@ -142,10 +132,11 @@ jobs:
 
   publish-docker-multiarch:
     docker:
-      - image: cimg/go:1.23
+      - image: cimg/go:1.24
     resource_class: large
     environment:
       GOPRIVATE: "go.6river.tech/*,github.com/6RiverSystems/*"
+      GOMAXPROCS: "4"
     steps:
       - checkout
       - run:
