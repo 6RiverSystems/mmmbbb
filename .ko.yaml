@@ -22,6 +22,7 @@ builds:
     main: ./cmd/mmmbbb
     env:
       - "GOPRIVATE=go.6river.tech/*,github.com/6RiverSystems/*"
+      - CGO_ENABLED=0
     ldflags:
       - "-s -w"
       - '-extldflags "-static"'
