@@ -1,8 +1,6 @@
 module go.6river.tech/mmmbbb
 
-go 1.23.0
-
-toolchain go1.23.4
+go 1.24.0
 
 require (
 	cloud.google.com/go/pubsub v1.47.0
@@ -179,3 +177,5 @@ require (
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.8.0 // indirect
 )
+
+tool github.com/magefile/mage

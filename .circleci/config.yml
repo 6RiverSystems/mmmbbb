@@ -4,7 +4,7 @@ orbs:
   sixrs-gke: sixriversystems/sixrs-gke@7
 
 aliases:
-  - &pg_default "14.14"
+  - &pg_default "14.15"
 
 jobs:
   all-in-one:
@@ -14,7 +14,7 @@ jobs:
       cgo:
         type: string
     docker:
-      - image: cimg/go:1.23
+      - image: cimg/go:1.24
       - image: cimg/postgres:<< parameters.pgver >>
         environment:
           POSTGRES_USER: circle
@@ -26,6 +26,8 @@ jobs:
       DATABASE_URL: "postgres://circle@localhost:5432/circle_test?sslmode=disable"
       GOPRIVATE: "go.6river.tech/*,github.com/6RiverSystems/*"
       CGO_ENABLED: << parameters.cgo >>
+      GOMAXPROCS: "4"
+      MAGEFILE_ENABLE_COLOR: "1"
 
     steps:
       - checkout
@@ -42,18 +44,18 @@ jobs:
       #       - go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
       #       - go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-
 
-      - run: ./mage -v get
+      - run: go tool mage -v get
       # gotestsum is included in the cimg/go image
-      # - run: ./mage -v installCITools
+      # - run: go tool mage -v installCITools
       # however protobuf is not
-      - run: ./mage -v installProtobufTools
-      - run: ./mage -v generate:force
+      - run: go tool mage -v installProtobufTools
+      - run: go tool mage -v generate:force
       # make sure committed generated code was up to date
       - run: git diff --exit-code
 
       - run:
           name: Compile code
-          command: ./mage -v compile
+          command: go tool mage -v compile
 
       - run:
           name: Prepare for tests
@@ -61,7 +63,7 @@ jobs:
       - run:
           name: format check
           command: |
-            ./mage -v format
+            go tool mage -v format
             git diff --exit-code
       # we only need to run lint on one build variant
       - when:
@@ -75,7 +77,7 @@ jobs:
                 keys:
                   - go-lint-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
                   - go-lint-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-
-            - run: ./mage -v lint:ci
+            - run: go tool mage -v lint:ci
             - save_cache:
                 name: Save golangci-lint cache
                 key: go-lint-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
@@ -91,11 +93,11 @@ jobs:
           # while we aren't using the parallel test split here, we still need to
           # use test-go-ci-split to get junit output and proper coverage file
           # storage
-          command: ./mage -v testGoCISplit
+          command: go tool mage -v testGoCISplit
 
       - run:
           name: Validate service is working (mmmbbb)
-          command: ./mage -v testSmoke mmmbbb localhost:3001
+          command: go tool mage -v testSmoke mmmbbb localhost:3001
 
       - run:
           name: Coverage HTML report
@@ -166,16 +168,16 @@ jobs:
           steps:
             - run:
                 name: Select dev version
-                command: ./mage -v generate:devVersion
+                command: go tool mage -v generate:devVersion
       - store_artifacts:
           name: Capture chosen version
           path: .version
-      - run: ./mage -v get
+      - run: go tool mage -v get
       # gotestsum is included in the cimg/go image
-      # - run: ./mage -v installCITools
+      # - run: go tool mage -v installCITools
       # however protobuf is not
-      - run: ./mage -v installProtobufTools
-      - run: ./mage -v generate:force
+      - run: go tool mage -v installProtobufTools
+      - run: go tool mage -v generate:force
       - setup_remote_docker
       - sixrs-gke/docker-login
       - run:
@@ -186,23 +188,23 @@ jobs:
             docker buildx create --name mmmbbb-multiarch --driver docker-container --bootstrap --use multiarch-context
       - run:
           name: Build multiarch binaries
-          command: ./mage -v releaseBinaries
+          command: go tool mage -v releaseBinaries
       - run:
           name: Build multiarch docker images
-          command: ./mage -v docker:multiarchBuildAll
+          command: go tool mage -v docker:multiarchBuildAll
       - run:
           name: Verify docker images
           command: |
             set -xeuo pipefail
             for plat in amd64 arm64 ; do
-              ./mage -v docker:multiarchLoadArch mmmbbb $plat
+              go tool mage -v docker:multiarchLoadArch mmmbbb $plat
               docker run --rm --platform linux/$plat --entrypoint /app/mmmbbb mmmbbb:$(<.version) --version
               # fire this one into the background for the smoke test run
               docker run --name mmmbbb-smoke-$plat --rm --platform linux/$plat mmmbbb:$(<.version) &
               pid=$!
               # can't contact the remote docker directly, so we have to build
               # the mage binary, copy it over, and exec it
-              CGO_ENABLED=0 ./mage -v -compile magebinary-$plat -goarch $plat
+              CGO_ENABLED=0 go tool mage -v -compile magebinary-$plat -goarch $plat
               docker cp magebinary-$plat mmmbbb-smoke-$plat:/
               # this should ask the app to shut down at the end
               docker exec mmmbbb-smoke-$plat /magebinary-$plat -v testSmokeCore mmmbbb localhost:8084
@@ -210,7 +212,7 @@ jobs:
             done
       - run:
           name: Push multiarch docker images
-          command: ./mage -v docker:multiarchPushAll
+          command: go tool mage -v docker:multiarchPushAll
       - save_cache:
           name: Save multiarch build cache
           key: go-build-multiarch-v1-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
@@ -226,8 +228,8 @@ workflows:
             parameters:
               pgver:
                 - *pg_default
-                - "15.9"
-                - "16.5"
+                - "15.10"
+                - "16.6"
                 - "17.2"
               cgo:
                 - "1"
