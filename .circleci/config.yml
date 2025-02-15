@@ -165,7 +165,8 @@ jobs:
       - store_artifacts:
           name: Capture chosen version
           path: .version
-      - run: go tool mage -v get
+      - run: go mod download
+      - run: go mod verify
       - run: go tool mage -v installProtobufTools
       - run: go tool mage -v generate:force
       - setup_remote_docker
