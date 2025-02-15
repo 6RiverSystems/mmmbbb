@@ -46,9 +46,6 @@ jobs:
 
       - run: go mod download
       - run: go mod verify
-      # gotestsum is included in the cimg/go image
-      # - run: go tool mage -v installCITools
-      # however protobuf is not
       - run: go tool mage -v installProtobufTools
       - run: go tool mage -v generate:force
       # make sure committed generated code was up to date
@@ -183,9 +180,6 @@ jobs:
           name: Capture chosen version
           path: .version
       - run: go tool mage -v get
-      # gotestsum is included in the cimg/go image
-      # - run: go tool mage -v installCITools
-      # however protobuf is not
       - run: go tool mage -v installProtobufTools
       - run: go tool mage -v generate:force
       - setup_remote_docker
