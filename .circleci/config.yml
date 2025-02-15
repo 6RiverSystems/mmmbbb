@@ -195,12 +195,11 @@ jobs:
           command: |
             set -xeuo pipefail
             version=$(<.version)
-            args=(--tags "$version")
+            args=(--bare --tags "$version")
             if [ "$CIRCLE_BRANCH" = "main" ]; then
               args+=(--tags latest)
             fi
-            export KO_DOCKER_REPO=us-docker.pkg.dev/plasma-column-128721/gcr.io/mmmbbb
-            go tool ko build "${args[@]}" ./cmd/mmmbbb
+            KO_DOCKER_REPO=us-docker.pkg.dev/plasma-column-128721/gcr.io/mmmbbb go tool ko build "${args[@]}" ./cmd/mmmbbb
 
 workflows:
   build-workflow:
