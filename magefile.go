@@ -290,9 +290,6 @@ func InstallCITools(ctx context.Context) error {
 	if err := sh.Run("go", "install", "gotest.tools/gotestsum@latest"); err != nil {
 		return err
 	}
-	if err := sh.Run("go", "install", "github.com/golangci/golangci-lint/cmd/golangci-lint@latest"); err != nil {
-		return err
-	}
 	return nil
 }
 
