@@ -450,7 +450,7 @@ func (Lint) addLicense(fix bool) error {
 func (Lint) VulnCheck(ctx context.Context) error {
 	fmt.Println("Linting(vulncheck)...")
 	return sh.Run(
-		"go", "run", "golang.org/x/vuln/cmd/govulncheck",
+		"go", "tool", "govulncheck",
 		"-test",
 		"./...",
 	)

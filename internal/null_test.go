@@ -27,8 +27,6 @@
 package internal
 
 import (
-	_ "golang.org/x/tools/imports"
-	_ "golang.org/x/vuln/cmd/govulncheck"
 	_ "gotest.tools/gotestsum/cmd"
 
 	_ "github.com/oapi-codegen/oapi-codegen/v2/pkg/codegen"
