@@ -1,0 +1,11 @@
+builds:
+  - id: mmmbbb
+    main: ./cmd/mmmbbb
+    env:
+      - "GOPRIVATE=go.6river.tech/*,github.com/6RiverSystems/*"
+    ldflags:
+      - "-s -w"
+      - '-extldflags "-static"'
+defaultPlatforms:
+  - linux/amd64
+  - linux/arm64

@@ -81,6 +81,28 @@ func main() {
 		}
 	}
 
+	// if running in a ko-built container, set some env defaults that we would
+	// have otherwise embedded via the Dockerfile
+	if os.Getenv("KO_DATA_PATH") == "" {
+		if os.Getenv("NODE_ENV") == "" {
+			os.Setenv("NODE_ENV", "production")
+		}
+		if os.Getenv("DATABASE_URL") == "" {
+			// default to an in-container SQLite database to simplify usage as a drop-in
+			os.Setenv("DATABASE_URL",
+				"sqlite:///data/mmmbbb.sqlite?"+
+					"_pragma=foreign_keys(1)&"+
+					"_pragma=journal_mode(wal)&"+
+					"_pragma=busy_timeout(10000)&"+
+					"cache=private&"+
+					"_txlock=immediate",
+			)
+		}
+		if os.Getenv("PORT") == "" {
+			os.Setenv("PORT", "8084")
+		}
+	}
+
 	if exitCode, err := NewApp().main(); err != nil {
 		panic(err)
 	} else if exitCode != 0 {
