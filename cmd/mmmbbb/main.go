@@ -262,7 +262,9 @@ func (app *app) setupGin(params ginParams) (ginResults, error) {
 	}
 
 	// Enable `format: uuid` validation
-	openapi3.DefineStringFormat("uuid", openapi3.FormatOfStringForUUIDOfRFC4122)
+	openapi3.DefineStringFormatValidator(
+		"uuid", openapi3.NewRegexpFormatValidator(openapi3.FormatOfStringForUUIDOfRFC4122),
+	)
 
 	if spec, err := oas.LoadSpec(); err != nil {
 		return res, err
