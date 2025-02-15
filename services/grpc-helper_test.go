@@ -38,7 +38,6 @@ import (
 	"go.6river.tech/mmmbbb/faults"
 	mbgrpc "go.6river.tech/mmmbbb/grpc"
 	"go.6river.tech/mmmbbb/internal"
-	"go.6river.tech/mmmbbb/internal/testutil"
 	"go.6river.tech/mmmbbb/logging"
 )
 
@@ -56,7 +55,7 @@ func initGrpcService(t testing.TB, readies []ReadyCheck) *ent.Client {
 	logging.ConfigureDefaultLogging()
 	internal.EnableRandomPorts()
 	client := enttest.ClientForTest(t)
-	ctx := testutil.Context(t)
+	ctx := t.Context()
 	svc := mbgrpc.NewGrpcService(
 		defaults.Port, defaults.GRPCOffset,
 		nil,
@@ -110,7 +109,7 @@ func initPubsubClient(t testing.TB) *pubsub.Client {
 	// -count N
 	var err error
 	psClient, err := pubsub.NewClient(
-		testutil.Context(t),
+		t.Context(),
 		safeName(t),
 	)
 	require.NoError(t, err)

@@ -34,7 +34,6 @@ import (
 
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/internal/sqltypes"
-	"go.6river.tech/mmmbbb/internal/testutil"
 )
 
 func nameFor(t testing.TB, offset int) string {
@@ -87,7 +86,7 @@ func createSubscriptionClient(
 		SetID(xID(t, &ent.Subscription{}, offset)).
 		SetName(nameFor(t, offset)).
 		SetTopic(topic).
-		SetExpiresAt(testutil.DeadlineForTest(t)).
+		SetExpiresAt(time.Now().Add(time.Minute)).
 		SetTTL(sqltypes.Interval(time.Minute)).
 		SetMessageTTL(sqltypes.Interval(time.Minute))
 	for _, o := range opts {
@@ -113,7 +112,7 @@ func createSnapshotClient(
 		SetID(xID(t, &ent.Snapshot{}, offset)).
 		SetName(nameFor(t, offset)).
 		SetTopic(topic).
-		SetExpiresAt(testutil.DeadlineForTest(t)).
+		SetExpiresAt(time.Now().Add(time.Minute)).
 		SetAckedMessagesBefore(time.Now()).
 		SetAckedMessageIDs([]uuid.UUID{})
 	for _, o := range opts {
@@ -164,7 +163,7 @@ func createDeliveryClient(
 		SetID(xID(t, &ent.Delivery{}, offset)).
 		SetMessage(msg).
 		SetSubscription(sub).
-		SetExpiresAt(testutil.DeadlineForTest(t)).
+		SetExpiresAt(time.Now().Add(time.Minute)).
 		SetPublishedAt(msg.PublishedAt)
 	for _, o := range opts {
 		dc = o(dc)

@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  sixrs-gke: sixriversystems/sixrs-gke@7
+  sixrs-gke: sixriversystems/sixrs-gke@8
 
 aliases:
   - &pg_default "14.15"

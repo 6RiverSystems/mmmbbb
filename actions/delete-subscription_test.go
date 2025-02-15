@@ -28,7 +28,6 @@ import (
 
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/enttest"
-	"go.6river.tech/mmmbbb/internal/testutil"
 )
 
 func TestDeleteSubscription_Execute(t *testing.T) {
@@ -78,7 +77,7 @@ func TestDeleteSubscription_Execute(t *testing.T) {
 			subID := xID(t, &ent.Subscription{}, 0)
 			subMod := SubModifiedAwaiter(subID, nameFor(t, 0))
 			defer CancelSubModifiedAwaiter(subID, nameFor(t, 0), subMod)
-			assert.NoError(t, client.DoCtxTx(testutil.Context(t), nil, func(ctx context.Context, tx *ent.Tx) error {
+			assert.NoError(t, client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
 				if tt.before != nil {
 					tt.before(t, ctx, tx, &tt)
 				}

@@ -38,7 +38,6 @@ import (
 	"go.6river.tech/mmmbbb/ent/enttest"
 	"go.6river.tech/mmmbbb/ent/subscription"
 	"go.6river.tech/mmmbbb/internal/sqltypes"
-	"go.6river.tech/mmmbbb/internal/testutil"
 	"go.6river.tech/mmmbbb/middleware"
 	"go.6river.tech/mmmbbb/oas"
 )
@@ -59,7 +58,7 @@ func setupDelayInjectorController(
 
 func createDelaySub(dd time.Duration) func(*testing.T, *ent.Client) {
 	return func(t *testing.T, c *ent.Client) {
-		ctx := testutil.Context(t)
+		ctx := t.Context()
 		topic, err := c.Topic.Create().
 			SetName(t.Name()).
 			Save(ctx)
@@ -96,7 +95,7 @@ func assertDelaySubFound(dd time.Duration) func(*testing.T, *http.Response, erro
 
 func assertDelaySubFoundDB(dd time.Duration) func(*testing.T, *ent.Client) {
 	return func(t *testing.T, c *ent.Client) {
-		ctx := testutil.Context(t)
+		ctx := t.Context()
 		sub, err := c.Subscription.Query().
 			Where(subscription.Name(t.Name())).
 			Only(ctx)
@@ -179,7 +178,7 @@ func TestDelayInjectorController_GetDelay(t *testing.T) {
 			if tt.setup != nil {
 				tt.setup(t, client)
 			}
-			ctx := testutil.Context(t)
+			ctx := t.Context()
 			req, err := http.NewRequestWithContext(
 				ctx,
 				http.MethodGet,
@@ -247,7 +246,7 @@ func TestDelayInjectorController_SetDelay(t *testing.T) {
 			if tt.setup != nil {
 				tt.setup(t, client)
 			}
-			ctx := testutil.Context(t)
+			ctx := t.Context()
 			req, err := http.NewRequestWithContext(
 				ctx,
 				http.MethodPut,
@@ -297,7 +296,7 @@ func TestDelayInjectorController_DeleteDelay(t *testing.T) {
 			if tt.setup != nil {
 				tt.setup(t, client)
 			}
-			ctx := testutil.Context(t)
+			ctx := t.Context()
 			req, err := http.NewRequestWithContext(
 				ctx,
 				http.MethodDelete,

@@ -40,7 +40,6 @@ import (
 	"go.6river.tech/mmmbbb/ent/delivery"
 	"go.6river.tech/mmmbbb/ent/enttest"
 	"go.6river.tech/mmmbbb/ent/subscription"
-	"go.6river.tech/mmmbbb/internal/testutil"
 	"go.6river.tech/mmmbbb/logging"
 )
 
@@ -98,7 +97,7 @@ func TestHttpPush(t *testing.T) {
 				}
 				// sadly we just need to delay a bit to know the message went through
 				<-time.After(25 * time.Millisecond)
-				if err := client.DoCtxTx(testutil.Context(t), nil, func(ctx context.Context, tx *ent.Tx) error {
+				if err := client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
 					sub, err := tx.Subscription.Query().
 						Where(subscription.Name(safeName(t))).
 						Only(ctx)
@@ -145,7 +144,7 @@ func TestHttpPush(t *testing.T) {
 				if err := publishMarker(t, client, 0); err != nil {
 					return err
 				}
-				if err := client.DoCtxTx(testutil.Context(t), nil, func(ctx context.Context, tx *ent.Tx) error {
+				if err := client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
 					sub, err := tx.Subscription.Query().
 						Where(subscription.Name(safeName(t))).
 						Only(ctx)
@@ -236,7 +235,7 @@ func TestHttpPush(t *testing.T) {
 						delivery.CompletedAtIsNil(),
 						delivery.HasSubscriptionWith(subscription.Name(safeName(t))),
 					).
-					Count(testutil.Context(t)); assert.NoError(t, err) {
+					Count(t.Context()); assert.NoError(t, err) {
 					assert.Zero(t, incomplete, "all messages should have been delivered and ACKed")
 				}
 			},
@@ -364,7 +363,7 @@ func TestHttpPush(t *testing.T) {
 						delivery.CompletedAtIsNil(),
 						delivery.HasSubscriptionWith(subscription.Name(safeName(t))),
 					).
-					Only(testutil.Context(t)); assert.NoError(t, err) {
+					Only(t.Context()); assert.NoError(t, err) {
 					assert.Equal(t, 1, del.Attempts)
 					// should be in the future, too, by at least ~50% of the min backoff
 					assert.Greater(
@@ -426,7 +425,7 @@ func TestHttpPush(t *testing.T) {
 						delivery.CompletedAtIsNil(),
 						delivery.HasSubscriptionWith(subscription.Name(safeName(t))),
 					).
-					Only(testutil.Context(t)); assert.NoError(t, err) {
+					Only(t.Context()); assert.NoError(t, err) {
 					assert.Equal(t, 2, del.Attempts)
 					// should be in the future, too, by at least ~50% of the min backoff
 					assert.Greater(
@@ -443,7 +442,7 @@ func TestHttpPush(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			enttest.ResetTables(t, client)
-			ctx := testutil.Context(t)
+			ctx := t.Context()
 
 			receiver, addr, msgs, serverWG := newPushReceiver(t, tt.responder)
 			t.Cleanup(func() {
@@ -511,7 +510,7 @@ func newPushReceiver(
 	t testing.TB,
 	responder pushResponder,
 ) (*http.Server, *net.TCPAddr, chan *actions.PushRequest, *sync.WaitGroup) {
-	ctx := testutil.Context(t)
+	ctx := t.Context()
 
 	received := make(chan *actions.PushRequest, 1)
 	wg := &sync.WaitGroup{}
@@ -579,7 +578,7 @@ func assertNoMore(t testing.TB, msgs chan *actions.PushRequest) {
 }
 
 func publishMarker(t testing.TB, client *ent.Client, sequence int) error {
-	err := client.DoCtxTx(testutil.Context(t), nil, actions.NewPublishMessage(actions.PublishMessageParams{
+	err := client.DoCtxTx(t.Context(), nil, actions.NewPublishMessage(actions.PublishMessageParams{
 		TopicName: safeName(t),
 		Payload:   json.RawMessage(fmt.Sprintf(`{"sequence": %d}`, sequence)),
 	}).Execute)

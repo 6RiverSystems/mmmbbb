@@ -44,7 +44,6 @@ import (
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/subscription"
 	"go.6river.tech/mmmbbb/ent/topic"
-	"go.6river.tech/mmmbbb/internal/testutil"
 )
 
 // TestGrpcCompat is an acceptance-style test for checking the gRPC
@@ -783,7 +782,7 @@ func TestGrpcCompat(t *testing.T) {
 	}...)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := testutil.Context(t)
+			ctx := t.Context()
 			if tt.before != nil {
 				tt.before(t, ctx, client, tt, psClient)
 			}
@@ -841,7 +840,7 @@ func benchUsePg(b *testing.B) {
 
 func benchThroughput(b *testing.B, numTopics, subsPerTopic, maxMessages int, payload json.RawMessage) {
 	_, psClient := initGrpcTest(b)
-	ctx := testutil.Context(b)
+	ctx := b.Context()
 
 	topics := make([]*pubsub.Topic, numTopics)
 	pubs := make([][]*pubsub.PublishResult, numTopics)
@@ -865,7 +864,7 @@ func benchThroughput(b *testing.B, numTopics, subsPerTopic, maxMessages int, pay
 		subs[i].ReceiveSettings.MaxOutstandingMessages = maxMessages
 	}
 
-	eg, egCtx := errgroup.WithContext(testutil.Context(b))
+	eg, egCtx := errgroup.WithContext(b.Context())
 	b.ResetTimer()
 	start := time.Now()
 	var pubDuration time.Duration

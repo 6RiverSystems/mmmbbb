@@ -29,7 +29,6 @@ import (
 
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/enttest"
-	"go.6river.tech/mmmbbb/internal/testutil"
 )
 
 func TestPrunedExpiredDeliveries_Execute(t *testing.T) {
@@ -164,7 +163,7 @@ func TestPrunedExpiredDeliveries_Execute(t *testing.T) {
 			// have to make this indirect as the expected notify may be generated in
 			// before
 			defer func() { CancelPublishAwaiter(tt.expectPublishNotify, pubNotify) }()
-			assert.NoError(t, client.DoCtxTx(testutil.Context(t), nil, func(ctx context.Context, tx *ent.Tx) error {
+			assert.NoError(t, client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
 				if tt.before != nil {
 					tt.before(t, ctx, tx, &tt)
 				}

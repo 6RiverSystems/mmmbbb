@@ -35,7 +35,6 @@ import (
 
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/enttest"
-	"go.6river.tech/mmmbbb/internal/testutil"
 	"go.6river.tech/mmmbbb/logging"
 )
 
@@ -375,7 +374,7 @@ func TestMessageStreamer_Go(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			enttest.ResetTables(t, client)
-			ctx := testutil.Context(t)
+			ctx := t.Context()
 			if tt.before != nil {
 				tt.before(t, ctx, client, &tt)
 			}

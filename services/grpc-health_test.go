@@ -35,7 +35,6 @@ import (
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/enttest"
 	"go.6river.tech/mmmbbb/internal"
-	"go.6river.tech/mmmbbb/internal/testutil"
 )
 
 type mockReady struct{ error }
@@ -103,7 +102,7 @@ func Test_healthServer_Check(t *testing.T) {
 				readies: tt.fields.readies,
 			}
 			if tt.args.ctx == nil {
-				tt.args.ctx = testutil.Context(t)
+				tt.args.ctx = t.Context()
 			}
 			if tt.args.req == nil {
 				tt.args.req = &health.HealthCheckRequest{}
@@ -185,7 +184,7 @@ func TestGrpc_healthServer_Check(t *testing.T) {
 			grpcClient := health.NewHealthClient(conn)
 
 			if tt.args.ctx == nil {
-				tt.args.ctx = testutil.Context(t)
+				tt.args.ctx = t.Context()
 			}
 			tt.before(t, entClient, &tt)
 			if tt.args.req == nil {

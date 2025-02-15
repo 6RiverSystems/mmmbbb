@@ -30,7 +30,6 @@ import (
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/enttest"
 	"go.6river.tech/mmmbbb/internal/sqltypes"
-	"go.6river.tech/mmmbbb/internal/testutil"
 )
 
 func TestCreateSubscription_Execute(t *testing.T) {
@@ -176,7 +175,7 @@ func TestCreateSubscription_Execute(t *testing.T) {
 			enttest.ResetTables(t, client)
 			subMod := SubModifiedAwaiter(uuid.Nil, t.Name())
 			defer CancelSubModifiedAwaiter(uuid.Nil, t.Name(), subMod)
-			assert.NoError(t, client.DoCtxTx(testutil.Context(t), nil, func(ctx context.Context, tx *ent.Tx) error {
+			assert.NoError(t, client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
 				if tt.before != nil {
 					tt.before(t, ctx, tx, &tt)
 				}

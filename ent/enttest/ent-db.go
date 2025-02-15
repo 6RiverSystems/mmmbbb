@@ -42,7 +42,6 @@ import (
 	"go.6river.tech/mmmbbb/db"
 	"go.6river.tech/mmmbbb/db/postgres"
 	"go.6river.tech/mmmbbb/ent"
-	"go.6river.tech/mmmbbb/internal/testutil"
 	"go.6river.tech/mmmbbb/migrations"
 	"go.6river.tech/mmmbbb/version"
 )
@@ -55,7 +54,7 @@ func StartDockertest(t testing.TB) string {
 	t.Log("using dockertest to create postgresql 14 db")
 	pool, err := dockertest.NewPool("")
 	require.NoError(t, err)
-	require.NoError(t, pool.Client.PingWithContext(testutil.Context(t)))
+	require.NoError(t, pool.Client.PingWithContext(t.Context()))
 	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
 		Repository: "postgres",
 		Tag:        "14-alpine",
@@ -130,11 +129,11 @@ func ClientForTest(t testing.TB, opts ...ent.Option) *ent.Client {
 	}
 	switch dialectName {
 	case dialect.Postgres:
-		if err := db.MigrateUp(testutil.Context(t), client, migrations.MessageBusMigrations); err != nil {
+		if err := db.MigrateUp(t.Context(), client, migrations.MessageBusMigrations); err != nil {
 			t.Fatalf("Failed to apply migrations: %v", err)
 		}
 	default:
-		if err := db.MigrateUpEnt(testutil.Context(t), client.Schema); err != nil {
+		if err := db.MigrateUpEnt(t.Context(), client.Schema); err != nil {
 			t.Fatalf("Failed to apply migrations: %v", err)
 		}
 	}
@@ -151,7 +150,7 @@ func ResetTables(t testing.TB, client *ent.Client) {
 		client.Snapshot.Delete().Exec,
 		client.Topic.Delete().Exec,
 	}
-	ctx := testutil.Context(t)
+	ctx := t.Context()
 	for _, d := range deletes {
 		if _, err := d(ctx); err != nil {
 			t.Fatalf("Failed to cleanup old test data: (%T) %[1]v", err)

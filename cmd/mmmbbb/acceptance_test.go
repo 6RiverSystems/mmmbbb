@@ -43,7 +43,6 @@ import (
 	"go.6river.tech/mmmbbb/internal"
 	"go.6river.tech/mmmbbb/internal/oastypes"
 	"go.6river.tech/mmmbbb/internal/sqltypes"
-	"go.6river.tech/mmmbbb/internal/testutil"
 	"go.6river.tech/mmmbbb/logging"
 	"go.6river.tech/mmmbbb/oas"
 )
@@ -407,7 +406,7 @@ func TestEndpoints(t *testing.T) {
 					bodyReader = bytes.NewReader(body)
 				}
 			}
-			ctx := testutil.Context(t)
+			ctx := t.Context()
 			req, err := http.NewRequestWithContext(ctx, tt.method, baseUrl+tt.url, bodyReader)
 			require.NoError(t, err)
 			if bodyReader != nil {
