@@ -44,7 +44,8 @@ jobs:
       #       - go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
       #       - go-build-aio-v1-cgo<< parameters.cgo >>-{{ checksum "/tmp/cache-time-limit" }}-
 
-      - run: go tool mage -v get
+      - run: go mod download
+      - run: go mod verify
       # gotestsum is included in the cimg/go image
       # - run: go tool mage -v installCITools
       # however protobuf is not

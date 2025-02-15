@@ -214,18 +214,6 @@ func (Generate) Grpc(ctx context.Context) error {
 	return nil
 }
 
-func Get(ctx context.Context) error {
-	fmt.Println("Downloading dependencies...")
-	if err := sh.Run("go", "mod", "download", "-x"); err != nil {
-		return err
-	}
-	fmt.Println("Verifying dependencies...")
-	if err := sh.Run("go", "mod", "verify"); err != nil {
-		return err
-	}
-	return nil
-}
-
 func InstallProtobufTools(ctx context.Context) error {
 	// CI needs apt-get update before packages can be installed, assume humans don't
 	if os.Getenv("CI") != "" {
