@@ -105,29 +105,6 @@ func init() {
 	}
 }
 
-func runAndCapture(cmd string, args ...string) (string, error) {
-	outBuf := &bytes.Buffer{}
-	var out io.Writer = outBuf
-	if mg.Verbose() {
-		out = io.MultiWriter(outBuf, os.Stdout)
-	}
-	if _, err := sh.Exec(nil, out, os.Stderr, cmd, args...); err != nil {
-		return "", err
-	}
-	return outBuf.String(), nil
-}
-
-func splitWithoutBlanks(output string) []string {
-	lines := strings.Split(output, "\n")
-	ret := make([]string, 0, len(output))
-	for _, l := range lines {
-		if l != "" {
-			ret = append(ret, l)
-		}
-	}
-	return ret
-}
-
 func GenerateDefault(ctx context.Context) error {
 	mg.CtxDeps(ctx, Generate{}.All)
 	return nil
