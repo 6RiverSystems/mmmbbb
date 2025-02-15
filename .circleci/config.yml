@@ -249,4 +249,4 @@ workflows:
             branches:
               only:
                 - main
-                - publish/*
+                - /^publish\/.*/
