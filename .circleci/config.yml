@@ -146,11 +146,6 @@ jobs:
           name: Restore module cache
           keys:
             - go-mod-v1-{{ checksum "go.sum" }}
-      - restore_cache:
-          name: Restore similar multiarch build cache
-          keys:
-            - go-build-multiarch-v1-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
-            - go-build-multiarch-v1-{{ checksum "/tmp/cache-time-limit" }}-
         # for Go modules, we only need version numbers on `main`, as Go can
         # pull any other git commit by hash. We do need a version tag for
         # docker for this package however, just don't need it to be a git
@@ -204,11 +199,6 @@ jobs:
             fi
             export KO_DOCKER_REPO=us-docker.pkg.dev/plasma-column-128721/gcr.io/mmmbbb
             go tool ko build "${args[@]}" ./cmd/mmmbbb
-      - save_cache:
-          name: Save multiarch build cache
-          key: go-build-multiarch-v1-{{ checksum "/tmp/cache-time-limit" }}-{{ .Revision }}
-          paths:
-            - ~/.cache/go-build
 
 workflows:
   build-workflow:
