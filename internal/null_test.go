@@ -27,7 +27,6 @@
 package internal
 
 import (
-	_ "github.com/google/addlicense"
 	_ "golang.org/x/tools/imports"
 	_ "golang.org/x/vuln/cmd/govulncheck"
 	_ "gotest.tools/gotestsum/cmd"

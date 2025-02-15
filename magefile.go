@@ -417,7 +417,7 @@ func (Lint) addLicense(fix bool) error {
 		cmdout, cmderr = buf, buf
 	}
 	args := []string{
-		"run", "github.com/google/addlicense",
+		"tool", "addlicense",
 		"-c", "6 River Systems",
 		"-l", "mit",
 		"-ignore", "**/*.css",
