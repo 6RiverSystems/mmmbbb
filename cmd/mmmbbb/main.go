@@ -98,9 +98,6 @@ func main() {
 					"_txlock=immediate",
 			)
 		}
-		if os.Getenv("PORT") == "" {
-			os.Setenv("PORT", "8084")
-		}
 	}
 
 	if exitCode, err := NewApp().main(); err != nil {

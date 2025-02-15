@@ -107,7 +107,7 @@ jobs:
 
       - run:
           name: Validate service is working (mmmbbb)
-          command: go tool mage -v testSmoke mmmbbb localhost:3001
+          command: go tool mage -v testSmoke mmmbbb localhost:8084
 
       - run:
           name: Coverage HTML report

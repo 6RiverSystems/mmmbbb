@@ -20,6 +20,6 @@
 package defaults
 
 const (
-	Port       = 3001
+	Port       = 8084
 	GRPCOffset = 1
 )
