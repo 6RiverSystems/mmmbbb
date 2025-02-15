@@ -83,7 +83,7 @@ func main() {
 
 	// if running in a ko-built container, set some env defaults that we would
 	// have otherwise embedded via the Dockerfile
-	if os.Getenv("KO_DATA_PATH") == "" {
+	if os.Getenv("KO_DATA_PATH") != "" {
 		if os.Getenv("NODE_ENV") == "" {
 			os.Setenv("NODE_ENV", "production")
 		}
