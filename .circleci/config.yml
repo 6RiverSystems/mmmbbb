@@ -187,6 +187,7 @@ jobs:
             # the mage binary, copy it over, and exec it
             CGO_ENABLED=0 go tool mage -v -compile magebinary
             docker cp magebinary mmmbbb-smoke:/
+            rm -f magebinary
             # this should ask the app to shut down at the end
             docker exec mmmbbb-smoke /magebinary -v testSmokeCore mmmbbb localhost:8084
             wait $pid
