@@ -56,7 +56,7 @@ jobs:
       - run:
           name: Ensure golangci-lint is up to date
           command: |
-            if ! golangci-lint version | fgrep -q 'built with go1.24.0' ; then
+            if golangci-lint version | fgrep -q 'built with go1.23' ; then
               cd $(mktemp -d)
               wget https://github.com/golangci/golangci-lint/releases/download/v1.64.5/golangci-lint-1.64.5-linux-amd64.tar.gz
               tar -axf golangci-lint-1.64.5-linux-amd64.tar.gz
