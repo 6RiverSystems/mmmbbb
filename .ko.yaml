@@ -1,5 +1,4 @@
-#!/bin/sh
-# Copyright (c) 2021 6 River Systems
+# Copyright (c) 2025 6 River Systems
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of
 # this software and associated documentation files (the "Software"), to deal in
@@ -18,13 +17,15 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-
-# TODO: this should be production-y with all the self-labelling shenaningans
-# from node_base
-
-# hack: see notes on CMD in Dockerfile for what is going on here
-if [ "$*" = '/app/${BINARYNAME}' ]; then
-	exec "/app/${BINARYNAME}"
-else
-	exec "$@"
-fi
+builds:
+  - id: mmmbbb
+    main: ./cmd/mmmbbb
+    env:
+      - "GOPRIVATE=go.6river.tech/*,github.com/6RiverSystems/*"
+      - CGO_ENABLED=0
+    ldflags:
+      - "-s -w"
+      - '-extldflags "-static"'
+defaultPlatforms:
+  - linux/amd64
+  - linux/arm64

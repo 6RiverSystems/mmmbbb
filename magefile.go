@@ -214,18 +214,6 @@ func (Generate) Grpc(ctx context.Context) error {
 	return nil
 }
 
-func Get(ctx context.Context) error {
-	fmt.Println("Downloading dependencies...")
-	if err := sh.Run("go", "mod", "download", "-x"); err != nil {
-		return err
-	}
-	fmt.Println("Verifying dependencies...")
-	if err := sh.Run("go", "mod", "verify"); err != nil {
-		return err
-	}
-	return nil
-}
-
 func InstallProtobufTools(ctx context.Context) error {
 	// CI needs apt-get update before packages can be installed, assume humans don't
 	if os.Getenv("CI") != "" {
@@ -300,9 +288,6 @@ func InstallCITools(ctx context.Context) error {
 	mg.CtxDeps(ctx, InstallProtobufTools)
 
 	if err := sh.Run("go", "install", "gotest.tools/gotestsum@latest"); err != nil {
-		return err
-	}
-	if err := sh.Run("go", "install", "github.com/golangci/golangci-lint/cmd/golangci-lint@latest"); err != nil {
 		return err
 	}
 	return nil
@@ -429,7 +414,7 @@ func (Lint) addLicense(fix bool) error {
 		cmdout, cmderr = buf, buf
 	}
 	args := []string{
-		"run", "github.com/google/addlicense",
+		"tool", "addlicense",
 		"-c", "6 River Systems",
 		"-l", "mit",
 		"-ignore", "**/*.css",
@@ -462,7 +447,7 @@ func (Lint) addLicense(fix bool) error {
 func (Lint) VulnCheck(ctx context.Context) error {
 	fmt.Println("Linting(vulncheck)...")
 	return sh.Run(
-		"go", "run", "golang.org/x/vuln/cmd/govulncheck",
+		"go", "tool", "govulncheck",
 		"-test",
 		"./...",
 	)
@@ -607,7 +592,6 @@ func TestSmoke(ctx context.Context, cmd, hostPort string) error {
 	// start the test run in the background
 	eg.Go(func() error {
 		args := []string{
-			"run", "gotest.tools/gotestsum",
 			"--format", "standard-verbose",
 			"--junitfile", filepath.Join(resultsDir, "gotestsum-smoke-report-"+cmd+".xml"),
 			"--",
@@ -620,7 +604,7 @@ func TestSmoke(ctx context.Context, cmd, hostPort string) error {
 			"./"+filepath.Join("cmd", cmd),
 		)
 		// have to use normal exec so the context can terminate this
-		cmd := exec.CommandContext(ctx, "go", args...)
+		cmd := exec.CommandContext(ctx, "gotestsum", args...)
 		cmd.Env = append([]string{}, os.Environ()...)
 		cmd.Env = append(cmd.Env, "NODE_ENV=acceptance")
 		cmd.Stdout = os.Stdout
@@ -740,162 +724,4 @@ func Clean(ctx context.Context) error {
 	}
 
 	return nil
-}
-
-// TODO: docker-dev-version
-
-func ReleaseBinary(ctx context.Context, cmd, arch string) error {
-	env := map[string]string{
-		"GOARCH": arch,
-		// NOTE: the base CI image we use can have a newer version of libc6 than the
-		// runtime base image, so we need to build statically always.
-		"CGO_ENABLED": "0",
-	}
-	args := []string{"build", "-v"}
-	args = append(args, goBuildArgs...)
-	args = append(args, "-o", filepath.Join("bin", cmd+"-"+arch), "./"+filepath.Join("cmd", cmd))
-	return sh.RunWith(env, "go", args...)
-}
-
-func ReleaseBinaries(ctx context.Context) error {
-	var fns []interface{}
-	for _, cmd := range cmds {
-		for _, arch := range goArches {
-			fns = append(fns, mg.F(ReleaseBinary, cmd, arch))
-		}
-	}
-	mg.CtxDeps(ctx, fns...)
-	return nil
-}
-
-type Docker mg.Namespace
-
-const multiArchBuilderName = "mmmbbb-multiarch"
-
-func (Docker) MultiarchInitLocal(ctx context.Context) error {
-	// this is for initializing a local machine for dev, CI needs a different flow
-	// that's in the config there
-	return sh.Run("docker", "buildx", "create", "--name", multiArchBuilderName, "--bootstrap")
-}
-
-func (Docker) MultiarchBuildAll(ctx context.Context) error {
-	var fns []interface{}
-	for _, cmd := range cmds {
-		fns = append(fns, mg.F(Docker{}.MultiarchBuild, cmd))
-	}
-	// paralleling these just makes the output confusing
-	mg.SerialCtxDeps(ctx, fns...)
-	return nil
-}
-
-// MultiarchPushAll pushes all the multi-arch docker images. It actually has to
-// rebuild them, so it relies on the docker build cache working well to be
-// efficient.
-func (Docker) MultiarchPushAll(ctx context.Context) error {
-	var fns []interface{}
-	for _, cmd := range cmds {
-		fns = append(fns, mg.F(Docker{}.MultiarchPush, cmd))
-	}
-	// paralleling these just makes the output confusing
-	mg.SerialCtxDeps(ctx, fns...)
-	return nil
-}
-
-func (Docker) MultiarchBuild(ctx context.Context, cmd string) error {
-	fmt.Printf("Docker-MultiArch(%s)...\n", cmd)
-	return dockerRunMultiArch(ctx, cmd, "build")
-}
-
-func (Docker) MultiarchLoadArch(ctx context.Context, cmd string, arch string) error {
-	fmt.Printf("Docker-MultiArchLoad(%s)...\n", cmd)
-	return dockerRunMultiArch(ctx, cmd, "load", arch)
-}
-
-func (Docker) MultiarchPush(ctx context.Context, cmd string) error {
-	fmt.Printf("Docker-MultiArchPush(%s)...\n", cmd)
-	return dockerRunMultiArch(ctx, cmd, "push")
-}
-
-func dockerRunMultiArch(_ context.Context, cmd string, mode string, arches ...string) error {
-	switch mode {
-	case "build", "load", "push":
-		// OK
-	default:
-		return fmt.Errorf("invalid multi-arch mode '%s', must be build, load, or push", mode)
-	}
-	var args []string
-	if os.Getenv("CI") != "" {
-		args = append(args, "--context", "multiarch-context")
-	}
-	args = append(args, "buildx", "build", "--builder", multiArchBuilderName)
-	var platforms []string
-	if len(arches) == 0 {
-		arches = goArches
-	}
-	for _, arch := range arches {
-		platforms = append(platforms, runtime.GOOS+"/"+arch)
-	}
-	args = append(args, "--platform", strings.Join(platforms, ","))
-	var version string
-	if content, err := os.ReadFile(".version"); err != nil {
-		return err
-	} else {
-		version = strings.TrimSpace(string(content))
-	}
-	baseImage := "mmmbbb-" + cmd
-	if cmd == "mmmbbb" {
-		// don't name things `mmmbbb-mmmbbb`
-		baseImage = "mmmbbb"
-	}
-	baseTag := baseImage + ":" + version
-	if mode == "push" {
-		const gcrBase = "gcr.io/plasma-column-128721/"
-		const arBase = "us-docker.pkg.dev/plasma-column-128721/gcr.io/"
-		// push everything to gcr & ar
-		args = append(args, "-t", gcrBase+baseTag)
-		args = append(args, "-t", arBase+baseTag)
-		if os.Getenv("CIRCLE_BRANCH") == "main" {
-			// push latest tag on main
-			args = append(args, "-t", gcrBase+baseImage+":latest")
-			args = append(args, "-t", arBase+baseImage+":latest")
-			// TODO: why is dockerhub access broken? CI secrets expired?
-			// // also push to docker hub for builds on main
-			// if os.Getenv("DOCKERHUB_USER") != "" {
-			// 	mg.CtxDeps(ctx, Docker{}.HubLogin)
-			// 	args = append(args, "-t", "6river/"+baseTag)
-			// 	args = append(args, "-t", "6river/"+baseImage+":latest")
-			// }
-		}
-	} else {
-		// base tag is not valid to push, but a useful local thing to use for the
-		// only-build mode
-		args = append(args, "-t", baseTag)
-	}
-	args = append(args, "--build-arg", "BINARYNAME="+cmd)
-	if mode == "push" {
-		args = append(args, "--push")
-	} else if mode == "load" {
-		args = append(args, "--load")
-	}
-	args = append(args, ".")
-	return sh.RunWithV(
-		// TODO: not sure we need this
-		map[string]string{"BINARYNAME": cmd},
-		"docker", args...,
-	)
-}
-
-func (Docker) HubLogin(ctx context.Context) error {
-	user, password := os.Getenv("DOCKERHUB_USER"), os.Getenv("DOCKERHUB_PASSWORD")
-	if user == "" || password == "" {
-		return fmt.Errorf("missing DOCKERHUB_USER and/or DOCKERHUB_PASSWORD")
-	}
-	// have to use raw exec to set stdin
-	cmd := exec.CommandContext(ctx, "docker", "login", "--username", user, "--password-stdin")
-	cmd.Stdin = strings.NewReader(password)
-	if mg.Verbose() {
-		cmd.Stdout = os.Stdout
-	}
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
 }

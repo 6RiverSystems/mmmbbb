@@ -14,22 +14,20 @@ This will be run automatically by `6mon`.
 
 ### For others
 
-You can build and run the `mmmbbb` app locally, or you can use our published
-Docker image `6river/mmmbbb`. The latter is simpler.
+You can build and run the `mmmbbb` app locally, or you can use the bundled
+[ko](https://ko.build/) configuration to build a docker image.
 
-The docker image defaults to using a SQLite back-end, which is stored in a
-`/data` volume in the container. This is done to minimize the amount of setup
-required, but it should be noted that the PostgreSQL backend has considerably
-better performance.
+The docker image defaults to using a SQLite back-end, which is stored
+ephemerally in `/tmp` in the container. This is done to minimize the amount of
+setup required, but it should be noted that the PostgreSQL backend has
+considerably better performance in addition to allowing data to persist across
+container instantiations.
 
 In its simplest form, you can use:
 
 ```shell
 docker run --rm --publish 8084-8085:8084-8085/tcp 6river/mmmbbb
 ```
-
-If you want to keep the SQLite database across runs, add
-`--volume /local/path:/data` to have the database kept in `/local/path/mmmbbb.sqlite`.
 
 ### Initializing a PostgreSQL Database
 
@@ -80,13 +78,13 @@ environment variables).
 SQLite as a backend currently requires explicitly specifying several extra
 parameters in the `DATABASE_URL`.
 
-CGo enabled (`mattn` driver):
+CGo enabled (`mattn` driver, only enabled if building from source):
 
 ```text
 ?_fk=true&_journal_mode=wal&cache=private&_busy_timeout=10000&_txlock=immediate
 ```
 
-CGo disabled (`modernc` driver):
+CGo disabled (`modernc` driver, this is what `ko`-built containers will use):
 
 ```text
 ?_pragma=foreign_keys(1)&_pragma=journal_mode(wal)&_pragma=busy_timeout(10000)&_txlock=immediate
