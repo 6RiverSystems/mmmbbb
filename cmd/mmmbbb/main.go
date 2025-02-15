@@ -90,7 +90,7 @@ func main() {
 		if os.Getenv("DATABASE_URL") == "" {
 			// default to an in-container SQLite database to simplify usage as a drop-in
 			os.Setenv("DATABASE_URL",
-				"sqlite:///data/mmmbbb.sqlite?"+
+				"sqlite:///tmp/mmmbbb.sqlite?"+
 					"_pragma=foreign_keys(1)&"+
 					"_pragma=journal_mode(wal)&"+
 					"_pragma=busy_timeout(10000)&"+
