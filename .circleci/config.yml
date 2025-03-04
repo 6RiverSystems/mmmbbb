@@ -4,7 +4,7 @@ orbs:
   sixrs-gke: sixriversystems/sixrs-gke@8
 
 aliases:
-  - &pg_default "14.15"
+  - &pg_default "14.17"
 
 jobs:
   all-in-one:
@@ -211,9 +211,9 @@ workflows:
             parameters:
               pgver:
                 - *pg_default
-                - "15.10"
-                - "16.6"
-                - "17.2"
+                - "15.12"
+                - "16.8"
+                - "17.4"
               cgo:
                 - "1"
                 # modernc driver is suffering from test flake issues, skip it for now
