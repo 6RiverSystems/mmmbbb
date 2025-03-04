@@ -54,15 +54,6 @@ jobs:
           name: Prepare for tests
           command: mkdir -p $TEST_RESULTS
       - run:
-          name: Ensure golangci-lint is up to date
-          command: |
-            if golangci-lint version | fgrep -q 'built with go1.23' ; then
-              cd $(mktemp -d)
-              wget https://github.com/golangci/golangci-lint/releases/download/v1.64.5/golangci-lint-1.64.5-linux-amd64.tar.gz
-              tar -axf golangci-lint-1.64.5-linux-amd64.tar.gz
-              sudo install -m 755 golangci-lint-1.64.5-linux-amd64/golangci-lint /usr/local/bin
-            fi
-      - run:
           name: format check
           command: |
             go tool mage -v format
