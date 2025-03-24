@@ -370,7 +370,6 @@ func (Lint) golangci(_ context.Context, opts gciOpts) error {
 	}
 
 	var err error
-	outFile := os.Stdout
 	if opts.fix && !opts.format {
 		args = append(args, "--fix")
 	}
@@ -380,11 +379,6 @@ func (Lint) golangci(_ context.Context, opts gciOpts) error {
 			return fmt.Errorf("missing TEST_RESULTS env var")
 		}
 		outFileName := filepath.Join(resultsDir, "golangci-lint.xml")
-		outFile, err = os.OpenFile(outFileName, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o644)
-		if err != nil {
-			return err
-		}
-		defer outFile.Close()
 		args = append(args, "--output.junit-xml.path="+outFileName)
 	}
 	if opts.dir != "" || len(opts.dirs) != 0 {
@@ -398,7 +392,7 @@ func (Lint) golangci(_ context.Context, opts gciOpts) error {
 			args = append(args, opts.dirs...)
 		}
 	}
-	_, err = sh.Exec(map[string]string{}, outFile, os.Stderr, cmd, args...)
+	_, err = sh.Exec(map[string]string{}, os.Stdout, os.Stderr, cmd, args...)
 	return err
 }
 
