@@ -91,6 +91,11 @@ formatters:
       max-len: 120
       # match editorconfig
       tab-len: 2
+      # tag reformatting is buggy, see:
+      # https://github.com/segmentio/golines/issues/161
+      # https://github.com/segmentio/golines/issues/142
+      # https://github.com/segmentio/golines/pull/143
+      reformat-tags: false
   exclusions:
     generated: lax
     paths:
