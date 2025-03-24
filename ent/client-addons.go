@@ -106,11 +106,11 @@ func (c *Client) DB() *sql.DB {
 func DriverDB(driver dialect.Driver) *sql.DB {
 	switch d := driver.(type) {
 	case *entsql.Driver:
-		return d.Conn.ExecQuerier.(*sql.DB)
+		return d.ExecQuerier.(*sql.DB)
 	case *dialect.DebugDriver:
 		return DriverDB(d.Driver)
 	default:
-		panic(fmt.Errorf("Unable to find DB from %T", driver))
+		panic(fmt.Errorf("unable to find DB from %T", driver))
 	}
 }
 
@@ -127,7 +127,7 @@ func (tx *Tx) DBTx() *sql.Tx {
 		case *dialect.DebugTx:
 			etx = ttx.Tx
 		default:
-			panic(fmt.Errorf("Unrecognized dialect.Tx type %T", etx))
+			panic(fmt.Errorf("unrecognized dialect.Tx type %T", etx))
 		}
 	}
 }

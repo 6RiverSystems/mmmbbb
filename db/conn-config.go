@@ -140,7 +140,7 @@ func ParseDefault() (driverName, dialectName, dsn string, err error) {
 		driverName = "pgx"
 		dialectName = PostgresDialect
 	} else {
-		return "", "", dsn, fmt.Errorf("Unrecognized db url '%s'", dsn)
+		return "", "", dsn, fmt.Errorf("unrecognized db url '%s'", dsn)
 	}
 	return
 }
@@ -171,7 +171,7 @@ func Open(driverName, dialectName, dsn string) (db *sql.DB, err error) {
 	} else {
 		db, err = sql.Open(driverName, dsn)
 		if err != nil {
-			err = fmt.Errorf("Failed to open default DB connection: %w", err)
+			err = fmt.Errorf("failed to open default DB connection: %w", err)
 		}
 	}
 
@@ -272,6 +272,6 @@ func TryCreateDB(ctx context.Context, driverName, dialect, dsn, createVia string
 		// TODO: detect "already exists" and report that as success (e.g. multiple instances racing to create)
 		return err
 	} else {
-		return errors.New("Don't know how to create this kind of db")
+		return errors.New("don't know how to create this kind of db")
 	}
 }

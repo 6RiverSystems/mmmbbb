@@ -45,7 +45,7 @@ type DeadLetterDeliveries struct {
 
 func NewDeadLetterDeliveries(params DeadLetterDeliveriesParams) *DeadLetterDeliveries {
 	if params.MaxDeliveries < 1 {
-		panic(errors.New("MaxDeliveries must be > 0"))
+		panic(errors.New("maxDeliveries must be > 0"))
 	}
 	return &DeadLetterDeliveries{
 		actionBase[DeadLetterDeliveriesParams, DeadLetterDeliveriesResults]{

@@ -76,7 +76,7 @@ func (i *Interval) Scan(src interface{}) error {
 		// place
 		*i = 0
 	default:
-		return fmt.Errorf("Unsupported scan type: %T", src)
+		return fmt.Errorf("unsupported scan type: %T", src)
 	}
 	return nil
 }
@@ -115,7 +115,7 @@ func ParsePostgreSQLInterval(s string) (result time.Duration, err error) {
 		// try to parse in Go format, happens with sqlite
 		result, err = time.ParseDuration(s)
 		if err != nil {
-			err = errors.New("Unrecognized interval format")
+			err = errors.New("unrecognized interval format")
 		}
 		return
 	}
@@ -144,7 +144,7 @@ func ParsePostgreSQLInterval(s string) (result time.Duration, err error) {
 		// PG cannot store more than microsecond resolution, but we can at least
 		// tolerate up to what Go can represent on input
 		if len(subsecs) > 9 {
-			err = errors.New("Cannot parse beyond nanosecond resolution")
+			err = errors.New("cannot parse beyond nanosecond resolution")
 			return
 		}
 		// len(subsecs) is in the range [1..9], so we know that

@@ -54,7 +54,6 @@ import (
 	"go.6river.tech/mmmbbb/oas"
 	"go.6river.tech/mmmbbb/server"
 	"go.6river.tech/mmmbbb/services"
-	_ "go.6river.tech/mmmbbb/services"
 	"go.6river.tech/mmmbbb/version"
 )
 

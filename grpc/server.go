@@ -209,7 +209,7 @@ func (s *grpcServer) Start(ctx context.Context, ready chan<- struct{}) error {
 	if err != nil {
 		s.logger.Error().Err(err).Msg("Failed to open gRPC listen socket")
 
-		return fmt.Errorf("Failed to open listen port for grpc server: %w", err)
+		return fmt.Errorf("failed to open listen port for grpc server: %w", err)
 	}
 
 	// ask the server to stop when the context is canceled

@@ -75,17 +75,17 @@ var _ Action[GetSubscriptionMessagesParams, getSubscriptionMessagesResults] = (*
 
 func NewGetSubscriptionMessages(params GetSubscriptionMessagesParams) *GetSubscriptionMessages {
 	if params.MaxMessages < 1 {
-		panic(errors.New("MaxMessages must be > 0"))
+		panic(errors.New("maxMessages must be > 0"))
 	}
 	if params.MaxBytes < 1 {
-		panic(errors.New("MaxBytes must be > 0"))
+		panic(errors.New("maxBytes must be > 0"))
 	}
 	if params.MaxWait < 0 {
 		// we allow 0 here as "use the default"
-		panic(errors.New("MaxWait must be >= 0"))
+		panic(errors.New("maxWait must be >= 0"))
 	}
 	if params.Name == "" && params.ID == nil {
-		panic(errors.New("Must provide Name or ID"))
+		panic(errors.New("must provide Name or ID"))
 	}
 	return &GetSubscriptionMessages{
 		actionBase[GetSubscriptionMessagesParams, getSubscriptionMessagesResults]{

@@ -346,7 +346,7 @@ func parseUUIDName(s string) (uuid.UUID, string, error) {
 	// that is the uuid and everything after is the name
 	space := strings.IndexRune(s, ' ')
 	if space < 0 {
-		return uuid.UUID{}, "", errors.New("No space found")
+		return uuid.UUID{}, "", errors.New("no space found")
 	}
 	name := s[space+1:]
 	id, err := uuid.Parse(s[:space])

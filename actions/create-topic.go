@@ -44,7 +44,7 @@ var _ Action[CreateTopicParams, createTopicResults] = (*CreateTopic)(nil)
 
 func NewCreateTopic(params CreateTopicParams) *CreateTopic {
 	if params.Name == "" {
-		panic(errors.New("Topic must have a non-empty name"))
+		panic(errors.New("topic must have a non-empty name"))
 	}
 	return &CreateTopic{
 		actionBase[CreateTopicParams, createTopicResults]{

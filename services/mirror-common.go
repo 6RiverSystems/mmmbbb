@@ -43,7 +43,7 @@ func parseShardConfig() func(string) bool {
 			panic(err)
 		} else if n != 2 {
 			// should never get here
-			panic(errors.New("Bad format for MIRROR_SHARD_CONFIG"))
+			panic(errors.New("bad format for MIRROR_SHARD_CONFIG"))
 		}
 		// else
 		return func(topicName string) bool {

@@ -58,7 +58,7 @@ func Up(
 		defer sql.Close()
 	}
 	if err != nil {
-		return fmt.Errorf("Failed to connect to DB for Up migration: %w", err)
+		return fmt.Errorf("failed to connect to DB for Up migration: %w", err)
 	}
 
 	if !migrator.HasMigrations() || dialectName == SqliteDialect {
@@ -66,11 +66,11 @@ func Up(
 		case *ent.Client:
 			err := MigrateUpEnt(ctx, mdb.Schema)
 			if err != nil {
-				return fmt.Errorf("Failed Up migration via ent for %s: %w", dialectName, err)
+				return fmt.Errorf("failed Up migration via ent for %s: %w", dialectName, err)
 			}
 			return nil
 		default:
-			return fmt.Errorf("Unrecognized migrateVia for %s: %T", dialectName, migrateVia)
+			return fmt.Errorf("unrecognized migrateVia for %s: %T", dialectName, migrateVia)
 		}
 	}
 
@@ -79,7 +79,7 @@ func Up(
 		migrator = migrator.WithDialect(&migrate.PgxDialect{})
 	default:
 		// TODO: if we had a dialect registry could make this generic
-		return fmt.Errorf("Unrecognized dialect '%s'", dialectName)
+		return fmt.Errorf("unrecognized dialect '%s'", dialectName)
 	}
 
 	// default fallthrough assumes we've initialized migrator with a dialect

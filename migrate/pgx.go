@@ -48,7 +48,7 @@ func (p *PgxDialect) DefaultConfig() *Config {
 
 func (p *PgxDialect) Verify(db *sqlx.DB) error {
 	if _, ok := db.Driver().(*stdlib.Driver); !ok {
-		return fmt.Errorf("Cannot use Pgx dialect without pgx driver")
+		return fmt.Errorf("cannot use Pgx dialect without pgx driver")
 	}
 	return nil
 }

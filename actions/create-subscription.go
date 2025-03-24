@@ -68,7 +68,7 @@ func NewCreateSubscription(params CreateSubscriptionParams) *CreateSubscription 
 		panic(errors.New("messageTTL must be > 0"))
 	}
 	if params.MaxDeliveryAttempts < 0 {
-		panic(errors.New("MaxDeliveryAttempts must be >= 0"))
+		panic(errors.New("maxDeliveryAttempts must be >= 0"))
 	}
 	if (params.MaxDeliveryAttempts != 0) != (params.DeadLetterTopic != "") {
 		panic(errors.New("must set both or neither of MaxDeliveryAttempts and DeadLetterTopic"))

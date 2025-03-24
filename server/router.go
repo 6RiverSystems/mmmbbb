@@ -49,7 +49,7 @@ func NewEngine() *gin.Engine {
 			// TODO: actually probably want debug mode here too?
 			gin.SetMode(gin.TestMode)
 		default:
-			panic(fmt.Errorf("Unrecognized NODE_ENV value: '%s'", os.Getenv("NODE_ENV")))
+			panic(fmt.Errorf("unrecognized NODE_ENV value: '%s'", os.Getenv("NODE_ENV")))
 		}
 	}
 

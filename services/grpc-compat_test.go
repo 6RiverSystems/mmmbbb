@@ -476,19 +476,20 @@ func TestGrpcCompat(t *testing.T) {
 						}
 						assert.Equal(t, strconv.Itoa(int(expected)), string(m.Data),
 							"should get expected message (in order)")
-						if counter == 1 {
+						switch counter {
+						case 1:
 							// go fast
 							defer m.Ack()
-						} else if counter == 2 {
+						case 2:
 							// delay and nack
 							defer m.Nack()
 							time.Sleep(pullTimeScale)
-						} else if counter == 3 {
+						case 3:
 							// delay and ack and done
 							defer m.Ack()
 							time.Sleep(pullTimeScale * 3 / 2)
 							cancel()
-						} else {
+						default:
 							assert.LessOrEqual(t, expected, int32(3))
 						}
 						// t.Logf("done with %q at %d", m.ID, counter)
@@ -544,19 +545,20 @@ func TestGrpcCompat(t *testing.T) {
 							expected = 2
 						}
 						assert.Equal(t, ([]byte)(strconv.Itoa(int(expected))), m.Data)
-						if counter == 1 {
+						switch counter {
+						case 1:
 							// go fast
 							defer m.Ack()
-						} else if counter == 2 {
+						case 2:
 							// delay and nack
 							defer m.Nack()
 							time.Sleep(pullTimeScale)
-						} else if counter == 3 {
+						case 3:
 							// delay and ack and done
 							defer m.Ack()
 							time.Sleep(pullTimeScale * 3 / 2)
 							cancel()
-						} else {
+						default:
 							assert.LessOrEqual(t, expected, int32(3))
 						}
 					})
@@ -655,19 +657,20 @@ func TestGrpcCompat(t *testing.T) {
 						decoded, err := base64.StdEncoding.DecodeString(m.Message.Data)
 						assert.NoError(t, err, "message data should be base64 decodable")
 						assert.Equal(t, strconv.Itoa(int(expected)), string(decoded))
-						if counter == 1 {
+						switch counter {
+						case 1:
 							// go fast
 							w.WriteHeader(http.StatusNoContent)
-						} else if counter == 2 {
+						case 2:
 							// delay and nack
 							time.Sleep(50 * time.Millisecond)
 							w.WriteHeader(http.StatusInternalServerError)
-						} else if counter == 3 {
+						case 3:
 							// delay and ack and done
 							time.Sleep(150 * time.Millisecond)
 							w.WriteHeader(http.StatusNoContent)
 							cancel()
-						} else {
+						default:
 							assert.LessOrEqual(t, expected, int32(3))
 							// above will always fail
 							w.WriteHeader(http.StatusInternalServerError)

@@ -25,9 +25,9 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
-var ErrExists = errors.New("Already exists")
+var ErrExists = errors.New("already exists")
 
-var ErrNotFound = errors.New("Not found")
+var ErrNotFound = errors.New("not found")
 
 func isSqlDuplicateKeyError(err error) bool {
 	var pgErr *pgconn.PgError

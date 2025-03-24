@@ -42,7 +42,6 @@ import (
 	"go.6river.tech/mmmbbb/ent/topic"
 	"go.6river.tech/mmmbbb/filter"
 	"go.6river.tech/mmmbbb/grpc"
-	mbgrpc "go.6river.tech/mmmbbb/grpc"
 	"go.6river.tech/mmmbbb/grpc/pubsubpb"
 	"go.6river.tech/mmmbbb/internal/sqltypes"
 	"go.6river.tech/mmmbbb/logging"
@@ -575,7 +574,7 @@ func (s *subscriberServer) StreamingPull(stream pubsubpb.Subscriber_StreamingPul
 	// we require an initial message before we can start doing anything
 	initial, err := stream.Recv()
 	if err != nil {
-		return mbgrpc.WrapError(err, "Error receiving StreamingPull message")
+		return grpc.WrapError(err, "Error receiving StreamingPull message")
 	}
 
 	if !isValidSubscriptionName(initial.Subscription) {
