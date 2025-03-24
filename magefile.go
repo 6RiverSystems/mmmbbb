@@ -301,7 +301,7 @@ func Format(ctx context.Context) error {
 
 func FormatDir(ctx context.Context, dir string) error {
 	fmt.Printf("Formatting(%s)...\n", dir)
-	return Lint{}.golangci(ctx, gciOpts{fix: true, dir: dir})
+	return Lint{}.golangci(ctx, gciOpts{format: true, dir: dir})
 }
 
 type Lint mg.Namespace
@@ -341,17 +341,22 @@ func (Lint) GolangciJUnit(ctx context.Context) error {
 }
 
 type gciOpts struct {
-	junit bool
-	fix   bool
-	dir   string
-	dirs  []string
+	junit  bool
+	fix    bool
+	format bool
+	dir    string
+	dirs   []string
 }
 
 func (Lint) golangci(_ context.Context, opts gciOpts) error {
 	cmd := "golangci-lint"
 	var args []string
-	args = append(args, "run")
-	args = append(args, goLintArgs...)
+	if opts.format {
+		args = append(args, "fmt")
+	} else {
+		args = append(args, "run")
+		args = append(args, goLintArgs...)
+	}
 	if os.Getenv("VERBOSE") != "" {
 		args = append(args, "-v")
 	}
@@ -362,7 +367,7 @@ func (Lint) golangci(_ context.Context, opts gciOpts) error {
 
 	var err error
 	outFile := os.Stdout
-	if opts.fix {
+	if opts.fix && !opts.format {
 		args = append(args, "--fix")
 	}
 	if opts.junit {
@@ -379,7 +384,9 @@ func (Lint) golangci(_ context.Context, opts gciOpts) error {
 		defer outFile.Close()
 	}
 	if opts.dir != "" || len(opts.dirs) != 0 {
-		args = append(args, "--allow-parallel-runners")
+		if !opts.format {
+			args = append(args, "--allow-parallel-runners")
+		}
 		if opts.dir != "" {
 			args = append(args, opts.dir)
 		}
