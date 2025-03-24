@@ -103,9 +103,12 @@ func (ms *MessageStreamer) Go(ctx context.Context, conn StreamConnection) error 
 		ms.SubscriptionName = s.Name
 	}
 	if ms.Logger == nil {
-		ms.Logger = logging.GetLoggerWith("actions/message-streamer", func(c zerolog.Context) zerolog.Context {
-			return c.Str("subscription", ms.SubscriptionName)
-		})
+		ms.Logger = logging.GetLoggerWith(
+			"actions/message-streamer",
+			func(c zerolog.Context) zerolog.Context {
+				return c.Str("subscription", ms.SubscriptionName)
+			},
+		)
 	}
 
 	eg, ctx := errgroup.WithContext(ctx)
@@ -206,7 +209,9 @@ func (ms *MessageStreamer) Go(ctx context.Context, conn StreamConnection) error 
 					// OK to send at least one message
 					break
 				}
-				ms.Logger.Trace().Interface("flowControl", curFc).Msg("Flow control full, waiting for wakeup")
+				ms.Logger.Trace().
+					Interface("flowControl", curFc).
+					Msg("Flow control full, waiting for wakeup")
 				waitTimer := prometheus.NewTimer(messageStreamerFlowControlWait)
 				// need to wait for some acks before we can send
 				select {
@@ -218,7 +223,9 @@ func (ms *MessageStreamer) Go(ctx context.Context, conn StreamConnection) error 
 				waitTimer.ObserveDuration()
 			}
 
-			ms.Logger.Trace().Interface("flowControl", curFc).Msg("Flow control ready, fetching messages")
+			ms.Logger.Trace().
+				Interface("flowControl", curFc).
+				Msg("Flow control ready, fetching messages")
 
 			p := GetSubscriptionMessagesParams{
 				ID:          ms.SubscriptionID,
@@ -430,7 +437,11 @@ func (ms *MessageStreamer) doAcksNacks(ctx context.Context, ackIDs, nackIDs []uu
 	return err
 }
 
-func (ms *MessageStreamer) doDelay(ctx context.Context, ids []uuid.UUID, delay time.Duration) error {
+func (ms *MessageStreamer) doDelay(
+	ctx context.Context,
+	ids []uuid.UUID,
+	delay time.Duration,
+) error {
 	if len(ids) == 0 {
 		return nil
 	}

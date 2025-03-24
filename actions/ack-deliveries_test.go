@@ -125,28 +125,31 @@ func TestAckDeliveries_Execute(t *testing.T) {
 			// have to make this indirect as the expected notify may be generated in
 			// before
 			defer func() { CancelPublishAwaiter(tt.expectPublishNotify, pubNotify) }()
-			assert.NoError(t, client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
-				if tt.before != nil {
-					tt.before(t, ctx, tx, &tt)
-				}
-				pubNotify = PublishAwaiter(tt.expectPublishNotify)
-				a := NewAckDeliveries(tt.params.ids...)
-				tt.assertion(t, a.Execute(ctx, tx))
-				assert.Equal(t, tt.results, a.results)
-				results, ok := a.Results()
-				assert.Equal(t, tt.results != nil, ok)
-				if tt.results != nil {
-					assert.Equal(t, *tt.results, results)
-				}
-				unAcked, err := tx.Delivery.Query().
-					Where(
-						delivery.IDIn(tt.params.ids...),
-						delivery.CompletedAtIsNil(),
-					).Count(ctx)
-				assert.NoError(t, err)
-				assert.Zero(t, unAcked)
-				return nil
-			}))
+			assert.NoError(
+				t,
+				client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
+					if tt.before != nil {
+						tt.before(t, ctx, tx, &tt)
+					}
+					pubNotify = PublishAwaiter(tt.expectPublishNotify)
+					a := NewAckDeliveries(tt.params.ids...)
+					tt.assertion(t, a.Execute(ctx, tx))
+					assert.Equal(t, tt.results, a.results)
+					results, ok := a.Results()
+					assert.Equal(t, tt.results != nil, ok)
+					if tt.results != nil {
+						assert.Equal(t, *tt.results, results)
+					}
+					unAcked, err := tx.Delivery.Query().
+						Where(
+							delivery.IDIn(tt.params.ids...),
+							delivery.CompletedAtIsNil(),
+						).Count(ctx)
+					assert.NoError(t, err)
+					assert.Zero(t, unAcked)
+					return nil
+				}),
+			)
 			if tt.expectPublishNotify != uuid.Nil {
 				assertClosed(t, pubNotify)
 			} else {

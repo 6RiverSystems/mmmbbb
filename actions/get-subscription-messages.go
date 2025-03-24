@@ -71,7 +71,9 @@ type GetSubscriptionMessages struct {
 	actionBase[GetSubscriptionMessagesParams, getSubscriptionMessagesResults]
 }
 
-var _ Action[GetSubscriptionMessagesParams, getSubscriptionMessagesResults] = (*GetSubscriptionMessages)(nil)
+var _ Action[GetSubscriptionMessagesParams, getSubscriptionMessagesResults] = (*GetSubscriptionMessages)(
+	nil,
+)
 
 func NewGetSubscriptionMessages(params GetSubscriptionMessagesParams) *GetSubscriptionMessages {
 	if params.MaxMessages < 1 {

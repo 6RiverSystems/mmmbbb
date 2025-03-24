@@ -319,6 +319,10 @@ func (Lint) Default(ctx context.Context) error {
 	return LintDefault(ctx)
 }
 
+func (Lint) Fix(ctx context.Context) error {
+	return Lint{}.golangci(ctx, gciOpts{fix: true})
+}
+
 func (Lint) Ci(ctx context.Context) error {
 	mg.CtxDeps(ctx, Lint{}.Vet, Lint{}.AddLicense, Lint{}.VulnCheck, Lint{}.GolangciJUnit)
 	return nil

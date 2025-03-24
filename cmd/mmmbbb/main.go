@@ -74,7 +74,11 @@ func main() {
 		}
 
 		if !testModeIgnoreArgs {
-			fmt.Fprintf(os.Stderr, "mmmbbb does not accept command line arguments: %v\n", os.Args[1:])
+			fmt.Fprintf(
+				os.Stderr,
+				"mmmbbb does not accept command line arguments: %v\n",
+				os.Args[1:],
+			)
 			//nolint:forbidigo
 			os.Exit(1)
 		}
@@ -238,7 +242,9 @@ func (app *app) setupDB(ctx context.Context, drv *sql.Driver) (client *ent.Clien
 		return nil
 	}))
 	// Setup db prometheus metrics
-	prometheus.DefaultRegisterer.MustRegister(collectors.NewDBStatsCollector(drv.DB(), db.GetDefaultDbName()))
+	prometheus.DefaultRegisterer.MustRegister(
+		collectors.NewDBStatsCollector(drv.DB(), db.GetDefaultDbName()),
+	)
 
 	m := &migrate.Migrator{}
 
@@ -301,15 +307,17 @@ func (app *app) setupGin(params ginParams) (ginResults, error) {
 	// TODO: this won't work properly behind a path-modifying reverse proxy as we
 	// don't have any `servers` entries so it will guess the wrong base
 	res.Engine.StaticFS("/oas-ui", http.FS(swaggerui.FS))
-	configHandler := swaggerui.CustomConfigHandler(func(config map[string]interface{}) map[string]interface{} {
-		config["urls"] = []map[string]interface{}{
-			{"url": config["url"], "name": version.AppName},
-			{"url": "../oas-grpc/pubsub.swagger.json", "name": "grpc:pubsub"},
-			{"url": "../oas-grpc/schema.swagger.json", "name": "grpc:schema"},
-		}
-		delete(config, "url")
-		return config
-	})
+	configHandler := swaggerui.CustomConfigHandler(
+		func(config map[string]interface{}) map[string]interface{} {
+			config["urls"] = []map[string]interface{}{
+				{"url": config["url"], "name": version.AppName},
+				{"url": "../oas-grpc/pubsub.swagger.json", "name": "grpc:pubsub"},
+				{"url": "../oas-grpc/schema.swagger.json", "name": "grpc:schema"},
+			}
+			delete(config, "url")
+			return config
+		},
+	)
 	res.Engine.GET(swaggerui.ConfigLoadingPath, gin.WrapF(configHandler))
 	// NOTE: this will serve yaml as text/plain. YAML doesn't have a standardized
 	// mime type, so that's OK for now

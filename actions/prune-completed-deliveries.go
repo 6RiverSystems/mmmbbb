@@ -39,7 +39,9 @@ func NewPruneCompletedDeliveries(params PruneCommonParams) *PruneCompletedDelive
 	}
 }
 
-var pruneCompletedDeliveriesCounter, pruneCompletedDeliveriesHistogram = pruneMetrics("completed_deliveries")
+var pruneCompletedDeliveriesCounter, pruneCompletedDeliveriesHistogram = pruneMetrics(
+	"completed_deliveries",
+)
 
 func (pcd *PruneCompletedDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 	timer := startActionTimer(pruneCompletedDeliveriesHistogram, tx)

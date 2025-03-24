@@ -409,7 +409,12 @@ func init() {
 		shardFilter := parseShardConfig()
 		projectId := os.Getenv("PUBSUB_GCLOUD_PROJECT_ID")
 		if projectId == "" {
-			panic(fmt.Errorf("cannot use MIRROR_IN_SITE_NAME=%q without PUBSUB_GCLOUD_PROJECT_ID", site))
+			panic(
+				fmt.Errorf(
+					"cannot use MIRROR_IN_SITE_NAME=%q without PUBSUB_GCLOUD_PROJECT_ID",
+					site,
+				),
+			)
 		}
 		defaultServices = append(defaultServices, &topicMirrorIn{
 			project:           projectId,

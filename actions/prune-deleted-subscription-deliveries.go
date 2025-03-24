@@ -34,7 +34,9 @@ type PruneDeletedSubscriptionDeliveries struct {
 
 var _ Action[PruneCommonParams, PruneCommonResults] = (*PruneDeletedSubscriptionDeliveries)(nil)
 
-func NewPruneDeletedSubscriptionDeliveries(params PruneCommonParams) *PruneDeletedSubscriptionDeliveries {
+func NewPruneDeletedSubscriptionDeliveries(
+	params PruneCommonParams,
+) *PruneDeletedSubscriptionDeliveries {
 	return &PruneDeletedSubscriptionDeliveries{
 		pruneAction: newPruneAction(params),
 	}

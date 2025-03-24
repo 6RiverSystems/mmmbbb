@@ -59,7 +59,11 @@ func (s *subscriberServer) CreateSubscription(
 	req *pubsubpb.Subscription,
 ) (*pubsubpb.Subscription, error) {
 	if !isValidSubscriptionName(req.Name) {
-		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / subscription path %s", req.Name)
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"Unsupported project / subscription path %s",
+			req.Name,
+		)
 	}
 
 	if req.Detached {
@@ -68,7 +72,10 @@ func (s *subscriberServer) CreateSubscription(
 
 	if req.PushConfig != nil {
 		if len(req.PushConfig.Attributes) != 0 {
-			return nil, status.Error(codes.Unimplemented, "Advanced features not supported (PushConfig.Attributes)")
+			return nil, status.Error(
+				codes.Unimplemented,
+				"Advanced features not supported (PushConfig.Attributes)",
+			)
 		}
 		if req.PushConfig.AuthenticationMethod != nil {
 			return nil, status.Error(
@@ -163,7 +170,11 @@ func (s *subscriberServer) GetSubscription(
 	})
 	if err != nil {
 		if isNotFound(err) {
-			return nil, status.Errorf(codes.NotFound, "Subscription not found: %s", req.Subscription)
+			return nil, status.Errorf(
+				codes.NotFound,
+				"Subscription not found: %s",
+				req.Subscription,
+			)
 		}
 		return nil, grpc.AsStatusError(err)
 	}
@@ -216,7 +227,10 @@ func (s *subscriberServer) UpdateSubscription(
 			case "name":
 				return status.Error(codes.InvalidArgument, "Subscriptions cannot be renamed")
 			case "topic":
-				return status.Error(codes.InvalidArgument, "Subscriptions cannot be moved between topics")
+				return status.Error(
+					codes.InvalidArgument,
+					"Subscriptions cannot be moved between topics",
+				)
 			case "labels":
 				subUpdate.SetLabels(req.Subscription.Labels)
 			case "expiration_policy":
@@ -295,7 +309,11 @@ func (s *subscriberServer) UpdateSubscription(
 				}
 			case "ack_deadline_seconds", "retain_acked_messages", "detached":
 				// these are valid paths, we just don't support changing them
-				return status.Errorf(codes.InvalidArgument, "Modifying Subscription.%s is not supported", p)
+				return status.Errorf(
+					codes.InvalidArgument,
+					"Modifying Subscription.%s is not supported",
+					p,
+				)
 			default:
 				return status.Errorf(
 					codes.InvalidArgument,
@@ -369,7 +387,10 @@ func (s *subscriberServer) ListSubscriptions(
 		if len(subs) >= int(pageSize) {
 			nextPageToken = subs[len(subs)-1].ID.String()
 		}
-		resp = &pubsubpb.ListSubscriptionsResponse{Subscriptions: grpcSubscriptions, NextPageToken: nextPageToken}
+		resp = &pubsubpb.ListSubscriptionsResponse{
+			Subscriptions: grpcSubscriptions,
+			NextPageToken: nextPageToken,
+		}
 		return nil
 	})
 	if err != nil {
@@ -394,7 +415,11 @@ func (s *subscriberServer) DeleteSubscription(
 	err := s.client.DoCtxTx(ctx, nil, action.Execute)
 	if err != nil {
 		if isNotFound(err) {
-			return nil, status.Errorf(codes.NotFound, "Subscription does not exist: %s", req.Subscription)
+			return nil, status.Errorf(
+				codes.NotFound,
+				"Subscription does not exist: %s",
+				req.Subscription,
+			)
 		}
 		return nil, grpc.AsStatusError(err)
 	}
@@ -501,7 +526,11 @@ func (s *subscriberServer) Pull(
 	err := action.ExecuteClient(ctx, s.client)
 	if err != nil {
 		if isNotFound(err) {
-			return nil, status.Errorf(codes.NotFound, "Subscription not found: %s", req.Subscription)
+			return nil, status.Errorf(
+				codes.NotFound,
+				"Subscription not found: %s",
+				req.Subscription,
+			)
 		}
 		return nil, grpc.AsStatusError(err)
 	}
@@ -723,7 +752,10 @@ func (w *streamWrapper) Send(ctx context.Context, m *actions.SubscriptionMessage
 	})
 }
 
-func (w *streamWrapper) SendBatch(ctx context.Context, ms []*actions.SubscriptionMessageDelivery) error {
+func (w *streamWrapper) SendBatch(
+	ctx context.Context,
+	ms []*actions.SubscriptionMessageDelivery,
+) error {
 	rm := make([]*pubsubpb.ReceivedMessage, len(ms))
 	for i, m := range ms {
 		rm[i] = entDeliveryToGrpc(m)
@@ -735,7 +767,9 @@ func (w *streamWrapper) SendBatch(ctx context.Context, ms []*actions.Subscriptio
 
 var _ actions.StreamConnectionBatchSend = (*streamWrapper)(nil)
 
-func (w *streamWrapper) adaptIn(m *pubsubpb.StreamingPullRequest) (*actions.MessageStreamRequest, error) {
+func (w *streamWrapper) adaptIn(
+	m *pubsubpb.StreamingPullRequest,
+) (*actions.MessageStreamRequest, error) {
 	ret := &actions.MessageStreamRequest{}
 	if m == w.initial {
 		// for Google PubSub, the flow control can only be set on the first request
@@ -826,7 +860,10 @@ func validatePushConfig(cfg *pubsubpb.PushConfig) error {
 	return nil
 }
 
-func applyPushConfig(mut *ent.SubscriptionUpdateOne, cfg *pubsubpb.PushConfig) *ent.SubscriptionUpdateOne {
+func applyPushConfig(
+	mut *ent.SubscriptionUpdateOne,
+	cfg *pubsubpb.PushConfig,
+) *ent.SubscriptionUpdateOne {
 	ep := cfg.GetPushEndpoint()
 	if ep == "" {
 		mut = mut.ClearPushEndpoint()

@@ -33,7 +33,11 @@ import (
 
 // DoTx wraps inner in a transaction, which will be committed if it returns nil
 // or rolled back if it returns an error
-func (c *Client) DoTx(ctx context.Context, opts *sql.TxOptions, inner func(tx *Tx) error) (finalErr error) {
+func (c *Client) DoTx(
+	ctx context.Context,
+	opts *sql.TxOptions,
+	inner func(tx *Tx) error,
+) (finalErr error) {
 	tx, finalErr := c.BeginTx(ctx, opts)
 	if finalErr != nil {
 		return

@@ -40,7 +40,9 @@ func NewPruneExpiredDeliveries(params PruneCommonParams) *PruneExpiredDeliveries
 	}
 }
 
-var pruneExpiredDeliveriesCounter, pruneExpiredDeliveriesHistogram = pruneMetrics("expired_deliveries")
+var pruneExpiredDeliveriesCounter, pruneExpiredDeliveriesHistogram = pruneMetrics(
+	"expired_deliveries",
+)
 
 func (a *PruneExpiredDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 	timer := startActionTimer(pruneExpiredDeliveriesHistogram, tx)

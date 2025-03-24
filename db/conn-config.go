@@ -76,7 +76,11 @@ func DefaultDbUrl() string {
 }
 
 func PostgreSQLDSN(suffix string) string {
-	return fmt.Sprintf("postgres://6river:6river@localhost/%s_%s?sslmode=disable", defaultDbName, suffix)
+	return fmt.Sprintf(
+		"postgres://6river:6river@localhost/%s_%s?sslmode=disable",
+		defaultDbName,
+		suffix,
+	)
 }
 
 func ApplyPgAppName(dbUrl string) string {
@@ -268,7 +272,10 @@ func TryCreateDB(ctx context.Context, driverName, dialect, dsn, createVia string
 		db := stdlib.OpenDB(*cfg)
 		defer db.Close()
 		// can't use placeholders for CREATE DATABASE, have to escape (quote) things instead
-		_, err = db.ExecContext(ctx, fmt.Sprintf("CREATE DATABASE %s", postgres.QuoteIdentifier(origDB)))
+		_, err = db.ExecContext(
+			ctx,
+			fmt.Sprintf("CREATE DATABASE %s", postgres.QuoteIdentifier(origDB)),
+		)
 		// TODO: detect "already exists" and report that as success (e.g. multiple instances racing to create)
 		return err
 	} else {

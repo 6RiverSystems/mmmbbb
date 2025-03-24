@@ -78,24 +78,27 @@ func TestDeleteTopic_Execute(t *testing.T) {
 			topicID := xID(t, &ent.Topic{}, 0)
 			topicMod := TopicModifiedAwaiter(topicID, nameFor(t, 0))
 			defer CancelTopicModifiedAwaiter(topicID, nameFor(t, 0), topicMod)
-			assert.NoError(t, client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
-				if tt.before != nil {
-					tt.before(t, ctx, tx, &tt)
-				}
-				a := NewDeleteTopic(nameFor(t, 0))
-				tt.assertion(t, a.Execute(ctx, tx))
-				assert.Equal(t, tt.expect, a.results)
-				results, ok := a.Results()
-				if tt.expect != nil {
-					if assert.True(t, ok) {
-						assert.Equal(t, tt.expect.NumDeleted, results.NumDeleted)
+			assert.NoError(
+				t,
+				client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
+					if tt.before != nil {
+						tt.before(t, ctx, tx, &tt)
 					}
-				} else {
-					assert.Nil(t, a.results)
-					assert.False(t, ok)
-				}
-				return nil
-			}))
+					a := NewDeleteTopic(nameFor(t, 0))
+					tt.assertion(t, a.Execute(ctx, tx))
+					assert.Equal(t, tt.expect, a.results)
+					results, ok := a.Results()
+					if tt.expect != nil {
+						if assert.True(t, ok) {
+							assert.Equal(t, tt.expect.NumDeleted, results.NumDeleted)
+						}
+					} else {
+						assert.Nil(t, a.results)
+						assert.False(t, ok)
+					}
+					return nil
+				}),
+			)
 			if tt.expect != nil && tt.expect.NumDeleted > 0 {
 				assertClosed(t, topicMod)
 			} else {

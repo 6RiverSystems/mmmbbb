@@ -91,30 +91,33 @@ func TestDelayDeliveries_Execute(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			enttest.ResetTables(t, client)
-			assert.NoError(t, client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
-				if tt.before != nil {
-					tt.before(t, ctx, tx, &tt)
-				}
-				a := NewDelayDeliveries(tt.params)
-				tt.assertion(t, a.Execute(ctx, tx))
-				assert.Equal(t, tt.results, a.results)
-				results, ok := a.Results()
-				if tt.results != nil {
-					if assert.True(t, ok) {
-						assert.Equal(t, tt.results.NumDelayed, results.NumDelayed)
+			assert.NoError(
+				t,
+				client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
+					if tt.before != nil {
+						tt.before(t, ctx, tx, &tt)
 					}
-				} else {
-					assert.False(t, ok)
-				}
-				unDelayed, err := tx.Delivery.Query().
-					Where(
-						delivery.IDIn(tt.params.IDs...),
-						delivery.AttemptAtLTE(time.Now()),
-					).Count(ctx)
-				assert.NoError(t, err)
-				assert.Zero(t, unDelayed)
-				return nil
-			}))
+					a := NewDelayDeliveries(tt.params)
+					tt.assertion(t, a.Execute(ctx, tx))
+					assert.Equal(t, tt.results, a.results)
+					results, ok := a.Results()
+					if tt.results != nil {
+						if assert.True(t, ok) {
+							assert.Equal(t, tt.results.NumDelayed, results.NumDelayed)
+						}
+					} else {
+						assert.False(t, ok)
+					}
+					unDelayed, err := tx.Delivery.Query().
+						Where(
+							delivery.IDIn(tt.params.IDs...),
+							delivery.AttemptAtLTE(time.Now()),
+						).Count(ctx)
+					assert.NoError(t, err)
+					assert.Zero(t, unDelayed)
+					return nil
+				}),
+			)
 		})
 	}
 }

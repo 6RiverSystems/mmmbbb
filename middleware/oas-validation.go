@@ -109,7 +109,8 @@ func WithOASValidation(
 		}
 
 		// write the buffered body now that validation passed
-		if body := bodyCapture.Bytes(); c.Writer.Status() != http.StatusNoContent || len(body) != 0 {
+		if body := bodyCapture.Bytes(); c.Writer.Status() != http.StatusNoContent ||
+			len(body) != 0 {
 			_, err = realWriter.Write(body)
 			if err != nil {
 				panic(err)
@@ -132,7 +133,10 @@ func DefaultOASErrorHandler(c *gin.Context, err error) {
 	case errors.As(err, &routeErr):
 		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": routeErr.Reason})
 	case errors.As(err, &requestErr):
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": requestErr.Reason, "details": requestErr.Err})
+		c.AbortWithStatusJSON(
+			http.StatusBadRequest,
+			gin.H{"error": requestErr.Reason, "details": requestErr.Err},
+		)
 	case errors.As(err, &responseErr):
 		c.AbortWithStatusJSON(
 			http.StatusInternalServerError,

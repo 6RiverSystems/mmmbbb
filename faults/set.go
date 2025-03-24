@@ -218,7 +218,13 @@ func (s *Set) Current() map[string][]Description {
 		ll := make([]Description, 0, len(l))
 		for _, d := range l {
 			// make a copy before we look at it
-			dd := Description{d.Operation, d.Parameters, d.OnFault, atomic.LoadInt64(&d.Count), d.FaultDescription}
+			dd := Description{
+				d.Operation,
+				d.Parameters,
+				d.OnFault,
+				atomic.LoadInt64(&d.Count),
+				d.FaultDescription,
+			}
 			if dd.Count > 0 {
 				ll = append(ll, dd)
 			}

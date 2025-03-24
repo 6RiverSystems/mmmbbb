@@ -95,9 +95,17 @@ func TestNackDeliveries_Execute(t *testing.T) {
 				sub := createSubscription(t, ctx, tx, topic, 0, withDeadLetter(dlTopic, 1))
 				createSubscription(t, ctx, tx, dlTopic, 1)
 				msg := createMessage(t, ctx, tx, topic, 0)
-				delivery := createDelivery(t, ctx, tx, sub, msg, 0, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
-					return dc.SetAttempts(1)
-				})
+				delivery := createDelivery(
+					t,
+					ctx,
+					tx,
+					sub,
+					msg,
+					0,
+					func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
+						return dc.SetAttempts(1)
+					},
+				)
 				tt.params = NackDeliveriesParams{
 					[]uuid.UUID{delivery.ID},
 				}
@@ -120,7 +128,11 @@ func TestNackDeliveries_Execute(t *testing.T) {
 				assert.Equal(t, origDelivery.MessageID, dlDelivery.MessageID)
 				assert.Nil(t, dlDelivery.CompletedAt)
 				if assert.NotNil(t, origDelivery.CompletedAt) {
-					assert.GreaterOrEqual(t, dlDelivery.AttemptAt.UnixNano(), origDelivery.CompletedAt.UnixNano())
+					assert.GreaterOrEqual(
+						t,
+						dlDelivery.AttemptAt.UnixNano(),
+						origDelivery.CompletedAt.UnixNano(),
+					)
 				}
 				assert.LessOrEqual(t, dlDelivery.AttemptAt.UnixNano(), time.Now().UnixNano())
 			},
@@ -130,43 +142,46 @@ func TestNackDeliveries_Execute(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			enttest.ResetTables(t, client)
-			assert.NoError(t, client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
-				if tt.before != nil {
-					tt.before(t, ctx, tx, &tt)
-				}
-				a := NewNackDeliveries(tt.params.IDs...)
-				tt.assertion(t, a.Execute(ctx, tx))
-				assert.Equal(t, tt.results, a.results)
-				results, ok := a.Results()
-				assert.Equal(t, tt.results != nil, ok)
-				if tt.results != nil && a.results != nil {
-					assert.Equal(t, tt.results.NumNacked, results.NumNacked)
-					assert.Equal(t, tt.results.NumDeadLettered, results.NumDeadLettered)
-				}
-				unNacked, err := tx.Delivery.Query().
-					Where(
-						delivery.IDIn(tt.params.IDs...),
-						delivery.AttemptAtLTE(time.Now()),
-						delivery.CompletedAtIsNil(),
-					).Count(ctx)
-				assert.NoError(t, err)
-				assert.Zero(t, unNacked)
-				numDeadLettered, err := tx.Delivery.Query().
-					Where(
-						delivery.IDIn(tt.params.IDs...),
-						delivery.CompletedAtNotNil(),
-					).Count(ctx)
-				assert.NoError(t, err)
-				if tt.results != nil {
-					assert.Equal(t, tt.results.NumDeadLettered, numDeadLettered)
-				} else {
-					assert.Zero(t, numDeadLettered)
-				}
-				if tt.after != nil {
-					tt.after(t, ctx, tx, &tt)
-				}
-				return nil
-			}))
+			assert.NoError(
+				t,
+				client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
+					if tt.before != nil {
+						tt.before(t, ctx, tx, &tt)
+					}
+					a := NewNackDeliveries(tt.params.IDs...)
+					tt.assertion(t, a.Execute(ctx, tx))
+					assert.Equal(t, tt.results, a.results)
+					results, ok := a.Results()
+					assert.Equal(t, tt.results != nil, ok)
+					if tt.results != nil && a.results != nil {
+						assert.Equal(t, tt.results.NumNacked, results.NumNacked)
+						assert.Equal(t, tt.results.NumDeadLettered, results.NumDeadLettered)
+					}
+					unNacked, err := tx.Delivery.Query().
+						Where(
+							delivery.IDIn(tt.params.IDs...),
+							delivery.AttemptAtLTE(time.Now()),
+							delivery.CompletedAtIsNil(),
+						).Count(ctx)
+					assert.NoError(t, err)
+					assert.Zero(t, unNacked)
+					numDeadLettered, err := tx.Delivery.Query().
+						Where(
+							delivery.IDIn(tt.params.IDs...),
+							delivery.CompletedAtNotNil(),
+						).Count(ctx)
+					assert.NoError(t, err)
+					if tt.results != nil {
+						assert.Equal(t, tt.results.NumDeadLettered, numDeadLettered)
+					} else {
+						assert.Zero(t, numDeadLettered)
+					}
+					if tt.after != nil {
+						tt.after(t, ctx, tx, &tt)
+					}
+					return nil
+				}),
+			)
 		})
 	}
 }

@@ -58,7 +58,12 @@ func actionMetricsMulti(
 		counters[i] = promauto.NewCounter(prometheus.CounterOpts{
 			Namespace: version.AppName,
 			Name:      fmt.Sprintf("%s_num_%s", name, sv.verb),
-			Help:      fmt.Sprintf("Number of %s %s in calls to %s", sv.subject, sv.verb, prettyName),
+			Help: fmt.Sprintf(
+				"Number of %s %s in calls to %s",
+				sv.subject,
+				sv.verb,
+				prettyName,
+			),
 		})
 	}
 	histogram := promauto.NewHistogramVec(prometheus.HistogramOpts{

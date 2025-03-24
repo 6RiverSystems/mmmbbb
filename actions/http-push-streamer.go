@@ -115,12 +115,15 @@ func newHttpPushConn(
 		panic("empty endpoint")
 	}
 	return &httpPushStreamConn{
-		logger: logging.GetLoggerWith("actions/http-streamer", func(c zerolog.Context) zerolog.Context {
-			return c.
-				Str("subscriptionName", subscriptionName).
-				Stringer("subscriptionID", subscriptionID).
-				Str("endpoint", endpoint)
-		}),
+		logger: logging.GetLoggerWith(
+			"actions/http-streamer",
+			func(c zerolog.Context) zerolog.Context {
+				return c.
+					Str("subscriptionName", subscriptionName).
+					Stringer("subscriptionID", subscriptionID).
+					Str("endpoint", endpoint)
+			},
+		),
 		subscriptionName: subscriptionName,
 		subscriptionID:   subscriptionID,
 		endpoint:         endpoint,

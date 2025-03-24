@@ -48,7 +48,9 @@ type SeekSubscriptionToTime struct {
 	actionBase[SeekSubscriptionToTimeParams, seekSubscriptionToTimeResults]
 }
 
-var _ Action[SeekSubscriptionToTimeParams, seekSubscriptionToTimeResults] = (*SeekSubscriptionToTime)(nil)
+var _ Action[SeekSubscriptionToTimeParams, seekSubscriptionToTimeResults] = (*SeekSubscriptionToTime)(
+	nil,
+)
 
 func NewSeekSubscriptionToTime(params SeekSubscriptionToTimeParams) *SeekSubscriptionToTime {
 	if params.Name == "" && params.ID == nil {

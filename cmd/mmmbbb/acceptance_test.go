@@ -218,7 +218,10 @@ func TestEndpoints(t *testing.T) {
 				assert.NoError(t, err)
 				assert.Contains(t, bodyObject, "startTime")
 				require.IsType(t, "", bodyObject["startTime"])
-				startTime, err := time.Parse(oastypes.OASRFC3339Millis, bodyObject["startTime"].(string))
+				startTime, err := time.Parse(
+					oastypes.OASRFC3339Millis,
+					bodyObject["startTime"].(string),
+				)
 				assert.NoError(t, err)
 				assert.NotZero(t, startTime)
 			},
@@ -237,7 +240,11 @@ func TestEndpoints(t *testing.T) {
 				assert.NoError(t, err)
 				assert.Contains(t, bodyObject, "name")
 				assert.IsType(t, "", bodyObject["name"])
-				assert.Equal(t, "projects/"+uniqueProject+"/topics/"+uniqueTopic, bodyObject["name"])
+				assert.Equal(
+					t,
+					"projects/"+uniqueProject+"/topics/"+uniqueTopic,
+					bodyObject["name"],
+				)
 				assert.Contains(t, bodyObject, "labels")
 				assert.IsType(t, msi{}, bodyObject["labels"])
 				assert.Empty(t, bodyObject["labels"])
@@ -249,7 +256,11 @@ func TestEndpoints(t *testing.T) {
 			http.MethodPut,
 			func(t *testing.T) json.RawMessage {
 				return mustJSON(t, msi{
-					"topic":                    fmt.Sprintf("projects/%s/topics/%s", uniqueProject, uniqueTopic),
+					"topic": fmt.Sprintf(
+						"projects/%s/topics/%s",
+						uniqueProject,
+						uniqueTopic,
+					),
 					"messageRetentionDuration": "3600s",
 				})
 			},
@@ -261,10 +272,18 @@ func TestEndpoints(t *testing.T) {
 				assert.NoError(t, err)
 				assert.Contains(t, bodyObject, "name")
 				assert.IsType(t, "", bodyObject["name"])
-				assert.Equal(t, bodyObject["name"], "projects/"+uniqueProject+"/subscriptions/"+uniqueSubscription)
+				assert.Equal(
+					t,
+					bodyObject["name"],
+					"projects/"+uniqueProject+"/subscriptions/"+uniqueSubscription,
+				)
 				assert.Contains(t, bodyObject, "topic")
 				assert.IsType(t, "", bodyObject["topic"])
-				assert.Equal(t, bodyObject["topic"], "projects/"+uniqueProject+"/topics/"+uniqueTopic)
+				assert.Equal(
+					t,
+					bodyObject["topic"],
+					"projects/"+uniqueProject+"/topics/"+uniqueTopic,
+				)
 				assert.Contains(t, bodyObject, "labels")
 				assert.IsType(t, msi{}, bodyObject["labels"])
 				assert.Empty(t, bodyObject["labels"])
@@ -272,7 +291,11 @@ func TestEndpoints(t *testing.T) {
 				assert.IsType(t, msi{}, bodyObject["expirationPolicy"])
 				assert.Contains(t, bodyObject["expirationPolicy"], "ttl")
 				assert.IsType(t, "", bodyObject["expirationPolicy"].(msi)["ttl"])
-				assert.Equal(t, fmt.Sprintf("%ds", 60*60*24*30), bodyObject["expirationPolicy"].(msi)["ttl"])
+				assert.Equal(
+					t,
+					fmt.Sprintf("%ds", 60*60*24*30),
+					bodyObject["expirationPolicy"].(msi)["ttl"],
+				)
 			},
 		},
 		{
@@ -291,7 +314,11 @@ func TestEndpoints(t *testing.T) {
 		},
 		{
 			"ack message",
-			fmt.Sprintf("/v1/projects/%s/subscriptions/%s:acknowledge", uniqueProject, uniqueSubscription),
+			fmt.Sprintf(
+				"/v1/projects/%s/subscriptions/%s:acknowledge",
+				uniqueProject,
+				uniqueSubscription,
+			),
 			http.MethodPost,
 			func(*testing.T) json.RawMessage {
 				return mustJSON(t, msi{
@@ -317,7 +344,11 @@ func TestEndpoints(t *testing.T) {
 		},
 		{
 			"re-ack message",
-			fmt.Sprintf("/v1/projects/%s/subscriptions/%s:acknowledge", uniqueProject, uniqueSubscription),
+			fmt.Sprintf(
+				"/v1/projects/%s/subscriptions/%s:acknowledge",
+				uniqueProject,
+				uniqueSubscription,
+			),
 			http.MethodPost,
 			func(*testing.T) json.RawMessage {
 				return mustJSON(t, msi{

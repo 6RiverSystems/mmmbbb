@@ -118,27 +118,30 @@ func TestPrunedCompletedMessages_Execute(t *testing.T) {
 			enttest.ResetTables(t, client)
 			subMod := SubModifiedAwaiter(uuid.UUID{}, t.Name())
 			defer CancelSubModifiedAwaiter(uuid.UUID{}, t.Name(), subMod)
-			assert.NoError(t, client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
-				if tt.before != nil {
-					tt.before(t, ctx, tx, &tt)
-				}
-				a := NewPruneCompletedMessages(tt.params)
-				tt.assertion(t, a.Execute(ctx, tx))
-				assert.Equal(t, tt.expect, a.results)
-				results, ok := a.Results()
-				if tt.expect != nil {
-					if assert.True(t, ok) {
-						assert.Equal(t, tt.expect.NumDeleted, results.NumDeleted)
+			assert.NoError(
+				t,
+				client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
+					if tt.before != nil {
+						tt.before(t, ctx, tx, &tt)
 					}
-				} else {
-					assert.False(t, ok)
-				}
+					a := NewPruneCompletedMessages(tt.params)
+					tt.assertion(t, a.Execute(ctx, tx))
+					assert.Equal(t, tt.expect, a.results)
+					results, ok := a.Results()
+					if tt.expect != nil {
+						if assert.True(t, ok) {
+							assert.Equal(t, tt.expect.NumDeleted, results.NumDeleted)
+						}
+					} else {
+						assert.False(t, ok)
+					}
 
-				numRemaining, err := tx.Message.Query().Count(ctx)
-				assert.NoError(t, err)
-				assert.Equal(t, tt.remainder, numRemaining)
-				return nil
-			}))
+					numRemaining, err := tx.Message.Query().Count(ctx)
+					assert.NoError(t, err)
+					assert.Equal(t, tt.remainder, numRemaining)
+					return nil
+				}),
+			)
 			// pruning already deleted ones should never send a notify
 			assertOpenEmpty(t, subMod)
 		})

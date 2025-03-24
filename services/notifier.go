@@ -206,7 +206,12 @@ func (n *pgNotifier) Start(ctx context.Context, ready chan<- struct{}) error {
 				defer conn.Close()
 				for id := range pn {
 					delete(pn, id)
-					_, err := conn.ExecContext(egCtx, `SELECT pg_notify($1, $2)`, subPublishedChannelName, id.String())
+					_, err := conn.ExecContext(
+						egCtx,
+						`SELECT pg_notify($1, $2)`,
+						subPublishedChannelName,
+						id.String(),
+					)
 					if err != nil {
 						n.logger.Error().Err(err).Msg("Failed to send notify for sub publish")
 					}
@@ -260,7 +265,10 @@ func (n *pgNotifier) runOnce(ctx context.Context, ready *chan<- struct{}) error 
 			defer func() {
 				// if we are exiting due to context cancellation, we don't want this to
 				// be canceled, so we use the background ctx here
-				_, err := pgc.Exec(context.Background(), fmt.Sprintf(`UNLISTEN %s`, postgres.QuoteIdentifier(c)))
+				_, err := pgc.Exec(
+					context.Background(),
+					fmt.Sprintf(`UNLISTEN %s`, postgres.QuoteIdentifier(c)),
+				)
 				if err != nil {
 					n.logger.Error().Err(err).Msg("Unable to UNLISTEN")
 				}
