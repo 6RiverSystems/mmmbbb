@@ -23,14 +23,14 @@ type Filter = Condition
 
 type Condition struct {
 	Term *Term   `parser:"@@"              json:",omitempty"`
-	And  []*Term `parser:"( (\"AND\" @@ )+"  json:",omitempty"`
-	Or   []*Term `parser:"| (\"OR\" @@)+ )?" json:",omitempty"`
+	And  []*Term `parser:"( ("AND" @@ )+"  json:",omitempty"`
+	Or   []*Term `parser:"| ("OR" @@)+ )?" json:",omitempty"`
 }
 
 type Term struct {
-	Not   bool             `parser:"@(\"NOT\"|\"-\")?"`
+	Not   bool             `parser:"@("NOT"|"-")?"`
 	Basic *BasicExpression `parser:"( @@"           json:",omitempty"`
-	Sub   *Condition       `parser:"| \"(\" @@ \")\" )" json:",omitempty"`
+	Sub   *Condition       `parser:"| "(" @@ ")" )" json:",omitempty"`
 }
 
 type BasicExpression struct {
@@ -40,19 +40,19 @@ type BasicExpression struct {
 }
 
 type HasAttribute struct {
-	Name string `parser:"\"attributes\" \":\" @(Ident|String)"`
+	Name string `parser:""attributes" ":" @(Ident|String)"`
 }
 
 type HasAttributeValue struct {
-	Name  string            `parser:"\"attributes\" \".\" @(Ident|String)"`
-	Op    AttributeOperator `parser:"@(\"=\" | \"!\" \"=\")"`
+	Name  string            `parser:""attributes" "." @(Ident|String)"`
+	Op    AttributeOperator `parser:"@("=" | "!" "=")"`
 	Value string            `parser:"@String"`
 }
 
 type HasAttributePredicate struct {
-	Predicate AttributePredicate `parser:"@(\"hasPrefix\")\"(\""`
-	Name      string             `parser:"\"attributes\" \".\" @(Ident|String) \",\""`
-	Value     string             `parser:"@String \")\""`
+	Predicate AttributePredicate `parser:"@("hasPrefix")"(""`
+	Name      string             `parser:""attributes" "." @(Ident|String) ",""`
+	Value     string             `parser:"@String ")""`
 }
 
 type BooleanOperator string

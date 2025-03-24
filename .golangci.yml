@@ -18,6 +18,7 @@ linters:
         - pattern: cobra.CheckErr
       exclude-godoc-examples: true
     lll:
+      # keep settings matching golines formatter
       line-length: 120
       tab-width: 2
     wrapcheck:
@@ -77,6 +78,7 @@ formatters:
   enable:
     - gofumpt
     - goimports
+    - golines
   settings:
     gofumpt:
       extra-rules: true
@@ -85,6 +87,10 @@ formatters:
       local-prefixes:
         - github.com/6RiverSystems
         - go.6river.tech
+    golines:
+      max-len: 120
+      # match editorconfig
+      tab-len: 2
   exclusions:
     generated: lax
     paths:
