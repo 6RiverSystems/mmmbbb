@@ -1,72 +1,93 @@
+version: "2"
 run:
-  go: "1.23"
+  go: "1.24"
+linters:
+  enable:
+    - copyloopvar
+    - forbidigo
+    - intrange
+    - lll
+    - unparam
+    # this is useful, but it is a MONSTROUS yak shave, don't have time for doing
+    # this 100% for now
+    # - wrapcheck
+  settings:
+    forbidigo:
+      forbid:
+        - pattern: os.Exit
+        - pattern: cobra.CheckErr
+      exclude-godoc-examples: true
+    lll:
+      line-length: 120
+      tab-width: 2
+    wrapcheck:
+      ignore-sigs:
+        # need to repeat the defaults
+        - .Errorf(
+        - errors.New(
+        - errors.Unwrap(
+        - .Wrap(
+        - .Wrapf(
+        - .WithMessage(
+        - .WithMessagef(
+        - .WithStack(
+        # failures from this are huge bugs and not expected to happen IRL
+        - net/http.NewRequestWithContext(
+        # these OS errors self annotate the file related to the failure, and so
+        # are thus generally already detailed enough
+        - os.Stat(
+        - os.RemoveAll(
+        - os.MkdirAll(
+        - os.Open(
+        - os.OpenFile(
+        - os.ReadDir(
+        # aggregate collapse
+        - .ErrorOrNil()
+        - multierror.Append(
+        # these just return context.Context.Err()
+        - channels.SendOrErr
+        # self-annotates
+        - config.GetConfig(
+      ignore-package-globs:
+        # context errors are generally just propagated and something else has the
+        # real error
+        - context
+        # errgroup.Wait returns something that should already be wrapped
+        - golang.org/x/sync/errgroup
+      ignore-interface-regexps:
+        # context errors are generally just propagated and something else has the
+        # real error
+        - context.Context
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
   uniq-by-line: false
-linters:
+formatters:
   enable:
-    - forbidigo
     - gofumpt
     - goimports
-    - unparam
-    - lll
-    - copyloopvar
-    - intrange
-
-    # this is useful, but it is a MONSTROUS yak shave, don't have time for doing
-    # this 100% for now
-    # - wrapcheck
-
-linters-settings:
-  forbidigo:
-    exclude-godoc-examples: true
-    forbid:
-      - "os.Exit"
-      - "cobra.CheckErr"
-  gofumpt:
-    extra-rules: true
-  goimports:
-    # keep in sync with magefile
-    local-prefixes: github.com/6RiverSystems,go.6river.tech
-  lll:
-    line-length: 120
-    tab-width: 2
-  wrapcheck:
-    ignorePackageGlobs:
-      # context errors are generally just propagated and something else has the
-      # real error
-      - "context"
-      # errgroup.Wait returns something that should already be wrapped
-      - "golang.org/x/sync/errgroup"
-    ignoreInterfaceRegexps:
-      # context errors are generally just propagated and something else has the
-      # real error
-      - "context.Context"
-    ignoreSigs:
-      # need to repeat the defaults
-      - ".Errorf("
-      - "errors.New("
-      - "errors.Unwrap("
-      - ".Wrap("
-      - ".Wrapf("
-      - ".WithMessage("
-      - ".WithMessagef("
-      - ".WithStack("
-      # failures from this are huge bugs and not expected to happen IRL
-      - "net/http.NewRequestWithContext("
-      # these OS errors self annotate the file related to the failure, and so
-      # are thus generally already detailed enough
-      - "os.Stat("
-      - "os.RemoveAll("
-      - "os.MkdirAll("
-      - "os.Open("
-      - "os.OpenFile("
-      - "os.ReadDir("
-      # aggregate collapse
-      - ".ErrorOrNil()"
-      - "multierror.Append("
-      # these just return context.Context.Err()
-      - "channels.SendOrErr"
-      # self-annotates
-      - "config.GetConfig("
+  settings:
+    gofumpt:
+      extra-rules: true
+    goimports:
+      # keep in sync with magefile
+      local-prefixes:
+        - github.com/6RiverSystems
+        - go.6river.tech
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
