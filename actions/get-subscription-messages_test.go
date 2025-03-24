@@ -621,7 +621,9 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 				assert.NoError(
 					t,
 					client.DoCtxTx(ctx, nil, func(ctx context.Context, tx *ent.Tx) error {
-						if err := tx.Delivery.UpdateOneID(xID(t, &ent.Delivery{}, 0)).SetExpiresAt(time.Now()).Exec(ctx); err != nil {
+						if err := tx.Delivery.UpdateOneID(xID(t, &ent.Delivery{}, 0)).
+							SetExpiresAt(time.Now()).
+							Exec(ctx); err != nil {
 							return err
 						}
 						notifyPublish(tx, xID(t, &ent.Subscription{}, 0))
