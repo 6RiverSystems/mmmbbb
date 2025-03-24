@@ -361,7 +361,7 @@ func (Lint) golangci(_ context.Context, opts gciOpts) error {
 		args = append(args, "-v")
 	}
 	// CI reports being a 48 core machine or such, but we only get a couple cores
-	if os.Getenv("CI") != "" && runtime.NumCPU() > 6 {
+	if !opts.format && os.Getenv("CI") != "" && runtime.NumCPU() > 6 {
 		args = append(args, "--concurrency", "6")
 	}
 
