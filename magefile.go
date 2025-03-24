@@ -370,8 +370,7 @@ func (Lint) golangci(_ context.Context, opts gciOpts) error {
 	if opts.fix && !opts.format {
 		args = append(args, "--fix")
 	}
-	if opts.junit {
-		args = append(args, "--out-format=junit-xml")
+	if opts.junit && !opts.format {
 		resultsDir := os.Getenv("TEST_RESULTS")
 		if resultsDir == "" {
 			return fmt.Errorf("missing TEST_RESULTS env var")
@@ -382,6 +381,7 @@ func (Lint) golangci(_ context.Context, opts gciOpts) error {
 			return err
 		}
 		defer outFile.Close()
+		args = append(args, "--output.junit-xml.path="+outFileName)
 	}
 	if opts.dir != "" || len(opts.dirs) != 0 {
 		if !opts.format {
