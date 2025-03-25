@@ -47,9 +47,9 @@ jobs:
           command: |
             if ! golangci-lint version | fgrep -q 'version 2' ; then
               cd $(mktemp -d)
-              wget https://github.com/golangci/golangci-lint/releases/download/v2.0.1/golangci-lint-2.0.1-linux-amd64.tar.gz
-              tar -axf golangci-lint-2.0.1-linux-amd64.tar.gz
-              sudo install -m 755 golangci-lint-2.0.1-linux-amd64/golangci-lint /usr/local/bin
+              wget https://github.com/golangci/golangci-lint/releases/download/v2.0.2/golangci-lint-2.0.2-linux-amd64.tar.gz
+              tar -axf golangci-lint-2.0.2-linux-amd64.tar.gz
+              sudo install -m 755 golangci-lint-2.0.2-linux-amd64/golangci-lint /usr/local/bin
             fi
       - run: go tool mage -v generate:force
       # make sure committed generated code was up to date
