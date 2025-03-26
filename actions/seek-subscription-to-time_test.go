@@ -76,9 +76,17 @@ func TestSeekSubscriptionToTime_Execute(t *testing.T) {
 				tt.expectPublishNotify = tt.sub.ID
 				for i := range 10 {
 					m := createMessage(t, ctx, tx, tt.topic, i)
-					d := createDelivery(t, ctx, tx, tt.sub, m, i, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
-						return dc.SetCompletedAt(begin)
-					})
+					d := createDelivery(
+						t,
+						ctx,
+						tx,
+						tt.sub,
+						m,
+						i,
+						func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
+							return dc.SetCompletedAt(begin)
+						},
+					)
 					tt.expectNotAcked = append(tt.expectNotAcked, d.ID)
 				}
 				// need to ensure this is strictly before all our deliveries
@@ -99,9 +107,17 @@ func TestSeekSubscriptionToTime_Execute(t *testing.T) {
 				// expect any notifications
 				for i := range 10 {
 					m := createMessage(t, ctx, tx, tt.topic, i)
-					d := createDelivery(t, ctx, tx, tt.sub, m, i, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
-						return dc.SetCompletedAt(time.Now())
-					})
+					d := createDelivery(
+						t,
+						ctx,
+						tx,
+						tt.sub,
+						m,
+						i,
+						func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
+							return dc.SetCompletedAt(time.Now())
+						},
+					)
 					tt.expectAcked = append(tt.expectAcked, d.ID)
 				}
 				// need to refresh this so it's >= our deliveries
@@ -145,30 +161,33 @@ func TestSeekSubscriptionToTime_Execute(t *testing.T) {
 			// have to make this indirect as the expected notify may be generated in
 			// before
 			defer func() { CancelPublishAwaiter(tt.expectPublishNotify, pubNotify) }()
-			assert.NoError(t, client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
-				tt.topic = createTopic(t, ctx, tx, 0)
-				tt.sub = createSubscription(t, ctx, tx, tt.topic, 0)
-				if tt.before != nil {
-					tt.before(t, ctx, tx, &tt)
-				}
-				pubNotify = PublishAwaiter(tt.expectPublishNotify)
-				a := NewSeekSubscriptionToTime(tt.params)
-				tt.assertion(t, a.Execute(ctx, tx))
-				assert.Equal(t, tt.results, a.results)
-				params := a.Parameters()
-				assert.Equal(t, &tt.sub.ID, params.ID)
-				assert.Equal(t, tt.sub.Name, params.Name)
-				assert.Equal(t, tt.params.Time, params.Time)
-				results, ok := a.Results()
-				assert.Equal(t, tt.results != nil, ok)
-				if tt.results != nil && a.results != nil {
-					assert.Equal(t, tt.results.NumAcked, results.NumAcked)
-					assert.Equal(t, tt.results.NumDeAcked, results.NumDeAcked)
-				}
-				expectAckState(t, ctx, tx, tt.expectAcked, true)
-				expectAckState(t, ctx, tx, tt.expectNotAcked, false)
-				return nil
-			}))
+			assert.NoError(
+				t,
+				client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
+					tt.topic = createTopic(t, ctx, tx, 0)
+					tt.sub = createSubscription(t, ctx, tx, tt.topic, 0)
+					if tt.before != nil {
+						tt.before(t, ctx, tx, &tt)
+					}
+					pubNotify = PublishAwaiter(tt.expectPublishNotify)
+					a := NewSeekSubscriptionToTime(tt.params)
+					tt.assertion(t, a.Execute(ctx, tx))
+					assert.Equal(t, tt.results, a.results)
+					params := a.Parameters()
+					assert.Equal(t, &tt.sub.ID, params.ID)
+					assert.Equal(t, tt.sub.Name, params.Name)
+					assert.Equal(t, tt.params.Time, params.Time)
+					results, ok := a.Results()
+					assert.Equal(t, tt.results != nil, ok)
+					if tt.results != nil && a.results != nil {
+						assert.Equal(t, tt.results.NumAcked, results.NumAcked)
+						assert.Equal(t, tt.results.NumDeAcked, results.NumDeAcked)
+					}
+					expectAckState(t, ctx, tx, tt.expectAcked, true)
+					expectAckState(t, ctx, tx, tt.expectNotAcked, false)
+					return nil
+				}),
+			)
 			if tt.expectPublishNotify != (uuid.Nil) {
 				assertClosed(t, pubNotify)
 			} else {
@@ -178,8 +197,15 @@ func TestSeekSubscriptionToTime_Execute(t *testing.T) {
 	}
 }
 
+//
 //nolint:unparam
-func expectAckState(t *testing.T, ctx context.Context, tx *ent.Tx, ids []uuid.UUID, acked bool) bool {
+func expectAckState(
+	t *testing.T,
+	ctx context.Context,
+	tx *ent.Tx,
+	ids []uuid.UUID,
+	acked bool,
+) bool {
 	numAcked, err := tx.Delivery.Query().
 		Where(delivery.IDIn(ids...), delivery.CompletedAtNotNil()).
 		Count(ctx)

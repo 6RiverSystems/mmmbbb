@@ -354,7 +354,7 @@ func CancelPublishAwaiter(subID uuid.UUID, c PublishNotifier) {
 }
 
 // this has to return a two-way channel so that it can be passed to cancelSubModifiedAwaiter
-func SubModifiedAwaiter(subID uuid.UUID, subName string) SubModifiedNotifier { // nolint:deadcode,unused
+func SubModifiedAwaiter(subID uuid.UUID, subName string) SubModifiedNotifier {
 	c := make(chan struct{})
 	mk := modifyKey{subID, subName}
 	nmu.Lock()
@@ -373,7 +373,7 @@ func CancelSubModifiedAwaiter(
 	subID uuid.UUID,
 	subName string,
 	c SubModifiedNotifier,
-) { // nolint:deadcode,unused
+) {
 	if c == nil {
 		return
 	}

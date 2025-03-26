@@ -244,7 +244,11 @@ func (s *topicMirrorOut) startMirrorsOnce(ctx context.Context) error {
 	return nil
 }
 
-func (s *topicMirrorOut) watchSub(ctx context.Context, subName, topicName string, topicID uuid.UUID) error {
+func (s *topicMirrorOut) watchSub(
+	ctx context.Context,
+	subName, topicName string,
+	topicID uuid.UUID,
+) error {
 	psTopicName := s.localToRemoteName(topicName)
 	// assumes monitor loop will have handled topic creation
 	psTopic := s.psClient.Topic(psTopicName)
@@ -392,7 +396,12 @@ func init() {
 		shardFilter := parseShardConfig()
 		projectId := os.Getenv("PUBSUB_GCLOUD_PROJECT_ID")
 		if projectId == "" {
-			panic(fmt.Errorf("cannot use MIRROR_OUT_SITE_NAME=%q without PUBSUB_GCLOUD_PROJECT_ID", site))
+			panic(
+				fmt.Errorf(
+					"cannot use MIRROR_OUT_SITE_NAME=%q without PUBSUB_GCLOUD_PROJECT_ID",
+					site,
+				),
+			)
 		}
 		defaultServices = append(defaultServices, &topicMirrorOut{
 			project: projectId,

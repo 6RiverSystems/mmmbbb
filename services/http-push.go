@@ -62,9 +62,15 @@ func waitPusherMonitors(
 		Dir:  reflect.SelectRecv,
 		Chan: reflect.ValueOf(ctx.Done()),
 	}
-	selects[waitMonitorNotified] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(notifier)}
+	selects[waitMonitorNotified] = reflect.SelectCase{
+		Dir:  reflect.SelectRecv,
+		Chan: reflect.ValueOf(notifier),
+	}
 	for _, mp := range mons {
-		selects = append(selects, reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(mp.Done())})
+		selects = append(
+			selects,
+			reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(mp.Done())},
+		)
 	}
 
 	chosen, _, _ := reflect.Select(selects)

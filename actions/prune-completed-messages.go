@@ -39,7 +39,9 @@ func NewPruneCompletedMessages(params PruneCommonParams) *PruneCompletedMessages
 	}
 }
 
-var pruneCompletedMessagesCounter, pruneCompletedMessagesHistogram = pruneMetrics("completed_messages")
+var pruneCompletedMessagesCounter, pruneCompletedMessagesHistogram = pruneMetrics(
+	"completed_messages",
+)
 
 func (a *PruneCompletedMessages) Execute(ctx context.Context, tx *ent.Tx) error {
 	timer := startActionTimer(pruneCompletedMessagesHistogram, tx)

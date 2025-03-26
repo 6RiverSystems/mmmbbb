@@ -177,6 +177,7 @@ func TestEvaluateComplex(t *testing.T) {
 		{
 			"NOT (a OR b) AND c",
 			"NOT (attributes:a OR attributes:b) AND attributes:c",
+			//nolint:staticcheck // QF1001: keep this logic identical to what's being parsed
 			func(a, b, c bool) bool { return !(a || b) && c },
 		},
 	}

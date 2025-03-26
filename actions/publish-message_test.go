@@ -36,8 +36,14 @@ import (
 	"go.6river.tech/mmmbbb/ent/topic"
 )
 
+//
 //nolint:unparam
-func expectMessages(t *testing.T, ctx context.Context, tx *ent.Tx, topicOffset, num int) []*ent.Message {
+func expectMessages(
+	t *testing.T,
+	ctx context.Context,
+	tx *ent.Tx,
+	topicOffset, num int,
+) []*ent.Message {
 	topicID := xID(t, &ent.Topic{}, topicOffset)
 	messages, err := tx.Message.Query().
 		Where(message.HasTopicWith(topic.ID(topicID))).
@@ -54,7 +60,12 @@ func expectNoDeliveries(t *testing.T, ctx context.Context, tx *ent.Tx) {
 	assert.Zero(t, num)
 }
 
-func expectDeliveries(t *testing.T, ctx context.Context, tx *ent.Tx, subOffset, num int) []*ent.Delivery {
+func expectDeliveries(
+	t *testing.T,
+	ctx context.Context,
+	tx *ent.Tx,
+	subOffset, num int,
+) []*ent.Delivery {
 	subID := xID(t, &ent.Subscription{}, subOffset)
 	deliveries, err := tx.Delivery.Query().
 		Where(delivery.HasSubscriptionWith(subscription.ID(subID))).
@@ -240,9 +251,16 @@ func TestPublishMessage_Execute(t *testing.T) {
 					},
 				)
 				// create an earlier delivery, new message should be "after" it
-				msg := createMessage(t, ctx, tx, topic, 0, func(mc *ent.MessageCreate) *ent.MessageCreate {
-					return mc.SetOrderKey(t.Name())
-				})
+				msg := createMessage(
+					t,
+					ctx,
+					tx,
+					topic,
+					0,
+					func(mc *ent.MessageCreate) *ent.MessageCreate {
+						return mc.SetOrderKey(t.Name())
+					},
+				)
 				createDelivery(t, ctx, tx, sub, msg, 0)
 				tt.params.TopicName = topic.Name
 				tt.params.OrderKey = t.Name()
@@ -295,9 +313,16 @@ func TestPublishMessage_Execute(t *testing.T) {
 					},
 				)
 				// create an earlier delivery, new message should be "after" it
-				msg := createMessage(t, ctx, tx, topic, 0, func(mc *ent.MessageCreate) *ent.MessageCreate {
-					return mc.SetOrderKey(t.Name())
-				})
+				msg := createMessage(
+					t,
+					ctx,
+					tx,
+					topic,
+					0,
+					func(mc *ent.MessageCreate) *ent.MessageCreate {
+						return mc.SetOrderKey(t.Name())
+					},
+				)
 				createDelivery(t, ctx, tx, sub1, msg, 0)
 				createDelivery(t, ctx, tx, sub2, msg, 1)
 				tt.params.TopicName = topic.Name
@@ -320,10 +345,26 @@ func TestPublishMessage_Execute(t *testing.T) {
 				deliveries2 := expectDeliveries(t, ctx, tx, 1, 2)
 				assert.Equal(t, xID(t, &ent.Delivery{}, 0), deliveries1[0].ID)
 				assert.Equal(t, xID(t, &ent.Delivery{}, 1), deliveries2[0].ID)
-				assert.Equal(t, xID(t, &ent.Subscription{}, 0), deliveries1[0].Edges.Subscription.ID)
-				assert.Equal(t, xID(t, &ent.Subscription{}, 1), deliveries2[0].Edges.Subscription.ID)
-				assert.Equal(t, xID(t, &ent.Subscription{}, 0), deliveries1[1].Edges.Subscription.ID)
-				assert.Equal(t, xID(t, &ent.Subscription{}, 1), deliveries2[1].Edges.Subscription.ID)
+				assert.Equal(
+					t,
+					xID(t, &ent.Subscription{}, 0),
+					deliveries1[0].Edges.Subscription.ID,
+				)
+				assert.Equal(
+					t,
+					xID(t, &ent.Subscription{}, 1),
+					deliveries2[0].Edges.Subscription.ID,
+				)
+				assert.Equal(
+					t,
+					xID(t, &ent.Subscription{}, 0),
+					deliveries1[1].Edges.Subscription.ID,
+				)
+				assert.Equal(
+					t,
+					xID(t, &ent.Subscription{}, 1),
+					deliveries2[1].Edges.Subscription.ID,
+				)
 				assert.NotEqual(t, json.RawMessage(`{}`), messages[0].Payload)
 				assert.Equal(t, json.RawMessage(`{}`), messages[1].Payload)
 				assert.Equal(t, messages[0].ID, deliveries1[0].Edges.Message.ID)
@@ -351,9 +392,16 @@ func TestPublishMessage_Execute(t *testing.T) {
 				)
 				sub2 := createSubscription(t, ctx, tx, topic, 1)
 				// create an earlier delivery, new message should be "after" it
-				msg := createMessage(t, ctx, tx, topic, 0, func(mc *ent.MessageCreate) *ent.MessageCreate {
-					return mc.SetOrderKey(t.Name())
-				})
+				msg := createMessage(
+					t,
+					ctx,
+					tx,
+					topic,
+					0,
+					func(mc *ent.MessageCreate) *ent.MessageCreate {
+						return mc.SetOrderKey(t.Name())
+					},
+				)
 				createDelivery(t, ctx, tx, sub1, msg, 0)
 				createDelivery(t, ctx, tx, sub2, msg, 1)
 				tt.params.TopicName = topic.Name
@@ -376,10 +424,26 @@ func TestPublishMessage_Execute(t *testing.T) {
 				deliveries2 := expectDeliveries(t, ctx, tx, 1, 2)
 				assert.Equal(t, xID(t, &ent.Delivery{}, 0), deliveries1[0].ID)
 				assert.Equal(t, xID(t, &ent.Delivery{}, 1), deliveries2[0].ID)
-				assert.Equal(t, xID(t, &ent.Subscription{}, 0), deliveries1[0].Edges.Subscription.ID)
-				assert.Equal(t, xID(t, &ent.Subscription{}, 1), deliveries2[0].Edges.Subscription.ID)
-				assert.Equal(t, xID(t, &ent.Subscription{}, 0), deliveries1[1].Edges.Subscription.ID)
-				assert.Equal(t, xID(t, &ent.Subscription{}, 1), deliveries2[1].Edges.Subscription.ID)
+				assert.Equal(
+					t,
+					xID(t, &ent.Subscription{}, 0),
+					deliveries1[0].Edges.Subscription.ID,
+				)
+				assert.Equal(
+					t,
+					xID(t, &ent.Subscription{}, 1),
+					deliveries2[0].Edges.Subscription.ID,
+				)
+				assert.Equal(
+					t,
+					xID(t, &ent.Subscription{}, 0),
+					deliveries1[1].Edges.Subscription.ID,
+				)
+				assert.Equal(
+					t,
+					xID(t, &ent.Subscription{}, 1),
+					deliveries2[1].Edges.Subscription.ID,
+				)
 				assert.NotEqual(t, json.RawMessage(`{}`), messages[0].Payload)
 				assert.Equal(t, json.RawMessage(`{}`), messages[1].Payload)
 				assert.Equal(t, messages[0].ID, deliveries1[0].Edges.Message.ID)
@@ -428,9 +492,16 @@ func TestPublishMessage_Execute(t *testing.T) {
 			"filtered sub, non-match",
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
 				topic := createTopic(t, ctx, tx, 0)
-				createSubscription(t, ctx, tx, topic, 0, func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
-					return sc.SetMessageFilter("attributes:deliver")
-				})
+				createSubscription(
+					t,
+					ctx,
+					tx,
+					topic,
+					0,
+					func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
+						return sc.SetMessageFilter("attributes:deliver")
+					},
+				)
 				tt.params.TopicName = topic.Name
 				tt.params.OrderKey = t.Name()
 			},
@@ -532,42 +603,45 @@ func TestPublishMessage_Execute(t *testing.T) {
 					CancelPublishAwaiter(id, n)
 				}
 			}()
-			assert.NoError(t, client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
-				if tt.before != nil {
-					tt.before(t, ctx, tx, &tt)
-				}
-				for _, id := range tt.expectPublishNotify {
-					pubNotifies[id] = PublishAwaiter(id)
-				}
-				a := NewPublishMessage(tt.params)
-				tt.assertion(t, a.Execute(ctx, tx))
-				// TODO: if err, verify no message
-				// TODO: if no error, verify message
-				results, ok := a.Results()
-				if tt.results != nil {
-					require.NotNil(t, a.results)
-					assert.True(t, ok)
-					assert.Equal(t, tt.results.NumDeliveries, a.results.NumDeliveries)
-					assert.Equal(t, tt.results.NumDeliveries, results.NumDeliveries)
-					assert.NotZero(t, results.ID)
+			assert.NoError(
+				t,
+				client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
+					if tt.before != nil {
+						tt.before(t, ctx, tx, &tt)
+					}
+					for _, id := range tt.expectPublishNotify {
+						pubNotifies[id] = PublishAwaiter(id)
+					}
+					a := NewPublishMessage(tt.params)
+					tt.assertion(t, a.Execute(ctx, tx))
+					// TODO: if err, verify no message
+					// TODO: if no error, verify message
+					results, ok := a.Results()
+					if tt.results != nil {
+						require.NotNil(t, a.results)
+						assert.True(t, ok)
+						assert.Equal(t, tt.results.NumDeliveries, a.results.NumDeliveries)
+						assert.Equal(t, tt.results.NumDeliveries, results.NumDeliveries)
+						assert.NotZero(t, results.ID)
 
-					m, err := tx.Message.Get(ctx, results.ID)
-					require.NoError(t, err)
-					assert.Equal(t, m.Payload, tt.params.Payload)
-					assert.Equal(t, m.Attributes, tt.params.Attributes)
-					d, err := m.QueryDeliveries().All(ctx)
-					require.NoError(t, err)
-					assert.Len(t, d, results.NumDeliveries)
-				} else {
-					assert.Nil(t, a.results)
-					assert.False(t, ok)
-					// TODO: verify no deliveries created
-				}
-				if tt.after != nil {
-					tt.after(t, ctx, tx, &tt)
-				}
-				return nil
-			}))
+						m, err := tx.Message.Get(ctx, results.ID)
+						require.NoError(t, err)
+						assert.Equal(t, m.Payload, tt.params.Payload)
+						assert.Equal(t, m.Attributes, tt.params.Attributes)
+						d, err := m.QueryDeliveries().All(ctx)
+						require.NoError(t, err)
+						assert.Len(t, d, results.NumDeliveries)
+					} else {
+						assert.Nil(t, a.results)
+						assert.False(t, ok)
+						// TODO: verify no deliveries created
+					}
+					if tt.after != nil {
+						tt.after(t, ctx, tx, &tt)
+					}
+					return nil
+				}),
+			)
 			for id, n := range pubNotifies {
 				// if we get a watch-anything expect, we expect nothing to have happened
 				if id != uuid.Nil {

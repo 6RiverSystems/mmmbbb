@@ -69,7 +69,10 @@ func (a *DelayDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 
 	// workaround for https://github.com/ent/ent/issues/358: avoid deadlocks by
 	// touching deliveries in sorted order by uuid
-	sort.Slice(a.params.IDs, func(i, j int) bool { return parse.UUIDLess(a.params.IDs[i], a.params.IDs[j]) })
+	sort.Slice(
+		a.params.IDs,
+		func(i, j int) bool { return parse.UUIDLess(a.params.IDs[i], a.params.IDs[j]) },
+	)
 
 	predicates := []predicate.Delivery{
 		delivery.IDIn(a.params.IDs...),

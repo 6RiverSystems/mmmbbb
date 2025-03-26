@@ -163,6 +163,9 @@ func formatAttrName(name string) string {
 	isIdent := true
 	for i, ch := range name {
 		// stolen from scanner.Scanner.isIdentRune
+		// (QF1001): applying De Morgan's law here just makes it more confusing, and
+		// diverges from the code whence it is copied
+		//nolint:staticcheck
 		if !(ch == '_' || unicode.IsLetter(ch) || unicode.IsDigit(ch) && i > 0) {
 			isIdent = false
 			break

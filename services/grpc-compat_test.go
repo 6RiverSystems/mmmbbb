@@ -362,7 +362,11 @@ func TestGrpcCompat(t *testing.T) {
 					require.NoError(t, err)
 					require.False(t, exists)
 
-					sub, err := psc.CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{Topic: tt.topics[0]})
+					sub, err := psc.CreateSubscription(
+						ctx,
+						safeName(t),
+						pubsub.SubscriptionConfig{Topic: tt.topics[0]},
+					)
 					require.NoError(t, err)
 
 					cfg, err := sub.Config(ctx)
@@ -467,32 +471,36 @@ func TestGrpcCompat(t *testing.T) {
 				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 					i := int32(0)
 					rCtx, cancel := context.WithCancel(ctx)
-					assert.NoError(t, tt.subs[0].Receive(rCtx, func(ctx context.Context, m *pubsub.Message) {
-						counter := atomic.AddInt32(&i, 1)
-						// t.Logf("received %q as %q at %d", string(m.Data), m.ID, counter)
-						expected := counter
-						if expected > 2 {
-							expected = 2
-						}
-						assert.Equal(t, strconv.Itoa(int(expected)), string(m.Data),
-							"should get expected message (in order)")
-						if counter == 1 {
-							// go fast
-							defer m.Ack()
-						} else if counter == 2 {
-							// delay and nack
-							defer m.Nack()
-							time.Sleep(pullTimeScale)
-						} else if counter == 3 {
-							// delay and ack and done
-							defer m.Ack()
-							time.Sleep(pullTimeScale * 3 / 2)
-							cancel()
-						} else {
-							assert.LessOrEqual(t, expected, int32(3))
-						}
-						// t.Logf("done with %q at %d", m.ID, counter)
-					}))
+					assert.NoError(
+						t,
+						tt.subs[0].Receive(rCtx, func(ctx context.Context, m *pubsub.Message) {
+							counter := atomic.AddInt32(&i, 1)
+							// t.Logf("received %q as %q at %d", string(m.Data), m.ID, counter)
+							expected := counter
+							if expected > 2 {
+								expected = 2
+							}
+							assert.Equal(t, strconv.Itoa(int(expected)), string(m.Data),
+								"should get expected message (in order)")
+							switch counter {
+							case 1:
+								// go fast
+								defer m.Ack()
+							case 2:
+								// delay and nack
+								defer m.Nack()
+								time.Sleep(pullTimeScale)
+							case 3:
+								// delay and ack and done
+								defer m.Ack()
+								time.Sleep(pullTimeScale * 3 / 2)
+								cancel()
+							default:
+								assert.LessOrEqual(t, expected, int32(3))
+							}
+							// t.Logf("done with %q at %d", m.ID, counter)
+						}),
+					)
 				},
 			},
 		},
@@ -544,19 +552,20 @@ func TestGrpcCompat(t *testing.T) {
 							expected = 2
 						}
 						assert.Equal(t, ([]byte)(strconv.Itoa(int(expected))), m.Data)
-						if counter == 1 {
+						switch counter {
+						case 1:
 							// go fast
 							defer m.Ack()
-						} else if counter == 2 {
+						case 2:
 							// delay and nack
 							defer m.Nack()
 							time.Sleep(pullTimeScale)
-						} else if counter == 3 {
+						case 3:
 							// delay and ack and done
 							defer m.Ack()
 							time.Sleep(pullTimeScale * 3 / 2)
 							cancel()
-						} else {
+						default:
 							assert.LessOrEqual(t, expected, int32(3))
 						}
 					})
@@ -569,10 +578,12 @@ func TestGrpcCompat(t *testing.T) {
 		{
 			name: "subscription http push",
 			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
-				srv := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					// test step will replace this with the real listener before starting the server
-					panic("should never be called")
-				}))
+				srv := httptest.NewUnstartedServer(
+					http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+						// test step will replace this with the real listener before starting the server
+						panic("should never be called")
+					}),
+				)
 				// s.URL won't be populated until we start the server, but we can find
 				// it out from the Listener, which is already created
 				serverURL := "http://" + srv.Listener.Addr().String()
@@ -642,37 +653,40 @@ func TestGrpcCompat(t *testing.T) {
 				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 					i := int32(0)
 					rCtx, cancel := context.WithCancel(ctx)
-					tt.servers[0].Config.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-						defer r.Body.Close()
-						counter := atomic.AddInt32(&i, 1)
-						expected := counter
-						if expected > 2 {
-							expected = 2
-						}
-						var m actions.PushRequest
-						dec := json.NewDecoder(r.Body)
-						assert.NoError(t, dec.Decode(&m))
-						decoded, err := base64.StdEncoding.DecodeString(m.Message.Data)
-						assert.NoError(t, err, "message data should be base64 decodable")
-						assert.Equal(t, strconv.Itoa(int(expected)), string(decoded))
-						if counter == 1 {
-							// go fast
-							w.WriteHeader(http.StatusNoContent)
-						} else if counter == 2 {
-							// delay and nack
-							time.Sleep(50 * time.Millisecond)
-							w.WriteHeader(http.StatusInternalServerError)
-						} else if counter == 3 {
-							// delay and ack and done
-							time.Sleep(150 * time.Millisecond)
-							w.WriteHeader(http.StatusNoContent)
-							cancel()
-						} else {
-							assert.LessOrEqual(t, expected, int32(3))
-							// above will always fail
-							w.WriteHeader(http.StatusInternalServerError)
-						}
-					})
+					tt.servers[0].Config.Handler = http.HandlerFunc(
+						func(w http.ResponseWriter, r *http.Request) {
+							defer r.Body.Close()
+							counter := atomic.AddInt32(&i, 1)
+							expected := counter
+							if expected > 2 {
+								expected = 2
+							}
+							var m actions.PushRequest
+							dec := json.NewDecoder(r.Body)
+							assert.NoError(t, dec.Decode(&m))
+							decoded, err := base64.StdEncoding.DecodeString(m.Message.Data)
+							assert.NoError(t, err, "message data should be base64 decodable")
+							assert.Equal(t, strconv.Itoa(int(expected)), string(decoded))
+							switch counter {
+							case 1:
+								// go fast
+								w.WriteHeader(http.StatusNoContent)
+							case 2:
+								// delay and nack
+								time.Sleep(50 * time.Millisecond)
+								w.WriteHeader(http.StatusInternalServerError)
+							case 3:
+								// delay and ack and done
+								time.Sleep(150 * time.Millisecond)
+								w.WriteHeader(http.StatusNoContent)
+								cancel()
+							default:
+								assert.LessOrEqual(t, expected, int32(3))
+								// above will always fail
+								w.WriteHeader(http.StatusInternalServerError)
+							}
+						},
+					)
 					tt.servers[0].Start()
 					<-rCtx.Done()
 				},
@@ -744,7 +758,11 @@ func TestGrpcCompat(t *testing.T) {
 			before: func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 				topic, err := psc.CreateTopic(ctx, safeName(t))
 				require.NoError(t, err)
-				sub, err := psc.CreateSubscription(ctx, safeName(t), pubsub.SubscriptionConfig{Topic: topic})
+				sub, err := psc.CreateSubscription(
+					ctx,
+					safeName(t),
+					pubsub.SubscriptionConfig{Topic: topic},
+				)
 				require.NoError(t, err)
 				// this should make it use the non-streaming pull endpoint
 				sub.ReceiveSettings.Synchronous = true
@@ -770,11 +788,14 @@ func TestGrpcCompat(t *testing.T) {
 					// do a synchronous pull and verify there are no messages
 					timeoutCtx, cancel := context.WithTimeout(ctx, time.Second)
 					defer cancel()
-					err = tt.subs[0].Receive(timeoutCtx, func(ctx context.Context, m *pubsub.Message) {
-						assert.Fail(t, "should not have received a message")
-						m.Ack()
-						cancel()
-					})
+					err = tt.subs[0].Receive(
+						timeoutCtx,
+						func(ctx context.Context, m *pubsub.Message) {
+							assert.Fail(t, "should not have received a message")
+							m.Ack()
+							cancel()
+						},
+					)
 					assert.NoError(t, err)
 				},
 			},
@@ -838,7 +859,11 @@ func benchUsePg(b *testing.B) {
 	b.Setenv("NODE_ENV", "acceptance")
 }
 
-func benchThroughput(b *testing.B, numTopics, subsPerTopic, maxMessages int, payload json.RawMessage) {
+func benchThroughput(
+	b *testing.B,
+	numTopics, subsPerTopic, maxMessages int,
+	payload json.RawMessage,
+) {
 	_, psClient := initGrpcTest(b)
 	ctx := b.Context()
 

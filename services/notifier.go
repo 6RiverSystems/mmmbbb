@@ -206,7 +206,12 @@ func (n *pgNotifier) Start(ctx context.Context, ready chan<- struct{}) error {
 				defer conn.Close()
 				for id := range pn {
 					delete(pn, id)
-					_, err := conn.ExecContext(egCtx, `SELECT pg_notify($1, $2)`, subPublishedChannelName, id.String())
+					_, err := conn.ExecContext(
+						egCtx,
+						`SELECT pg_notify($1, $2)`,
+						subPublishedChannelName,
+						id.String(),
+					)
 					if err != nil {
 						n.logger.Error().Err(err).Msg("Failed to send notify for sub publish")
 					}
@@ -260,7 +265,10 @@ func (n *pgNotifier) runOnce(ctx context.Context, ready *chan<- struct{}) error 
 			defer func() {
 				// if we are exiting due to context cancellation, we don't want this to
 				// be canceled, so we use the background ctx here
-				_, err := pgc.Exec(context.Background(), fmt.Sprintf(`UNLISTEN %s`, postgres.QuoteIdentifier(c)))
+				_, err := pgc.Exec(
+					context.Background(),
+					fmt.Sprintf(`UNLISTEN %s`, postgres.QuoteIdentifier(c)),
+				)
 				if err != nil {
 					n.logger.Error().Err(err).Msg("Unable to UNLISTEN")
 				}
@@ -346,7 +354,7 @@ func parseUUIDName(s string) (uuid.UUID, string, error) {
 	// that is the uuid and everything after is the name
 	space := strings.IndexRune(s, ' ')
 	if space < 0 {
-		return uuid.UUID{}, "", errors.New("No space found")
+		return uuid.UUID{}, "", errors.New("no space found")
 	}
 	name := s[space+1:]
 	id, err := uuid.Parse(s[:space])

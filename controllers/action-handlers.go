@@ -30,7 +30,7 @@ import (
 	"go.6river.tech/mmmbbb/ent"
 )
 
-// nolint:unused,deadcode // want to save this for future work
+// nolint:unused // want to save this for future work
 func handleActionError(c *gin.Context, err error) bool {
 	switch {
 	case errors.Is(err, actions.ErrNotFound):

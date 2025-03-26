@@ -133,19 +133,19 @@ func (m *Migrator) run(
 	}
 
 	if err := m.dialect.EnsureMigrationsTable(ctx, db, m.config); err != nil {
-		return fmt.Errorf("Failed ensuring migrations state table exists: %w", err)
+		return fmt.Errorf("failed ensuring migrations state table exists: %w", err)
 	}
 
 	states, err := m.loadStates(ctx, db)
 	if err != nil {
-		return fmt.Errorf("Failed to load migration states: %w", err)
+		return fmt.Errorf("failed to load migration states: %w", err)
 	}
 
 	todo := m.toRun(direction, states)
 
 	for _, mm := range todo {
 		if err = m.runOne(ctx, db, mm, direction); err != nil {
-			return fmt.Errorf("Failed to run migration %s: %w", mm.Name(), err)
+			return fmt.Errorf("failed to run migration %s: %w", mm.Name(), err)
 		}
 	}
 

@@ -57,9 +57,18 @@ func TestSeekSubscriptionToSnapshot_Execute(t *testing.T) {
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
 				// create a bunch of messages all before the snapshot time, already acked
 				for offset := -10; offset < 0; offset++ {
-					m := createMessage(t, ctx, tx, tt.topic, offset, func(m *ent.MessageCreate) *ent.MessageCreate {
-						return m.SetPublishedAt(refTime.Add(time.Duration(offset) * time.Second))
-					})
+					m := createMessage(
+						t,
+						ctx,
+						tx,
+						tt.topic,
+						offset,
+						func(m *ent.MessageCreate) *ent.MessageCreate {
+							return m.SetPublishedAt(
+								refTime.Add(time.Duration(offset) * time.Second),
+							)
+						},
+					)
 					d := createDelivery(
 						t,
 						ctx,
@@ -80,9 +89,18 @@ func TestSeekSubscriptionToSnapshot_Execute(t *testing.T) {
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
 				// create some more messages
 				for offset := 1; offset <= 10; offset++ {
-					m := createMessage(t, ctx, tx, tt.topic, offset, func(m *ent.MessageCreate) *ent.MessageCreate {
-						return m.SetPublishedAt(refTime.Add(time.Duration(offset) * time.Second))
-					})
+					m := createMessage(
+						t,
+						ctx,
+						tx,
+						tt.topic,
+						offset,
+						func(m *ent.MessageCreate) *ent.MessageCreate {
+							return m.SetPublishedAt(
+								refTime.Add(time.Duration(offset) * time.Second),
+							)
+						},
+					)
 					d := createDelivery(t, ctx, tx, tt.sub, m, offset)
 					tt.expectNotAcked = append(tt.expectNotAcked, d.ID)
 				}
@@ -105,9 +123,18 @@ func TestSeekSubscriptionToSnapshot_Execute(t *testing.T) {
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
 				// create a bunch of messages all after the snapshot time, already acked
 				for offset := 1; offset <= 10; offset++ {
-					m := createMessage(t, ctx, tx, tt.topic, offset, func(m *ent.MessageCreate) *ent.MessageCreate {
-						return m.SetPublishedAt(refTime.Add(time.Duration(offset) * time.Second))
-					})
+					m := createMessage(
+						t,
+						ctx,
+						tx,
+						tt.topic,
+						offset,
+						func(m *ent.MessageCreate) *ent.MessageCreate {
+							return m.SetPublishedAt(
+								refTime.Add(time.Duration(offset) * time.Second),
+							)
+						},
+					)
 					d := createDelivery(
 						t,
 						ctx,
@@ -153,9 +180,18 @@ func TestSeekSubscriptionToSnapshot_Execute(t *testing.T) {
 						// defined by the spec and is uninteresting in practice
 						continue
 					}
-					m := createMessage(t, ctx, tx, tt.topic, offset, func(m *ent.MessageCreate) *ent.MessageCreate {
-						return m.SetPublishedAt(refTime.Add(time.Duration(offset) * time.Second))
-					})
+					m := createMessage(
+						t,
+						ctx,
+						tx,
+						tt.topic,
+						offset,
+						func(m *ent.MessageCreate) *ent.MessageCreate {
+							return m.SetPublishedAt(
+								refTime.Add(time.Duration(offset) * time.Second),
+							)
+						},
+					)
 					d := createDelivery(
 						t,
 						ctx,
@@ -216,37 +252,47 @@ func TestSeekSubscriptionToSnapshot_Execute(t *testing.T) {
 			// have to make this indirect as the expected notify may be generated in
 			// before
 			defer func() { CancelPublishAwaiter(tt.expectPublishNotify, pubNotify) }()
-			assert.NoError(t, client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
-				tt.topic = createTopic(t, ctx, tx, 0)
-				tt.sub = createSubscription(t, ctx, tx, tt.topic, 0)
-				if tt.beforeSnap != nil {
-					tt.beforeSnap(t, ctx, tx, &tt)
-				}
-				tt.snap = createSnapshot(t, ctx, tx, tt.topic, 0, func(sc *ent.SnapshotCreate) *ent.SnapshotCreate {
-					return tt.setupSnap(t, sc)
-				})
-				if tt.afterSnap != nil {
-					tt.afterSnap(t, ctx, tx, &tt)
-				}
-				pubNotify = PublishAwaiter(tt.expectPublishNotify)
-				a := NewSeekSubscriptionToSnapshot(tt.params)
-				tt.assertion(t, a.Execute(ctx, tx))
-				assert.Equal(t, tt.results, a.results)
-				params := a.Parameters()
-				assert.Equal(t, &tt.sub.ID, params.SubscriptionID)
-				assert.Equal(t, tt.sub.Name, params.SubscriptionName)
-				assert.Equal(t, &tt.snap.ID, params.SnapshotID)
-				assert.Equal(t, tt.snap.Name, params.SnapshotName)
-				results, ok := a.Results()
-				assert.Equal(t, tt.results != nil, ok)
-				if tt.results != nil && a.results != nil {
-					assert.Equal(t, tt.results.NumAcked, results.NumAcked)
-					assert.Equal(t, tt.results.NumDeAcked, results.NumDeAcked)
-				}
-				expectAckState(t, ctx, tx, tt.expectAcked, true)
-				expectAckState(t, ctx, tx, tt.expectNotAcked, false)
-				return nil
-			}))
+			assert.NoError(
+				t,
+				client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
+					tt.topic = createTopic(t, ctx, tx, 0)
+					tt.sub = createSubscription(t, ctx, tx, tt.topic, 0)
+					if tt.beforeSnap != nil {
+						tt.beforeSnap(t, ctx, tx, &tt)
+					}
+					tt.snap = createSnapshot(
+						t,
+						ctx,
+						tx,
+						tt.topic,
+						0,
+						func(sc *ent.SnapshotCreate) *ent.SnapshotCreate {
+							return tt.setupSnap(t, sc)
+						},
+					)
+					if tt.afterSnap != nil {
+						tt.afterSnap(t, ctx, tx, &tt)
+					}
+					pubNotify = PublishAwaiter(tt.expectPublishNotify)
+					a := NewSeekSubscriptionToSnapshot(tt.params)
+					tt.assertion(t, a.Execute(ctx, tx))
+					assert.Equal(t, tt.results, a.results)
+					params := a.Parameters()
+					assert.Equal(t, &tt.sub.ID, params.SubscriptionID)
+					assert.Equal(t, tt.sub.Name, params.SubscriptionName)
+					assert.Equal(t, &tt.snap.ID, params.SnapshotID)
+					assert.Equal(t, tt.snap.Name, params.SnapshotName)
+					results, ok := a.Results()
+					assert.Equal(t, tt.results != nil, ok)
+					if tt.results != nil && a.results != nil {
+						assert.Equal(t, tt.results.NumAcked, results.NumAcked)
+						assert.Equal(t, tt.results.NumDeAcked, results.NumDeAcked)
+					}
+					expectAckState(t, ctx, tx, tt.expectAcked, true)
+					expectAckState(t, ctx, tx, tt.expectNotAcked, false)
+					return nil
+				}),
+			)
 			if tt.expectPublishNotify != uuid.Nil {
 				assertClosed(t, pubNotify)
 			} else {

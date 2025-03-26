@@ -57,9 +57,16 @@ func TestDeleteExpiredSubscriptions_Execute(t *testing.T) {
 			"simple",
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
 				topic := createTopic(t, ctx, tx, 0)
-				createSubscription(t, ctx, tx, topic, 0, func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
-					return sc.SetExpiresAt(time.Now().Add(-time.Hour))
-				})
+				createSubscription(
+					t,
+					ctx,
+					tx,
+					topic,
+					0,
+					func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
+						return sc.SetExpiresAt(time.Now().Add(-time.Hour))
+					},
+				)
 			},
 			PruneCommonParams{
 				MinAge:    time.Minute,
@@ -75,9 +82,16 @@ func TestDeleteExpiredSubscriptions_Execute(t *testing.T) {
 			"ignores age limit",
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
 				topic := createTopic(t, ctx, tx, 0)
-				createSubscription(t, ctx, tx, topic, 0, func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
-					return sc.SetExpiresAt(time.Now().Add(-time.Minute))
-				})
+				createSubscription(
+					t,
+					ctx,
+					tx,
+					topic,
+					0,
+					func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
+						return sc.SetExpiresAt(time.Now().Add(-time.Minute))
+					},
+				)
 			},
 			PruneCommonParams{
 				MinAge:    time.Hour,
@@ -92,12 +106,26 @@ func TestDeleteExpiredSubscriptions_Execute(t *testing.T) {
 			"count limit",
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test) {
 				topic := createTopic(t, ctx, tx, 0)
-				createSubscription(t, ctx, tx, topic, 0, func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
-					return sc.SetExpiresAt(time.Now().Add(-time.Hour))
-				})
-				createSubscription(t, ctx, tx, topic, 1, func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
-					return sc.SetExpiresAt(time.Now().Add(-time.Hour))
-				})
+				createSubscription(
+					t,
+					ctx,
+					tx,
+					topic,
+					0,
+					func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
+						return sc.SetExpiresAt(time.Now().Add(-time.Hour))
+					},
+				)
+				createSubscription(
+					t,
+					ctx,
+					tx,
+					topic,
+					1,
+					func(sc *ent.SubscriptionCreate) *ent.SubscriptionCreate {
+						return sc.SetExpiresAt(time.Now().Add(-time.Hour))
+					},
+				)
 			},
 			PruneCommonParams{
 				MinAge:    time.Minute,
@@ -115,33 +143,38 @@ func TestDeleteExpiredSubscriptions_Execute(t *testing.T) {
 			enttest.ResetTables(t, client)
 			subMod := SubModifiedAwaiter(uuid.UUID{}, nameFor(t, 0))
 			defer CancelSubModifiedAwaiter(uuid.UUID{}, nameFor(t, 0), subMod)
-			assert.NoError(t, client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
-				if tt.before != nil {
-					tt.before(t, ctx, tx, &tt)
-				}
-				a := NewDeleteExpiredSubscriptions(tt.params)
-				tt.assertion(t, a.Execute(ctx, tx))
-				assert.Equal(t, tt.expect, a.results)
-				results, ok := a.Results()
-				if tt.expect != nil {
-					if assert.True(t, ok) {
-						assert.Equal(t, tt.expect.NumDeleted, results.NumDeleted)
+			assert.NoError(
+				t,
+				client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
+					if tt.before != nil {
+						tt.before(t, ctx, tx, &tt)
 					}
+					a := NewDeleteExpiredSubscriptions(tt.params)
+					tt.assertion(t, a.Execute(ctx, tx))
+					assert.Equal(t, tt.expect, a.results)
+					results, ok := a.Results()
+					if tt.expect != nil {
+						if assert.True(t, ok) {
+							assert.Equal(t, tt.expect.NumDeleted, results.NumDeleted)
+						}
 
-					// deleted subs should match the result expectation
-					deleted, err := tx.Subscription.Query().Where(subscription.DeletedAtNotNil()).All(ctx)
-					assert.NoError(t, err)
-					assert.Len(t, deleted, tt.expect.NumDeleted)
-					// make sure they were proper to be deleted
-					for _, d := range deleted {
-						assert.NotZero(t, d.ExpiresAt)
-						assert.Less(t, d.ExpiresAt.UnixNano(), time.Now().UnixNano())
+						// deleted subs should match the result expectation
+						deleted, err := tx.Subscription.Query().
+							Where(subscription.DeletedAtNotNil()).
+							All(ctx)
+						assert.NoError(t, err)
+						assert.Len(t, deleted, tt.expect.NumDeleted)
+						// make sure they were proper to be deleted
+						for _, d := range deleted {
+							assert.NotZero(t, d.ExpiresAt)
+							assert.Less(t, d.ExpiresAt.UnixNano(), time.Now().UnixNano())
+						}
+					} else {
+						assert.False(t, ok)
 					}
-				} else {
-					assert.False(t, ok)
-				}
-				return nil
-			}))
+					return nil
+				}),
+			)
 			if tt.expect != nil && tt.expect.NumDeleted > 0 {
 				assertClosed(t, subMod)
 			} else {

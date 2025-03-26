@@ -76,7 +76,11 @@ func DefaultDbUrl() string {
 }
 
 func PostgreSQLDSN(suffix string) string {
-	return fmt.Sprintf("postgres://6river:6river@localhost/%s_%s?sslmode=disable", defaultDbName, suffix)
+	return fmt.Sprintf(
+		"postgres://6river:6river@localhost/%s_%s?sslmode=disable",
+		defaultDbName,
+		suffix,
+	)
 }
 
 func ApplyPgAppName(dbUrl string) string {
@@ -140,7 +144,7 @@ func ParseDefault() (driverName, dialectName, dsn string, err error) {
 		driverName = "pgx"
 		dialectName = PostgresDialect
 	} else {
-		return "", "", dsn, fmt.Errorf("Unrecognized db url '%s'", dsn)
+		return "", "", dsn, fmt.Errorf("unrecognized db url '%s'", dsn)
 	}
 	return
 }
@@ -171,7 +175,7 @@ func Open(driverName, dialectName, dsn string) (db *sql.DB, err error) {
 	} else {
 		db, err = sql.Open(driverName, dsn)
 		if err != nil {
-			err = fmt.Errorf("Failed to open default DB connection: %w", err)
+			err = fmt.Errorf("failed to open default DB connection: %w", err)
 		}
 	}
 
@@ -268,10 +272,13 @@ func TryCreateDB(ctx context.Context, driverName, dialect, dsn, createVia string
 		db := stdlib.OpenDB(*cfg)
 		defer db.Close()
 		// can't use placeholders for CREATE DATABASE, have to escape (quote) things instead
-		_, err = db.ExecContext(ctx, fmt.Sprintf("CREATE DATABASE %s", postgres.QuoteIdentifier(origDB)))
+		_, err = db.ExecContext(
+			ctx,
+			fmt.Sprintf("CREATE DATABASE %s", postgres.QuoteIdentifier(origDB)),
+		)
 		// TODO: detect "already exists" and report that as success (e.g. multiple instances racing to create)
 		return err
 	} else {
-		return errors.New("Don't know how to create this kind of db")
+		return errors.New("don't know how to create this kind of db")
 	}
 }

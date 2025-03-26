@@ -57,7 +57,11 @@ func NewAckDeliveries(
 	}
 }
 
-var ackDeliveriesCounter, ackDeliveriesHistogram = actionMetrics("ack_deliveries", "deliveries", "acked")
+var ackDeliveriesCounter, ackDeliveriesHistogram = actionMetrics(
+	"ack_deliveries",
+	"deliveries",
+	"acked",
+)
 
 func (a *AckDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 	timer := startActionTimer(ackDeliveriesHistogram, tx)
@@ -65,7 +69,10 @@ func (a *AckDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 
 	// workaround for https://github.com/ent/ent/issues/358: avoid deadlocks by
 	// touching deliveries in sorted order by uuid
-	sort.Slice(a.params.ids, func(i, j int) bool { return parse.UUIDLess(a.params.ids[i], a.params.ids[j]) })
+	sort.Slice(
+		a.params.ids,
+		func(i, j int) bool { return parse.UUIDLess(a.params.ids[i], a.params.ids[j]) },
+	)
 
 	predicates := []predicate.Delivery{
 		delivery.IDIn(a.params.ids...),

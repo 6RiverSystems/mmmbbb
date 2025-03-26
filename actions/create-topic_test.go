@@ -79,7 +79,12 @@ func TestCreateTopic(t *testing.T) {
 			func(t *testing.T, err error, a *CreateTopic) {
 				assert.Nil(t, a)
 				require.Error(t, err)
-				assert.Contains(t, err.Error(), "name", "error message should mention that name is required")
+				assert.Contains(
+					t,
+					err.Error(),
+					"name",
+					"error message should mention that name is required",
+				)
 			},
 		},
 		{

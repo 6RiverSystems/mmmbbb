@@ -228,7 +228,12 @@ func TestHttpPush(t *testing.T) {
 				assert.Len(t, s.pushers, 1)
 				for _, p := range s.pushers {
 					fc := p.CurrentFlowControl()
-					assert.Equal(t, 101, fc.MaxMessages, "flow control should have incremented one for every message")
+					assert.Equal(
+						t,
+						101,
+						fc.MaxMessages,
+						"flow control should have incremented one for every message",
+					)
 				}
 				if incomplete, err := s.client.Delivery.Query().
 					Where(
@@ -294,7 +299,12 @@ func TestHttpPush(t *testing.T) {
 				assert.Len(t, s.pushers, 1)
 				for _, p := range s.pushers {
 					fc := p.CurrentFlowControl()
-					assert.Equal(t, 1, fc.MaxMessages, "FlowControl should decelerate to 1 message at a time on NACKs")
+					assert.Equal(
+						t,
+						1,
+						fc.MaxMessages,
+						"FlowControl should decelerate to 1 message at a time on NACKs",
+					)
 				}
 			},
 		},
@@ -355,7 +365,12 @@ func TestHttpPush(t *testing.T) {
 				assert.Len(t, s.pushers, 1)
 				for _, p := range s.pushers {
 					fc := p.CurrentFlowControl()
-					assert.Equal(t, 1, fc.MaxMessages, "flow control should be at minimum after nacks")
+					assert.Equal(
+						t,
+						1,
+						fc.MaxMessages,
+						"flow control should be at minimum after nacks",
+					)
 				}
 				// there should be one incomplete delivery on the sub, with attempts=1
 				if del, err := s.client.Delivery.Query().
@@ -417,7 +432,12 @@ func TestHttpPush(t *testing.T) {
 				assert.Len(t, s.pushers, 1)
 				for _, p := range s.pushers {
 					fc := p.CurrentFlowControl()
-					assert.Equal(t, 1, fc.MaxMessages, "flow control should be at minimum after nacks")
+					assert.Equal(
+						t,
+						1,
+						fc.MaxMessages,
+						"flow control should be at minimum after nacks",
+					)
 				}
 				// there should be one incomplete delivery on the sub, with attempts=1
 				if del, err := s.client.Delivery.Query().
@@ -451,9 +471,12 @@ func TestHttpPush(t *testing.T) {
 				serverWG.Wait()
 			})
 
-			require.NoError(t, client.DoCtxTx(ctx, nil, actions.NewCreateTopic(actions.CreateTopicParams{
-				Name: safeName(t),
-			}).Execute))
+			require.NoError(
+				t,
+				client.DoCtxTx(ctx, nil, actions.NewCreateTopic(actions.CreateTopicParams{
+					Name: safeName(t),
+				}).Execute),
+			)
 			initialEndpoint := ""
 			pushEndpoint := fmt.Sprintf("http://%s/", addr.String())
 			if tt.initialEnable {
@@ -461,15 +484,19 @@ func TestHttpPush(t *testing.T) {
 			}
 			require.NoError(
 				t,
-				client.DoCtxTx(ctx, nil, actions.NewCreateSubscription(actions.CreateSubscriptionParams{
-					TopicName:    safeName(t),
-					Name:         safeName(t),
-					PushEndpoint: initialEndpoint,
-					TTL:          time.Minute,
-					MessageTTL:   time.Minute,
-					MinBackoff:   200 * time.Millisecond,
-					MaxBackoff:   2000 * time.Millisecond,
-				}).Execute),
+				client.DoCtxTx(
+					ctx,
+					nil,
+					actions.NewCreateSubscription(actions.CreateSubscriptionParams{
+						TopicName:    safeName(t),
+						Name:         safeName(t),
+						PushEndpoint: initialEndpoint,
+						TTL:          time.Minute,
+						MessageTTL:   time.Minute,
+						MinBackoff:   200 * time.Millisecond,
+						MaxBackoff:   2000 * time.Millisecond,
+					}).Execute,
+				),
 			)
 
 			s := &httpPusher{}

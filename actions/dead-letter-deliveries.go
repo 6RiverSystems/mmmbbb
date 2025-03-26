@@ -45,7 +45,7 @@ type DeadLetterDeliveries struct {
 
 func NewDeadLetterDeliveries(params DeadLetterDeliveriesParams) *DeadLetterDeliveries {
 	if params.MaxDeliveries < 1 {
-		panic(errors.New("MaxDeliveries must be > 0"))
+		panic(errors.New("maxDeliveries must be > 0"))
 	}
 	return &DeadLetterDeliveries{
 		actionBase[DeadLetterDeliveriesParams, DeadLetterDeliveriesResults]{
@@ -90,10 +90,15 @@ func (a *DeadLetterDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 					sql.IsNull(t.C(subscription.FieldDeletedAt)),
 					sql.GT(t.C(subscription.FieldMaxDeliveryAttempts), 0),
 					sql.NotNull(t.C(subscription.FieldDeadLetterTopicID)),
-					sql.ColumnsGTE(s.C(delivery.FieldAttempts), t.C(subscription.FieldMaxDeliveryAttempts)),
+					sql.ColumnsGTE(
+						s.C(delivery.FieldAttempts),
+						t.C(subscription.FieldMaxDeliveryAttempts),
+					),
 				))
 				// this column alias needs to match the `sql` tag on `deadLetterData`
-				s.AppendSelect(sql.As(t.C(subscription.FieldDeadLetterTopicID), "dead_letter_topic_id"))
+				s.AppendSelect(
+					sql.As(t.C(subscription.FieldDeadLetterTopicID), "dead_letter_topic_id"),
+				)
 			},
 			// ignore completed deliveries, of course
 			delivery.CompletedAtIsNil(),

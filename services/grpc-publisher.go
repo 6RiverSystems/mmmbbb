@@ -94,9 +94,16 @@ func (s *publisherServer) ListTopics(
 	return resp, nil
 }
 
-func (s *publisherServer) CreateTopic(ctx context.Context, req *pubsubpb.Topic) (*pubsubpb.Topic, error) {
+func (s *publisherServer) CreateTopic(
+	ctx context.Context,
+	req *pubsubpb.Topic,
+) (*pubsubpb.Topic, error) {
 	if !isValidTopicName(req.Name) {
-		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / topic path %s", req.Name)
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"Unsupported project / topic path %s",
+			req.Name,
+		)
 	}
 
 	if req.MessageStoragePolicy != nil || req.KmsKeyName != "" || req.SchemaSettings != nil {
@@ -130,7 +137,11 @@ func (s *publisherServer) GetTopic(
 	req *pubsubpb.GetTopicRequest,
 ) (*pubsubpb.Topic, error) {
 	if !isValidTopicName(req.Topic) {
-		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / topic path %s", req.Topic)
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"Unsupported project / topic path %s",
+			req.Topic,
+		)
 	}
 
 	var resp *pubsubpb.Topic
@@ -161,7 +172,11 @@ func (s *publisherServer) UpdateTopic(
 	req *pubsubpb.UpdateTopicRequest,
 ) (*pubsubpb.Topic, error) {
 	if !isValidTopicName(req.Topic.Name) {
-		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / topic path %s", req.Topic.Name)
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"Unsupported project / topic path %s",
+			req.Topic.Name,
+		)
 	}
 
 	var resp *pubsubpb.Topic
@@ -229,7 +244,11 @@ func (s *publisherServer) DeleteTopic(
 	req *pubsubpb.DeleteTopicRequest,
 ) (*emptypb.Empty, error) {
 	if !isValidTopicName(req.Topic) {
-		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / topic path %s", req.Topic)
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"Unsupported project / topic path %s",
+			req.Topic,
+		)
 	}
 
 	action := actions.NewDeleteTopic(req.Topic)
@@ -248,7 +267,11 @@ func (s *publisherServer) ListTopicSubscriptions(
 	req *pubsubpb.ListTopicSubscriptionsRequest,
 ) (*pubsubpb.ListTopicSubscriptionsResponse, error) {
 	if !isValidTopicName(req.Topic) {
-		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / topic path %s", req.Topic)
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"Unsupported project / topic path %s",
+			req.Topic,
+		)
 	}
 
 	var pageSize int32 = 100
@@ -298,7 +321,10 @@ func (s *publisherServer) ListTopicSubscriptions(
 		if len(subs) >= int(pageSize) {
 			nextPageToken = subs[len(subs)-1].ID.String()
 		}
-		resp = &pubsubpb.ListTopicSubscriptionsResponse{Subscriptions: subNames, NextPageToken: nextPageToken}
+		resp = &pubsubpb.ListTopicSubscriptionsResponse{
+			Subscriptions: subNames,
+			NextPageToken: nextPageToken,
+		}
 		return nil
 	})
 	if err != nil {
@@ -312,7 +338,11 @@ func (s *publisherServer) Publish(
 	req *pubsubpb.PublishRequest,
 ) (*pubsubpb.PublishResponse, error) {
 	if !isValidTopicName(req.Topic) {
-		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / topic path %s", req.Topic)
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"Unsupported project / topic path %s",
+			req.Topic,
+		)
 	}
 
 	var resp *pubsubpb.PublishResponse

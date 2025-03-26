@@ -164,7 +164,11 @@ func TestCreateSubscription_Execute(t *testing.T) {
 				if !assert.Error(t, err, i...) {
 					return false
 				}
-				return assert.Regexp(t, `invalid.*filter.*unexpected token.*attribute`, err.Error(), i...)
+				return assert.Regexp(
+					t,
+					`invalid.*filter.*unexpected token.*attribute`,
+					err.Error(),
+					i...)
 			},
 			nil,
 		},
@@ -175,34 +179,37 @@ func TestCreateSubscription_Execute(t *testing.T) {
 			enttest.ResetTables(t, client)
 			subMod := SubModifiedAwaiter(uuid.Nil, t.Name())
 			defer CancelSubModifiedAwaiter(uuid.Nil, t.Name(), subMod)
-			assert.NoError(t, client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
-				if tt.before != nil {
-					tt.before(t, ctx, tx, &tt)
-				}
-				a := NewCreateSubscription(tt.params)
-				tt.assertion(t, a.Execute(ctx, tx))
-				if tt.expect != nil {
-					assert.NotNil(t, a.results)
-					results, ok := a.Results()
-					assert.True(t, ok)
-					assert.Equal(t, tt.expect.topicID, results.TopicID)
-					if tt.expect.subscription.ID != uuid.Nil {
-						assert.Equal(t, tt.expect.subscription.ID, results.ID)
-						assert.Equal(t, tt.expect.subscription.ID, results.Sub.ID)
-						checkSubEqual(t, &tt.expect.subscription, results.Sub)
-					} else {
-						assert.Equal(t, results.Sub.ID, results.ID)
-						assert.NotEqual(t, results.ID, uuid.Nil)
+			assert.NoError(
+				t,
+				client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
+					if tt.before != nil {
+						tt.before(t, ctx, tx, &tt)
 					}
+					a := NewCreateSubscription(tt.params)
+					tt.assertion(t, a.Execute(ctx, tx))
+					if tt.expect != nil {
+						assert.NotNil(t, a.results)
+						results, ok := a.Results()
+						assert.True(t, ok)
+						assert.Equal(t, tt.expect.topicID, results.TopicID)
+						if tt.expect.subscription.ID != uuid.Nil {
+							assert.Equal(t, tt.expect.subscription.ID, results.ID)
+							assert.Equal(t, tt.expect.subscription.ID, results.Sub.ID)
+							checkSubEqual(t, &tt.expect.subscription, results.Sub)
+						} else {
+							assert.Equal(t, results.Sub.ID, results.ID)
+							assert.NotEqual(t, results.ID, uuid.Nil)
+						}
 
-					sub, err := tx.Subscription.Get(ctx, results.ID)
-					assert.NoError(t, err)
-					checkSubEqual(t, results.Sub, sub)
-				} else {
-					assert.Nil(t, a.results)
-				}
-				return nil
-			}))
+						sub, err := tx.Subscription.Get(ctx, results.ID)
+						assert.NoError(t, err)
+						checkSubEqual(t, results.Sub, sub)
+					} else {
+						assert.Nil(t, a.results)
+					}
+					return nil
+				}),
+			)
 			if tt.expect != nil {
 				assertClosed(t, subMod)
 			} else {

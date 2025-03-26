@@ -44,7 +44,11 @@ func (s *subscriberServer) GetSnapshot(
 	req *pubsubpb.GetSnapshotRequest,
 ) (*pubsubpb.Snapshot, error) {
 	if !isValidSnapshotName(req.Snapshot) {
-		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / snapshot path %s", req.Snapshot)
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"Unsupported project / snapshot path %s",
+			req.Snapshot,
+		)
 	}
 
 	var resp *pubsubpb.Snapshot
@@ -109,7 +113,10 @@ func (s *subscriberServer) ListSnapshots(
 		if len(snaps) >= int(pageSize) {
 			nextPageToken = snaps[len(snaps)-1].ID.String()
 		}
-		resp = &pubsubpb.ListSnapshotsResponse{Snapshots: grpcSnapshots, NextPageToken: nextPageToken}
+		resp = &pubsubpb.ListSnapshotsResponse{
+			Snapshots:     grpcSnapshots,
+			NextPageToken: nextPageToken,
+		}
 		return nil
 	})
 	if err != nil {
@@ -123,7 +130,11 @@ func (s *subscriberServer) CreateSnapshot(
 	req *pubsubpb.CreateSnapshotRequest,
 ) (*pubsubpb.Snapshot, error) {
 	if !isValidSnapshotName(req.Name) {
-		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / snapshot path %s", req.Name)
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"Unsupported project / snapshot path %s",
+			req.Name,
+		)
 	}
 	if !isValidSubscriptionName(req.Subscription) {
 		return nil, status.Errorf(
@@ -141,7 +152,11 @@ func (s *subscriberServer) CreateSnapshot(
 	action := actions.NewCreateSnapshot(params)
 	if err := s.client.DoCtxTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable}, action.Execute); err != nil {
 		if isNotFound(err) {
-			return nil, status.Errorf(codes.NotFound, "Subscription not found: %s", req.Subscription)
+			return nil, status.Errorf(
+				codes.NotFound,
+				"Subscription not found: %s",
+				req.Subscription,
+			)
 		}
 		if errors.Is(err, actions.ErrExists) {
 			return nil, status.Error(codes.AlreadyExists, "Subscription already exists")
@@ -168,7 +183,11 @@ func (s *subscriberServer) DeleteSnapshot(
 	req *pubsubpb.DeleteSnapshotRequest,
 ) (*empty.Empty, error) {
 	if !isValidSnapshotName(req.Snapshot) {
-		return nil, status.Errorf(codes.InvalidArgument, "Unsupported project / snapshot path %s", req.Snapshot)
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"Unsupported project / snapshot path %s",
+			req.Snapshot,
+		)
 	}
 
 	// TODO: implement this as an action

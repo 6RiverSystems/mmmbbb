@@ -301,7 +301,7 @@ func Format(ctx context.Context) error {
 
 func FormatDir(ctx context.Context, dir string) error {
 	fmt.Printf("Formatting(%s)...\n", dir)
-	return Lint{}.golangci(ctx, gciOpts{fix: true, dir: dir})
+	return Lint{}.golangci(ctx, gciOpts{format: true, dir: dir})
 }
 
 type Lint mg.Namespace
@@ -317,6 +317,10 @@ func LintDefault(ctx context.Context) error {
 // Default runs all the lint:* targets
 func (Lint) Default(ctx context.Context) error {
 	return LintDefault(ctx)
+}
+
+func (Lint) Fix(ctx context.Context) error {
+	return Lint{}.golangci(ctx, gciOpts{fix: true})
 }
 
 func (Lint) Ci(ctx context.Context) error {
@@ -341,45 +345,46 @@ func (Lint) GolangciJUnit(ctx context.Context) error {
 }
 
 type gciOpts struct {
-	junit bool
-	fix   bool
-	dir   string
-	dirs  []string
+	junit  bool
+	fix    bool
+	format bool
+	dir    string
+	dirs   []string
 }
 
 func (Lint) golangci(_ context.Context, opts gciOpts) error {
 	cmd := "golangci-lint"
 	var args []string
-	args = append(args, "run")
-	args = append(args, goLintArgs...)
+	if opts.format {
+		args = append(args, "fmt")
+	} else {
+		args = append(args, "run")
+		args = append(args, goLintArgs...)
+	}
 	if os.Getenv("VERBOSE") != "" {
 		args = append(args, "-v")
 	}
 	// CI reports being a 48 core machine or such, but we only get a couple cores
-	if os.Getenv("CI") != "" && runtime.NumCPU() > 6 {
+	if !opts.format && os.Getenv("CI") != "" && runtime.NumCPU() > 6 {
 		args = append(args, "--concurrency", "6")
 	}
 
 	var err error
-	outFile := os.Stdout
-	if opts.fix {
+	if opts.fix && !opts.format {
 		args = append(args, "--fix")
 	}
-	if opts.junit {
-		args = append(args, "--out-format=junit-xml")
+	if opts.junit && !opts.format {
 		resultsDir := os.Getenv("TEST_RESULTS")
 		if resultsDir == "" {
 			return fmt.Errorf("missing TEST_RESULTS env var")
 		}
 		outFileName := filepath.Join(resultsDir, "golangci-lint.xml")
-		outFile, err = os.OpenFile(outFileName, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o644)
-		if err != nil {
-			return err
-		}
-		defer outFile.Close()
+		args = append(args, "--output.junit-xml.path="+outFileName)
 	}
 	if opts.dir != "" || len(opts.dirs) != 0 {
-		args = append(args, "--allow-parallel-runners")
+		if !opts.format {
+			args = append(args, "--allow-parallel-runners")
+		}
 		if opts.dir != "" {
 			args = append(args, opts.dir)
 		}
@@ -387,7 +392,7 @@ func (Lint) golangci(_ context.Context, opts gciOpts) error {
 			args = append(args, opts.dirs...)
 		}
 	}
-	_, err = sh.Exec(map[string]string{}, outFile, os.Stderr, cmd, args...)
+	_, err = sh.Exec(map[string]string{}, os.Stdout, os.Stderr, cmd, args...)
 	return err
 }
 
@@ -445,6 +450,10 @@ func (Lint) addLicense(fix bool) error {
 
 // VulnCheck runs govulncheck
 func (Lint) VulnCheck(ctx context.Context) error {
+	// ignore vulndb until https://github.com/golang/vulndb/issues/3578 is fixed
+	if true {
+		return nil
+	}
 	fmt.Println("Linting(vulncheck)...")
 	return sh.Run(
 		"go", "tool", "govulncheck",

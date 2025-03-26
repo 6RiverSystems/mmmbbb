@@ -145,7 +145,7 @@ func errorFactory(errorType oas.ErrorType) func(faults.Description, faults.Param
 	var err error
 	err, ok := errorMap[errorType]
 	if !ok {
-		panic(fmt.Errorf("Unsupported error type '%s'", errorType))
+		panic(fmt.Errorf("unsupported error type '%s'", errorType))
 	}
 
 	// this relies on places checking for injections using errors.Is / errors.As
@@ -160,8 +160,8 @@ func errorFactory(errorType oas.ErrorType) func(faults.Description, faults.Param
 			err = ent.NewNotFoundError(label)
 		}
 		if len(d.Parameters) == 0 {
-			return fmt.Errorf("Injected fault matched %s(): %w", d.Operation, err)
+			return fmt.Errorf("injected fault matched %s(): %w", d.Operation, err)
 		}
-		return fmt.Errorf("Injected fault matched %s(%v): %w", d.Operation, d.Parameters, err)
+		return fmt.Errorf("injected fault matched %s(%v): %w", d.Operation, d.Parameters, err)
 	}
 }

@@ -48,14 +48,16 @@ type SeekSubscriptionToTime struct {
 	actionBase[SeekSubscriptionToTimeParams, seekSubscriptionToTimeResults]
 }
 
-var _ Action[SeekSubscriptionToTimeParams, seekSubscriptionToTimeResults] = (*SeekSubscriptionToTime)(nil)
+var _ Action[SeekSubscriptionToTimeParams, seekSubscriptionToTimeResults] = (*SeekSubscriptionToTime)(
+	nil,
+)
 
 func NewSeekSubscriptionToTime(params SeekSubscriptionToTimeParams) *SeekSubscriptionToTime {
 	if params.Name == "" && params.ID == nil {
-		panic(errors.New("Must provide Name or ID"))
+		panic(errors.New("must provide Name or ID"))
 	}
-	if params.Time.IsZero() || (params.Time == time.Time{}) {
-		panic(errors.New("Target time must be specified as a non-zero value"))
+	if params.Time.IsZero() {
+		panic(errors.New("target time must be specified as a non-zero value"))
 	}
 	// FUTURE: do we want to bound how far in the future or past the target can be?
 	return &SeekSubscriptionToTime{

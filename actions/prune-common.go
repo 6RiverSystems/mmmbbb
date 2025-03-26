@@ -33,10 +33,10 @@ type PruneCommonParams struct {
 
 func (p *PruneCommonParams) Validate() error {
 	if p.MinAge < 0 {
-		return errors.New("MinAge must be >= 0")
+		return errors.New("minAge must be >= 0")
 	}
 	if p.MaxDelete <= 0 {
-		return errors.New("MaxDelete must be > 0")
+		return errors.New("maxDelete must be > 0")
 	}
 
 	return nil

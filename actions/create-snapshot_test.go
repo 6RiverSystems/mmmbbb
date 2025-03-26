@@ -47,12 +47,29 @@ func TestCreateSnapshot_Execute(t *testing.T) {
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test, topic *ent.Topic, sub *ent.Subscription) {
 				// create several already-acked messages in the past
 				for offset := range 10 {
-					m := createMessage(t, ctx, tx, topic, offset, func(mc *ent.MessageCreate) *ent.MessageCreate {
-						return mc.SetPublishedAt(refTime.Add(time.Duration(offset) * time.Second))
-					})
-					createDelivery(t, ctx, tx, sub, m, offset, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
-						return dc.SetCompletedAt(time.Now())
-					})
+					m := createMessage(
+						t,
+						ctx,
+						tx,
+						topic,
+						offset,
+						func(mc *ent.MessageCreate) *ent.MessageCreate {
+							return mc.SetPublishedAt(
+								refTime.Add(time.Duration(offset) * time.Second),
+							)
+						},
+					)
+					createDelivery(
+						t,
+						ctx,
+						tx,
+						sub,
+						m,
+						offset,
+						func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
+							return dc.SetCompletedAt(time.Now())
+						},
+					)
 				}
 				tt.params.SubscriptionName = sub.Name
 				tt.expect.TopicID = topic.ID
@@ -78,9 +95,18 @@ func TestCreateSnapshot_Execute(t *testing.T) {
 			func(t *testing.T, ctx context.Context, tx *ent.Tx, tt *test, topic *ent.Topic, sub *ent.Subscription) {
 				// create several not-acked messages in the past
 				for offset := range 10 {
-					m := createMessage(t, ctx, tx, topic, offset, func(mc *ent.MessageCreate) *ent.MessageCreate {
-						return mc.SetPublishedAt(refTime.Add(time.Duration(offset) * time.Second))
-					})
+					m := createMessage(
+						t,
+						ctx,
+						tx,
+						topic,
+						offset,
+						func(mc *ent.MessageCreate) *ent.MessageCreate {
+							return mc.SetPublishedAt(
+								refTime.Add(time.Duration(offset) * time.Second),
+							)
+						},
+					)
 					createDelivery(t, ctx, tx, sub, m, offset)
 				}
 				tt.params.SubscriptionName = sub.Name
@@ -107,15 +133,32 @@ func TestCreateSnapshot_Execute(t *testing.T) {
 				// ack even messages, so the first un-acked is the first odd one, and
 				// thus the zero message doesn't appear in the override list
 				for offset := range 10 {
-					m := createMessage(t, ctx, tx, topic, offset, func(mc *ent.MessageCreate) *ent.MessageCreate {
-						return mc.SetPublishedAt(refTime.Add(time.Duration(offset) * time.Second))
-					})
-					createDelivery(t, ctx, tx, sub, m, offset, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
-						if offset%2 == 0 {
-							return dc.SetCompletedAt(time.Now())
-						}
-						return dc
-					})
+					m := createMessage(
+						t,
+						ctx,
+						tx,
+						topic,
+						offset,
+						func(mc *ent.MessageCreate) *ent.MessageCreate {
+							return mc.SetPublishedAt(
+								refTime.Add(time.Duration(offset) * time.Second),
+							)
+						},
+					)
+					createDelivery(
+						t,
+						ctx,
+						tx,
+						sub,
+						m,
+						offset,
+						func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
+							if offset%2 == 0 {
+								return dc.SetCompletedAt(time.Now())
+							}
+							return dc
+						},
+					)
 					if offset%2 == 0 && offset > 0 {
 						tt.expect.AckedMessageIDs = append(tt.expect.AckedMessageIDs, m.ID)
 					}
@@ -143,38 +186,41 @@ func TestCreateSnapshot_Execute(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			enttest.ResetTables(t, client)
-			assert.NoError(t, client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
-				topic := createTopic(t, ctx, tx, 0)
-				sub := createSubscription(t, ctx, tx, topic, 0)
-				if tt.before != nil {
-					tt.before(t, ctx, tx, &tt, topic, sub)
-				}
-				a := NewCreateSnapshot(tt.params)
-				start := time.Now()
-				tt.assertion(t, a.Execute(ctx, tx))
-				deltaT := time.Since(start)
-				if tt.expect != nil {
-					assert.NotNil(t, a.results)
-					results, ok := a.Results()
-					assert.True(t, ok)
-					assert.Equal(t, tt.expect.TopicID, results.TopicID)
-					if tt.expect.ID != uuid.Nil {
-						assert.Equal(t, tt.expect.ID, results.SnapshotID)
-						assert.Equal(t, tt.expect.ID, results.Snapshot.ID)
-					} else {
-						assert.Equal(t, results.Snapshot.ID, results.SnapshotID)
-						assert.NotEqual(t, results.SnapshotID, uuid.Nil)
+			assert.NoError(
+				t,
+				client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
+					topic := createTopic(t, ctx, tx, 0)
+					sub := createSubscription(t, ctx, tx, topic, 0)
+					if tt.before != nil {
+						tt.before(t, ctx, tx, &tt, topic, sub)
 					}
-					checkSnapEqual(t, tt.expect, results.Snapshot, deltaT)
+					a := NewCreateSnapshot(tt.params)
+					start := time.Now()
+					tt.assertion(t, a.Execute(ctx, tx))
+					deltaT := time.Since(start)
+					if tt.expect != nil {
+						assert.NotNil(t, a.results)
+						results, ok := a.Results()
+						assert.True(t, ok)
+						assert.Equal(t, tt.expect.TopicID, results.TopicID)
+						if tt.expect.ID != uuid.Nil {
+							assert.Equal(t, tt.expect.ID, results.SnapshotID)
+							assert.Equal(t, tt.expect.ID, results.Snapshot.ID)
+						} else {
+							assert.Equal(t, results.Snapshot.ID, results.SnapshotID)
+							assert.NotEqual(t, results.SnapshotID, uuid.Nil)
+						}
+						checkSnapEqual(t, tt.expect, results.Snapshot, deltaT)
 
-					snap, err := tx.Snapshot.Get(ctx, results.SnapshotID)
-					assert.NoError(t, err)
-					checkSnapEqual(t, results.Snapshot, snap, deltaT)
-				} else {
-					assert.Nil(t, a.results)
-				}
-				return nil
-			}))
+						snap, err := tx.Snapshot.Get(ctx, results.SnapshotID)
+						assert.NoError(t, err)
+						checkSnapEqual(t, results.Snapshot, snap, deltaT)
+					} else {
+						assert.Nil(t, a.results)
+					}
+					return nil
+				}),
+			)
 		})
 	}
 }

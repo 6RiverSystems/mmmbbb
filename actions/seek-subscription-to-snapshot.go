@@ -50,7 +50,9 @@ var _ Action[SeekSubscriptionToSnapshotParams, seekSubscriptionToSnapshotResults
 	nil,
 )
 
-func NewSeekSubscriptionToSnapshot(params SeekSubscriptionToSnapshotParams) *SeekSubscriptionToSnapshot {
+func NewSeekSubscriptionToSnapshot(
+	params SeekSubscriptionToSnapshotParams,
+) *SeekSubscriptionToSnapshot {
 	if params.SubscriptionName == "" && params.SubscriptionID == nil {
 		panic(errors.New("must provide subscription name or id"))
 	}

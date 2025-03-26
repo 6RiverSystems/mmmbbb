@@ -102,9 +102,16 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 						return sc.SetOrderedDelivery(true)
 					},
 				)
-				msg1 := createMessageClient(t, ctx, client, topic, 0, func(mc *ent.MessageCreate) *ent.MessageCreate {
-					return mc.SetOrderKey(t.Name())
-				})
+				msg1 := createMessageClient(
+					t,
+					ctx,
+					client,
+					topic,
+					0,
+					func(mc *ent.MessageCreate) *ent.MessageCreate {
+						return mc.SetOrderKey(t.Name())
+					},
+				)
 				del1 := createDeliveryClient(
 					t,
 					ctx,
@@ -118,12 +125,27 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 						return dc.SetAttemptAt(time.Now().Add(time.Hour))
 					},
 				)
-				msg2 := createMessageClient(t, ctx, client, topic, 1, func(mc *ent.MessageCreate) *ent.MessageCreate {
-					return mc.SetOrderKey(t.Name())
-				})
-				createDeliveryClient(t, ctx, client, sub, msg2, 1, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
-					return dc.SetNotBeforeID(del1.ID)
-				})
+				msg2 := createMessageClient(
+					t,
+					ctx,
+					client,
+					topic,
+					1,
+					func(mc *ent.MessageCreate) *ent.MessageCreate {
+						return mc.SetOrderKey(t.Name())
+					},
+				)
+				createDeliveryClient(
+					t,
+					ctx,
+					client,
+					sub,
+					msg2,
+					1,
+					func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
+						return dc.SetNotBeforeID(del1.ID)
+					},
+				)
 			},
 			GetSubscriptionMessagesParams{
 				// Name will be auto-filled
@@ -150,9 +172,16 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 						return sc.SetOrderedDelivery(true)
 					},
 				)
-				msg1 := createMessageClient(t, ctx, client, topic, 0, func(mc *ent.MessageCreate) *ent.MessageCreate {
-					return mc.SetOrderKey(t.Name())
-				})
+				msg1 := createMessageClient(
+					t,
+					ctx,
+					client,
+					topic,
+					0,
+					func(mc *ent.MessageCreate) *ent.MessageCreate {
+						return mc.SetOrderKey(t.Name())
+					},
+				)
 				del1 := createDeliveryClient(
 					t,
 					ctx,
@@ -164,12 +193,27 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 						return dc.SetAttemptAt(time.Now().Add(time.Hour)).SetCompletedAt(time.Now())
 					},
 				)
-				msg2 := createMessageClient(t, ctx, client, topic, 1, func(mc *ent.MessageCreate) *ent.MessageCreate {
-					return mc.SetOrderKey(t.Name())
-				})
-				createDeliveryClient(t, ctx, client, sub, msg2, 1, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
-					return dc.SetNotBeforeID(del1.ID)
-				})
+				msg2 := createMessageClient(
+					t,
+					ctx,
+					client,
+					topic,
+					1,
+					func(mc *ent.MessageCreate) *ent.MessageCreate {
+						return mc.SetOrderKey(t.Name())
+					},
+				)
+				createDeliveryClient(
+					t,
+					ctx,
+					client,
+					sub,
+					msg2,
+					1,
+					func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
+						return dc.SetNotBeforeID(del1.ID)
+					},
+				)
 			},
 			GetSubscriptionMessagesParams{
 				// Name will be auto-filled
@@ -200,9 +244,16 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 						return sc.SetOrderedDelivery(true)
 					},
 				)
-				msg1 := createMessageClient(t, ctx, client, topic, 0, func(mc *ent.MessageCreate) *ent.MessageCreate {
-					return mc.SetOrderKey(t.Name())
-				})
+				msg1 := createMessageClient(
+					t,
+					ctx,
+					client,
+					topic,
+					0,
+					func(mc *ent.MessageCreate) *ent.MessageCreate {
+						return mc.SetOrderKey(t.Name())
+					},
+				)
 				del1 := createDeliveryClient(
 					t,
 					ctx,
@@ -214,12 +265,27 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 						return dc.SetAttemptAt(time.Now().Add(time.Hour)).SetExpiresAt(time.Now())
 					},
 				)
-				msg2 := createMessageClient(t, ctx, client, topic, 1, func(mc *ent.MessageCreate) *ent.MessageCreate {
-					return mc.SetOrderKey(t.Name())
-				})
-				createDeliveryClient(t, ctx, client, sub, msg2, 1, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
-					return dc.SetNotBeforeID(del1.ID)
-				})
+				msg2 := createMessageClient(
+					t,
+					ctx,
+					client,
+					topic,
+					1,
+					func(mc *ent.MessageCreate) *ent.MessageCreate {
+						return mc.SetOrderKey(t.Name())
+					},
+				)
+				createDeliveryClient(
+					t,
+					ctx,
+					client,
+					sub,
+					msg2,
+					1,
+					func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
+						return dc.SetNotBeforeID(del1.ID)
+					},
+				)
 			},
 			GetSubscriptionMessagesParams{
 				// Name will be auto-filled
@@ -270,14 +336,28 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test) {
 				topic := createTopicClient(t, ctx, client, 0)
 				sub := createSubscriptionClient(t, ctx, client, topic, 0)
-				msg1 := createMessageClient(t, ctx, client, topic, 0, func(mc *ent.MessageCreate) *ent.MessageCreate {
-					// length 5
-					return mc.SetPayload(json.RawMessage(`"123"`))
-				})
+				msg1 := createMessageClient(
+					t,
+					ctx,
+					client,
+					topic,
+					0,
+					func(mc *ent.MessageCreate) *ent.MessageCreate {
+						// length 5
+						return mc.SetPayload(json.RawMessage(`"123"`))
+					},
+				)
 				createDeliveryClient(t, ctx, client, sub, msg1, 0)
-				msg2 := createMessageClient(t, ctx, client, topic, 1, func(mc *ent.MessageCreate) *ent.MessageCreate {
-					return mc.SetPayload(json.RawMessage(`"123"`))
-				})
+				msg2 := createMessageClient(
+					t,
+					ctx,
+					client,
+					topic,
+					1,
+					func(mc *ent.MessageCreate) *ent.MessageCreate {
+						return mc.SetPayload(json.RawMessage(`"123"`))
+					},
+				)
 				createDeliveryClient(t, ctx, client, sub, msg2, 1)
 			},
 			GetSubscriptionMessagesParams{
@@ -305,14 +385,28 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test) {
 				topic := createTopicClient(t, ctx, client, 0)
 				sub := createSubscriptionClient(t, ctx, client, topic, 0)
-				msg1 := createMessageClient(t, ctx, client, topic, 0, func(mc *ent.MessageCreate) *ent.MessageCreate {
-					// length 5
-					return mc.SetPayload(json.RawMessage(`"123"`))
-				})
+				msg1 := createMessageClient(
+					t,
+					ctx,
+					client,
+					topic,
+					0,
+					func(mc *ent.MessageCreate) *ent.MessageCreate {
+						// length 5
+						return mc.SetPayload(json.RawMessage(`"123"`))
+					},
+				)
 				createDeliveryClient(t, ctx, client, sub, msg1, 0)
-				msg2 := createMessageClient(t, ctx, client, topic, 1, func(mc *ent.MessageCreate) *ent.MessageCreate {
-					return mc.SetPayload(json.RawMessage(`"123"`))
-				})
+				msg2 := createMessageClient(
+					t,
+					ctx,
+					client,
+					topic,
+					1,
+					func(mc *ent.MessageCreate) *ent.MessageCreate {
+						return mc.SetPayload(json.RawMessage(`"123"`))
+					},
+				)
 				createDeliveryClient(t, ctx, client, sub, msg2, 1)
 			},
 			GetSubscriptionMessagesParams{
@@ -379,9 +473,16 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 						return sc.SetOrderedDelivery(true)
 					},
 				)
-				msg1 := createMessageClient(t, ctx, client, topic, 0, func(mc *ent.MessageCreate) *ent.MessageCreate {
-					return mc.SetOrderKey(t.Name())
-				})
+				msg1 := createMessageClient(
+					t,
+					ctx,
+					client,
+					topic,
+					0,
+					func(mc *ent.MessageCreate) *ent.MessageCreate {
+						return mc.SetOrderKey(t.Name())
+					},
+				)
 				del1 := createDeliveryClient(
 					t,
 					ctx,
@@ -393,12 +494,27 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 						return dc.SetAttemptAt(time.Now().Add(time.Hour))
 					},
 				)
-				msg2 := createMessageClient(t, ctx, client, topic, 1, func(mc *ent.MessageCreate) *ent.MessageCreate {
-					return mc.SetOrderKey(t.Name())
-				})
-				createDeliveryClient(t, ctx, client, sub, msg2, 1, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
-					return dc.SetNotBeforeID(del1.ID)
-				})
+				msg2 := createMessageClient(
+					t,
+					ctx,
+					client,
+					topic,
+					1,
+					func(mc *ent.MessageCreate) *ent.MessageCreate {
+						return mc.SetOrderKey(t.Name())
+					},
+				)
+				createDeliveryClient(
+					t,
+					ctx,
+					client,
+					sub,
+					msg2,
+					1,
+					func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
+						return dc.SetNotBeforeID(del1.ID)
+					},
+				)
 			},
 			GetSubscriptionMessagesParams{
 				// Name will be auto-filled
@@ -415,16 +531,19 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 				case <-time.After(100 * time.Millisecond):
 					// fall through, expect failure
 				}
-				assert.NoError(t, client.DoCtxTx(ctx, nil, func(ctx context.Context, tx *ent.Tx) error {
-					if err := tx.Delivery.
-						UpdateOneID(xID(t, &ent.Delivery{}, 0)).
-						SetCompletedAt(time.Now()).
-						Exec(ctx); err != nil {
-						return err
-					}
-					notifyPublish(tx, xID(t, &ent.Subscription{}, 0))
-					return nil
-				}))
+				assert.NoError(
+					t,
+					client.DoCtxTx(ctx, nil, func(ctx context.Context, tx *ent.Tx) error {
+						if err := tx.Delivery.
+							UpdateOneID(xID(t, &ent.Delivery{}, 0)).
+							SetCompletedAt(time.Now()).
+							Exec(ctx); err != nil {
+							return err
+						}
+						notifyPublish(tx, xID(t, &ent.Subscription{}, 0))
+						return nil
+					}),
+				)
 			},
 			assert.NoError,
 			1,
@@ -448,9 +567,16 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 						return sc.SetOrderedDelivery(true)
 					},
 				)
-				msg1 := createMessageClient(t, ctx, client, topic, 0, func(mc *ent.MessageCreate) *ent.MessageCreate {
-					return mc.SetOrderKey(t.Name())
-				})
+				msg1 := createMessageClient(
+					t,
+					ctx,
+					client,
+					topic,
+					0,
+					func(mc *ent.MessageCreate) *ent.MessageCreate {
+						return mc.SetOrderKey(t.Name())
+					},
+				)
 				del1 := createDeliveryClient(
 					t,
 					ctx,
@@ -463,12 +589,27 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 							SetExpiresAt(time.Now().Add(100 * time.Millisecond))
 					},
 				)
-				msg2 := createMessageClient(t, ctx, client, topic, 1, func(mc *ent.MessageCreate) *ent.MessageCreate {
-					return mc.SetOrderKey(t.Name())
-				})
-				createDeliveryClient(t, ctx, client, sub, msg2, 1, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
-					return dc.SetNotBeforeID(del1.ID)
-				})
+				msg2 := createMessageClient(
+					t,
+					ctx,
+					client,
+					topic,
+					1,
+					func(mc *ent.MessageCreate) *ent.MessageCreate {
+						return mc.SetOrderKey(t.Name())
+					},
+				)
+				createDeliveryClient(
+					t,
+					ctx,
+					client,
+					sub,
+					msg2,
+					1,
+					func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
+						return dc.SetNotBeforeID(del1.ID)
+					},
+				)
 			},
 			GetSubscriptionMessagesParams{
 				// Name will be auto-filled
@@ -477,13 +618,18 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 				MaxWait:     time.Minute,
 			},
 			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, _ <-chan struct{}) {
-				assert.NoError(t, client.DoCtxTx(ctx, nil, func(ctx context.Context, tx *ent.Tx) error {
-					if err := tx.Delivery.UpdateOneID(xID(t, &ent.Delivery{}, 0)).SetExpiresAt(time.Now()).Exec(ctx); err != nil {
-						return err
-					}
-					notifyPublish(tx, xID(t, &ent.Subscription{}, 0))
-					return nil
-				}))
+				assert.NoError(
+					t,
+					client.DoCtxTx(ctx, nil, func(ctx context.Context, tx *ent.Tx) error {
+						if err := tx.Delivery.UpdateOneID(xID(t, &ent.Delivery{}, 0)).
+							SetExpiresAt(time.Now()).
+							Exec(ctx); err != nil {
+							return err
+						}
+						notifyPublish(tx, xID(t, &ent.Subscription{}, 0))
+						return nil
+					}),
+				)
 			},
 			assert.NoError,
 			1,
@@ -500,12 +646,27 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 			func(t *testing.T, ctx context.Context, client *ent.Client, tt *test) {
 				topic := createTopicClient(t, ctx, client, 0)
 				dlTopic := createTopicClient(t, ctx, client, 1)
-				sub := createSubscriptionClient(t, ctx, client, topic, 0, withDeadLetter(dlTopic, 1))
+				sub := createSubscriptionClient(
+					t,
+					ctx,
+					client,
+					topic,
+					0,
+					withDeadLetter(dlTopic, 1),
+				)
 				createSubscriptionClient(t, ctx, client, dlTopic, 1)
 				msg := createMessageClient(t, ctx, client, topic, 0)
-				createDeliveryClient(t, ctx, client, sub, msg, 0, func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
-					return dc.SetAttempts(1)
-				})
+				createDeliveryClient(
+					t,
+					ctx,
+					client,
+					sub,
+					msg,
+					0,
+					func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
+						return dc.SetAttempts(1)
+					},
+				)
 			},
 			GetSubscriptionMessagesParams{
 				// Name will be auto-filled
@@ -530,7 +691,11 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 				assert.Equal(t, origDelivery.MessageID, dlDelivery.MessageID)
 				assert.Nil(t, dlDelivery.CompletedAt)
 				if assert.NotNil(t, origDelivery.CompletedAt) {
-					assert.GreaterOrEqual(t, dlDelivery.AttemptAt.UnixNano(), origDelivery.CompletedAt.UnixNano())
+					assert.GreaterOrEqual(
+						t,
+						dlDelivery.AttemptAt.UnixNano(),
+						origDelivery.CompletedAt.UnixNano(),
+					)
 				}
 				assert.LessOrEqual(t, dlDelivery.AttemptAt.UnixNano(), time.Now().UnixNano())
 			},
@@ -576,8 +741,16 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 						assert.Equal(t, msg.PublishedAt, d.PublishedAt)
 						// zone info will likely be different here, we just care that they
 						// represent the same time, within the fuzz boundary
-						assert.GreaterOrEqual(t, del.AttemptAt.UnixNano(), d.NextAttemptAt.UnixNano())
-						assert.LessOrEqual(t, del.AttemptAt.UnixNano(), d.NextAttemptAt.Add(time.Second).UnixNano())
+						assert.GreaterOrEqual(
+							t,
+							del.AttemptAt.UnixNano(),
+							d.NextAttemptAt.UnixNano(),
+						)
+						assert.LessOrEqual(
+							t,
+							del.AttemptAt.UnixNano(),
+							d.NextAttemptAt.Add(time.Second).UnixNano(),
+						)
 						assert.Equal(t, del.Attempts, d.NumAttempts)
 						assert.Greater(t, del.Attempts, 0)
 						assert.Greater(t, del.AttemptAt.UnixNano(), time.Now().UnixNano())

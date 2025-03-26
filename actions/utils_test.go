@@ -149,14 +149,24 @@ func createMessageClient(
 }
 
 func createDelivery(
-	t *testing.T, ctx context.Context, tx *ent.Tx, sub *ent.Subscription, msg *ent.Message, offset int,
+	t *testing.T,
+	ctx context.Context,
+	tx *ent.Tx,
+	sub *ent.Subscription,
+	msg *ent.Message,
+	offset int,
 	opts ...func(*ent.DeliveryCreate) *ent.DeliveryCreate,
 ) *ent.Delivery {
 	return createDeliveryClient(t, ctx, tx.Client(), sub, msg, offset, opts...)
 }
 
 func createDeliveryClient(
-	t *testing.T, ctx context.Context, client *ent.Client, sub *ent.Subscription, msg *ent.Message, offset int,
+	t *testing.T,
+	ctx context.Context,
+	client *ent.Client,
+	sub *ent.Subscription,
+	msg *ent.Message,
+	offset int,
 	opts ...func(*ent.DeliveryCreate) *ent.DeliveryCreate,
 ) *ent.Delivery {
 	dc := client.Delivery.Create().

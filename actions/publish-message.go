@@ -52,7 +52,7 @@ var _ Action[PublishMessageParams, publishMessageResults] = (*PublishMessage)(ni
 
 func NewPublishMessage(params PublishMessageParams) *PublishMessage {
 	if params.TopicName == "" && params.TopicID == nil {
-		panic(errors.New("Must provide Name or ID"))
+		panic(errors.New("must provide Name or ID"))
 	}
 	return &PublishMessage{
 		actionBase[PublishMessageParams, publishMessageResults]{

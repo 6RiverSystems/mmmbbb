@@ -59,7 +59,11 @@ func NewNackDeliveries(
 	}
 }
 
-var nackDeliveriesCounter, nackDeliveriesHistogram = actionMetrics("nack_deliveries", "deliveries", "nacked")
+var nackDeliveriesCounter, nackDeliveriesHistogram = actionMetrics(
+	"nack_deliveries",
+	"deliveries",
+	"nacked",
+)
 
 func (a *NackDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 	timer := startActionTimer(nackDeliveriesHistogram, tx)
@@ -83,7 +87,10 @@ func (a *NackDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 
 	// workaround for https://github.com/ent/ent/issues/358: avoid deadlocks by
 	// touching deliveries in sorted order by uuid
-	sort.Slice(deliveries, func(i, j int) bool { return parse.UUIDLess(deliveries[i].ID, deliveries[j].ID) })
+	sort.Slice(
+		deliveries,
+		func(i, j int) bool { return parse.UUIDLess(deliveries[i].ID, deliveries[j].ID) },
+	)
 
 	// look up all the subs once
 	var subIDs []uuid.UUID

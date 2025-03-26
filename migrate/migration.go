@@ -101,7 +101,7 @@ func (m *SQLMigration) run(ctx context.Context, tx *sqlx.Tx, direction Direction
 	// this is meant to catch "no going back" migrations where once you "up",
 	// there is no (safe) way to go back down again.
 	if contents == "" {
-		return fmt.Errorf("No script to %s migration %s", direction, m.name)
+		return fmt.Errorf("no script to %s migration %s", direction, m.name)
 	}
 
 	_, err = tx.ExecContext(ctx, contents)

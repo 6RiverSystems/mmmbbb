@@ -107,7 +107,7 @@ func (at *actionTimer) Failed() {
 }
 
 func (at *actionTimer) Ended() {
-	if at.end == (time.Time{}) {
+	if at.end.IsZero() {
 		at.end = time.Now()
 	}
 }
@@ -116,7 +116,7 @@ func (at *actionTimer) ReportRollback() {
 	if at.reported {
 		return
 	}
-	if at.end == (time.Time{}) {
+	if at.end.IsZero() {
 		at.end = time.Now()
 	}
 	outcome := outcomeFailure
@@ -134,7 +134,7 @@ func (at *actionTimer) ReportCommit() {
 	if at.reported {
 		return
 	}
-	if at.end == (time.Time{}) {
+	if at.end.IsZero() {
 		at.end = time.Now()
 	}
 	outcome := outcomeFailure

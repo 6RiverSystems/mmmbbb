@@ -45,9 +45,11 @@ func (cc *DelayInjectorController) Register(router gin.IRouter) error {
 		cc.dbName = middleware.Key()
 	}
 	rg := router.Group(delaysRootPath)
-	rg.Use(middleware.WithTransaction(cc.dbName, nil, func(ctx *gin.Context, to *sql.TxOptions) bool {
-		return ctx.Request.Method != http.MethodGet
-	}))
+	rg.Use(
+		middleware.WithTransaction(cc.dbName, nil, func(ctx *gin.Context, to *sql.TxOptions) bool {
+			return ctx.Request.Method != http.MethodGet
+		}),
+	)
 
 	rg.GET("/*subscription", cc.GetDelay)
 	rg.PUT("/*subscription", cc.PutDelay)
@@ -69,7 +71,10 @@ func (cc *DelayInjectorController) GetDelay(c *gin.Context) {
 	).Only(c)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			c.JSON(http.StatusNotFound, gin.H{"subscription": subName, "message": "Subscription not found"})
+			c.JSON(
+				http.StatusNotFound,
+				gin.H{"subscription": subName, "message": "Subscription not found"},
+			)
 			return
 		}
 		panic(err)
@@ -107,7 +112,10 @@ func (cc *DelayInjectorController) PutDelay(c *gin.Context) {
 		panic(err)
 	}
 	if n <= 0 {
-		c.JSON(http.StatusNotFound, gin.H{"subscription": subName, "message": "Subscription not found"})
+		c.JSON(
+			http.StatusNotFound,
+			gin.H{"subscription": subName, "message": "Subscription not found"},
+		)
 	} else if n > 1 {
 		panic(fmt.Errorf("BUG DETECTED: %d live subs with same name '%s'", n, subName))
 	} else {
@@ -131,7 +139,10 @@ func (cc *DelayInjectorController) DeleteDelay(c *gin.Context) {
 		panic(err)
 	}
 	if n <= 0 {
-		c.JSON(http.StatusNotFound, gin.H{"subscription": subName, "message": "Subscription not found"})
+		c.JSON(
+			http.StatusNotFound,
+			gin.H{"subscription": subName, "message": "Subscription not found"},
+		)
 	} else if n > 1 {
 		panic(fmt.Errorf("BUG DETECTED: %d live subs with same name '%s'", n, subName))
 	} else {
