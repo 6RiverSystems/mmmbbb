@@ -450,11 +450,14 @@ func (Lint) addLicense(fix bool) error {
 
 // VulnCheck runs govulncheck
 func (Lint) VulnCheck(ctx context.Context) error {
+	// ignore vulndb until https://github.com/golang/vulndb/issues/3578 is fixed
+	if true {
+		return nil
+	}
 	fmt.Println("Linting(vulncheck)...")
 	return sh.Run(
 		"go", "tool", "govulncheck",
-		// ignore tests until https://github.com/golang/vulndb/issues/3578 is fixed
-		// "-test",
+		"-test",
 		"./...",
 	)
 }
