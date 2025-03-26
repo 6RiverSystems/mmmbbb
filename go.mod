@@ -4,10 +4,10 @@ go 1.24.0
 
 require (
 	cloud.google.com/go/pubsub v1.48.0
-	entgo.io/ent v0.14.3
+	entgo.io/ent v0.14.4
 	github.com/Depado/ginprom v1.8.1
 	github.com/alecthomas/participle/v2 v2.1.2
-	github.com/getkin/kin-openapi v0.130.0
+	github.com/getkin/kin-openapi v0.131.0
 	github.com/gin-contrib/expvar v1.0.2
 	github.com/gin-contrib/gzip v1.2.2
 	github.com/gin-contrib/location v1.0.2
@@ -259,6 +259,7 @@ require (
 )
 
 tool (
+	entgo.io/ent/cmd/ent
 	github.com/google/addlicense
 	github.com/google/ko
 	github.com/magefile/mage
