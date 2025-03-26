@@ -453,7 +453,8 @@ func (Lint) VulnCheck(ctx context.Context) error {
 	fmt.Println("Linting(vulncheck)...")
 	return sh.Run(
 		"go", "tool", "govulncheck",
-		"-test",
+		// ignore tests until https://github.com/golang/vulndb/issues/3578 is fixed
+		// "-test",
 		"./...",
 	)
 }
