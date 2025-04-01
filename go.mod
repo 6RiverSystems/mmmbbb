@@ -2,11 +2,13 @@ module go.6river.tech/mmmbbb
 
 go 1.24.0
 
+toolchain go1.24.1
+
 require (
 	cloud.google.com/go/pubsub v1.48.0
 	entgo.io/ent v0.14.4
 	github.com/Depado/ginprom v1.8.1
-	github.com/alecthomas/participle/v2 v2.1.2
+	github.com/alecthomas/participle/v2 v2.1.4
 	github.com/getkin/kin-openapi v0.131.0
 	github.com/gin-contrib/expvar v1.0.2
 	github.com/gin-contrib/gzip v1.2.2
@@ -18,7 +20,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3
 	github.com/iancoleman/strcase v0.3.0
-	github.com/jackc/pgx/v5 v5.7.2
+	github.com/jackc/pgx/v5 v5.7.4
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/magefile/mage v1.15.0
 	github.com/mattn/go-sqlite3 v1.14.24
@@ -26,17 +28,17 @@ require (
 	github.com/ory/dockertest/v3 v3.11.0
 	github.com/prometheus/client_golang v1.21.1
 	github.com/rs/cors/wrapper/gin v0.0.0-20240830163046-1084d89a1692
-	github.com/rs/zerolog v1.33.0
+	github.com/rs/zerolog v1.34.0
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/fx v1.23.0
 	golang.org/x/sync v0.12.0
 	golang.org/x/tools v0.31.0
-	google.golang.org/api v0.226.0
+	google.golang.org/api v0.228.0
 	google.golang.org/grpc v1.71.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.5.1
-	google.golang.org/protobuf v1.36.5
-	modernc.org/sqlite v1.36.1
+	google.golang.org/protobuf v1.36.6
+	modernc.org/sqlite v1.37.0
 )
 
 require (
@@ -44,7 +46,7 @@ require (
 	ariga.io/atlas v0.32.0 // indirect
 	cloud.google.com/go v0.119.0 // indirect
 	cloud.google.com/go/auth v0.15.0 // indirect
-	cloud.google.com/go/auth/oauth2adapt v0.2.7 // indirect
+	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
 	cloud.google.com/go/compute/metadata v0.6.0 // indirect
 	cloud.google.com/go/iam v1.4.2 // indirect
 	dario.cat/mergo v1.0.1 // indirect
@@ -136,7 +138,6 @@ require (
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/go-containerregistry v0.20.3 // indirect
 	github.com/google/ko v0.17.1 // indirect
-	github.com/google/pprof v0.0.0-20250315033105-103756e64e1d // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/google/safetext v0.0.0-20240722112252-5a72de7e7962 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
@@ -251,9 +252,9 @@ require (
 	k8s.io/apimachinery v0.32.3 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	k8s.io/utils v0.0.0-20241210054802-24370beab758 // indirect
-	modernc.org/libc v1.61.13 // indirect
+	modernc.org/libc v1.62.1 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
-	modernc.org/memory v1.8.2 // indirect
+	modernc.org/memory v1.9.1 // indirect
 	sigs.k8s.io/kind v0.27.0 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
