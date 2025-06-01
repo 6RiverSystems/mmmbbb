@@ -13,8 +13,8 @@ importers:
         version: 5.0.0
     devDependencies:
       '@types/node':
-        specifier: ^22.15.3
-        version: 22.15.3
+        specifier: ^22.15.29
+        version: 22.15.29
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
@@ -102,8 +102,8 @@ packages:
     resolution: {integrity: sha512-eQs9RsucA/LNjnMoJvWG/nXa7Pot/RbBzilF/QRIU/xRl+0ApxrSUFsV5lmf01SvSlqMzJ7Zwxe440wmz2SJGA==}
     deprecated: This is a stub types definition. long provides its own type definitions, so you do not need this installed.
 
-  '@types/node@22.15.3':
-    resolution: {integrity: sha512-lX7HFZeHf4QG/J7tBZqrCAXwz9J5RD56Y6MpP0eJkka8p+K0RY/yBTW7CYFJ4VGCclxqOLKmiGP5juQc6MKgcw==}
+  '@types/node@22.15.29':
+    resolution: {integrity: sha512-LNdjOkUDlU1RZb8e1kOIUpN1qQUlzGkEtbVNo53vbrwDg5om6oduhm4SiUaPW5ASTXhAiP0jInWG8Qx9fVlOeQ==}
 
   '@types/request@2.48.12':
     resolution: {integrity: sha512-G3sY+NpsA9jnwm0ixhAFQSJ3Q9JkpLZpJbI3GMv0mIAT0y3mRabYeINzal5WOChIiaTEGQYlHOKgkaM9EisWHw==}
@@ -533,14 +533,14 @@ snapshots:
     dependencies:
       long: 5.3.2
 
-  '@types/node@22.15.3':
+  '@types/node@22.15.29':
     dependencies:
       undici-types: 6.21.0
 
   '@types/request@2.48.12':
     dependencies:
       '@types/caseless': 0.12.5
-      '@types/node': 22.15.3
+      '@types/node': 22.15.29
       '@types/tough-cookie': 4.0.5
       form-data: 2.5.3
 
@@ -844,7 +844,7 @@ snapshots:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
-      '@types/node': 22.15.3
+      '@types/node': 22.15.29
       long: 5.3.2
 
   readable-stream@3.6.2:
