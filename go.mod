@@ -32,7 +32,7 @@ require (
 	go.uber.org/fx v1.24.0
 	golang.org/x/sync v0.14.0
 	google.golang.org/api v0.235.0
-	google.golang.org/grpc v1.72.1
+	google.golang.org/grpc v1.72.2
 	google.golang.org/protobuf v1.36.6
 	modernc.org/sqlite v1.37.1
 )
