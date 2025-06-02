@@ -17,10 +17,6 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-// this isn't part of the actual code build
-//go:build generate
-// +build generate
-
 package ent
 
 //go:generate go tool ent generate --feature entql --feature sql/lock --feature sql/upsert ./schema
