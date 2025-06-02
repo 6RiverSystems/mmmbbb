@@ -23,9 +23,4 @@
 
 package ent
 
-import (
-	_ "entgo.io/ent/entc/gen"
-	_ "github.com/olekukonko/tablewriter"
-)
-
 //go:generate go tool ent generate --feature entql --feature sql/lock --feature sql/upsert ./schema

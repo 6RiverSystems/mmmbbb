@@ -45,11 +45,6 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/magefile/mage/target"
 	"golang.org/x/sync/errgroup"
-
-	// tools this needs, to keep `go mod tidy` from deleting lines
-	_ "entgo.io/ent/entc/gen"
-	_ "github.com/spf13/cobra"
-	_ "golang.org/x/tools/imports"
 )
 
 var (
@@ -61,8 +56,6 @@ var (
 		"lint":     LintDefault,
 	}
 )
-
-var goImportsFlags = []string{"-local", "github.com/6RiverSystems,go.6river.tech"}
 
 // cSpell:ignore nomsgpack
 var (
