@@ -8,8 +8,8 @@ version: 2
 updates:
   - package-ecosystem: "gomod"
     directory: "/"
-    schedule:
-      interval: "monthly"
+    # schedule:
+    #   interval: "monthly"
     # groups:
     #   go-everything:
     #     patterns:
@@ -19,8 +19,8 @@ updates:
       - "*"
   - package-ecosystem: "npm"
     directory: "/internal/ts-compat/" # Location of package manifests
-    schedule:
-      interval: "monthly"
+    # schedule:
+    #   interval: "monthly"
     versioning-strategy: increase
     # registries:
     #   - artifactory
