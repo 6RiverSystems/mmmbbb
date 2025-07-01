@@ -14,6 +14,7 @@ updates:
       go-everything:
         patterns:
           - "*"
+    multi-ecosystem-group: everything
   - package-ecosystem: "npm"
     directory: "/internal/ts-compat/" # Location of package manifests
     schedule:
@@ -25,3 +26,9 @@ updates:
       npm-ts-compat-everything:
         patterns:
           - "*"
+    multi-ecosystem-group: everything
+
+multi-ecosystem-groups:
+  everything:
+    schedule:
+      interval: "monthly"
