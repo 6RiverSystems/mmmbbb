@@ -27,7 +27,7 @@ import (
 	"regexp"
 	"time"
 
-	"cloud.google.com/go/pubsub"
+	"cloud.google.com/go/pubsub" //nolint:staticcheck // https://github.com/6RiverSystems/mmmbbb/issues/521
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

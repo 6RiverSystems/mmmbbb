@@ -29,7 +29,7 @@ import (
 	"strings"
 	"time"
 
-	"cloud.google.com/go/pubsub"
+	"cloud.google.com/go/pubsub" //nolint:staticcheck // https://github.com/6RiverSystems/mmmbbb/issues/521
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
 	"golang.org/x/sync/errgroup"
