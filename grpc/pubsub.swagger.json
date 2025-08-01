@@ -1069,6 +1069,106 @@
       "default": "STATE_UNSPECIFIED",
       "description": "Possible states for ingestion from Amazon Kinesis Data Streams.\n\n - STATE_UNSPECIFIED: Default value. This value is unused.\n - ACTIVE: Ingestion is active.\n - KINESIS_PERMISSION_DENIED: Permission denied encountered while consuming data from Kinesis.\nThis can happen if:\n  - The provided `aws_role_arn` does not exist or does not have the\n    appropriate permissions attached.\n  - The provided `aws_role_arn` is not set up properly for Identity\n    Federation using `gcp_service_account`.\n  - The Pub/Sub SA is not granted the\n    `iam.serviceAccounts.getOpenIdToken` permission on\n    `gcp_service_account`.\n - PUBLISH_PERMISSION_DENIED: Permission denied encountered while publishing to the topic. This can\nhappen if the Pub/Sub SA has not been granted the [appropriate publish\npermissions](https://cloud.google.com/pubsub/docs/access-control#pubsub.publisher)\n - STREAM_NOT_FOUND: The Kinesis stream does not exist.\n - CONSUMER_NOT_FOUND: The Kinesis consumer does not exist."
     },
+    "IngestionDataSourceSettingsAwsMsk": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "$ref": "#/definitions/IngestionDataSourceSettingsAwsMskState",
+          "description": "Output only. An output-only field that indicates the state of the Amazon\nMSK ingestion source.",
+          "readOnly": true
+        },
+        "clusterArn": {
+          "type": "string",
+          "description": "Required. The Amazon Resource Name (ARN) that uniquely identifies the\ncluster."
+        },
+        "topic": {
+          "type": "string",
+          "description": "Required. The name of the topic in the Amazon MSK cluster that Pub/Sub\nwill import from."
+        },
+        "awsRoleArn": {
+          "type": "string",
+          "description": "Required. AWS role ARN to be used for Federated Identity authentication\nwith Amazon MSK. Check the Pub/Sub docs for how to set up this role and\nthe required permissions that need to be attached to it."
+        },
+        "gcpServiceAccount": {
+          "type": "string",
+          "description": "Required. The GCP service account to be used for Federated Identity\nauthentication with Amazon MSK (via a `AssumeRoleWithWebIdentity` call\nfor the provided role). The `aws_role_arn` must be set up with\n`accounts.google.com:sub` equals to this service account number."
+        }
+      },
+      "description": "Ingestion settings for Amazon MSK.",
+      "required": [
+        "clusterArn",
+        "topic",
+        "awsRoleArn",
+        "gcpServiceAccount"
+      ]
+    },
+    "IngestionDataSourceSettingsAwsMskState": {
+      "type": "string",
+      "enum": [
+        "STATE_UNSPECIFIED",
+        "ACTIVE",
+        "MSK_PERMISSION_DENIED",
+        "PUBLISH_PERMISSION_DENIED",
+        "CLUSTER_NOT_FOUND",
+        "TOPIC_NOT_FOUND"
+      ],
+      "default": "STATE_UNSPECIFIED",
+      "description": "Possible states for managed ingestion from Amazon MSK.\n\n - STATE_UNSPECIFIED: Default value. This value is unused.\n - ACTIVE: Ingestion is active.\n - MSK_PERMISSION_DENIED: Permission denied encountered while consuming data from Amazon MSK.\n - PUBLISH_PERMISSION_DENIED: Permission denied encountered while publishing to the topic.\n - CLUSTER_NOT_FOUND: The provided MSK cluster wasn't found.\n - TOPIC_NOT_FOUND: The provided topic wasn't found."
+    },
+    "IngestionDataSourceSettingsAzureEventHubs": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "$ref": "#/definitions/IngestionDataSourceSettingsAzureEventHubsState",
+          "description": "Output only. An output-only field that indicates the state of the Event\nHubs ingestion source.",
+          "readOnly": true
+        },
+        "resourceGroup": {
+          "type": "string",
+          "description": "Optional. Name of the resource group within the azure subscription."
+        },
+        "namespace": {
+          "type": "string",
+          "description": "Optional. The name of the Event Hubs namespace."
+        },
+        "eventHub": {
+          "type": "string",
+          "description": "Optional. The name of the Event Hub."
+        },
+        "clientId": {
+          "type": "string",
+          "description": "Optional. The client id of the Azure application that is being used to\nauthenticate Pub/Sub."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Optional. The tenant id of the Azure application that is being used to\nauthenticate Pub/Sub."
+        },
+        "subscriptionId": {
+          "type": "string",
+          "description": "Optional. The Azure subscription id."
+        },
+        "gcpServiceAccount": {
+          "type": "string",
+          "description": "Optional. The GCP service account to be used for Federated Identity\nauthentication."
+        }
+      },
+      "description": "Ingestion settings for Azure Event Hubs."
+    },
+    "IngestionDataSourceSettingsAzureEventHubsState": {
+      "type": "string",
+      "enum": [
+        "STATE_UNSPECIFIED",
+        "ACTIVE",
+        "EVENT_HUBS_PERMISSION_DENIED",
+        "PUBLISH_PERMISSION_DENIED",
+        "NAMESPACE_NOT_FOUND",
+        "EVENT_HUB_NOT_FOUND",
+        "SUBSCRIPTION_NOT_FOUND",
+        "RESOURCE_GROUP_NOT_FOUND"
+      ],
+      "default": "STATE_UNSPECIFIED",
+      "description": "Possible states for managed ingestion from Event Hubs.\n\n - STATE_UNSPECIFIED: Default value. This value is unused.\n - ACTIVE: Ingestion is active.\n - EVENT_HUBS_PERMISSION_DENIED: Permission denied encountered while consuming data from Event Hubs.\nThis can happen when `client_id`, or `tenant_id` are invalid. Or the\nright permissions haven't been granted.\n - PUBLISH_PERMISSION_DENIED: Permission denied encountered while publishing to the topic.\n - NAMESPACE_NOT_FOUND: The provided Event Hubs namespace couldn't be found.\n - EVENT_HUB_NOT_FOUND: The provided Event Hub couldn't be found.\n - SUBSCRIPTION_NOT_FOUND: The provided Event Hubs subscription couldn't be found.\n - RESOURCE_GROUP_NOT_FOUND: The provided Event Hubs resource group couldn't be found."
+    },
     "IngestionDataSourceSettingsCloudStorage": {
       "type": "object",
       "properties": {
@@ -1117,6 +1217,58 @@
       ],
       "default": "STATE_UNSPECIFIED",
       "description": "Possible states for ingestion from Cloud Storage.\n\n - STATE_UNSPECIFIED: Default value. This value is unused.\n - ACTIVE: Ingestion is active.\n - CLOUD_STORAGE_PERMISSION_DENIED: Permission denied encountered while calling the Cloud Storage API. This\ncan happen if the Pub/Sub SA has not been granted the\n[appropriate\npermissions](https://cloud.google.com/storage/docs/access-control/iam-permissions):\n- storage.objects.list: to list the objects in a bucket.\n- storage.objects.get: to read the objects in a bucket.\n- storage.buckets.get: to verify the bucket exists.\n - PUBLISH_PERMISSION_DENIED: Permission denied encountered while publishing to the topic. This can\nhappen if the Pub/Sub SA has not been granted the [appropriate publish\npermissions](https://cloud.google.com/pubsub/docs/access-control#pubsub.publisher)\n - BUCKET_NOT_FOUND: The provided Cloud Storage bucket doesn't exist.\n - TOO_MANY_OBJECTS: The Cloud Storage bucket has too many objects, ingestion will be\npaused."
+    },
+    "IngestionDataSourceSettingsConfluentCloud": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "$ref": "#/definitions/IngestionDataSourceSettingsConfluentCloudState",
+          "description": "Output only. An output-only field that indicates the state of the\nConfluent Cloud ingestion source.",
+          "readOnly": true
+        },
+        "bootstrapServer": {
+          "type": "string",
+          "description": "Required. The address of the bootstrap server. The format is url:port."
+        },
+        "clusterId": {
+          "type": "string",
+          "description": "Required. The id of the cluster."
+        },
+        "topic": {
+          "type": "string",
+          "description": "Required. The name of the topic in the Confluent Cloud cluster that\nPub/Sub will import from."
+        },
+        "identityPoolId": {
+          "type": "string",
+          "description": "Required. The id of the identity pool to be used for Federated Identity\nauthentication with Confluent Cloud. See\nhttps://docs.confluent.io/cloud/current/security/authenticate/workload-identities/identity-providers/oauth/identity-pools.html#add-oauth-identity-pools."
+        },
+        "gcpServiceAccount": {
+          "type": "string",
+          "description": "Required. The GCP service account to be used for Federated Identity\nauthentication with `identity_pool_id`."
+        }
+      },
+      "description": "Ingestion settings for Confluent Cloud.",
+      "required": [
+        "bootstrapServer",
+        "clusterId",
+        "topic",
+        "identityPoolId",
+        "gcpServiceAccount"
+      ]
+    },
+    "IngestionDataSourceSettingsConfluentCloudState": {
+      "type": "string",
+      "enum": [
+        "STATE_UNSPECIFIED",
+        "ACTIVE",
+        "CONFLUENT_CLOUD_PERMISSION_DENIED",
+        "PUBLISH_PERMISSION_DENIED",
+        "UNREACHABLE_BOOTSTRAP_SERVER",
+        "CLUSTER_NOT_FOUND",
+        "TOPIC_NOT_FOUND"
+      ],
+      "default": "STATE_UNSPECIFIED",
+      "description": "Possible states for managed ingestion from Confluent Cloud.\n\n - STATE_UNSPECIFIED: Default value. This value is unused.\n - ACTIVE: Ingestion is active.\n - CONFLUENT_CLOUD_PERMISSION_DENIED: Permission denied encountered while consuming data from Confluent\nCloud.\n - PUBLISH_PERMISSION_DENIED: Permission denied encountered while publishing to the topic.\n - UNREACHABLE_BOOTSTRAP_SERVER: The provided bootstrap server address is unreachable.\n - CLUSTER_NOT_FOUND: The provided cluster wasn't found.\n - TOPIC_NOT_FOUND: The provided topic wasn't found."
     },
     "PlatformLogsSettingsSeverity": {
       "type": "string",
@@ -1169,6 +1321,14 @@
         "ingestionDataSourceSettings": {
           "$ref": "#/definitions/v1IngestionDataSourceSettings",
           "description": "Optional. Settings for ingestion from a data source into this topic."
+        },
+        "messageTransforms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MessageTransform"
+          },
+          "description": "Optional. Transforms to be applied to messages published to the topic.\nTransforms are applied in the order specified."
         }
       },
       "description": "A topic resource."
@@ -1231,6 +1391,14 @@
             "ingestionDataSourceSettings": {
               "$ref": "#/definitions/v1IngestionDataSourceSettings",
               "description": "Optional. Settings for ingestion from a data source into this topic."
+            },
+            "messageTransforms": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/v1MessageTransform"
+              },
+              "description": "Optional. Transforms to be applied to messages published to the topic.\nTransforms are applied in the order specified."
             }
           },
           "description": "Required. The updated topic object.",
@@ -1283,31 +1451,31 @@
           "items": {
             "type": "string"
           },
-          "description": "Optional. Successfully processed acknowledgement IDs."
+          "description": "Optional. Successfully processed acknowledgment IDs."
         },
         "invalidAckIds": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Optional. List of acknowledgement IDs that were malformed or whose\nacknowledgement deadline has expired."
+          "description": "Optional. List of acknowledgment IDs that were malformed or whose\nacknowledgment deadline has expired."
         },
         "unorderedAckIds": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Optional. List of acknowledgement IDs that were out of order."
+          "description": "Optional. List of acknowledgment IDs that were out of order."
         },
         "temporaryFailedAckIds": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Optional. List of acknowledgement IDs that failed processing with\ntemporary issues."
+          "description": "Optional. List of acknowledgment IDs that failed processing with\ntemporary issues."
         }
       },
-      "description": "Acknowledgement IDs sent in one or more previous requests to acknowledge a\npreviously received message."
+      "description": "Acknowledgment IDs sent in one or more previous requests to acknowledge a\npreviously received message."
     },
     "StreamingPullResponseModifyAckDeadlineConfirmation": {
       "type": "object",
@@ -1317,24 +1485,24 @@
           "items": {
             "type": "string"
           },
-          "description": "Optional. Successfully processed acknowledgement IDs."
+          "description": "Optional. Successfully processed acknowledgment IDs."
         },
         "invalidAckIds": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Optional. List of acknowledgement IDs that were malformed or whose\nacknowledgement deadline has expired."
+          "description": "Optional. List of acknowledgment IDs that were malformed or whose\nacknowledgment deadline has expired."
         },
         "temporaryFailedAckIds": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Optional. List of acknowledgement IDs that failed processing with\ntemporary issues."
+          "description": "Optional. List of acknowledgment IDs that failed processing with\ntemporary issues."
         }
       },
-      "description": "Acknowledgement IDs sent in one or more previous requests to modify the\ndeadline for a specific message."
+      "description": "Acknowledgment IDs sent in one or more previous requests to modify the\ndeadline for a specific message."
     },
     "StreamingPullResponseSubscriptionProperties": {
       "type": "object",
@@ -1443,7 +1611,7 @@
         },
         "retryPolicy": {
           "$ref": "#/definitions/v1RetryPolicy",
-          "description": "Optional. A policy that specifies how Pub/Sub retries message delivery for\nthis subscription.\n\nIf not set, the default retry policy is applied. This generally implies\nthat messages will be retried as soon as possible for healthy subscribers.\nRetryPolicy will be triggered on NACKs or acknowledgement deadline\nexceeded events for a given message."
+          "description": "Optional. A policy that specifies how Pub/Sub retries message delivery for\nthis subscription.\n\nIf not set, the default retry policy is applied. This generally implies\nthat messages will be retried as soon as possible for healthy subscribers.\nRetryPolicy will be triggered on NACKs or acknowledgment deadline exceeded\nevents for a given message."
         },
         "detached": {
           "type": "boolean",
@@ -1451,7 +1619,7 @@
         },
         "enableExactlyOnceDelivery": {
           "type": "boolean",
-          "description": "* The message sent to a subscriber is guaranteed not to be resent\nbefore the message's acknowledgement deadline expires.\n* An acknowledged message will not be resent to a subscriber.\n\nNote that subscribers may still receive multiple copies of a message\nwhen `enable_exactly_once_delivery` is true if the message was published\nmultiple times by a publisher client. These copies are  considered distinct\nby Pub/Sub and have distinct `message_id` values.",
+          "description": "* The message sent to a subscriber is guaranteed not to be resent\nbefore the message's acknowledgment deadline expires.\n* An acknowledged message will not be resent to a subscriber.\n\nNote that subscribers may still receive multiple copies of a message\nwhen `enable_exactly_once_delivery` is true if the message was published\nmultiple times by a publisher client. These copies are  considered distinct\nby Pub/Sub and have distinct `message_id` values.",
           "title": "Optional. If true, Pub/Sub provides the following guarantees for the\ndelivery of a message with a given value of `message_id` on this\nsubscription:"
         },
         "topicMessageRetentionDuration": {
@@ -1468,6 +1636,14 @@
           "$ref": "#/definitions/SubscriptionAnalyticsHubSubscriptionInfo",
           "description": "Output only. Information about the associated Analytics Hub subscription.\nOnly set if the subscritpion is created by Analytics Hub.",
           "readOnly": true
+        },
+        "messageTransforms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MessageTransform"
+          },
+          "description": "Optional. Transforms to be applied to messages before they are delivered to\nsubscribers. Transforms are applied in the order specified."
         }
       },
       "description": "A subscription resource. If none of `push_config`, `bigquery_config`, or\n`cloud_storage_config` is set, then the subscriber will pull and ack messages\nusing API methods. At most one of these fields may be set.",
@@ -1640,7 +1816,7 @@
             },
             "retryPolicy": {
               "$ref": "#/definitions/v1RetryPolicy",
-              "description": "Optional. A policy that specifies how Pub/Sub retries message delivery for\nthis subscription.\n\nIf not set, the default retry policy is applied. This generally implies\nthat messages will be retried as soon as possible for healthy subscribers.\nRetryPolicy will be triggered on NACKs or acknowledgement deadline\nexceeded events for a given message."
+              "description": "Optional. A policy that specifies how Pub/Sub retries message delivery for\nthis subscription.\n\nIf not set, the default retry policy is applied. This generally implies\nthat messages will be retried as soon as possible for healthy subscribers.\nRetryPolicy will be triggered on NACKs or acknowledgment deadline exceeded\nevents for a given message."
             },
             "detached": {
               "type": "boolean",
@@ -1648,7 +1824,7 @@
             },
             "enableExactlyOnceDelivery": {
               "type": "boolean",
-              "description": "* The message sent to a subscriber is guaranteed not to be resent\nbefore the message's acknowledgement deadline expires.\n* An acknowledged message will not be resent to a subscriber.\n\nNote that subscribers may still receive multiple copies of a message\nwhen `enable_exactly_once_delivery` is true if the message was published\nmultiple times by a publisher client. These copies are  considered distinct\nby Pub/Sub and have distinct `message_id` values.",
+              "description": "* The message sent to a subscriber is guaranteed not to be resent\nbefore the message's acknowledgment deadline expires.\n* An acknowledged message will not be resent to a subscriber.\n\nNote that subscribers may still receive multiple copies of a message\nwhen `enable_exactly_once_delivery` is true if the message was published\nmultiple times by a publisher client. These copies are  considered distinct\nby Pub/Sub and have distinct `message_id` values.",
               "title": "Optional. If true, Pub/Sub provides the following guarantees for the\ndelivery of a message with a given value of `message_id` on this\nsubscription:"
             },
             "topicMessageRetentionDuration": {
@@ -1665,6 +1841,14 @@
               "$ref": "#/definitions/SubscriptionAnalyticsHubSubscriptionInfo",
               "description": "Output only. Information about the associated Analytics Hub subscription.\nOnly set if the subscritpion is created by Analytics Hub.",
               "readOnly": true
+            },
+            "messageTransforms": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/v1MessageTransform"
+              },
+              "description": "Optional. Transforms to be applied to messages before they are delivered to\nsubscribers. Transforms are applied in the order specified."
             }
           },
           "description": "Required. The updated subscription object.",
@@ -1694,7 +1878,7 @@
           "title": "Optional. The name of the associated Analytics Hub subscription resource.\nPattern:\n\"projects/{project}/locations/{location}/subscriptions/{subscription}\""
         }
       },
-      "description": "Information about an associated Analytics Hub subscription\n(https://cloud.google.com/bigquery/docs/analytics-hub-manage-subscriptions)."
+      "description": "Information about an associated [Analytics Hub\nsubscription](https://cloud.google.com/bigquery/docs/analytics-hub-manage-subscriptions)."
     },
     "protobufAny": {
       "type": "object",
@@ -1801,7 +1985,7 @@
         },
         "maxDuration": {
           "type": "string",
-          "description": "Optional. The maximum duration that can elapse before a new Cloud Storage\nfile is created. Min 1 minute, max 10 minutes, default 5 minutes. May not\nexceed the subscription's acknowledgement deadline."
+          "description": "Optional. The maximum duration that can elapse before a new Cloud Storage\nfile is created. Min 1 minute, max 10 minutes, default 5 minutes. May not\nexceed the subscription's acknowledgment deadline."
         },
         "maxBytes": {
           "type": "string",
@@ -1851,7 +2035,7 @@
         "maxDeliveryAttempts": {
           "type": "integer",
           "format": "int32",
-          "description": "Optional. The maximum number of delivery attempts for any message. The\nvalue must be between 5 and 100.\n\nThe number of delivery attempts is defined as 1 + (the sum of number of\nNACKs and number of times the acknowledgement deadline has been exceeded\nfor the message).\n\nA NACK is any call to ModifyAckDeadline with a 0 deadline. Note that\nclient libraries may automatically extend ack_deadlines.\n\nThis field will be honored on a best effort basis.\n\nIf this parameter is 0, a default value of 5 is used."
+          "description": "Optional. The maximum number of delivery attempts for any message. The\nvalue must be between 5 and 100.\n\nThe number of delivery attempts is defined as 1 + (the sum of number of\nNACKs and number of times the acknowledgment deadline has been exceeded\nfor the message).\n\nA NACK is any call to ModifyAckDeadline with a 0 deadline. Note that\nclient libraries may automatically extend ack_deadlines.\n\nThis field will be honored on a best effort basis.\n\nIf this parameter is 0, a default value of 5 is used."
         }
       },
       "description": "Dead lettering is done on a best effort basis. The same message might be\ndead lettered multiple times.\n\nIf validation on any of the fields fails at subscription creation/updation,\nthe create/update subscription request will fail."
@@ -1891,12 +2075,43 @@
           "$ref": "#/definitions/IngestionDataSourceSettingsCloudStorage",
           "description": "Optional. Cloud Storage."
         },
+        "azureEventHubs": {
+          "$ref": "#/definitions/IngestionDataSourceSettingsAzureEventHubs",
+          "description": "Optional. Azure Event Hubs."
+        },
+        "awsMsk": {
+          "$ref": "#/definitions/IngestionDataSourceSettingsAwsMsk",
+          "description": "Optional. Amazon MSK."
+        },
+        "confluentCloud": {
+          "$ref": "#/definitions/IngestionDataSourceSettingsConfluentCloud",
+          "description": "Optional. Confluent Cloud."
+        },
         "platformLogsSettings": {
           "$ref": "#/definitions/v1PlatformLogsSettings",
           "description": "Optional. Platform Logs settings. If unset, no Platform Logs will be\ngenerated."
         }
       },
       "description": "Settings for an ingestion data source on a topic."
+    },
+    "v1JavaScriptUDF": {
+      "type": "object",
+      "properties": {
+        "functionName": {
+          "type": "string",
+          "description": "Required. Name of the JavasScript function that should applied to Pub/Sub\nmessages."
+        },
+        "code": {
+          "type": "string",
+          "description": "```\n  /**\n  * Transforms a Pub/Sub message.\n\n  * @return {(Object\u003cstring, (string | Object\u003cstring, string\u003e)\u003e|null)} - To\n  * filter a message, return `null`. To transform a message return a map\n  * with the following keys:\n  *   - (required) 'data' : {string}\n  *   - (optional) 'attributes' : {Object\u003cstring, string\u003e}\n  * Returning empty `attributes` will remove all attributes from the\n  * message.\n  *\n  * @param  {(Object\u003cstring, (string | Object\u003cstring, string\u003e)\u003e} Pub/Sub\n  * message. Keys:\n  *   - (required) 'data' : {string}\n  *   - (required) 'attributes' : {Object\u003cstring, string\u003e}\n  *\n  * @param  {Object\u003cstring, any\u003e} metadata - Pub/Sub message metadata.\n  * Keys:\n  *   - (optional) 'message_id'  : {string}\n  *   - (optional) 'publish_time': {string} YYYY-MM-DDTHH:MM:SSZ format\n  *   - (optional) 'ordering_key': {string}\n  */\n\n  function \u003cfunction_name\u003e(message, metadata) {\n  }\n```",
+          "title": "Required. JavaScript code that contains a function `function_name` with the\nbelow signature:"
+        }
+      },
+      "description": "User-defined JavaScript function that can transform or filter a Pub/Sub\nmessage.",
+      "required": [
+        "functionName",
+        "code"
+      ]
     },
     "v1ListSnapshotsResponse": {
       "type": "object",
@@ -2002,6 +2217,24 @@
         }
       },
       "description": "A policy constraining the storage of messages published to the topic."
+    },
+    "v1MessageTransform": {
+      "type": "object",
+      "properties": {
+        "javascriptUdf": {
+          "$ref": "#/definitions/v1JavaScriptUDF",
+          "description": "Optional. JavaScript User Defined Function. If multiple JavaScriptUDF's\nare specified on a resource, each must have a unique `function_name`."
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Optional. This field is deprecated, use the `disabled` field to disable\ntransforms."
+        },
+        "disabled": {
+          "type": "boolean",
+          "description": "Optional. If true, the transform is disabled and will not be applied to\nmessages. Defaults to `false`."
+        }
+      },
+      "description": "All supported message transforms types."
     },
     "v1PlatformLogsSettings": {
       "type": "object",
@@ -2131,7 +2364,7 @@
           "description": "Optional. The maximum delay between consecutive deliveries of a given\nmessage. Value should be between 0 and 600 seconds. Defaults to 600\nseconds."
         }
       },
-      "description": "A policy that specifies how Pub/Sub retries message delivery.\n\nRetry delay will be exponential based on provided minimum and maximum\nbackoffs. https://en.wikipedia.org/wiki/Exponential_backoff.\n\nRetryPolicy will be triggered on NACKs or acknowledgement deadline exceeded\nevents for a given message.\n\nRetry Policy is implemented on a best effort basis. At times, the delay\nbetween consecutive deliveries may not match the configuration. That is,\ndelay can be more or less than configured backoff."
+      "description": "A policy that specifies how Pub/Sub retries message delivery.\n\nRetry delay will be exponential based on provided minimum and maximum\nbackoffs. https://en.wikipedia.org/wiki/Exponential_backoff.\n\nRetryPolicy will be triggered on NACKs or acknowledgment deadline exceeded\nevents for a given message.\n\nRetry Policy is implemented on a best effort basis. At times, the delay\nbetween consecutive deliveries may not match the configuration. That is,\ndelay can be more or less than configured backoff."
     },
     "v1SchemaSettings": {
       "type": "object",
@@ -2201,11 +2434,11 @@
         },
         "acknowledgeConfirmation": {
           "$ref": "#/definitions/StreamingPullResponseAcknowledgeConfirmation",
-          "description": "Optional. This field will only be set if `enable_exactly_once_delivery` is\nset to `true`."
+          "description": "Optional. This field will only be set if `enable_exactly_once_delivery` is\nset to `true` and is not guaranteed to be populated."
         },
         "modifyAckDeadlineConfirmation": {
           "$ref": "#/definitions/StreamingPullResponseModifyAckDeadlineConfirmation",
-          "description": "Optional. This field will only be set if `enable_exactly_once_delivery` is\nset to `true`."
+          "description": "Optional. This field will only be set if `enable_exactly_once_delivery` is\nset to `true` and is not guaranteed to be populated."
         },
         "subscriptionProperties": {
           "$ref": "#/definitions/StreamingPullResponseSubscriptionProperties",
@@ -2275,7 +2508,7 @@
         },
         "retryPolicy": {
           "$ref": "#/definitions/v1RetryPolicy",
-          "description": "Optional. A policy that specifies how Pub/Sub retries message delivery for\nthis subscription.\n\nIf not set, the default retry policy is applied. This generally implies\nthat messages will be retried as soon as possible for healthy subscribers.\nRetryPolicy will be triggered on NACKs or acknowledgement deadline\nexceeded events for a given message."
+          "description": "Optional. A policy that specifies how Pub/Sub retries message delivery for\nthis subscription.\n\nIf not set, the default retry policy is applied. This generally implies\nthat messages will be retried as soon as possible for healthy subscribers.\nRetryPolicy will be triggered on NACKs or acknowledgment deadline exceeded\nevents for a given message."
         },
         "detached": {
           "type": "boolean",
@@ -2283,7 +2516,7 @@
         },
         "enableExactlyOnceDelivery": {
           "type": "boolean",
-          "description": "* The message sent to a subscriber is guaranteed not to be resent\nbefore the message's acknowledgement deadline expires.\n* An acknowledged message will not be resent to a subscriber.\n\nNote that subscribers may still receive multiple copies of a message\nwhen `enable_exactly_once_delivery` is true if the message was published\nmultiple times by a publisher client. These copies are  considered distinct\nby Pub/Sub and have distinct `message_id` values.",
+          "description": "* The message sent to a subscriber is guaranteed not to be resent\nbefore the message's acknowledgment deadline expires.\n* An acknowledged message will not be resent to a subscriber.\n\nNote that subscribers may still receive multiple copies of a message\nwhen `enable_exactly_once_delivery` is true if the message was published\nmultiple times by a publisher client. These copies are  considered distinct\nby Pub/Sub and have distinct `message_id` values.",
           "title": "Optional. If true, Pub/Sub provides the following guarantees for the\ndelivery of a message with a given value of `message_id` on this\nsubscription:"
         },
         "topicMessageRetentionDuration": {
@@ -2300,6 +2533,14 @@
           "$ref": "#/definitions/SubscriptionAnalyticsHubSubscriptionInfo",
           "description": "Output only. Information about the associated Analytics Hub subscription.\nOnly set if the subscritpion is created by Analytics Hub.",
           "readOnly": true
+        },
+        "messageTransforms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MessageTransform"
+          },
+          "description": "Optional. Transforms to be applied to messages before they are delivered to\nsubscribers. Transforms are applied in the order specified."
         }
       },
       "description": "A subscription resource. If none of `push_config`, `bigquery_config`, or\n`cloud_storage_config` is set, then the subscriber will pull and ack messages\nusing API methods. At most one of these fields may be set.",
@@ -2360,6 +2601,14 @@
         "ingestionDataSourceSettings": {
           "$ref": "#/definitions/v1IngestionDataSourceSettings",
           "description": "Optional. Settings for ingestion from a data source into this topic."
+        },
+        "messageTransforms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1MessageTransform"
+          },
+          "description": "Optional. Transforms to be applied to messages published to the topic.\nTransforms are applied in the order specified."
         }
       },
       "description": "A topic resource.",

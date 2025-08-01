@@ -31,11 +31,11 @@ rm -vf pubsubpb/*{.pb.go,.pb.gw.go,-types.go} *.swagger.json
 
 pushd "$td"
 curl -s --location --fail -o googleapis.tgz \
-	https://github.com/googleapis/googleapis/archive/ea947de5d1fca3a75723d993815827e835aed7cf.tar.gz
+	https://github.com/googleapis/googleapis/archive/master.tar.gz
 curl -s --location --fail -o grpc-proto.tgz \
 	https://github.com/grpc/grpc-proto/archive/master.tar.gz
 
-tar -zxf googleapis.tgz --strip-components=1 googleapis-ea947de5d1fca3a75723d993815827e835aed7cf/google/
+tar -zxf googleapis.tgz --strip-components=1 googleapis-master/google/
 tar -zxf grpc-proto.tgz --strip-components=1 grpc-proto-master/grpc/
 
 protoc \
@@ -54,9 +54,7 @@ popd # back to source dir
 
 mkdir -p pubsubpb
 cp -avf \
-	"${td}/google/pubsub/v1/pubsub_grpc.pb.go" \
 	"${td}/google/pubsub/v1/pubsub.pb.gw.go" \
-	"${td}/google/pubsub/v1/schema_grpc.pb.go" \
 	"${td}/google/pubsub/v1/schema.pb.gw.go" \
 	pubsubpb/
 
@@ -66,4 +64,6 @@ cp -avf \
 cp -avf "${td}/google/pubsub/v1/pubsub.swagger.json" "${td}/google/pubsub/v1/schema.swagger.json" .
 
 ./gen-types.sh pubsubpb cloud.google.com/go/pubsub/v2/apiv1/pubsubpb "${td}/google/pubsub/v1/pubsub.pb.go" pubsubpb/pubsub-types.go
+./gen-types.sh pubsubpb cloud.google.com/go/pubsub/v2/apiv1/pubsubpb "${td}/google/pubsub/v1/pubsub_grpc.pb.go" pubsubpb/pubsub-grpc-types.go
 ./gen-types.sh pubsubpb cloud.google.com/go/pubsub/v2/apiv1/pubsubpb "${td}/google/pubsub/v1/schema.pb.go" pubsubpb/schema-types.go
+./gen-types.sh pubsubpb cloud.google.com/go/pubsub/v2/apiv1/pubsubpb "${td}/google/pubsub/v1/schema_grpc.pb.go" pubsubpb/schema-grpc-types.go
