@@ -76,7 +76,7 @@ func TestHttpPush(t *testing.T) {
 			nil,
 			func(t *testing.T, msgs chan *actions.PushRequest) error {
 				m := <-msgs
-				assert.Equal(t, safeName(t), m.Subscription)
+				assert.Equal(t, safeID(t), m.Subscription)
 				decoded, err := base64.StdEncoding.DecodeString(m.Message.Data)
 				assert.NoError(t, err, "message data should be base64 decodable")
 				assertEqualJSON(t, map[string]any{"sequence": 0.0}, decoded)
@@ -99,7 +99,7 @@ func TestHttpPush(t *testing.T) {
 				<-time.After(25 * time.Millisecond)
 				if err := client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
 					sub, err := tx.Subscription.Query().
-						Where(subscription.Name(safeName(t))).
+						Where(subscription.Name(safeID(t))).
 						Only(ctx)
 					if !assert.NoError(t, err) {
 						return err
@@ -125,7 +125,7 @@ func TestHttpPush(t *testing.T) {
 			nil,
 			func(t *testing.T, msgs chan *actions.PushRequest) error {
 				m := <-msgs
-				assert.Equal(t, safeName(t), m.Subscription)
+				assert.Equal(t, safeID(t), m.Subscription)
 				decoded, err := base64.StdEncoding.DecodeString(m.Message.Data)
 				assert.NoError(t, err, "message data should be base64 decodable")
 				assertEqualJSON(t, map[string]any{"sequence": 0.0}, decoded)
@@ -146,7 +146,7 @@ func TestHttpPush(t *testing.T) {
 				}
 				if err := client.DoCtxTx(t.Context(), nil, func(ctx context.Context, tx *ent.Tx) error {
 					sub, err := tx.Subscription.Query().
-						Where(subscription.Name(safeName(t))).
+						Where(subscription.Name(safeID(t))).
 						Only(ctx)
 					if !assert.NoError(t, err) {
 						return err
@@ -180,7 +180,7 @@ func TestHttpPush(t *testing.T) {
 			nil,
 			func(t *testing.T, msgs chan *actions.PushRequest) error {
 				m := <-msgs
-				assert.Equal(t, safeName(t), m.Subscription)
+				assert.Equal(t, safeID(t), m.Subscription)
 				decoded, err := base64.StdEncoding.DecodeString(m.Message.Data)
 				assert.NoError(t, err, "message data should be base64 decodable")
 				assertEqualJSON(t, map[string]any{"sequence": 1.0}, decoded)
@@ -207,7 +207,7 @@ func TestHttpPush(t *testing.T) {
 				got := map[int]struct{}{}
 				for len(got) < 100 {
 					m := <-msgs
-					assert.Equal(t, safeName(t), m.Subscription)
+					assert.Equal(t, safeID(t), m.Subscription)
 					var mm struct {
 						Sequence int `json:"sequence"`
 					}
@@ -238,7 +238,7 @@ func TestHttpPush(t *testing.T) {
 				if incomplete, err := s.client.Delivery.Query().
 					Where(
 						delivery.CompletedAtIsNil(),
-						delivery.HasSubscriptionWith(subscription.Name(safeName(t))),
+						delivery.HasSubscriptionWith(subscription.Name(safeID(t))),
 					).
 					Count(t.Context()); assert.NoError(t, err) {
 					assert.Zero(t, incomplete, "all messages should have been delivered and ACKed")
@@ -277,7 +277,7 @@ func TestHttpPush(t *testing.T) {
 				got := map[int]struct{}{}
 				for len(got) < 4 {
 					m := <-msgs
-					assert.Equal(t, safeName(t), m.Subscription)
+					assert.Equal(t, safeID(t), m.Subscription)
 					var mm struct {
 						Sequence int `json:"sequence"`
 					}
@@ -340,7 +340,7 @@ func TestHttpPush(t *testing.T) {
 				got := map[int]struct{}{}
 				for len(got) < 11 {
 					m := <-msgs
-					assert.Equal(t, safeName(t), m.Subscription)
+					assert.Equal(t, safeID(t), m.Subscription)
 					var mm struct {
 						Sequence int `json:"sequence"`
 					}
@@ -376,7 +376,7 @@ func TestHttpPush(t *testing.T) {
 				if del, err := s.client.Delivery.Query().
 					Where(
 						delivery.CompletedAtIsNil(),
-						delivery.HasSubscriptionWith(subscription.Name(safeName(t))),
+						delivery.HasSubscriptionWith(subscription.Name(safeID(t))),
 					).
 					Only(t.Context()); assert.NoError(t, err) {
 					assert.Equal(t, 1, del.Attempts)
@@ -411,7 +411,7 @@ func TestHttpPush(t *testing.T) {
 			func(t *testing.T, msgs chan *actions.PushRequest) error {
 				for range 2 {
 					m := <-msgs
-					assert.Equal(t, safeName(t), m.Subscription)
+					assert.Equal(t, safeID(t), m.Subscription)
 					var mm struct {
 						Sequence int `json:"sequence"`
 					}
@@ -443,7 +443,7 @@ func TestHttpPush(t *testing.T) {
 				if del, err := s.client.Delivery.Query().
 					Where(
 						delivery.CompletedAtIsNil(),
-						delivery.HasSubscriptionWith(subscription.Name(safeName(t))),
+						delivery.HasSubscriptionWith(subscription.Name(safeID(t))),
 					).
 					Only(t.Context()); assert.NoError(t, err) {
 					assert.Equal(t, 2, del.Attempts)
@@ -474,7 +474,7 @@ func TestHttpPush(t *testing.T) {
 			require.NoError(
 				t,
 				client.DoCtxTx(ctx, nil, actions.NewCreateTopic(actions.CreateTopicParams{
-					Name: safeName(t),
+					Name: safeID(t),
 				}).Execute),
 			)
 			initialEndpoint := ""
@@ -488,8 +488,8 @@ func TestHttpPush(t *testing.T) {
 					ctx,
 					nil,
 					actions.NewCreateSubscription(actions.CreateSubscriptionParams{
-						TopicName:    safeName(t),
-						Name:         safeName(t),
+						TopicName:    safeID(t),
+						Name:         safeID(t),
 						PushEndpoint: initialEndpoint,
 						TTL:          time.Minute,
 						MessageTTL:   time.Minute,
@@ -606,7 +606,7 @@ func assertNoMore(t testing.TB, msgs chan *actions.PushRequest) {
 
 func publishMarker(t testing.TB, client *ent.Client, sequence int) error {
 	err := client.DoCtxTx(t.Context(), nil, actions.NewPublishMessage(actions.PublishMessageParams{
-		TopicName: safeName(t),
+		TopicName: safeID(t),
 		Payload:   json.RawMessage(fmt.Sprintf(`{"sequence": %d}`, sequence)),
 	}).Execute)
 	assert.NoError(t, err)

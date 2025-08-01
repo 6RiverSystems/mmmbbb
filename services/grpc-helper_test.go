@@ -26,7 +26,7 @@ import (
 	"strings"
 	"testing"
 
-	"cloud.google.com/go/pubsub" //nolint:staticcheck // https://github.com/6RiverSystems/mmmbbb/issues/521
+	"cloud.google.com/go/pubsub/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/sync/errgroup"
@@ -41,7 +41,7 @@ import (
 	"go.6river.tech/mmmbbb/logging"
 )
 
-func safeName(t testing.TB) string {
+func safeID(t testing.TB) string {
 	name := t.Name()
 	name = strings.ReplaceAll(name, "/", "_")
 	return name
@@ -110,7 +110,7 @@ func initPubsubClient(t testing.TB) *pubsub.Client {
 	var err error
 	psClient, err := pubsub.NewClient(
 		t.Context(),
-		safeName(t),
+		safeID(t),
 	)
 	require.NoError(t, err)
 	t.Cleanup(func() { assert.NoError(t, psClient.Close()) })

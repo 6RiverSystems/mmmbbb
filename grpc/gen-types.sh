@@ -37,5 +37,6 @@ set -euo pipefail
 	# generate a type alias for every exported type from the upstream package
 	cat "$3" \
 		| grep '^type [A-Z]' \
+		| grep -v '^type Unsafe' \
 		| sed -e 's/^type \([^ ]*\) .*/type \1 = upstream.\1/'
 } > "$4"

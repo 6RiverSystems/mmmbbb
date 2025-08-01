@@ -23,7 +23,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -95,13 +95,16 @@ func ClientForTest(t testing.TB, opts ...ent.Option) *ent.Client {
 		if dsn = os.Getenv("DATABASE_URL"); dsn == "" {
 			dsn = StartDockertest(t)
 			t.Setenv("DATABASE_URL", dsn)
+			t.Logf("using postgres acceptance DB: %s", dsn)
 		}
 	} else {
 		driverName = db.SQLiteDriverName
 		dialectName = dialect.SQLite
 		// cannot use memory DBs for this app due to
 		// https://github.com/mattn/go-sqlite3/issues/923
-		dsn = db.SQLiteDSN(path.Join(t.TempDir(), version.AppName+"_test"), true, false)
+		filename := filepath.Join(t.TempDir(), version.AppName+"_test")
+		dsn = db.SQLiteDSN(filename, true, false)
+		t.Logf("using sqlite test DB: %s", dsn)
 	}
 	conn, err := db.Open(driverName, dialectName, dsn)
 	if err != nil {
