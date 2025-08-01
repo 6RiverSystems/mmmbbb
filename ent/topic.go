@@ -88,7 +88,7 @@ func (*Topic) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Topic fields.
-func (t *Topic) assignValues(columns []string, values []any) error {
+func (_m *Topic) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -98,44 +98,44 @@ func (t *Topic) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				t.ID = *value
+				_m.ID = *value
 			}
 		case topic.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				t.Name = value.String
+				_m.Name = value.String
 			}
 		case topic.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field createdAt", values[i])
 			} else if value.Valid {
-				t.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case topic.FieldLive:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field live", values[i])
 			} else if value.Valid {
-				t.Live = new(bool)
-				*t.Live = value.Bool
+				_m.Live = new(bool)
+				*_m.Live = value.Bool
 			}
 		case topic.FieldDeletedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field deletedAt", values[i])
 			} else if value.Valid {
-				t.DeletedAt = new(time.Time)
-				*t.DeletedAt = value.Time
+				_m.DeletedAt = new(time.Time)
+				*_m.DeletedAt = value.Time
 			}
 		case topic.FieldLabels:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field labels", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &t.Labels); err != nil {
+				if err := json.Unmarshal(*value, &_m.Labels); err != nil {
 					return fmt.Errorf("unmarshal field labels: %w", err)
 				}
 			}
 		default:
-			t.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -143,61 +143,61 @@ func (t *Topic) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Topic.
 // This includes values selected through modifiers, order, etc.
-func (t *Topic) Value(name string) (ent.Value, error) {
-	return t.selectValues.Get(name)
+func (_m *Topic) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QuerySubscriptions queries the "subscriptions" edge of the Topic entity.
-func (t *Topic) QuerySubscriptions() *SubscriptionQuery {
-	return NewTopicClient(t.config).QuerySubscriptions(t)
+func (_m *Topic) QuerySubscriptions() *SubscriptionQuery {
+	return NewTopicClient(_m.config).QuerySubscriptions(_m)
 }
 
 // QueryMessages queries the "messages" edge of the Topic entity.
-func (t *Topic) QueryMessages() *MessageQuery {
-	return NewTopicClient(t.config).QueryMessages(t)
+func (_m *Topic) QueryMessages() *MessageQuery {
+	return NewTopicClient(_m.config).QueryMessages(_m)
 }
 
 // Update returns a builder for updating this Topic.
 // Note that you need to call Topic.Unwrap() before calling this method if this Topic
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (t *Topic) Update() *TopicUpdateOne {
-	return NewTopicClient(t.config).UpdateOne(t)
+func (_m *Topic) Update() *TopicUpdateOne {
+	return NewTopicClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Topic entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (t *Topic) Unwrap() *Topic {
-	_tx, ok := t.config.driver.(*txDriver)
+func (_m *Topic) Unwrap() *Topic {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Topic is not a transactional entity")
 	}
-	t.config.driver = _tx.drv
-	return t
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (t *Topic) String() string {
+func (_m *Topic) String() string {
 	var builder strings.Builder
 	builder.WriteString("Topic(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", t.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("name=")
-	builder.WriteString(t.Name)
+	builder.WriteString(_m.Name)
 	builder.WriteString(", ")
 	builder.WriteString("createdAt=")
-	builder.WriteString(t.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	if v := t.Live; v != nil {
+	if v := _m.Live; v != nil {
 		builder.WriteString("live=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
-	if v := t.DeletedAt; v != nil {
+	if v := _m.DeletedAt; v != nil {
 		builder.WriteString("deletedAt=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("labels=")
-	builder.WriteString(fmt.Sprintf("%v", t.Labels))
+	builder.WriteString(fmt.Sprintf("%v", _m.Labels))
 	builder.WriteByte(')')
 	return builder.String()
 }

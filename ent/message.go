@@ -89,7 +89,7 @@ func (*Message) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Message fields.
-func (m *Message) assignValues(columns []string, values []any) error {
+func (_m *Message) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -99,19 +99,19 @@ func (m *Message) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				m.ID = *value
+				_m.ID = *value
 			}
 		case message.FieldTopicID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field topicID", values[i])
 			} else if value != nil {
-				m.TopicID = *value
+				_m.TopicID = *value
 			}
 		case message.FieldPayload:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field payload", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &m.Payload); err != nil {
+				if err := json.Unmarshal(*value, &_m.Payload); err != nil {
 					return fmt.Errorf("unmarshal field payload: %w", err)
 				}
 			}
@@ -119,7 +119,7 @@ func (m *Message) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field attributes", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &m.Attributes); err != nil {
+				if err := json.Unmarshal(*value, &_m.Attributes); err != nil {
 					return fmt.Errorf("unmarshal field attributes: %w", err)
 				}
 			}
@@ -127,17 +127,17 @@ func (m *Message) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field publishedAt", values[i])
 			} else if value.Valid {
-				m.PublishedAt = value.Time
+				_m.PublishedAt = value.Time
 			}
 		case message.FieldOrderKey:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field orderKey", values[i])
 			} else if value.Valid {
-				m.OrderKey = new(string)
-				*m.OrderKey = value.String
+				_m.OrderKey = new(string)
+				*_m.OrderKey = value.String
 			}
 		default:
-			m.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -145,56 +145,56 @@ func (m *Message) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Message.
 // This includes values selected through modifiers, order, etc.
-func (m *Message) Value(name string) (ent.Value, error) {
-	return m.selectValues.Get(name)
+func (_m *Message) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryDeliveries queries the "deliveries" edge of the Message entity.
-func (m *Message) QueryDeliveries() *DeliveryQuery {
-	return NewMessageClient(m.config).QueryDeliveries(m)
+func (_m *Message) QueryDeliveries() *DeliveryQuery {
+	return NewMessageClient(_m.config).QueryDeliveries(_m)
 }
 
 // QueryTopic queries the "topic" edge of the Message entity.
-func (m *Message) QueryTopic() *TopicQuery {
-	return NewMessageClient(m.config).QueryTopic(m)
+func (_m *Message) QueryTopic() *TopicQuery {
+	return NewMessageClient(_m.config).QueryTopic(_m)
 }
 
 // Update returns a builder for updating this Message.
 // Note that you need to call Message.Unwrap() before calling this method if this Message
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (m *Message) Update() *MessageUpdateOne {
-	return NewMessageClient(m.config).UpdateOne(m)
+func (_m *Message) Update() *MessageUpdateOne {
+	return NewMessageClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Message entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (m *Message) Unwrap() *Message {
-	_tx, ok := m.config.driver.(*txDriver)
+func (_m *Message) Unwrap() *Message {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Message is not a transactional entity")
 	}
-	m.config.driver = _tx.drv
-	return m
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (m *Message) String() string {
+func (_m *Message) String() string {
 	var builder strings.Builder
 	builder.WriteString("Message(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", m.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("topicID=")
-	builder.WriteString(fmt.Sprintf("%v", m.TopicID))
+	builder.WriteString(fmt.Sprintf("%v", _m.TopicID))
 	builder.WriteString(", ")
 	builder.WriteString("payload=")
-	builder.WriteString(fmt.Sprintf("%v", m.Payload))
+	builder.WriteString(fmt.Sprintf("%v", _m.Payload))
 	builder.WriteString(", ")
 	builder.WriteString("attributes=")
-	builder.WriteString(fmt.Sprintf("%v", m.Attributes))
+	builder.WriteString(fmt.Sprintf("%v", _m.Attributes))
 	builder.WriteString(", ")
 	builder.WriteString("publishedAt=")
-	builder.WriteString(m.PublishedAt.Format(time.ANSIC))
+	builder.WriteString(_m.PublishedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	if v := m.OrderKey; v != nil {
+	if v := _m.OrderKey; v != nil {
 		builder.WriteString("orderKey=")
 		builder.WriteString(*v)
 	}

@@ -121,7 +121,7 @@ func (*Delivery) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Delivery fields.
-func (d *Delivery) assignValues(columns []string, values []any) error {
+func (_m *Delivery) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -131,66 +131,66 @@ func (d *Delivery) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				d.ID = *value
+				_m.ID = *value
 			}
 		case delivery.FieldMessageID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field messageID", values[i])
 			} else if value != nil {
-				d.MessageID = *value
+				_m.MessageID = *value
 			}
 		case delivery.FieldSubscriptionID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field subscriptionID", values[i])
 			} else if value != nil {
-				d.SubscriptionID = *value
+				_m.SubscriptionID = *value
 			}
 		case delivery.FieldPublishedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field publishedAt", values[i])
 			} else if value.Valid {
-				d.PublishedAt = value.Time
+				_m.PublishedAt = value.Time
 			}
 		case delivery.FieldAttemptAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field attemptAt", values[i])
 			} else if value.Valid {
-				d.AttemptAt = value.Time
+				_m.AttemptAt = value.Time
 			}
 		case delivery.FieldLastAttemptedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field lastAttemptedAt", values[i])
 			} else if value.Valid {
-				d.LastAttemptedAt = new(time.Time)
-				*d.LastAttemptedAt = value.Time
+				_m.LastAttemptedAt = new(time.Time)
+				*_m.LastAttemptedAt = value.Time
 			}
 		case delivery.FieldAttempts:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field attempts", values[i])
 			} else if value.Valid {
-				d.Attempts = int(value.Int64)
+				_m.Attempts = int(value.Int64)
 			}
 		case delivery.FieldCompletedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field completedAt", values[i])
 			} else if value.Valid {
-				d.CompletedAt = new(time.Time)
-				*d.CompletedAt = value.Time
+				_m.CompletedAt = new(time.Time)
+				*_m.CompletedAt = value.Time
 			}
 		case delivery.FieldExpiresAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field expiresAt", values[i])
 			} else if value.Valid {
-				d.ExpiresAt = value.Time
+				_m.ExpiresAt = value.Time
 			}
 		case delivery.FieldNotBeforeID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field notBeforeID", values[i])
 			} else if value != nil {
-				d.NotBeforeID = *value
+				_m.NotBeforeID = *value
 			}
 		default:
-			d.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -198,83 +198,83 @@ func (d *Delivery) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Delivery.
 // This includes values selected through modifiers, order, etc.
-func (d *Delivery) Value(name string) (ent.Value, error) {
-	return d.selectValues.Get(name)
+func (_m *Delivery) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryMessage queries the "message" edge of the Delivery entity.
-func (d *Delivery) QueryMessage() *MessageQuery {
-	return NewDeliveryClient(d.config).QueryMessage(d)
+func (_m *Delivery) QueryMessage() *MessageQuery {
+	return NewDeliveryClient(_m.config).QueryMessage(_m)
 }
 
 // QuerySubscription queries the "subscription" edge of the Delivery entity.
-func (d *Delivery) QuerySubscription() *SubscriptionQuery {
-	return NewDeliveryClient(d.config).QuerySubscription(d)
+func (_m *Delivery) QuerySubscription() *SubscriptionQuery {
+	return NewDeliveryClient(_m.config).QuerySubscription(_m)
 }
 
 // QueryNotBefore queries the "notBefore" edge of the Delivery entity.
-func (d *Delivery) QueryNotBefore() *DeliveryQuery {
-	return NewDeliveryClient(d.config).QueryNotBefore(d)
+func (_m *Delivery) QueryNotBefore() *DeliveryQuery {
+	return NewDeliveryClient(_m.config).QueryNotBefore(_m)
 }
 
 // QueryNextReady queries the "nextReady" edge of the Delivery entity.
-func (d *Delivery) QueryNextReady() *DeliveryQuery {
-	return NewDeliveryClient(d.config).QueryNextReady(d)
+func (_m *Delivery) QueryNextReady() *DeliveryQuery {
+	return NewDeliveryClient(_m.config).QueryNextReady(_m)
 }
 
 // Update returns a builder for updating this Delivery.
 // Note that you need to call Delivery.Unwrap() before calling this method if this Delivery
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (d *Delivery) Update() *DeliveryUpdateOne {
-	return NewDeliveryClient(d.config).UpdateOne(d)
+func (_m *Delivery) Update() *DeliveryUpdateOne {
+	return NewDeliveryClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Delivery entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (d *Delivery) Unwrap() *Delivery {
-	_tx, ok := d.config.driver.(*txDriver)
+func (_m *Delivery) Unwrap() *Delivery {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Delivery is not a transactional entity")
 	}
-	d.config.driver = _tx.drv
-	return d
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (d *Delivery) String() string {
+func (_m *Delivery) String() string {
 	var builder strings.Builder
 	builder.WriteString("Delivery(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", d.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("messageID=")
-	builder.WriteString(fmt.Sprintf("%v", d.MessageID))
+	builder.WriteString(fmt.Sprintf("%v", _m.MessageID))
 	builder.WriteString(", ")
 	builder.WriteString("subscriptionID=")
-	builder.WriteString(fmt.Sprintf("%v", d.SubscriptionID))
+	builder.WriteString(fmt.Sprintf("%v", _m.SubscriptionID))
 	builder.WriteString(", ")
 	builder.WriteString("publishedAt=")
-	builder.WriteString(d.PublishedAt.Format(time.ANSIC))
+	builder.WriteString(_m.PublishedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("attemptAt=")
-	builder.WriteString(d.AttemptAt.Format(time.ANSIC))
+	builder.WriteString(_m.AttemptAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	if v := d.LastAttemptedAt; v != nil {
+	if v := _m.LastAttemptedAt; v != nil {
 		builder.WriteString("lastAttemptedAt=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("attempts=")
-	builder.WriteString(fmt.Sprintf("%v", d.Attempts))
+	builder.WriteString(fmt.Sprintf("%v", _m.Attempts))
 	builder.WriteString(", ")
-	if v := d.CompletedAt; v != nil {
+	if v := _m.CompletedAt; v != nil {
 		builder.WriteString("completedAt=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("expiresAt=")
-	builder.WriteString(d.ExpiresAt.Format(time.ANSIC))
+	builder.WriteString(_m.ExpiresAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("notBeforeID=")
-	builder.WriteString(fmt.Sprintf("%v", d.NotBeforeID))
+	builder.WriteString(fmt.Sprintf("%v", _m.NotBeforeID))
 	builder.WriteByte(')')
 	return builder.String()
 }

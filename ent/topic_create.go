@@ -27,119 +27,119 @@ type TopicCreate struct {
 }
 
 // SetName sets the "name" field.
-func (tc *TopicCreate) SetName(s string) *TopicCreate {
-	tc.mutation.SetName(s)
-	return tc
+func (_c *TopicCreate) SetName(v string) *TopicCreate {
+	_c.mutation.SetName(v)
+	return _c
 }
 
 // SetCreatedAt sets the "createdAt" field.
-func (tc *TopicCreate) SetCreatedAt(t time.Time) *TopicCreate {
-	tc.mutation.SetCreatedAt(t)
-	return tc
+func (_c *TopicCreate) SetCreatedAt(v time.Time) *TopicCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
-func (tc *TopicCreate) SetNillableCreatedAt(t *time.Time) *TopicCreate {
-	if t != nil {
-		tc.SetCreatedAt(*t)
+func (_c *TopicCreate) SetNillableCreatedAt(v *time.Time) *TopicCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return tc
+	return _c
 }
 
 // SetLive sets the "live" field.
-func (tc *TopicCreate) SetLive(b bool) *TopicCreate {
-	tc.mutation.SetLive(b)
-	return tc
+func (_c *TopicCreate) SetLive(v bool) *TopicCreate {
+	_c.mutation.SetLive(v)
+	return _c
 }
 
 // SetNillableLive sets the "live" field if the given value is not nil.
-func (tc *TopicCreate) SetNillableLive(b *bool) *TopicCreate {
-	if b != nil {
-		tc.SetLive(*b)
+func (_c *TopicCreate) SetNillableLive(v *bool) *TopicCreate {
+	if v != nil {
+		_c.SetLive(*v)
 	}
-	return tc
+	return _c
 }
 
 // SetDeletedAt sets the "deletedAt" field.
-func (tc *TopicCreate) SetDeletedAt(t time.Time) *TopicCreate {
-	tc.mutation.SetDeletedAt(t)
-	return tc
+func (_c *TopicCreate) SetDeletedAt(v time.Time) *TopicCreate {
+	_c.mutation.SetDeletedAt(v)
+	return _c
 }
 
 // SetNillableDeletedAt sets the "deletedAt" field if the given value is not nil.
-func (tc *TopicCreate) SetNillableDeletedAt(t *time.Time) *TopicCreate {
-	if t != nil {
-		tc.SetDeletedAt(*t)
+func (_c *TopicCreate) SetNillableDeletedAt(v *time.Time) *TopicCreate {
+	if v != nil {
+		_c.SetDeletedAt(*v)
 	}
-	return tc
+	return _c
 }
 
 // SetLabels sets the "labels" field.
-func (tc *TopicCreate) SetLabels(m map[string]string) *TopicCreate {
-	tc.mutation.SetLabels(m)
-	return tc
+func (_c *TopicCreate) SetLabels(v map[string]string) *TopicCreate {
+	_c.mutation.SetLabels(v)
+	return _c
 }
 
 // SetID sets the "id" field.
-func (tc *TopicCreate) SetID(u uuid.UUID) *TopicCreate {
-	tc.mutation.SetID(u)
-	return tc
+func (_c *TopicCreate) SetID(v uuid.UUID) *TopicCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (tc *TopicCreate) SetNillableID(u *uuid.UUID) *TopicCreate {
-	if u != nil {
-		tc.SetID(*u)
+func (_c *TopicCreate) SetNillableID(v *uuid.UUID) *TopicCreate {
+	if v != nil {
+		_c.SetID(*v)
 	}
-	return tc
+	return _c
 }
 
 // AddSubscriptionIDs adds the "subscriptions" edge to the Subscription entity by IDs.
-func (tc *TopicCreate) AddSubscriptionIDs(ids ...uuid.UUID) *TopicCreate {
-	tc.mutation.AddSubscriptionIDs(ids...)
-	return tc
+func (_c *TopicCreate) AddSubscriptionIDs(ids ...uuid.UUID) *TopicCreate {
+	_c.mutation.AddSubscriptionIDs(ids...)
+	return _c
 }
 
 // AddSubscriptions adds the "subscriptions" edges to the Subscription entity.
-func (tc *TopicCreate) AddSubscriptions(s ...*Subscription) *TopicCreate {
-	ids := make([]uuid.UUID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+func (_c *TopicCreate) AddSubscriptions(v ...*Subscription) *TopicCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tc.AddSubscriptionIDs(ids...)
+	return _c.AddSubscriptionIDs(ids...)
 }
 
 // AddMessageIDs adds the "messages" edge to the Message entity by IDs.
-func (tc *TopicCreate) AddMessageIDs(ids ...uuid.UUID) *TopicCreate {
-	tc.mutation.AddMessageIDs(ids...)
-	return tc
+func (_c *TopicCreate) AddMessageIDs(ids ...uuid.UUID) *TopicCreate {
+	_c.mutation.AddMessageIDs(ids...)
+	return _c
 }
 
 // AddMessages adds the "messages" edges to the Message entity.
-func (tc *TopicCreate) AddMessages(m ...*Message) *TopicCreate {
-	ids := make([]uuid.UUID, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_c *TopicCreate) AddMessages(v ...*Message) *TopicCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tc.AddMessageIDs(ids...)
+	return _c.AddMessageIDs(ids...)
 }
 
 // Mutation returns the TopicMutation object of the builder.
-func (tc *TopicCreate) Mutation() *TopicMutation {
-	return tc.mutation
+func (_c *TopicCreate) Mutation() *TopicMutation {
+	return _c.mutation
 }
 
 // Save creates the Topic in the database.
-func (tc *TopicCreate) Save(ctx context.Context) (*Topic, error) {
-	if err := tc.defaults(); err != nil {
+func (_c *TopicCreate) Save(ctx context.Context) (*Topic, error) {
+	if err := _c.defaults(); err != nil {
 		return nil, err
 	}
-	return withHooks(ctx, tc.sqlSave, tc.mutation, tc.hooks)
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (tc *TopicCreate) SaveX(ctx context.Context) *Topic {
-	v, err := tc.Save(ctx)
+func (_c *TopicCreate) SaveX(ctx context.Context) *Topic {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -147,63 +147,63 @@ func (tc *TopicCreate) SaveX(ctx context.Context) *Topic {
 }
 
 // Exec executes the query.
-func (tc *TopicCreate) Exec(ctx context.Context) error {
-	_, err := tc.Save(ctx)
+func (_c *TopicCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (tc *TopicCreate) ExecX(ctx context.Context) {
-	if err := tc.Exec(ctx); err != nil {
+func (_c *TopicCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (tc *TopicCreate) defaults() error {
-	if _, ok := tc.mutation.CreatedAt(); !ok {
+func (_c *TopicCreate) defaults() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		if topic.DefaultCreatedAt == nil {
 			return fmt.Errorf("ent: uninitialized topic.DefaultCreatedAt (forgotten import ent/runtime?)")
 		}
 		v := topic.DefaultCreatedAt()
-		tc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
-	if _, ok := tc.mutation.Live(); !ok {
+	if _, ok := _c.mutation.Live(); !ok {
 		v := topic.DefaultLive
-		tc.mutation.SetLive(v)
+		_c.mutation.SetLive(v)
 	}
-	if _, ok := tc.mutation.ID(); !ok {
+	if _, ok := _c.mutation.ID(); !ok {
 		if topic.DefaultID == nil {
 			return fmt.Errorf("ent: uninitialized topic.DefaultID (forgotten import ent/runtime?)")
 		}
 		v := topic.DefaultID()
-		tc.mutation.SetID(v)
+		_c.mutation.SetID(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (tc *TopicCreate) check() error {
-	if _, ok := tc.mutation.Name(); !ok {
+func (_c *TopicCreate) check() error {
+	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Topic.name"`)}
 	}
-	if v, ok := tc.mutation.Name(); ok {
+	if v, ok := _c.mutation.Name(); ok {
 		if err := topic.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Topic.name": %w`, err)}
 		}
 	}
-	if _, ok := tc.mutation.CreatedAt(); !ok {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "Topic.createdAt"`)}
 	}
 	return nil
 }
 
-func (tc *TopicCreate) sqlSave(ctx context.Context) (*Topic, error) {
-	if err := tc.check(); err != nil {
+func (_c *TopicCreate) sqlSave(ctx context.Context) (*Topic, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := tc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, tc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -216,42 +216,42 @@ func (tc *TopicCreate) sqlSave(ctx context.Context) (*Topic, error) {
 			return nil, err
 		}
 	}
-	tc.mutation.id = &_node.ID
-	tc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (tc *TopicCreate) createSpec() (*Topic, *sqlgraph.CreateSpec) {
+func (_c *TopicCreate) createSpec() (*Topic, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Topic{config: tc.config}
+		_node = &Topic{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(topic.Table, sqlgraph.NewFieldSpec(topic.FieldID, field.TypeUUID))
 	)
-	_spec.OnConflict = tc.conflict
-	if id, ok := tc.mutation.ID(); ok {
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := tc.mutation.Name(); ok {
+	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(topic.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := tc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(topic.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := tc.mutation.Live(); ok {
+	if value, ok := _c.mutation.Live(); ok {
 		_spec.SetField(topic.FieldLive, field.TypeBool, value)
 		_node.Live = &value
 	}
-	if value, ok := tc.mutation.DeletedAt(); ok {
+	if value, ok := _c.mutation.DeletedAt(); ok {
 		_spec.SetField(topic.FieldDeletedAt, field.TypeTime, value)
 		_node.DeletedAt = &value
 	}
-	if value, ok := tc.mutation.Labels(); ok {
+	if value, ok := _c.mutation.Labels(); ok {
 		_spec.SetField(topic.FieldLabels, field.TypeJSON, value)
 		_node.Labels = value
 	}
-	if nodes := tc.mutation.SubscriptionsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.SubscriptionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -267,7 +267,7 @@ func (tc *TopicCreate) createSpec() (*Topic, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := tc.mutation.MessagesIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.MessagesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -302,10 +302,10 @@ func (tc *TopicCreate) createSpec() (*Topic, *sqlgraph.CreateSpec) {
 //			SetName(v+v).
 //		}).
 //		Exec(ctx)
-func (tc *TopicCreate) OnConflict(opts ...sql.ConflictOption) *TopicUpsertOne {
-	tc.conflict = opts
+func (_c *TopicCreate) OnConflict(opts ...sql.ConflictOption) *TopicUpsertOne {
+	_c.conflict = opts
 	return &TopicUpsertOne{
-		create: tc,
+		create: _c,
 	}
 }
 
@@ -315,10 +315,10 @@ func (tc *TopicCreate) OnConflict(opts ...sql.ConflictOption) *TopicUpsertOne {
 //	client.Topic.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (tc *TopicCreate) OnConflictColumns(columns ...string) *TopicUpsertOne {
-	tc.conflict = append(tc.conflict, sql.ConflictColumns(columns...))
+func (_c *TopicCreate) OnConflictColumns(columns ...string) *TopicUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &TopicUpsertOne{
-		create: tc,
+		create: _c,
 	}
 }
 
@@ -553,16 +553,16 @@ type TopicCreateBulk struct {
 }
 
 // Save creates the Topic entities in the database.
-func (tcb *TopicCreateBulk) Save(ctx context.Context) ([]*Topic, error) {
-	if tcb.err != nil {
-		return nil, tcb.err
+func (_c *TopicCreateBulk) Save(ctx context.Context) ([]*Topic, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(tcb.builders))
-	nodes := make([]*Topic, len(tcb.builders))
-	mutators := make([]Mutator, len(tcb.builders))
-	for i := range tcb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*Topic, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := tcb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*TopicMutation)
@@ -576,12 +576,12 @@ func (tcb *TopicCreateBulk) Save(ctx context.Context) ([]*Topic, error) {
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, tcb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = tcb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, tcb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -601,7 +601,7 @@ func (tcb *TopicCreateBulk) Save(ctx context.Context) ([]*Topic, error) {
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, tcb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -609,8 +609,8 @@ func (tcb *TopicCreateBulk) Save(ctx context.Context) ([]*Topic, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (tcb *TopicCreateBulk) SaveX(ctx context.Context) []*Topic {
-	v, err := tcb.Save(ctx)
+func (_c *TopicCreateBulk) SaveX(ctx context.Context) []*Topic {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -618,14 +618,14 @@ func (tcb *TopicCreateBulk) SaveX(ctx context.Context) []*Topic {
 }
 
 // Exec executes the query.
-func (tcb *TopicCreateBulk) Exec(ctx context.Context) error {
-	_, err := tcb.Save(ctx)
+func (_c *TopicCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (tcb *TopicCreateBulk) ExecX(ctx context.Context) {
-	if err := tcb.Exec(ctx); err != nil {
+func (_c *TopicCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -645,10 +645,10 @@ func (tcb *TopicCreateBulk) ExecX(ctx context.Context) {
 //			SetName(v+v).
 //		}).
 //		Exec(ctx)
-func (tcb *TopicCreateBulk) OnConflict(opts ...sql.ConflictOption) *TopicUpsertBulk {
-	tcb.conflict = opts
+func (_c *TopicCreateBulk) OnConflict(opts ...sql.ConflictOption) *TopicUpsertBulk {
+	_c.conflict = opts
 	return &TopicUpsertBulk{
-		create: tcb,
+		create: _c,
 	}
 }
 
@@ -658,10 +658,10 @@ func (tcb *TopicCreateBulk) OnConflict(opts ...sql.ConflictOption) *TopicUpsertB
 //	client.Topic.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (tcb *TopicCreateBulk) OnConflictColumns(columns ...string) *TopicUpsertBulk {
-	tcb.conflict = append(tcb.conflict, sql.ConflictColumns(columns...))
+func (_c *TopicCreateBulk) OnConflictColumns(columns ...string) *TopicUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &TopicUpsertBulk{
-		create: tcb,
+		create: _c,
 	}
 }
 

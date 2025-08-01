@@ -137,7 +137,7 @@ func (*Subscription) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Subscription fields.
-func (s *Subscription) assignValues(columns []string, values []any) error {
+func (_m *Subscription) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -147,69 +147,69 @@ func (s *Subscription) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				s.ID = *value
+				_m.ID = *value
 			}
 		case subscription.FieldTopicID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field topicID", values[i])
 			} else if value != nil {
-				s.TopicID = *value
+				_m.TopicID = *value
 			}
 		case subscription.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				s.Name = value.String
+				_m.Name = value.String
 			}
 		case subscription.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field createdAt", values[i])
 			} else if value.Valid {
-				s.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case subscription.FieldExpiresAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field expiresAt", values[i])
 			} else if value.Valid {
-				s.ExpiresAt = value.Time
+				_m.ExpiresAt = value.Time
 			}
 		case subscription.FieldLive:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field live", values[i])
 			} else if value.Valid {
-				s.Live = new(bool)
-				*s.Live = value.Bool
+				_m.Live = new(bool)
+				*_m.Live = value.Bool
 			}
 		case subscription.FieldDeletedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field deletedAt", values[i])
 			} else if value.Valid {
-				s.DeletedAt = new(time.Time)
-				*s.DeletedAt = value.Time
+				_m.DeletedAt = new(time.Time)
+				*_m.DeletedAt = value.Time
 			}
 		case subscription.FieldTTL:
 			if value, ok := values[i].(*sqltypes.Interval); !ok {
 				return fmt.Errorf("unexpected type %T for field ttl", values[i])
 			} else if value != nil {
-				s.TTL = *value
+				_m.TTL = *value
 			}
 		case subscription.FieldMessageTTL:
 			if value, ok := values[i].(*sqltypes.Interval); !ok {
 				return fmt.Errorf("unexpected type %T for field messageTTL", values[i])
 			} else if value != nil {
-				s.MessageTTL = *value
+				_m.MessageTTL = *value
 			}
 		case subscription.FieldOrderedDelivery:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field orderedDelivery", values[i])
 			} else if value.Valid {
-				s.OrderedDelivery = value.Bool
+				_m.OrderedDelivery = value.Bool
 			}
 		case subscription.FieldLabels:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field labels", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &s.Labels); err != nil {
+				if err := json.Unmarshal(*value, &_m.Labels); err != nil {
 					return fmt.Errorf("unmarshal field labels: %w", err)
 				}
 			}
@@ -217,50 +217,50 @@ func (s *Subscription) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field minBackoff", values[i])
 			} else if value.Valid {
-				s.MinBackoff = value.S.(*sqltypes.Interval)
+				_m.MinBackoff = value.S.(*sqltypes.Interval)
 			}
 		case subscription.FieldMaxBackoff:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field maxBackoff", values[i])
 			} else if value.Valid {
-				s.MaxBackoff = value.S.(*sqltypes.Interval)
+				_m.MaxBackoff = value.S.(*sqltypes.Interval)
 			}
 		case subscription.FieldPushEndpoint:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field pushEndpoint", values[i])
 			} else if value.Valid {
-				s.PushEndpoint = new(string)
-				*s.PushEndpoint = value.String
+				_m.PushEndpoint = new(string)
+				*_m.PushEndpoint = value.String
 			}
 		case subscription.FieldMessageFilter:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field messageFilter", values[i])
 			} else if value.Valid {
-				s.MessageFilter = new(string)
-				*s.MessageFilter = value.String
+				_m.MessageFilter = new(string)
+				*_m.MessageFilter = value.String
 			}
 		case subscription.FieldMaxDeliveryAttempts:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field maxDeliveryAttempts", values[i])
 			} else if value.Valid {
-				s.MaxDeliveryAttempts = new(int32)
-				*s.MaxDeliveryAttempts = int32(value.Int64)
+				_m.MaxDeliveryAttempts = new(int32)
+				*_m.MaxDeliveryAttempts = int32(value.Int64)
 			}
 		case subscription.FieldDeadLetterTopicID:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field deadLetterTopicID", values[i])
 			} else if value.Valid {
-				s.DeadLetterTopicID = new(uuid.UUID)
-				*s.DeadLetterTopicID = *value.S.(*uuid.UUID)
+				_m.DeadLetterTopicID = new(uuid.UUID)
+				*_m.DeadLetterTopicID = *value.S.(*uuid.UUID)
 			}
 		case subscription.FieldDeliveryDelay:
 			if value, ok := values[i].(*sqltypes.Interval); !ok {
 				return fmt.Errorf("unexpected type %T for field deliveryDelay", values[i])
 			} else if value != nil {
-				s.DeliveryDelay = *value
+				_m.DeliveryDelay = *value
 			}
 		default:
-			s.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -268,114 +268,114 @@ func (s *Subscription) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Subscription.
 // This includes values selected through modifiers, order, etc.
-func (s *Subscription) Value(name string) (ent.Value, error) {
-	return s.selectValues.Get(name)
+func (_m *Subscription) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryTopic queries the "topic" edge of the Subscription entity.
-func (s *Subscription) QueryTopic() *TopicQuery {
-	return NewSubscriptionClient(s.config).QueryTopic(s)
+func (_m *Subscription) QueryTopic() *TopicQuery {
+	return NewSubscriptionClient(_m.config).QueryTopic(_m)
 }
 
 // QueryDeliveries queries the "deliveries" edge of the Subscription entity.
-func (s *Subscription) QueryDeliveries() *DeliveryQuery {
-	return NewSubscriptionClient(s.config).QueryDeliveries(s)
+func (_m *Subscription) QueryDeliveries() *DeliveryQuery {
+	return NewSubscriptionClient(_m.config).QueryDeliveries(_m)
 }
 
 // QueryDeadLetterTopic queries the "deadLetterTopic" edge of the Subscription entity.
-func (s *Subscription) QueryDeadLetterTopic() *TopicQuery {
-	return NewSubscriptionClient(s.config).QueryDeadLetterTopic(s)
+func (_m *Subscription) QueryDeadLetterTopic() *TopicQuery {
+	return NewSubscriptionClient(_m.config).QueryDeadLetterTopic(_m)
 }
 
 // Update returns a builder for updating this Subscription.
 // Note that you need to call Subscription.Unwrap() before calling this method if this Subscription
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (s *Subscription) Update() *SubscriptionUpdateOne {
-	return NewSubscriptionClient(s.config).UpdateOne(s)
+func (_m *Subscription) Update() *SubscriptionUpdateOne {
+	return NewSubscriptionClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Subscription entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (s *Subscription) Unwrap() *Subscription {
-	_tx, ok := s.config.driver.(*txDriver)
+func (_m *Subscription) Unwrap() *Subscription {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Subscription is not a transactional entity")
 	}
-	s.config.driver = _tx.drv
-	return s
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (s *Subscription) String() string {
+func (_m *Subscription) String() string {
 	var builder strings.Builder
 	builder.WriteString("Subscription(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", s.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("topicID=")
-	builder.WriteString(fmt.Sprintf("%v", s.TopicID))
+	builder.WriteString(fmt.Sprintf("%v", _m.TopicID))
 	builder.WriteString(", ")
 	builder.WriteString("name=")
-	builder.WriteString(s.Name)
+	builder.WriteString(_m.Name)
 	builder.WriteString(", ")
 	builder.WriteString("createdAt=")
-	builder.WriteString(s.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("expiresAt=")
-	builder.WriteString(s.ExpiresAt.Format(time.ANSIC))
+	builder.WriteString(_m.ExpiresAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	if v := s.Live; v != nil {
+	if v := _m.Live; v != nil {
 		builder.WriteString("live=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
-	if v := s.DeletedAt; v != nil {
+	if v := _m.DeletedAt; v != nil {
 		builder.WriteString("deletedAt=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("ttl=")
-	builder.WriteString(fmt.Sprintf("%v", s.TTL))
+	builder.WriteString(fmt.Sprintf("%v", _m.TTL))
 	builder.WriteString(", ")
 	builder.WriteString("messageTTL=")
-	builder.WriteString(fmt.Sprintf("%v", s.MessageTTL))
+	builder.WriteString(fmt.Sprintf("%v", _m.MessageTTL))
 	builder.WriteString(", ")
 	builder.WriteString("orderedDelivery=")
-	builder.WriteString(fmt.Sprintf("%v", s.OrderedDelivery))
+	builder.WriteString(fmt.Sprintf("%v", _m.OrderedDelivery))
 	builder.WriteString(", ")
 	builder.WriteString("labels=")
-	builder.WriteString(fmt.Sprintf("%v", s.Labels))
+	builder.WriteString(fmt.Sprintf("%v", _m.Labels))
 	builder.WriteString(", ")
-	if v := s.MinBackoff; v != nil {
+	if v := _m.MinBackoff; v != nil {
 		builder.WriteString("minBackoff=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
-	if v := s.MaxBackoff; v != nil {
+	if v := _m.MaxBackoff; v != nil {
 		builder.WriteString("maxBackoff=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
-	if v := s.PushEndpoint; v != nil {
+	if v := _m.PushEndpoint; v != nil {
 		builder.WriteString("pushEndpoint=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	if v := s.MessageFilter; v != nil {
+	if v := _m.MessageFilter; v != nil {
 		builder.WriteString("messageFilter=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	if v := s.MaxDeliveryAttempts; v != nil {
+	if v := _m.MaxDeliveryAttempts; v != nil {
 		builder.WriteString("maxDeliveryAttempts=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
-	if v := s.DeadLetterTopicID; v != nil {
+	if v := _m.DeadLetterTopicID; v != nil {
 		builder.WriteString("deadLetterTopicID=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("deliveryDelay=")
-	builder.WriteString(fmt.Sprintf("%v", s.DeliveryDelay))
+	builder.WriteString(fmt.Sprintf("%v", _m.DeliveryDelay))
 	builder.WriteByte(')')
 	return builder.String()
 }

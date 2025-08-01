@@ -26,88 +26,88 @@ type SnapshotCreate struct {
 }
 
 // SetTopicID sets the "topicID" field.
-func (sc *SnapshotCreate) SetTopicID(u uuid.UUID) *SnapshotCreate {
-	sc.mutation.SetTopicID(u)
-	return sc
+func (_c *SnapshotCreate) SetTopicID(v uuid.UUID) *SnapshotCreate {
+	_c.mutation.SetTopicID(v)
+	return _c
 }
 
 // SetName sets the "name" field.
-func (sc *SnapshotCreate) SetName(s string) *SnapshotCreate {
-	sc.mutation.SetName(s)
-	return sc
+func (_c *SnapshotCreate) SetName(v string) *SnapshotCreate {
+	_c.mutation.SetName(v)
+	return _c
 }
 
 // SetCreatedAt sets the "createdAt" field.
-func (sc *SnapshotCreate) SetCreatedAt(t time.Time) *SnapshotCreate {
-	sc.mutation.SetCreatedAt(t)
-	return sc
+func (_c *SnapshotCreate) SetCreatedAt(v time.Time) *SnapshotCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
-func (sc *SnapshotCreate) SetNillableCreatedAt(t *time.Time) *SnapshotCreate {
-	if t != nil {
-		sc.SetCreatedAt(*t)
+func (_c *SnapshotCreate) SetNillableCreatedAt(v *time.Time) *SnapshotCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return sc
+	return _c
 }
 
 // SetExpiresAt sets the "expiresAt" field.
-func (sc *SnapshotCreate) SetExpiresAt(t time.Time) *SnapshotCreate {
-	sc.mutation.SetExpiresAt(t)
-	return sc
+func (_c *SnapshotCreate) SetExpiresAt(v time.Time) *SnapshotCreate {
+	_c.mutation.SetExpiresAt(v)
+	return _c
 }
 
 // SetLabels sets the "labels" field.
-func (sc *SnapshotCreate) SetLabels(m map[string]string) *SnapshotCreate {
-	sc.mutation.SetLabels(m)
-	return sc
+func (_c *SnapshotCreate) SetLabels(v map[string]string) *SnapshotCreate {
+	_c.mutation.SetLabels(v)
+	return _c
 }
 
 // SetAckedMessagesBefore sets the "ackedMessagesBefore" field.
-func (sc *SnapshotCreate) SetAckedMessagesBefore(t time.Time) *SnapshotCreate {
-	sc.mutation.SetAckedMessagesBefore(t)
-	return sc
+func (_c *SnapshotCreate) SetAckedMessagesBefore(v time.Time) *SnapshotCreate {
+	_c.mutation.SetAckedMessagesBefore(v)
+	return _c
 }
 
 // SetAckedMessageIDs sets the "ackedMessageIDs" field.
-func (sc *SnapshotCreate) SetAckedMessageIDs(u []uuid.UUID) *SnapshotCreate {
-	sc.mutation.SetAckedMessageIDs(u)
-	return sc
+func (_c *SnapshotCreate) SetAckedMessageIDs(v []uuid.UUID) *SnapshotCreate {
+	_c.mutation.SetAckedMessageIDs(v)
+	return _c
 }
 
 // SetID sets the "id" field.
-func (sc *SnapshotCreate) SetID(u uuid.UUID) *SnapshotCreate {
-	sc.mutation.SetID(u)
-	return sc
+func (_c *SnapshotCreate) SetID(v uuid.UUID) *SnapshotCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (sc *SnapshotCreate) SetNillableID(u *uuid.UUID) *SnapshotCreate {
-	if u != nil {
-		sc.SetID(*u)
+func (_c *SnapshotCreate) SetNillableID(v *uuid.UUID) *SnapshotCreate {
+	if v != nil {
+		_c.SetID(*v)
 	}
-	return sc
+	return _c
 }
 
 // SetTopic sets the "topic" edge to the Topic entity.
-func (sc *SnapshotCreate) SetTopic(t *Topic) *SnapshotCreate {
-	return sc.SetTopicID(t.ID)
+func (_c *SnapshotCreate) SetTopic(v *Topic) *SnapshotCreate {
+	return _c.SetTopicID(v.ID)
 }
 
 // Mutation returns the SnapshotMutation object of the builder.
-func (sc *SnapshotCreate) Mutation() *SnapshotMutation {
-	return sc.mutation
+func (_c *SnapshotCreate) Mutation() *SnapshotMutation {
+	return _c.mutation
 }
 
 // Save creates the Snapshot in the database.
-func (sc *SnapshotCreate) Save(ctx context.Context) (*Snapshot, error) {
-	sc.defaults()
-	return withHooks(ctx, sc.sqlSave, sc.mutation, sc.hooks)
+func (_c *SnapshotCreate) Save(ctx context.Context) (*Snapshot, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (sc *SnapshotCreate) SaveX(ctx context.Context) *Snapshot {
-	v, err := sc.Save(ctx)
+func (_c *SnapshotCreate) SaveX(ctx context.Context) *Snapshot {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -115,64 +115,64 @@ func (sc *SnapshotCreate) SaveX(ctx context.Context) *Snapshot {
 }
 
 // Exec executes the query.
-func (sc *SnapshotCreate) Exec(ctx context.Context) error {
-	_, err := sc.Save(ctx)
+func (_c *SnapshotCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (sc *SnapshotCreate) ExecX(ctx context.Context) {
-	if err := sc.Exec(ctx); err != nil {
+func (_c *SnapshotCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (sc *SnapshotCreate) defaults() {
-	if _, ok := sc.mutation.CreatedAt(); !ok {
+func (_c *SnapshotCreate) defaults() {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := snapshot.DefaultCreatedAt()
-		sc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
-	if _, ok := sc.mutation.ID(); !ok {
+	if _, ok := _c.mutation.ID(); !ok {
 		v := snapshot.DefaultID()
-		sc.mutation.SetID(v)
+		_c.mutation.SetID(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (sc *SnapshotCreate) check() error {
-	if _, ok := sc.mutation.TopicID(); !ok {
+func (_c *SnapshotCreate) check() error {
+	if _, ok := _c.mutation.TopicID(); !ok {
 		return &ValidationError{Name: "topicID", err: errors.New(`ent: missing required field "Snapshot.topicID"`)}
 	}
-	if _, ok := sc.mutation.Name(); !ok {
+	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Snapshot.name"`)}
 	}
-	if v, ok := sc.mutation.Name(); ok {
+	if v, ok := _c.mutation.Name(); ok {
 		if err := snapshot.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Snapshot.name": %w`, err)}
 		}
 	}
-	if _, ok := sc.mutation.CreatedAt(); !ok {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "Snapshot.createdAt"`)}
 	}
-	if _, ok := sc.mutation.ExpiresAt(); !ok {
+	if _, ok := _c.mutation.ExpiresAt(); !ok {
 		return &ValidationError{Name: "expiresAt", err: errors.New(`ent: missing required field "Snapshot.expiresAt"`)}
 	}
-	if _, ok := sc.mutation.AckedMessagesBefore(); !ok {
+	if _, ok := _c.mutation.AckedMessagesBefore(); !ok {
 		return &ValidationError{Name: "ackedMessagesBefore", err: errors.New(`ent: missing required field "Snapshot.ackedMessagesBefore"`)}
 	}
-	if len(sc.mutation.TopicIDs()) == 0 {
+	if len(_c.mutation.TopicIDs()) == 0 {
 		return &ValidationError{Name: "topic", err: errors.New(`ent: missing required edge "Snapshot.topic"`)}
 	}
 	return nil
 }
 
-func (sc *SnapshotCreate) sqlSave(ctx context.Context) (*Snapshot, error) {
-	if err := sc.check(); err != nil {
+func (_c *SnapshotCreate) sqlSave(ctx context.Context) (*Snapshot, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := sc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, sc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -185,46 +185,46 @@ func (sc *SnapshotCreate) sqlSave(ctx context.Context) (*Snapshot, error) {
 			return nil, err
 		}
 	}
-	sc.mutation.id = &_node.ID
-	sc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (sc *SnapshotCreate) createSpec() (*Snapshot, *sqlgraph.CreateSpec) {
+func (_c *SnapshotCreate) createSpec() (*Snapshot, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Snapshot{config: sc.config}
+		_node = &Snapshot{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(snapshot.Table, sqlgraph.NewFieldSpec(snapshot.FieldID, field.TypeUUID))
 	)
-	_spec.OnConflict = sc.conflict
-	if id, ok := sc.mutation.ID(); ok {
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := sc.mutation.Name(); ok {
+	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(snapshot.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := sc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(snapshot.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := sc.mutation.ExpiresAt(); ok {
+	if value, ok := _c.mutation.ExpiresAt(); ok {
 		_spec.SetField(snapshot.FieldExpiresAt, field.TypeTime, value)
 		_node.ExpiresAt = value
 	}
-	if value, ok := sc.mutation.Labels(); ok {
+	if value, ok := _c.mutation.Labels(); ok {
 		_spec.SetField(snapshot.FieldLabels, field.TypeJSON, value)
 		_node.Labels = value
 	}
-	if value, ok := sc.mutation.AckedMessagesBefore(); ok {
+	if value, ok := _c.mutation.AckedMessagesBefore(); ok {
 		_spec.SetField(snapshot.FieldAckedMessagesBefore, field.TypeTime, value)
 		_node.AckedMessagesBefore = value
 	}
-	if value, ok := sc.mutation.AckedMessageIDs(); ok {
+	if value, ok := _c.mutation.AckedMessageIDs(); ok {
 		_spec.SetField(snapshot.FieldAckedMessageIDs, field.TypeJSON, value)
 		_node.AckedMessageIDs = value
 	}
-	if nodes := sc.mutation.TopicIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.TopicIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -260,10 +260,10 @@ func (sc *SnapshotCreate) createSpec() (*Snapshot, *sqlgraph.CreateSpec) {
 //			SetTopicID(v+v).
 //		}).
 //		Exec(ctx)
-func (sc *SnapshotCreate) OnConflict(opts ...sql.ConflictOption) *SnapshotUpsertOne {
-	sc.conflict = opts
+func (_c *SnapshotCreate) OnConflict(opts ...sql.ConflictOption) *SnapshotUpsertOne {
+	_c.conflict = opts
 	return &SnapshotUpsertOne{
-		create: sc,
+		create: _c,
 	}
 }
 
@@ -273,10 +273,10 @@ func (sc *SnapshotCreate) OnConflict(opts ...sql.ConflictOption) *SnapshotUpsert
 //	client.Snapshot.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (sc *SnapshotCreate) OnConflictColumns(columns ...string) *SnapshotUpsertOne {
-	sc.conflict = append(sc.conflict, sql.ConflictColumns(columns...))
+func (_c *SnapshotCreate) OnConflictColumns(columns ...string) *SnapshotUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &SnapshotUpsertOne{
-		create: sc,
+		create: _c,
 	}
 }
 
@@ -550,16 +550,16 @@ type SnapshotCreateBulk struct {
 }
 
 // Save creates the Snapshot entities in the database.
-func (scb *SnapshotCreateBulk) Save(ctx context.Context) ([]*Snapshot, error) {
-	if scb.err != nil {
-		return nil, scb.err
+func (_c *SnapshotCreateBulk) Save(ctx context.Context) ([]*Snapshot, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(scb.builders))
-	nodes := make([]*Snapshot, len(scb.builders))
-	mutators := make([]Mutator, len(scb.builders))
-	for i := range scb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*Snapshot, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := scb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*SnapshotMutation)
@@ -573,12 +573,12 @@ func (scb *SnapshotCreateBulk) Save(ctx context.Context) ([]*Snapshot, error) {
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, scb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = scb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, scb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -598,7 +598,7 @@ func (scb *SnapshotCreateBulk) Save(ctx context.Context) ([]*Snapshot, error) {
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, scb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -606,8 +606,8 @@ func (scb *SnapshotCreateBulk) Save(ctx context.Context) ([]*Snapshot, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (scb *SnapshotCreateBulk) SaveX(ctx context.Context) []*Snapshot {
-	v, err := scb.Save(ctx)
+func (_c *SnapshotCreateBulk) SaveX(ctx context.Context) []*Snapshot {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -615,14 +615,14 @@ func (scb *SnapshotCreateBulk) SaveX(ctx context.Context) []*Snapshot {
 }
 
 // Exec executes the query.
-func (scb *SnapshotCreateBulk) Exec(ctx context.Context) error {
-	_, err := scb.Save(ctx)
+func (_c *SnapshotCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (scb *SnapshotCreateBulk) ExecX(ctx context.Context) {
-	if err := scb.Exec(ctx); err != nil {
+func (_c *SnapshotCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -642,10 +642,10 @@ func (scb *SnapshotCreateBulk) ExecX(ctx context.Context) {
 //			SetTopicID(v+v).
 //		}).
 //		Exec(ctx)
-func (scb *SnapshotCreateBulk) OnConflict(opts ...sql.ConflictOption) *SnapshotUpsertBulk {
-	scb.conflict = opts
+func (_c *SnapshotCreateBulk) OnConflict(opts ...sql.ConflictOption) *SnapshotUpsertBulk {
+	_c.conflict = opts
 	return &SnapshotUpsertBulk{
-		create: scb,
+		create: _c,
 	}
 }
 
@@ -655,10 +655,10 @@ func (scb *SnapshotCreateBulk) OnConflict(opts ...sql.ConflictOption) *SnapshotU
 //	client.Snapshot.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (scb *SnapshotCreateBulk) OnConflictColumns(columns ...string) *SnapshotUpsertBulk {
-	scb.conflict = append(scb.conflict, sql.ConflictColumns(columns...))
+func (_c *SnapshotCreateBulk) OnConflictColumns(columns ...string) *SnapshotUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &SnapshotUpsertBulk{
-		create: scb,
+		create: _c,
 	}
 }
 

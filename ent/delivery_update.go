@@ -26,244 +26,244 @@ type DeliveryUpdate struct {
 }
 
 // Where appends a list predicates to the DeliveryUpdate builder.
-func (du *DeliveryUpdate) Where(ps ...predicate.Delivery) *DeliveryUpdate {
-	du.mutation.Where(ps...)
-	return du
+func (_u *DeliveryUpdate) Where(ps ...predicate.Delivery) *DeliveryUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetMessageID sets the "messageID" field.
-func (du *DeliveryUpdate) SetMessageID(u uuid.UUID) *DeliveryUpdate {
-	du.mutation.SetMessageID(u)
-	return du
+func (_u *DeliveryUpdate) SetMessageID(v uuid.UUID) *DeliveryUpdate {
+	_u.mutation.SetMessageID(v)
+	return _u
 }
 
 // SetNillableMessageID sets the "messageID" field if the given value is not nil.
-func (du *DeliveryUpdate) SetNillableMessageID(u *uuid.UUID) *DeliveryUpdate {
-	if u != nil {
-		du.SetMessageID(*u)
+func (_u *DeliveryUpdate) SetNillableMessageID(v *uuid.UUID) *DeliveryUpdate {
+	if v != nil {
+		_u.SetMessageID(*v)
 	}
-	return du
+	return _u
 }
 
 // SetSubscriptionID sets the "subscriptionID" field.
-func (du *DeliveryUpdate) SetSubscriptionID(u uuid.UUID) *DeliveryUpdate {
-	du.mutation.SetSubscriptionID(u)
-	return du
+func (_u *DeliveryUpdate) SetSubscriptionID(v uuid.UUID) *DeliveryUpdate {
+	_u.mutation.SetSubscriptionID(v)
+	return _u
 }
 
 // SetNillableSubscriptionID sets the "subscriptionID" field if the given value is not nil.
-func (du *DeliveryUpdate) SetNillableSubscriptionID(u *uuid.UUID) *DeliveryUpdate {
-	if u != nil {
-		du.SetSubscriptionID(*u)
+func (_u *DeliveryUpdate) SetNillableSubscriptionID(v *uuid.UUID) *DeliveryUpdate {
+	if v != nil {
+		_u.SetSubscriptionID(*v)
 	}
-	return du
+	return _u
 }
 
 // SetPublishedAt sets the "publishedAt" field.
-func (du *DeliveryUpdate) SetPublishedAt(t time.Time) *DeliveryUpdate {
-	du.mutation.SetPublishedAt(t)
-	return du
+func (_u *DeliveryUpdate) SetPublishedAt(v time.Time) *DeliveryUpdate {
+	_u.mutation.SetPublishedAt(v)
+	return _u
 }
 
 // SetNillablePublishedAt sets the "publishedAt" field if the given value is not nil.
-func (du *DeliveryUpdate) SetNillablePublishedAt(t *time.Time) *DeliveryUpdate {
-	if t != nil {
-		du.SetPublishedAt(*t)
+func (_u *DeliveryUpdate) SetNillablePublishedAt(v *time.Time) *DeliveryUpdate {
+	if v != nil {
+		_u.SetPublishedAt(*v)
 	}
-	return du
+	return _u
 }
 
 // SetAttemptAt sets the "attemptAt" field.
-func (du *DeliveryUpdate) SetAttemptAt(t time.Time) *DeliveryUpdate {
-	du.mutation.SetAttemptAt(t)
-	return du
+func (_u *DeliveryUpdate) SetAttemptAt(v time.Time) *DeliveryUpdate {
+	_u.mutation.SetAttemptAt(v)
+	return _u
 }
 
 // SetNillableAttemptAt sets the "attemptAt" field if the given value is not nil.
-func (du *DeliveryUpdate) SetNillableAttemptAt(t *time.Time) *DeliveryUpdate {
-	if t != nil {
-		du.SetAttemptAt(*t)
+func (_u *DeliveryUpdate) SetNillableAttemptAt(v *time.Time) *DeliveryUpdate {
+	if v != nil {
+		_u.SetAttemptAt(*v)
 	}
-	return du
+	return _u
 }
 
 // SetLastAttemptedAt sets the "lastAttemptedAt" field.
-func (du *DeliveryUpdate) SetLastAttemptedAt(t time.Time) *DeliveryUpdate {
-	du.mutation.SetLastAttemptedAt(t)
-	return du
+func (_u *DeliveryUpdate) SetLastAttemptedAt(v time.Time) *DeliveryUpdate {
+	_u.mutation.SetLastAttemptedAt(v)
+	return _u
 }
 
 // SetNillableLastAttemptedAt sets the "lastAttemptedAt" field if the given value is not nil.
-func (du *DeliveryUpdate) SetNillableLastAttemptedAt(t *time.Time) *DeliveryUpdate {
-	if t != nil {
-		du.SetLastAttemptedAt(*t)
+func (_u *DeliveryUpdate) SetNillableLastAttemptedAt(v *time.Time) *DeliveryUpdate {
+	if v != nil {
+		_u.SetLastAttemptedAt(*v)
 	}
-	return du
+	return _u
 }
 
 // ClearLastAttemptedAt clears the value of the "lastAttemptedAt" field.
-func (du *DeliveryUpdate) ClearLastAttemptedAt() *DeliveryUpdate {
-	du.mutation.ClearLastAttemptedAt()
-	return du
+func (_u *DeliveryUpdate) ClearLastAttemptedAt() *DeliveryUpdate {
+	_u.mutation.ClearLastAttemptedAt()
+	return _u
 }
 
 // SetAttempts sets the "attempts" field.
-func (du *DeliveryUpdate) SetAttempts(i int) *DeliveryUpdate {
-	du.mutation.ResetAttempts()
-	du.mutation.SetAttempts(i)
-	return du
+func (_u *DeliveryUpdate) SetAttempts(v int) *DeliveryUpdate {
+	_u.mutation.ResetAttempts()
+	_u.mutation.SetAttempts(v)
+	return _u
 }
 
 // SetNillableAttempts sets the "attempts" field if the given value is not nil.
-func (du *DeliveryUpdate) SetNillableAttempts(i *int) *DeliveryUpdate {
-	if i != nil {
-		du.SetAttempts(*i)
+func (_u *DeliveryUpdate) SetNillableAttempts(v *int) *DeliveryUpdate {
+	if v != nil {
+		_u.SetAttempts(*v)
 	}
-	return du
+	return _u
 }
 
-// AddAttempts adds i to the "attempts" field.
-func (du *DeliveryUpdate) AddAttempts(i int) *DeliveryUpdate {
-	du.mutation.AddAttempts(i)
-	return du
+// AddAttempts adds value to the "attempts" field.
+func (_u *DeliveryUpdate) AddAttempts(v int) *DeliveryUpdate {
+	_u.mutation.AddAttempts(v)
+	return _u
 }
 
 // SetCompletedAt sets the "completedAt" field.
-func (du *DeliveryUpdate) SetCompletedAt(t time.Time) *DeliveryUpdate {
-	du.mutation.SetCompletedAt(t)
-	return du
+func (_u *DeliveryUpdate) SetCompletedAt(v time.Time) *DeliveryUpdate {
+	_u.mutation.SetCompletedAt(v)
+	return _u
 }
 
 // SetNillableCompletedAt sets the "completedAt" field if the given value is not nil.
-func (du *DeliveryUpdate) SetNillableCompletedAt(t *time.Time) *DeliveryUpdate {
-	if t != nil {
-		du.SetCompletedAt(*t)
+func (_u *DeliveryUpdate) SetNillableCompletedAt(v *time.Time) *DeliveryUpdate {
+	if v != nil {
+		_u.SetCompletedAt(*v)
 	}
-	return du
+	return _u
 }
 
 // ClearCompletedAt clears the value of the "completedAt" field.
-func (du *DeliveryUpdate) ClearCompletedAt() *DeliveryUpdate {
-	du.mutation.ClearCompletedAt()
-	return du
+func (_u *DeliveryUpdate) ClearCompletedAt() *DeliveryUpdate {
+	_u.mutation.ClearCompletedAt()
+	return _u
 }
 
 // SetExpiresAt sets the "expiresAt" field.
-func (du *DeliveryUpdate) SetExpiresAt(t time.Time) *DeliveryUpdate {
-	du.mutation.SetExpiresAt(t)
-	return du
+func (_u *DeliveryUpdate) SetExpiresAt(v time.Time) *DeliveryUpdate {
+	_u.mutation.SetExpiresAt(v)
+	return _u
 }
 
 // SetNillableExpiresAt sets the "expiresAt" field if the given value is not nil.
-func (du *DeliveryUpdate) SetNillableExpiresAt(t *time.Time) *DeliveryUpdate {
-	if t != nil {
-		du.SetExpiresAt(*t)
+func (_u *DeliveryUpdate) SetNillableExpiresAt(v *time.Time) *DeliveryUpdate {
+	if v != nil {
+		_u.SetExpiresAt(*v)
 	}
-	return du
+	return _u
 }
 
 // SetNotBeforeID sets the "notBeforeID" field.
-func (du *DeliveryUpdate) SetNotBeforeID(u uuid.UUID) *DeliveryUpdate {
-	du.mutation.SetNotBeforeID(u)
-	return du
+func (_u *DeliveryUpdate) SetNotBeforeID(v uuid.UUID) *DeliveryUpdate {
+	_u.mutation.SetNotBeforeID(v)
+	return _u
 }
 
 // SetNillableNotBeforeID sets the "notBeforeID" field if the given value is not nil.
-func (du *DeliveryUpdate) SetNillableNotBeforeID(u *uuid.UUID) *DeliveryUpdate {
-	if u != nil {
-		du.SetNotBeforeID(*u)
+func (_u *DeliveryUpdate) SetNillableNotBeforeID(v *uuid.UUID) *DeliveryUpdate {
+	if v != nil {
+		_u.SetNotBeforeID(*v)
 	}
-	return du
+	return _u
 }
 
 // ClearNotBeforeID clears the value of the "notBeforeID" field.
-func (du *DeliveryUpdate) ClearNotBeforeID() *DeliveryUpdate {
-	du.mutation.ClearNotBeforeID()
-	return du
+func (_u *DeliveryUpdate) ClearNotBeforeID() *DeliveryUpdate {
+	_u.mutation.ClearNotBeforeID()
+	return _u
 }
 
 // SetMessage sets the "message" edge to the Message entity.
-func (du *DeliveryUpdate) SetMessage(m *Message) *DeliveryUpdate {
-	return du.SetMessageID(m.ID)
+func (_u *DeliveryUpdate) SetMessage(v *Message) *DeliveryUpdate {
+	return _u.SetMessageID(v.ID)
 }
 
 // SetSubscription sets the "subscription" edge to the Subscription entity.
-func (du *DeliveryUpdate) SetSubscription(s *Subscription) *DeliveryUpdate {
-	return du.SetSubscriptionID(s.ID)
+func (_u *DeliveryUpdate) SetSubscription(v *Subscription) *DeliveryUpdate {
+	return _u.SetSubscriptionID(v.ID)
 }
 
 // SetNotBefore sets the "notBefore" edge to the Delivery entity.
-func (du *DeliveryUpdate) SetNotBefore(d *Delivery) *DeliveryUpdate {
-	return du.SetNotBeforeID(d.ID)
+func (_u *DeliveryUpdate) SetNotBefore(v *Delivery) *DeliveryUpdate {
+	return _u.SetNotBeforeID(v.ID)
 }
 
 // AddNextReadyIDs adds the "nextReady" edge to the Delivery entity by IDs.
-func (du *DeliveryUpdate) AddNextReadyIDs(ids ...uuid.UUID) *DeliveryUpdate {
-	du.mutation.AddNextReadyIDs(ids...)
-	return du
+func (_u *DeliveryUpdate) AddNextReadyIDs(ids ...uuid.UUID) *DeliveryUpdate {
+	_u.mutation.AddNextReadyIDs(ids...)
+	return _u
 }
 
 // AddNextReady adds the "nextReady" edges to the Delivery entity.
-func (du *DeliveryUpdate) AddNextReady(d ...*Delivery) *DeliveryUpdate {
-	ids := make([]uuid.UUID, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_u *DeliveryUpdate) AddNextReady(v ...*Delivery) *DeliveryUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return du.AddNextReadyIDs(ids...)
+	return _u.AddNextReadyIDs(ids...)
 }
 
 // Mutation returns the DeliveryMutation object of the builder.
-func (du *DeliveryUpdate) Mutation() *DeliveryMutation {
-	return du.mutation
+func (_u *DeliveryUpdate) Mutation() *DeliveryMutation {
+	return _u.mutation
 }
 
 // ClearMessage clears the "message" edge to the Message entity.
-func (du *DeliveryUpdate) ClearMessage() *DeliveryUpdate {
-	du.mutation.ClearMessage()
-	return du
+func (_u *DeliveryUpdate) ClearMessage() *DeliveryUpdate {
+	_u.mutation.ClearMessage()
+	return _u
 }
 
 // ClearSubscription clears the "subscription" edge to the Subscription entity.
-func (du *DeliveryUpdate) ClearSubscription() *DeliveryUpdate {
-	du.mutation.ClearSubscription()
-	return du
+func (_u *DeliveryUpdate) ClearSubscription() *DeliveryUpdate {
+	_u.mutation.ClearSubscription()
+	return _u
 }
 
 // ClearNotBefore clears the "notBefore" edge to the Delivery entity.
-func (du *DeliveryUpdate) ClearNotBefore() *DeliveryUpdate {
-	du.mutation.ClearNotBefore()
-	return du
+func (_u *DeliveryUpdate) ClearNotBefore() *DeliveryUpdate {
+	_u.mutation.ClearNotBefore()
+	return _u
 }
 
 // ClearNextReady clears all "nextReady" edges to the Delivery entity.
-func (du *DeliveryUpdate) ClearNextReady() *DeliveryUpdate {
-	du.mutation.ClearNextReady()
-	return du
+func (_u *DeliveryUpdate) ClearNextReady() *DeliveryUpdate {
+	_u.mutation.ClearNextReady()
+	return _u
 }
 
 // RemoveNextReadyIDs removes the "nextReady" edge to Delivery entities by IDs.
-func (du *DeliveryUpdate) RemoveNextReadyIDs(ids ...uuid.UUID) *DeliveryUpdate {
-	du.mutation.RemoveNextReadyIDs(ids...)
-	return du
+func (_u *DeliveryUpdate) RemoveNextReadyIDs(ids ...uuid.UUID) *DeliveryUpdate {
+	_u.mutation.RemoveNextReadyIDs(ids...)
+	return _u
 }
 
 // RemoveNextReady removes "nextReady" edges to Delivery entities.
-func (du *DeliveryUpdate) RemoveNextReady(d ...*Delivery) *DeliveryUpdate {
-	ids := make([]uuid.UUID, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_u *DeliveryUpdate) RemoveNextReady(v ...*Delivery) *DeliveryUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return du.RemoveNextReadyIDs(ids...)
+	return _u.RemoveNextReadyIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (du *DeliveryUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, du.sqlSave, du.mutation, du.hooks)
+func (_u *DeliveryUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (du *DeliveryUpdate) SaveX(ctx context.Context) int {
-	affected, err := du.Save(ctx)
+func (_u *DeliveryUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -271,69 +271,69 @@ func (du *DeliveryUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (du *DeliveryUpdate) Exec(ctx context.Context) error {
-	_, err := du.Save(ctx)
+func (_u *DeliveryUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (du *DeliveryUpdate) ExecX(ctx context.Context) {
-	if err := du.Exec(ctx); err != nil {
+func (_u *DeliveryUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (du *DeliveryUpdate) check() error {
-	if du.mutation.MessageCleared() && len(du.mutation.MessageIDs()) > 0 {
+func (_u *DeliveryUpdate) check() error {
+	if _u.mutation.MessageCleared() && len(_u.mutation.MessageIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Delivery.message"`)
 	}
-	if du.mutation.SubscriptionCleared() && len(du.mutation.SubscriptionIDs()) > 0 {
+	if _u.mutation.SubscriptionCleared() && len(_u.mutation.SubscriptionIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Delivery.subscription"`)
 	}
 	return nil
 }
 
-func (du *DeliveryUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := du.check(); err != nil {
-		return n, err
+func (_u *DeliveryUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(delivery.Table, delivery.Columns, sqlgraph.NewFieldSpec(delivery.FieldID, field.TypeUUID))
-	if ps := du.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := du.mutation.PublishedAt(); ok {
+	if value, ok := _u.mutation.PublishedAt(); ok {
 		_spec.SetField(delivery.FieldPublishedAt, field.TypeTime, value)
 	}
-	if value, ok := du.mutation.AttemptAt(); ok {
+	if value, ok := _u.mutation.AttemptAt(); ok {
 		_spec.SetField(delivery.FieldAttemptAt, field.TypeTime, value)
 	}
-	if value, ok := du.mutation.LastAttemptedAt(); ok {
+	if value, ok := _u.mutation.LastAttemptedAt(); ok {
 		_spec.SetField(delivery.FieldLastAttemptedAt, field.TypeTime, value)
 	}
-	if du.mutation.LastAttemptedAtCleared() {
+	if _u.mutation.LastAttemptedAtCleared() {
 		_spec.ClearField(delivery.FieldLastAttemptedAt, field.TypeTime)
 	}
-	if value, ok := du.mutation.Attempts(); ok {
+	if value, ok := _u.mutation.Attempts(); ok {
 		_spec.SetField(delivery.FieldAttempts, field.TypeInt, value)
 	}
-	if value, ok := du.mutation.AddedAttempts(); ok {
+	if value, ok := _u.mutation.AddedAttempts(); ok {
 		_spec.AddField(delivery.FieldAttempts, field.TypeInt, value)
 	}
-	if value, ok := du.mutation.CompletedAt(); ok {
+	if value, ok := _u.mutation.CompletedAt(); ok {
 		_spec.SetField(delivery.FieldCompletedAt, field.TypeTime, value)
 	}
-	if du.mutation.CompletedAtCleared() {
+	if _u.mutation.CompletedAtCleared() {
 		_spec.ClearField(delivery.FieldCompletedAt, field.TypeTime)
 	}
-	if value, ok := du.mutation.ExpiresAt(); ok {
+	if value, ok := _u.mutation.ExpiresAt(); ok {
 		_spec.SetField(delivery.FieldExpiresAt, field.TypeTime, value)
 	}
-	if du.mutation.MessageCleared() {
+	if _u.mutation.MessageCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -346,7 +346,7 @@ func (du *DeliveryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := du.mutation.MessageIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.MessageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -362,7 +362,7 @@ func (du *DeliveryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if du.mutation.SubscriptionCleared() {
+	if _u.mutation.SubscriptionCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -375,7 +375,7 @@ func (du *DeliveryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := du.mutation.SubscriptionIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.SubscriptionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -391,7 +391,7 @@ func (du *DeliveryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if du.mutation.NotBeforeCleared() {
+	if _u.mutation.NotBeforeCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -404,7 +404,7 @@ func (du *DeliveryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := du.mutation.NotBeforeIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NotBeforeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -420,7 +420,7 @@ func (du *DeliveryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if du.mutation.NextReadyCleared() {
+	if _u.mutation.NextReadyCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -433,7 +433,7 @@ func (du *DeliveryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := du.mutation.RemovedNextReadyIDs(); len(nodes) > 0 && !du.mutation.NextReadyCleared() {
+	if nodes := _u.mutation.RemovedNextReadyIDs(); len(nodes) > 0 && !_u.mutation.NextReadyCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -449,7 +449,7 @@ func (du *DeliveryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := du.mutation.NextReadyIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NextReadyIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -465,7 +465,7 @@ func (du *DeliveryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, du.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{delivery.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -473,8 +473,8 @@ func (du *DeliveryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	du.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // DeliveryUpdateOne is the builder for updating a single Delivery entity.
@@ -486,251 +486,251 @@ type DeliveryUpdateOne struct {
 }
 
 // SetMessageID sets the "messageID" field.
-func (duo *DeliveryUpdateOne) SetMessageID(u uuid.UUID) *DeliveryUpdateOne {
-	duo.mutation.SetMessageID(u)
-	return duo
+func (_u *DeliveryUpdateOne) SetMessageID(v uuid.UUID) *DeliveryUpdateOne {
+	_u.mutation.SetMessageID(v)
+	return _u
 }
 
 // SetNillableMessageID sets the "messageID" field if the given value is not nil.
-func (duo *DeliveryUpdateOne) SetNillableMessageID(u *uuid.UUID) *DeliveryUpdateOne {
-	if u != nil {
-		duo.SetMessageID(*u)
+func (_u *DeliveryUpdateOne) SetNillableMessageID(v *uuid.UUID) *DeliveryUpdateOne {
+	if v != nil {
+		_u.SetMessageID(*v)
 	}
-	return duo
+	return _u
 }
 
 // SetSubscriptionID sets the "subscriptionID" field.
-func (duo *DeliveryUpdateOne) SetSubscriptionID(u uuid.UUID) *DeliveryUpdateOne {
-	duo.mutation.SetSubscriptionID(u)
-	return duo
+func (_u *DeliveryUpdateOne) SetSubscriptionID(v uuid.UUID) *DeliveryUpdateOne {
+	_u.mutation.SetSubscriptionID(v)
+	return _u
 }
 
 // SetNillableSubscriptionID sets the "subscriptionID" field if the given value is not nil.
-func (duo *DeliveryUpdateOne) SetNillableSubscriptionID(u *uuid.UUID) *DeliveryUpdateOne {
-	if u != nil {
-		duo.SetSubscriptionID(*u)
+func (_u *DeliveryUpdateOne) SetNillableSubscriptionID(v *uuid.UUID) *DeliveryUpdateOne {
+	if v != nil {
+		_u.SetSubscriptionID(*v)
 	}
-	return duo
+	return _u
 }
 
 // SetPublishedAt sets the "publishedAt" field.
-func (duo *DeliveryUpdateOne) SetPublishedAt(t time.Time) *DeliveryUpdateOne {
-	duo.mutation.SetPublishedAt(t)
-	return duo
+func (_u *DeliveryUpdateOne) SetPublishedAt(v time.Time) *DeliveryUpdateOne {
+	_u.mutation.SetPublishedAt(v)
+	return _u
 }
 
 // SetNillablePublishedAt sets the "publishedAt" field if the given value is not nil.
-func (duo *DeliveryUpdateOne) SetNillablePublishedAt(t *time.Time) *DeliveryUpdateOne {
-	if t != nil {
-		duo.SetPublishedAt(*t)
+func (_u *DeliveryUpdateOne) SetNillablePublishedAt(v *time.Time) *DeliveryUpdateOne {
+	if v != nil {
+		_u.SetPublishedAt(*v)
 	}
-	return duo
+	return _u
 }
 
 // SetAttemptAt sets the "attemptAt" field.
-func (duo *DeliveryUpdateOne) SetAttemptAt(t time.Time) *DeliveryUpdateOne {
-	duo.mutation.SetAttemptAt(t)
-	return duo
+func (_u *DeliveryUpdateOne) SetAttemptAt(v time.Time) *DeliveryUpdateOne {
+	_u.mutation.SetAttemptAt(v)
+	return _u
 }
 
 // SetNillableAttemptAt sets the "attemptAt" field if the given value is not nil.
-func (duo *DeliveryUpdateOne) SetNillableAttemptAt(t *time.Time) *DeliveryUpdateOne {
-	if t != nil {
-		duo.SetAttemptAt(*t)
+func (_u *DeliveryUpdateOne) SetNillableAttemptAt(v *time.Time) *DeliveryUpdateOne {
+	if v != nil {
+		_u.SetAttemptAt(*v)
 	}
-	return duo
+	return _u
 }
 
 // SetLastAttemptedAt sets the "lastAttemptedAt" field.
-func (duo *DeliveryUpdateOne) SetLastAttemptedAt(t time.Time) *DeliveryUpdateOne {
-	duo.mutation.SetLastAttemptedAt(t)
-	return duo
+func (_u *DeliveryUpdateOne) SetLastAttemptedAt(v time.Time) *DeliveryUpdateOne {
+	_u.mutation.SetLastAttemptedAt(v)
+	return _u
 }
 
 // SetNillableLastAttemptedAt sets the "lastAttemptedAt" field if the given value is not nil.
-func (duo *DeliveryUpdateOne) SetNillableLastAttemptedAt(t *time.Time) *DeliveryUpdateOne {
-	if t != nil {
-		duo.SetLastAttemptedAt(*t)
+func (_u *DeliveryUpdateOne) SetNillableLastAttemptedAt(v *time.Time) *DeliveryUpdateOne {
+	if v != nil {
+		_u.SetLastAttemptedAt(*v)
 	}
-	return duo
+	return _u
 }
 
 // ClearLastAttemptedAt clears the value of the "lastAttemptedAt" field.
-func (duo *DeliveryUpdateOne) ClearLastAttemptedAt() *DeliveryUpdateOne {
-	duo.mutation.ClearLastAttemptedAt()
-	return duo
+func (_u *DeliveryUpdateOne) ClearLastAttemptedAt() *DeliveryUpdateOne {
+	_u.mutation.ClearLastAttemptedAt()
+	return _u
 }
 
 // SetAttempts sets the "attempts" field.
-func (duo *DeliveryUpdateOne) SetAttempts(i int) *DeliveryUpdateOne {
-	duo.mutation.ResetAttempts()
-	duo.mutation.SetAttempts(i)
-	return duo
+func (_u *DeliveryUpdateOne) SetAttempts(v int) *DeliveryUpdateOne {
+	_u.mutation.ResetAttempts()
+	_u.mutation.SetAttempts(v)
+	return _u
 }
 
 // SetNillableAttempts sets the "attempts" field if the given value is not nil.
-func (duo *DeliveryUpdateOne) SetNillableAttempts(i *int) *DeliveryUpdateOne {
-	if i != nil {
-		duo.SetAttempts(*i)
+func (_u *DeliveryUpdateOne) SetNillableAttempts(v *int) *DeliveryUpdateOne {
+	if v != nil {
+		_u.SetAttempts(*v)
 	}
-	return duo
+	return _u
 }
 
-// AddAttempts adds i to the "attempts" field.
-func (duo *DeliveryUpdateOne) AddAttempts(i int) *DeliveryUpdateOne {
-	duo.mutation.AddAttempts(i)
-	return duo
+// AddAttempts adds value to the "attempts" field.
+func (_u *DeliveryUpdateOne) AddAttempts(v int) *DeliveryUpdateOne {
+	_u.mutation.AddAttempts(v)
+	return _u
 }
 
 // SetCompletedAt sets the "completedAt" field.
-func (duo *DeliveryUpdateOne) SetCompletedAt(t time.Time) *DeliveryUpdateOne {
-	duo.mutation.SetCompletedAt(t)
-	return duo
+func (_u *DeliveryUpdateOne) SetCompletedAt(v time.Time) *DeliveryUpdateOne {
+	_u.mutation.SetCompletedAt(v)
+	return _u
 }
 
 // SetNillableCompletedAt sets the "completedAt" field if the given value is not nil.
-func (duo *DeliveryUpdateOne) SetNillableCompletedAt(t *time.Time) *DeliveryUpdateOne {
-	if t != nil {
-		duo.SetCompletedAt(*t)
+func (_u *DeliveryUpdateOne) SetNillableCompletedAt(v *time.Time) *DeliveryUpdateOne {
+	if v != nil {
+		_u.SetCompletedAt(*v)
 	}
-	return duo
+	return _u
 }
 
 // ClearCompletedAt clears the value of the "completedAt" field.
-func (duo *DeliveryUpdateOne) ClearCompletedAt() *DeliveryUpdateOne {
-	duo.mutation.ClearCompletedAt()
-	return duo
+func (_u *DeliveryUpdateOne) ClearCompletedAt() *DeliveryUpdateOne {
+	_u.mutation.ClearCompletedAt()
+	return _u
 }
 
 // SetExpiresAt sets the "expiresAt" field.
-func (duo *DeliveryUpdateOne) SetExpiresAt(t time.Time) *DeliveryUpdateOne {
-	duo.mutation.SetExpiresAt(t)
-	return duo
+func (_u *DeliveryUpdateOne) SetExpiresAt(v time.Time) *DeliveryUpdateOne {
+	_u.mutation.SetExpiresAt(v)
+	return _u
 }
 
 // SetNillableExpiresAt sets the "expiresAt" field if the given value is not nil.
-func (duo *DeliveryUpdateOne) SetNillableExpiresAt(t *time.Time) *DeliveryUpdateOne {
-	if t != nil {
-		duo.SetExpiresAt(*t)
+func (_u *DeliveryUpdateOne) SetNillableExpiresAt(v *time.Time) *DeliveryUpdateOne {
+	if v != nil {
+		_u.SetExpiresAt(*v)
 	}
-	return duo
+	return _u
 }
 
 // SetNotBeforeID sets the "notBeforeID" field.
-func (duo *DeliveryUpdateOne) SetNotBeforeID(u uuid.UUID) *DeliveryUpdateOne {
-	duo.mutation.SetNotBeforeID(u)
-	return duo
+func (_u *DeliveryUpdateOne) SetNotBeforeID(v uuid.UUID) *DeliveryUpdateOne {
+	_u.mutation.SetNotBeforeID(v)
+	return _u
 }
 
 // SetNillableNotBeforeID sets the "notBeforeID" field if the given value is not nil.
-func (duo *DeliveryUpdateOne) SetNillableNotBeforeID(u *uuid.UUID) *DeliveryUpdateOne {
-	if u != nil {
-		duo.SetNotBeforeID(*u)
+func (_u *DeliveryUpdateOne) SetNillableNotBeforeID(v *uuid.UUID) *DeliveryUpdateOne {
+	if v != nil {
+		_u.SetNotBeforeID(*v)
 	}
-	return duo
+	return _u
 }
 
 // ClearNotBeforeID clears the value of the "notBeforeID" field.
-func (duo *DeliveryUpdateOne) ClearNotBeforeID() *DeliveryUpdateOne {
-	duo.mutation.ClearNotBeforeID()
-	return duo
+func (_u *DeliveryUpdateOne) ClearNotBeforeID() *DeliveryUpdateOne {
+	_u.mutation.ClearNotBeforeID()
+	return _u
 }
 
 // SetMessage sets the "message" edge to the Message entity.
-func (duo *DeliveryUpdateOne) SetMessage(m *Message) *DeliveryUpdateOne {
-	return duo.SetMessageID(m.ID)
+func (_u *DeliveryUpdateOne) SetMessage(v *Message) *DeliveryUpdateOne {
+	return _u.SetMessageID(v.ID)
 }
 
 // SetSubscription sets the "subscription" edge to the Subscription entity.
-func (duo *DeliveryUpdateOne) SetSubscription(s *Subscription) *DeliveryUpdateOne {
-	return duo.SetSubscriptionID(s.ID)
+func (_u *DeliveryUpdateOne) SetSubscription(v *Subscription) *DeliveryUpdateOne {
+	return _u.SetSubscriptionID(v.ID)
 }
 
 // SetNotBefore sets the "notBefore" edge to the Delivery entity.
-func (duo *DeliveryUpdateOne) SetNotBefore(d *Delivery) *DeliveryUpdateOne {
-	return duo.SetNotBeforeID(d.ID)
+func (_u *DeliveryUpdateOne) SetNotBefore(v *Delivery) *DeliveryUpdateOne {
+	return _u.SetNotBeforeID(v.ID)
 }
 
 // AddNextReadyIDs adds the "nextReady" edge to the Delivery entity by IDs.
-func (duo *DeliveryUpdateOne) AddNextReadyIDs(ids ...uuid.UUID) *DeliveryUpdateOne {
-	duo.mutation.AddNextReadyIDs(ids...)
-	return duo
+func (_u *DeliveryUpdateOne) AddNextReadyIDs(ids ...uuid.UUID) *DeliveryUpdateOne {
+	_u.mutation.AddNextReadyIDs(ids...)
+	return _u
 }
 
 // AddNextReady adds the "nextReady" edges to the Delivery entity.
-func (duo *DeliveryUpdateOne) AddNextReady(d ...*Delivery) *DeliveryUpdateOne {
-	ids := make([]uuid.UUID, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_u *DeliveryUpdateOne) AddNextReady(v ...*Delivery) *DeliveryUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return duo.AddNextReadyIDs(ids...)
+	return _u.AddNextReadyIDs(ids...)
 }
 
 // Mutation returns the DeliveryMutation object of the builder.
-func (duo *DeliveryUpdateOne) Mutation() *DeliveryMutation {
-	return duo.mutation
+func (_u *DeliveryUpdateOne) Mutation() *DeliveryMutation {
+	return _u.mutation
 }
 
 // ClearMessage clears the "message" edge to the Message entity.
-func (duo *DeliveryUpdateOne) ClearMessage() *DeliveryUpdateOne {
-	duo.mutation.ClearMessage()
-	return duo
+func (_u *DeliveryUpdateOne) ClearMessage() *DeliveryUpdateOne {
+	_u.mutation.ClearMessage()
+	return _u
 }
 
 // ClearSubscription clears the "subscription" edge to the Subscription entity.
-func (duo *DeliveryUpdateOne) ClearSubscription() *DeliveryUpdateOne {
-	duo.mutation.ClearSubscription()
-	return duo
+func (_u *DeliveryUpdateOne) ClearSubscription() *DeliveryUpdateOne {
+	_u.mutation.ClearSubscription()
+	return _u
 }
 
 // ClearNotBefore clears the "notBefore" edge to the Delivery entity.
-func (duo *DeliveryUpdateOne) ClearNotBefore() *DeliveryUpdateOne {
-	duo.mutation.ClearNotBefore()
-	return duo
+func (_u *DeliveryUpdateOne) ClearNotBefore() *DeliveryUpdateOne {
+	_u.mutation.ClearNotBefore()
+	return _u
 }
 
 // ClearNextReady clears all "nextReady" edges to the Delivery entity.
-func (duo *DeliveryUpdateOne) ClearNextReady() *DeliveryUpdateOne {
-	duo.mutation.ClearNextReady()
-	return duo
+func (_u *DeliveryUpdateOne) ClearNextReady() *DeliveryUpdateOne {
+	_u.mutation.ClearNextReady()
+	return _u
 }
 
 // RemoveNextReadyIDs removes the "nextReady" edge to Delivery entities by IDs.
-func (duo *DeliveryUpdateOne) RemoveNextReadyIDs(ids ...uuid.UUID) *DeliveryUpdateOne {
-	duo.mutation.RemoveNextReadyIDs(ids...)
-	return duo
+func (_u *DeliveryUpdateOne) RemoveNextReadyIDs(ids ...uuid.UUID) *DeliveryUpdateOne {
+	_u.mutation.RemoveNextReadyIDs(ids...)
+	return _u
 }
 
 // RemoveNextReady removes "nextReady" edges to Delivery entities.
-func (duo *DeliveryUpdateOne) RemoveNextReady(d ...*Delivery) *DeliveryUpdateOne {
-	ids := make([]uuid.UUID, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_u *DeliveryUpdateOne) RemoveNextReady(v ...*Delivery) *DeliveryUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return duo.RemoveNextReadyIDs(ids...)
+	return _u.RemoveNextReadyIDs(ids...)
 }
 
 // Where appends a list predicates to the DeliveryUpdate builder.
-func (duo *DeliveryUpdateOne) Where(ps ...predicate.Delivery) *DeliveryUpdateOne {
-	duo.mutation.Where(ps...)
-	return duo
+func (_u *DeliveryUpdateOne) Where(ps ...predicate.Delivery) *DeliveryUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (duo *DeliveryUpdateOne) Select(field string, fields ...string) *DeliveryUpdateOne {
-	duo.fields = append([]string{field}, fields...)
-	return duo
+func (_u *DeliveryUpdateOne) Select(field string, fields ...string) *DeliveryUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Delivery entity.
-func (duo *DeliveryUpdateOne) Save(ctx context.Context) (*Delivery, error) {
-	return withHooks(ctx, duo.sqlSave, duo.mutation, duo.hooks)
+func (_u *DeliveryUpdateOne) Save(ctx context.Context) (*Delivery, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (duo *DeliveryUpdateOne) SaveX(ctx context.Context) *Delivery {
-	node, err := duo.Save(ctx)
+func (_u *DeliveryUpdateOne) SaveX(ctx context.Context) *Delivery {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -738,40 +738,40 @@ func (duo *DeliveryUpdateOne) SaveX(ctx context.Context) *Delivery {
 }
 
 // Exec executes the query on the entity.
-func (duo *DeliveryUpdateOne) Exec(ctx context.Context) error {
-	_, err := duo.Save(ctx)
+func (_u *DeliveryUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (duo *DeliveryUpdateOne) ExecX(ctx context.Context) {
-	if err := duo.Exec(ctx); err != nil {
+func (_u *DeliveryUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (duo *DeliveryUpdateOne) check() error {
-	if duo.mutation.MessageCleared() && len(duo.mutation.MessageIDs()) > 0 {
+func (_u *DeliveryUpdateOne) check() error {
+	if _u.mutation.MessageCleared() && len(_u.mutation.MessageIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Delivery.message"`)
 	}
-	if duo.mutation.SubscriptionCleared() && len(duo.mutation.SubscriptionIDs()) > 0 {
+	if _u.mutation.SubscriptionCleared() && len(_u.mutation.SubscriptionIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Delivery.subscription"`)
 	}
 	return nil
 }
 
-func (duo *DeliveryUpdateOne) sqlSave(ctx context.Context) (_node *Delivery, err error) {
-	if err := duo.check(); err != nil {
+func (_u *DeliveryUpdateOne) sqlSave(ctx context.Context) (_node *Delivery, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(delivery.Table, delivery.Columns, sqlgraph.NewFieldSpec(delivery.FieldID, field.TypeUUID))
-	id, ok := duo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Delivery.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := duo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, delivery.FieldID)
 		for _, f := range fields {
@@ -783,41 +783,41 @@ func (duo *DeliveryUpdateOne) sqlSave(ctx context.Context) (_node *Delivery, err
 			}
 		}
 	}
-	if ps := duo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := duo.mutation.PublishedAt(); ok {
+	if value, ok := _u.mutation.PublishedAt(); ok {
 		_spec.SetField(delivery.FieldPublishedAt, field.TypeTime, value)
 	}
-	if value, ok := duo.mutation.AttemptAt(); ok {
+	if value, ok := _u.mutation.AttemptAt(); ok {
 		_spec.SetField(delivery.FieldAttemptAt, field.TypeTime, value)
 	}
-	if value, ok := duo.mutation.LastAttemptedAt(); ok {
+	if value, ok := _u.mutation.LastAttemptedAt(); ok {
 		_spec.SetField(delivery.FieldLastAttemptedAt, field.TypeTime, value)
 	}
-	if duo.mutation.LastAttemptedAtCleared() {
+	if _u.mutation.LastAttemptedAtCleared() {
 		_spec.ClearField(delivery.FieldLastAttemptedAt, field.TypeTime)
 	}
-	if value, ok := duo.mutation.Attempts(); ok {
+	if value, ok := _u.mutation.Attempts(); ok {
 		_spec.SetField(delivery.FieldAttempts, field.TypeInt, value)
 	}
-	if value, ok := duo.mutation.AddedAttempts(); ok {
+	if value, ok := _u.mutation.AddedAttempts(); ok {
 		_spec.AddField(delivery.FieldAttempts, field.TypeInt, value)
 	}
-	if value, ok := duo.mutation.CompletedAt(); ok {
+	if value, ok := _u.mutation.CompletedAt(); ok {
 		_spec.SetField(delivery.FieldCompletedAt, field.TypeTime, value)
 	}
-	if duo.mutation.CompletedAtCleared() {
+	if _u.mutation.CompletedAtCleared() {
 		_spec.ClearField(delivery.FieldCompletedAt, field.TypeTime)
 	}
-	if value, ok := duo.mutation.ExpiresAt(); ok {
+	if value, ok := _u.mutation.ExpiresAt(); ok {
 		_spec.SetField(delivery.FieldExpiresAt, field.TypeTime, value)
 	}
-	if duo.mutation.MessageCleared() {
+	if _u.mutation.MessageCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -830,7 +830,7 @@ func (duo *DeliveryUpdateOne) sqlSave(ctx context.Context) (_node *Delivery, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := duo.mutation.MessageIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.MessageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -846,7 +846,7 @@ func (duo *DeliveryUpdateOne) sqlSave(ctx context.Context) (_node *Delivery, err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if duo.mutation.SubscriptionCleared() {
+	if _u.mutation.SubscriptionCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -859,7 +859,7 @@ func (duo *DeliveryUpdateOne) sqlSave(ctx context.Context) (_node *Delivery, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := duo.mutation.SubscriptionIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.SubscriptionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -875,7 +875,7 @@ func (duo *DeliveryUpdateOne) sqlSave(ctx context.Context) (_node *Delivery, err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if duo.mutation.NotBeforeCleared() {
+	if _u.mutation.NotBeforeCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -888,7 +888,7 @@ func (duo *DeliveryUpdateOne) sqlSave(ctx context.Context) (_node *Delivery, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := duo.mutation.NotBeforeIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NotBeforeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -904,7 +904,7 @@ func (duo *DeliveryUpdateOne) sqlSave(ctx context.Context) (_node *Delivery, err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if duo.mutation.NextReadyCleared() {
+	if _u.mutation.NextReadyCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -917,7 +917,7 @@ func (duo *DeliveryUpdateOne) sqlSave(ctx context.Context) (_node *Delivery, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := duo.mutation.RemovedNextReadyIDs(); len(nodes) > 0 && !duo.mutation.NextReadyCleared() {
+	if nodes := _u.mutation.RemovedNextReadyIDs(); len(nodes) > 0 && !_u.mutation.NextReadyCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -933,7 +933,7 @@ func (duo *DeliveryUpdateOne) sqlSave(ctx context.Context) (_node *Delivery, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := duo.mutation.NextReadyIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NextReadyIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -949,10 +949,10 @@ func (duo *DeliveryUpdateOne) sqlSave(ctx context.Context) (_node *Delivery, err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &Delivery{config: duo.config}
+	_node = &Delivery{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, duo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{delivery.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -960,6 +960,6 @@ func (duo *DeliveryUpdateOne) sqlSave(ctx context.Context) (_node *Delivery, err
 		}
 		return nil, err
 	}
-	duo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }
