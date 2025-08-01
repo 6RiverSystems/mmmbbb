@@ -281,13 +281,13 @@ type predicateAdder interface {
 }
 
 // addPredicate implements the predicateAdder interface.
-func (dq *DeliveryQuery) addPredicate(pred func(s *sql.Selector)) {
-	dq.predicates = append(dq.predicates, pred)
+func (_q *DeliveryQuery) addPredicate(pred func(s *sql.Selector)) {
+	_q.predicates = append(_q.predicates, pred)
 }
 
 // Filter returns a Filter implementation to apply filters on the DeliveryQuery builder.
-func (dq *DeliveryQuery) Filter() *DeliveryFilter {
-	return &DeliveryFilter{config: dq.config, predicateAdder: dq}
+func (_q *DeliveryQuery) Filter() *DeliveryFilter {
+	return &DeliveryFilter{config: _q.config, predicateAdder: _q}
 }
 
 // addPredicate implements the predicateAdder interface.
@@ -422,13 +422,13 @@ func (f *DeliveryFilter) WhereHasNextReadyWith(preds ...predicate.Delivery) {
 }
 
 // addPredicate implements the predicateAdder interface.
-func (mq *MessageQuery) addPredicate(pred func(s *sql.Selector)) {
-	mq.predicates = append(mq.predicates, pred)
+func (_q *MessageQuery) addPredicate(pred func(s *sql.Selector)) {
+	_q.predicates = append(_q.predicates, pred)
 }
 
 // Filter returns a Filter implementation to apply filters on the MessageQuery builder.
-func (mq *MessageQuery) Filter() *MessageFilter {
-	return &MessageFilter{config: mq.config, predicateAdder: mq}
+func (_q *MessageQuery) Filter() *MessageFilter {
+	return &MessageFilter{config: _q.config, predicateAdder: _q}
 }
 
 // addPredicate implements the predicateAdder interface.
@@ -515,13 +515,13 @@ func (f *MessageFilter) WhereHasTopicWith(preds ...predicate.Topic) {
 }
 
 // addPredicate implements the predicateAdder interface.
-func (sq *SnapshotQuery) addPredicate(pred func(s *sql.Selector)) {
-	sq.predicates = append(sq.predicates, pred)
+func (_q *SnapshotQuery) addPredicate(pred func(s *sql.Selector)) {
+	_q.predicates = append(_q.predicates, pred)
 }
 
 // Filter returns a Filter implementation to apply filters on the SnapshotQuery builder.
-func (sq *SnapshotQuery) Filter() *SnapshotFilter {
-	return &SnapshotFilter{config: sq.config, predicateAdder: sq}
+func (_q *SnapshotQuery) Filter() *SnapshotFilter {
+	return &SnapshotFilter{config: _q.config, predicateAdder: _q}
 }
 
 // addPredicate implements the predicateAdder interface.
@@ -604,13 +604,13 @@ func (f *SnapshotFilter) WhereHasTopicWith(preds ...predicate.Topic) {
 }
 
 // addPredicate implements the predicateAdder interface.
-func (sq *SubscriptionQuery) addPredicate(pred func(s *sql.Selector)) {
-	sq.predicates = append(sq.predicates, pred)
+func (_q *SubscriptionQuery) addPredicate(pred func(s *sql.Selector)) {
+	_q.predicates = append(_q.predicates, pred)
 }
 
 // Filter returns a Filter implementation to apply filters on the SubscriptionQuery builder.
-func (sq *SubscriptionQuery) Filter() *SubscriptionFilter {
-	return &SubscriptionFilter{config: sq.config, predicateAdder: sq}
+func (_q *SubscriptionQuery) Filter() *SubscriptionFilter {
+	return &SubscriptionFilter{config: _q.config, predicateAdder: _q}
 }
 
 // addPredicate implements the predicateAdder interface.
@@ -771,13 +771,13 @@ func (f *SubscriptionFilter) WhereHasDeadLetterTopicWith(preds ...predicate.Topi
 }
 
 // addPredicate implements the predicateAdder interface.
-func (tq *TopicQuery) addPredicate(pred func(s *sql.Selector)) {
-	tq.predicates = append(tq.predicates, pred)
+func (_q *TopicQuery) addPredicate(pred func(s *sql.Selector)) {
+	_q.predicates = append(_q.predicates, pred)
 }
 
 // Filter returns a Filter implementation to apply filters on the TopicQuery builder.
-func (tq *TopicQuery) Filter() *TopicFilter {
-	return &TopicFilter{config: tq.config, predicateAdder: tq}
+func (_q *TopicQuery) Filter() *TopicFilter {
+	return &TopicFilter{config: _q.config, predicateAdder: _q}
 }
 
 // addPredicate implements the predicateAdder interface.

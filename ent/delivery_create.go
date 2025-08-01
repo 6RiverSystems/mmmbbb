@@ -27,165 +27,165 @@ type DeliveryCreate struct {
 }
 
 // SetMessageID sets the "messageID" field.
-func (dc *DeliveryCreate) SetMessageID(u uuid.UUID) *DeliveryCreate {
-	dc.mutation.SetMessageID(u)
-	return dc
+func (_c *DeliveryCreate) SetMessageID(v uuid.UUID) *DeliveryCreate {
+	_c.mutation.SetMessageID(v)
+	return _c
 }
 
 // SetSubscriptionID sets the "subscriptionID" field.
-func (dc *DeliveryCreate) SetSubscriptionID(u uuid.UUID) *DeliveryCreate {
-	dc.mutation.SetSubscriptionID(u)
-	return dc
+func (_c *DeliveryCreate) SetSubscriptionID(v uuid.UUID) *DeliveryCreate {
+	_c.mutation.SetSubscriptionID(v)
+	return _c
 }
 
 // SetPublishedAt sets the "publishedAt" field.
-func (dc *DeliveryCreate) SetPublishedAt(t time.Time) *DeliveryCreate {
-	dc.mutation.SetPublishedAt(t)
-	return dc
+func (_c *DeliveryCreate) SetPublishedAt(v time.Time) *DeliveryCreate {
+	_c.mutation.SetPublishedAt(v)
+	return _c
 }
 
 // SetNillablePublishedAt sets the "publishedAt" field if the given value is not nil.
-func (dc *DeliveryCreate) SetNillablePublishedAt(t *time.Time) *DeliveryCreate {
-	if t != nil {
-		dc.SetPublishedAt(*t)
+func (_c *DeliveryCreate) SetNillablePublishedAt(v *time.Time) *DeliveryCreate {
+	if v != nil {
+		_c.SetPublishedAt(*v)
 	}
-	return dc
+	return _c
 }
 
 // SetAttemptAt sets the "attemptAt" field.
-func (dc *DeliveryCreate) SetAttemptAt(t time.Time) *DeliveryCreate {
-	dc.mutation.SetAttemptAt(t)
-	return dc
+func (_c *DeliveryCreate) SetAttemptAt(v time.Time) *DeliveryCreate {
+	_c.mutation.SetAttemptAt(v)
+	return _c
 }
 
 // SetNillableAttemptAt sets the "attemptAt" field if the given value is not nil.
-func (dc *DeliveryCreate) SetNillableAttemptAt(t *time.Time) *DeliveryCreate {
-	if t != nil {
-		dc.SetAttemptAt(*t)
+func (_c *DeliveryCreate) SetNillableAttemptAt(v *time.Time) *DeliveryCreate {
+	if v != nil {
+		_c.SetAttemptAt(*v)
 	}
-	return dc
+	return _c
 }
 
 // SetLastAttemptedAt sets the "lastAttemptedAt" field.
-func (dc *DeliveryCreate) SetLastAttemptedAt(t time.Time) *DeliveryCreate {
-	dc.mutation.SetLastAttemptedAt(t)
-	return dc
+func (_c *DeliveryCreate) SetLastAttemptedAt(v time.Time) *DeliveryCreate {
+	_c.mutation.SetLastAttemptedAt(v)
+	return _c
 }
 
 // SetNillableLastAttemptedAt sets the "lastAttemptedAt" field if the given value is not nil.
-func (dc *DeliveryCreate) SetNillableLastAttemptedAt(t *time.Time) *DeliveryCreate {
-	if t != nil {
-		dc.SetLastAttemptedAt(*t)
+func (_c *DeliveryCreate) SetNillableLastAttemptedAt(v *time.Time) *DeliveryCreate {
+	if v != nil {
+		_c.SetLastAttemptedAt(*v)
 	}
-	return dc
+	return _c
 }
 
 // SetAttempts sets the "attempts" field.
-func (dc *DeliveryCreate) SetAttempts(i int) *DeliveryCreate {
-	dc.mutation.SetAttempts(i)
-	return dc
+func (_c *DeliveryCreate) SetAttempts(v int) *DeliveryCreate {
+	_c.mutation.SetAttempts(v)
+	return _c
 }
 
 // SetNillableAttempts sets the "attempts" field if the given value is not nil.
-func (dc *DeliveryCreate) SetNillableAttempts(i *int) *DeliveryCreate {
-	if i != nil {
-		dc.SetAttempts(*i)
+func (_c *DeliveryCreate) SetNillableAttempts(v *int) *DeliveryCreate {
+	if v != nil {
+		_c.SetAttempts(*v)
 	}
-	return dc
+	return _c
 }
 
 // SetCompletedAt sets the "completedAt" field.
-func (dc *DeliveryCreate) SetCompletedAt(t time.Time) *DeliveryCreate {
-	dc.mutation.SetCompletedAt(t)
-	return dc
+func (_c *DeliveryCreate) SetCompletedAt(v time.Time) *DeliveryCreate {
+	_c.mutation.SetCompletedAt(v)
+	return _c
 }
 
 // SetNillableCompletedAt sets the "completedAt" field if the given value is not nil.
-func (dc *DeliveryCreate) SetNillableCompletedAt(t *time.Time) *DeliveryCreate {
-	if t != nil {
-		dc.SetCompletedAt(*t)
+func (_c *DeliveryCreate) SetNillableCompletedAt(v *time.Time) *DeliveryCreate {
+	if v != nil {
+		_c.SetCompletedAt(*v)
 	}
-	return dc
+	return _c
 }
 
 // SetExpiresAt sets the "expiresAt" field.
-func (dc *DeliveryCreate) SetExpiresAt(t time.Time) *DeliveryCreate {
-	dc.mutation.SetExpiresAt(t)
-	return dc
+func (_c *DeliveryCreate) SetExpiresAt(v time.Time) *DeliveryCreate {
+	_c.mutation.SetExpiresAt(v)
+	return _c
 }
 
 // SetNotBeforeID sets the "notBeforeID" field.
-func (dc *DeliveryCreate) SetNotBeforeID(u uuid.UUID) *DeliveryCreate {
-	dc.mutation.SetNotBeforeID(u)
-	return dc
+func (_c *DeliveryCreate) SetNotBeforeID(v uuid.UUID) *DeliveryCreate {
+	_c.mutation.SetNotBeforeID(v)
+	return _c
 }
 
 // SetNillableNotBeforeID sets the "notBeforeID" field if the given value is not nil.
-func (dc *DeliveryCreate) SetNillableNotBeforeID(u *uuid.UUID) *DeliveryCreate {
-	if u != nil {
-		dc.SetNotBeforeID(*u)
+func (_c *DeliveryCreate) SetNillableNotBeforeID(v *uuid.UUID) *DeliveryCreate {
+	if v != nil {
+		_c.SetNotBeforeID(*v)
 	}
-	return dc
+	return _c
 }
 
 // SetID sets the "id" field.
-func (dc *DeliveryCreate) SetID(u uuid.UUID) *DeliveryCreate {
-	dc.mutation.SetID(u)
-	return dc
+func (_c *DeliveryCreate) SetID(v uuid.UUID) *DeliveryCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (dc *DeliveryCreate) SetNillableID(u *uuid.UUID) *DeliveryCreate {
-	if u != nil {
-		dc.SetID(*u)
+func (_c *DeliveryCreate) SetNillableID(v *uuid.UUID) *DeliveryCreate {
+	if v != nil {
+		_c.SetID(*v)
 	}
-	return dc
+	return _c
 }
 
 // SetMessage sets the "message" edge to the Message entity.
-func (dc *DeliveryCreate) SetMessage(m *Message) *DeliveryCreate {
-	return dc.SetMessageID(m.ID)
+func (_c *DeliveryCreate) SetMessage(v *Message) *DeliveryCreate {
+	return _c.SetMessageID(v.ID)
 }
 
 // SetSubscription sets the "subscription" edge to the Subscription entity.
-func (dc *DeliveryCreate) SetSubscription(s *Subscription) *DeliveryCreate {
-	return dc.SetSubscriptionID(s.ID)
+func (_c *DeliveryCreate) SetSubscription(v *Subscription) *DeliveryCreate {
+	return _c.SetSubscriptionID(v.ID)
 }
 
 // SetNotBefore sets the "notBefore" edge to the Delivery entity.
-func (dc *DeliveryCreate) SetNotBefore(d *Delivery) *DeliveryCreate {
-	return dc.SetNotBeforeID(d.ID)
+func (_c *DeliveryCreate) SetNotBefore(v *Delivery) *DeliveryCreate {
+	return _c.SetNotBeforeID(v.ID)
 }
 
 // AddNextReadyIDs adds the "nextReady" edge to the Delivery entity by IDs.
-func (dc *DeliveryCreate) AddNextReadyIDs(ids ...uuid.UUID) *DeliveryCreate {
-	dc.mutation.AddNextReadyIDs(ids...)
-	return dc
+func (_c *DeliveryCreate) AddNextReadyIDs(ids ...uuid.UUID) *DeliveryCreate {
+	_c.mutation.AddNextReadyIDs(ids...)
+	return _c
 }
 
 // AddNextReady adds the "nextReady" edges to the Delivery entity.
-func (dc *DeliveryCreate) AddNextReady(d ...*Delivery) *DeliveryCreate {
-	ids := make([]uuid.UUID, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_c *DeliveryCreate) AddNextReady(v ...*Delivery) *DeliveryCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return dc.AddNextReadyIDs(ids...)
+	return _c.AddNextReadyIDs(ids...)
 }
 
 // Mutation returns the DeliveryMutation object of the builder.
-func (dc *DeliveryCreate) Mutation() *DeliveryMutation {
-	return dc.mutation
+func (_c *DeliveryCreate) Mutation() *DeliveryMutation {
+	return _c.mutation
 }
 
 // Save creates the Delivery in the database.
-func (dc *DeliveryCreate) Save(ctx context.Context) (*Delivery, error) {
-	dc.defaults()
-	return withHooks(ctx, dc.sqlSave, dc.mutation, dc.hooks)
+func (_c *DeliveryCreate) Save(ctx context.Context) (*Delivery, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (dc *DeliveryCreate) SaveX(ctx context.Context) *Delivery {
-	v, err := dc.Save(ctx)
+func (_c *DeliveryCreate) SaveX(ctx context.Context) *Delivery {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -193,73 +193,73 @@ func (dc *DeliveryCreate) SaveX(ctx context.Context) *Delivery {
 }
 
 // Exec executes the query.
-func (dc *DeliveryCreate) Exec(ctx context.Context) error {
-	_, err := dc.Save(ctx)
+func (_c *DeliveryCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (dc *DeliveryCreate) ExecX(ctx context.Context) {
-	if err := dc.Exec(ctx); err != nil {
+func (_c *DeliveryCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (dc *DeliveryCreate) defaults() {
-	if _, ok := dc.mutation.PublishedAt(); !ok {
+func (_c *DeliveryCreate) defaults() {
+	if _, ok := _c.mutation.PublishedAt(); !ok {
 		v := delivery.DefaultPublishedAt()
-		dc.mutation.SetPublishedAt(v)
+		_c.mutation.SetPublishedAt(v)
 	}
-	if _, ok := dc.mutation.AttemptAt(); !ok {
+	if _, ok := _c.mutation.AttemptAt(); !ok {
 		v := delivery.DefaultAttemptAt()
-		dc.mutation.SetAttemptAt(v)
+		_c.mutation.SetAttemptAt(v)
 	}
-	if _, ok := dc.mutation.Attempts(); !ok {
+	if _, ok := _c.mutation.Attempts(); !ok {
 		v := delivery.DefaultAttempts
-		dc.mutation.SetAttempts(v)
+		_c.mutation.SetAttempts(v)
 	}
-	if _, ok := dc.mutation.ID(); !ok {
+	if _, ok := _c.mutation.ID(); !ok {
 		v := delivery.DefaultID()
-		dc.mutation.SetID(v)
+		_c.mutation.SetID(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (dc *DeliveryCreate) check() error {
-	if _, ok := dc.mutation.MessageID(); !ok {
+func (_c *DeliveryCreate) check() error {
+	if _, ok := _c.mutation.MessageID(); !ok {
 		return &ValidationError{Name: "messageID", err: errors.New(`ent: missing required field "Delivery.messageID"`)}
 	}
-	if _, ok := dc.mutation.SubscriptionID(); !ok {
+	if _, ok := _c.mutation.SubscriptionID(); !ok {
 		return &ValidationError{Name: "subscriptionID", err: errors.New(`ent: missing required field "Delivery.subscriptionID"`)}
 	}
-	if _, ok := dc.mutation.PublishedAt(); !ok {
+	if _, ok := _c.mutation.PublishedAt(); !ok {
 		return &ValidationError{Name: "publishedAt", err: errors.New(`ent: missing required field "Delivery.publishedAt"`)}
 	}
-	if _, ok := dc.mutation.AttemptAt(); !ok {
+	if _, ok := _c.mutation.AttemptAt(); !ok {
 		return &ValidationError{Name: "attemptAt", err: errors.New(`ent: missing required field "Delivery.attemptAt"`)}
 	}
-	if _, ok := dc.mutation.Attempts(); !ok {
+	if _, ok := _c.mutation.Attempts(); !ok {
 		return &ValidationError{Name: "attempts", err: errors.New(`ent: missing required field "Delivery.attempts"`)}
 	}
-	if _, ok := dc.mutation.ExpiresAt(); !ok {
+	if _, ok := _c.mutation.ExpiresAt(); !ok {
 		return &ValidationError{Name: "expiresAt", err: errors.New(`ent: missing required field "Delivery.expiresAt"`)}
 	}
-	if len(dc.mutation.MessageIDs()) == 0 {
+	if len(_c.mutation.MessageIDs()) == 0 {
 		return &ValidationError{Name: "message", err: errors.New(`ent: missing required edge "Delivery.message"`)}
 	}
-	if len(dc.mutation.SubscriptionIDs()) == 0 {
+	if len(_c.mutation.SubscriptionIDs()) == 0 {
 		return &ValidationError{Name: "subscription", err: errors.New(`ent: missing required edge "Delivery.subscription"`)}
 	}
 	return nil
 }
 
-func (dc *DeliveryCreate) sqlSave(ctx context.Context) (*Delivery, error) {
-	if err := dc.check(); err != nil {
+func (_c *DeliveryCreate) sqlSave(ctx context.Context) (*Delivery, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := dc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, dc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -272,46 +272,46 @@ func (dc *DeliveryCreate) sqlSave(ctx context.Context) (*Delivery, error) {
 			return nil, err
 		}
 	}
-	dc.mutation.id = &_node.ID
-	dc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (dc *DeliveryCreate) createSpec() (*Delivery, *sqlgraph.CreateSpec) {
+func (_c *DeliveryCreate) createSpec() (*Delivery, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Delivery{config: dc.config}
+		_node = &Delivery{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(delivery.Table, sqlgraph.NewFieldSpec(delivery.FieldID, field.TypeUUID))
 	)
-	_spec.OnConflict = dc.conflict
-	if id, ok := dc.mutation.ID(); ok {
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := dc.mutation.PublishedAt(); ok {
+	if value, ok := _c.mutation.PublishedAt(); ok {
 		_spec.SetField(delivery.FieldPublishedAt, field.TypeTime, value)
 		_node.PublishedAt = value
 	}
-	if value, ok := dc.mutation.AttemptAt(); ok {
+	if value, ok := _c.mutation.AttemptAt(); ok {
 		_spec.SetField(delivery.FieldAttemptAt, field.TypeTime, value)
 		_node.AttemptAt = value
 	}
-	if value, ok := dc.mutation.LastAttemptedAt(); ok {
+	if value, ok := _c.mutation.LastAttemptedAt(); ok {
 		_spec.SetField(delivery.FieldLastAttemptedAt, field.TypeTime, value)
 		_node.LastAttemptedAt = &value
 	}
-	if value, ok := dc.mutation.Attempts(); ok {
+	if value, ok := _c.mutation.Attempts(); ok {
 		_spec.SetField(delivery.FieldAttempts, field.TypeInt, value)
 		_node.Attempts = value
 	}
-	if value, ok := dc.mutation.CompletedAt(); ok {
+	if value, ok := _c.mutation.CompletedAt(); ok {
 		_spec.SetField(delivery.FieldCompletedAt, field.TypeTime, value)
 		_node.CompletedAt = &value
 	}
-	if value, ok := dc.mutation.ExpiresAt(); ok {
+	if value, ok := _c.mutation.ExpiresAt(); ok {
 		_spec.SetField(delivery.FieldExpiresAt, field.TypeTime, value)
 		_node.ExpiresAt = value
 	}
-	if nodes := dc.mutation.MessageIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.MessageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -328,7 +328,7 @@ func (dc *DeliveryCreate) createSpec() (*Delivery, *sqlgraph.CreateSpec) {
 		_node.MessageID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := dc.mutation.SubscriptionIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.SubscriptionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -345,7 +345,7 @@ func (dc *DeliveryCreate) createSpec() (*Delivery, *sqlgraph.CreateSpec) {
 		_node.SubscriptionID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := dc.mutation.NotBeforeIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.NotBeforeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -362,7 +362,7 @@ func (dc *DeliveryCreate) createSpec() (*Delivery, *sqlgraph.CreateSpec) {
 		_node.NotBeforeID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := dc.mutation.NextReadyIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.NextReadyIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -397,10 +397,10 @@ func (dc *DeliveryCreate) createSpec() (*Delivery, *sqlgraph.CreateSpec) {
 //			SetMessageID(v+v).
 //		}).
 //		Exec(ctx)
-func (dc *DeliveryCreate) OnConflict(opts ...sql.ConflictOption) *DeliveryUpsertOne {
-	dc.conflict = opts
+func (_c *DeliveryCreate) OnConflict(opts ...sql.ConflictOption) *DeliveryUpsertOne {
+	_c.conflict = opts
 	return &DeliveryUpsertOne{
-		create: dc,
+		create: _c,
 	}
 }
 
@@ -410,10 +410,10 @@ func (dc *DeliveryCreate) OnConflict(opts ...sql.ConflictOption) *DeliveryUpsert
 //	client.Delivery.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (dc *DeliveryCreate) OnConflictColumns(columns ...string) *DeliveryUpsertOne {
-	dc.conflict = append(dc.conflict, sql.ConflictColumns(columns...))
+func (_c *DeliveryCreate) OnConflictColumns(columns ...string) *DeliveryUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &DeliveryUpsertOne{
-		create: dc,
+		create: _c,
 	}
 }
 
@@ -811,16 +811,16 @@ type DeliveryCreateBulk struct {
 }
 
 // Save creates the Delivery entities in the database.
-func (dcb *DeliveryCreateBulk) Save(ctx context.Context) ([]*Delivery, error) {
-	if dcb.err != nil {
-		return nil, dcb.err
+func (_c *DeliveryCreateBulk) Save(ctx context.Context) ([]*Delivery, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(dcb.builders))
-	nodes := make([]*Delivery, len(dcb.builders))
-	mutators := make([]Mutator, len(dcb.builders))
-	for i := range dcb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*Delivery, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := dcb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*DeliveryMutation)
@@ -834,12 +834,12 @@ func (dcb *DeliveryCreateBulk) Save(ctx context.Context) ([]*Delivery, error) {
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, dcb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = dcb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, dcb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -859,7 +859,7 @@ func (dcb *DeliveryCreateBulk) Save(ctx context.Context) ([]*Delivery, error) {
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, dcb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -867,8 +867,8 @@ func (dcb *DeliveryCreateBulk) Save(ctx context.Context) ([]*Delivery, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (dcb *DeliveryCreateBulk) SaveX(ctx context.Context) []*Delivery {
-	v, err := dcb.Save(ctx)
+func (_c *DeliveryCreateBulk) SaveX(ctx context.Context) []*Delivery {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -876,14 +876,14 @@ func (dcb *DeliveryCreateBulk) SaveX(ctx context.Context) []*Delivery {
 }
 
 // Exec executes the query.
-func (dcb *DeliveryCreateBulk) Exec(ctx context.Context) error {
-	_, err := dcb.Save(ctx)
+func (_c *DeliveryCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (dcb *DeliveryCreateBulk) ExecX(ctx context.Context) {
-	if err := dcb.Exec(ctx); err != nil {
+func (_c *DeliveryCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -903,10 +903,10 @@ func (dcb *DeliveryCreateBulk) ExecX(ctx context.Context) {
 //			SetMessageID(v+v).
 //		}).
 //		Exec(ctx)
-func (dcb *DeliveryCreateBulk) OnConflict(opts ...sql.ConflictOption) *DeliveryUpsertBulk {
-	dcb.conflict = opts
+func (_c *DeliveryCreateBulk) OnConflict(opts ...sql.ConflictOption) *DeliveryUpsertBulk {
+	_c.conflict = opts
 	return &DeliveryUpsertBulk{
-		create: dcb,
+		create: _c,
 	}
 }
 
@@ -916,10 +916,10 @@ func (dcb *DeliveryCreateBulk) OnConflict(opts ...sql.ConflictOption) *DeliveryU
 //	client.Delivery.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (dcb *DeliveryCreateBulk) OnConflictColumns(columns ...string) *DeliveryUpsertBulk {
-	dcb.conflict = append(dcb.conflict, sql.ConflictColumns(columns...))
+func (_c *DeliveryCreateBulk) OnConflictColumns(columns ...string) *DeliveryUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &DeliveryUpsertBulk{
-		create: dcb,
+		create: _c,
 	}
 }
 

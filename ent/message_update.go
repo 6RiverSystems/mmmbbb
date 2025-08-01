@@ -25,85 +25,85 @@ type MessageUpdate struct {
 }
 
 // Where appends a list predicates to the MessageUpdate builder.
-func (mu *MessageUpdate) Where(ps ...predicate.Message) *MessageUpdate {
-	mu.mutation.Where(ps...)
-	return mu
+func (_u *MessageUpdate) Where(ps ...predicate.Message) *MessageUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetTopicID sets the "topicID" field.
-func (mu *MessageUpdate) SetTopicID(u uuid.UUID) *MessageUpdate {
-	mu.mutation.SetTopicID(u)
-	return mu
+func (_u *MessageUpdate) SetTopicID(v uuid.UUID) *MessageUpdate {
+	_u.mutation.SetTopicID(v)
+	return _u
 }
 
 // SetNillableTopicID sets the "topicID" field if the given value is not nil.
-func (mu *MessageUpdate) SetNillableTopicID(u *uuid.UUID) *MessageUpdate {
-	if u != nil {
-		mu.SetTopicID(*u)
+func (_u *MessageUpdate) SetNillableTopicID(v *uuid.UUID) *MessageUpdate {
+	if v != nil {
+		_u.SetTopicID(*v)
 	}
-	return mu
+	return _u
 }
 
 // AddDeliveryIDs adds the "deliveries" edge to the Delivery entity by IDs.
-func (mu *MessageUpdate) AddDeliveryIDs(ids ...uuid.UUID) *MessageUpdate {
-	mu.mutation.AddDeliveryIDs(ids...)
-	return mu
+func (_u *MessageUpdate) AddDeliveryIDs(ids ...uuid.UUID) *MessageUpdate {
+	_u.mutation.AddDeliveryIDs(ids...)
+	return _u
 }
 
 // AddDeliveries adds the "deliveries" edges to the Delivery entity.
-func (mu *MessageUpdate) AddDeliveries(d ...*Delivery) *MessageUpdate {
-	ids := make([]uuid.UUID, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_u *MessageUpdate) AddDeliveries(v ...*Delivery) *MessageUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return mu.AddDeliveryIDs(ids...)
+	return _u.AddDeliveryIDs(ids...)
 }
 
 // SetTopic sets the "topic" edge to the Topic entity.
-func (mu *MessageUpdate) SetTopic(t *Topic) *MessageUpdate {
-	return mu.SetTopicID(t.ID)
+func (_u *MessageUpdate) SetTopic(v *Topic) *MessageUpdate {
+	return _u.SetTopicID(v.ID)
 }
 
 // Mutation returns the MessageMutation object of the builder.
-func (mu *MessageUpdate) Mutation() *MessageMutation {
-	return mu.mutation
+func (_u *MessageUpdate) Mutation() *MessageMutation {
+	return _u.mutation
 }
 
 // ClearDeliveries clears all "deliveries" edges to the Delivery entity.
-func (mu *MessageUpdate) ClearDeliveries() *MessageUpdate {
-	mu.mutation.ClearDeliveries()
-	return mu
+func (_u *MessageUpdate) ClearDeliveries() *MessageUpdate {
+	_u.mutation.ClearDeliveries()
+	return _u
 }
 
 // RemoveDeliveryIDs removes the "deliveries" edge to Delivery entities by IDs.
-func (mu *MessageUpdate) RemoveDeliveryIDs(ids ...uuid.UUID) *MessageUpdate {
-	mu.mutation.RemoveDeliveryIDs(ids...)
-	return mu
+func (_u *MessageUpdate) RemoveDeliveryIDs(ids ...uuid.UUID) *MessageUpdate {
+	_u.mutation.RemoveDeliveryIDs(ids...)
+	return _u
 }
 
 // RemoveDeliveries removes "deliveries" edges to Delivery entities.
-func (mu *MessageUpdate) RemoveDeliveries(d ...*Delivery) *MessageUpdate {
-	ids := make([]uuid.UUID, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_u *MessageUpdate) RemoveDeliveries(v ...*Delivery) *MessageUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return mu.RemoveDeliveryIDs(ids...)
+	return _u.RemoveDeliveryIDs(ids...)
 }
 
 // ClearTopic clears the "topic" edge to the Topic entity.
-func (mu *MessageUpdate) ClearTopic() *MessageUpdate {
-	mu.mutation.ClearTopic()
-	return mu
+func (_u *MessageUpdate) ClearTopic() *MessageUpdate {
+	_u.mutation.ClearTopic()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (mu *MessageUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, mu.sqlSave, mu.mutation, mu.hooks)
+func (_u *MessageUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (mu *MessageUpdate) SaveX(ctx context.Context) int {
-	affected, err := mu.Save(ctx)
+func (_u *MessageUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -111,45 +111,45 @@ func (mu *MessageUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (mu *MessageUpdate) Exec(ctx context.Context) error {
-	_, err := mu.Save(ctx)
+func (_u *MessageUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mu *MessageUpdate) ExecX(ctx context.Context) {
-	if err := mu.Exec(ctx); err != nil {
+func (_u *MessageUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (mu *MessageUpdate) check() error {
-	if mu.mutation.TopicCleared() && len(mu.mutation.TopicIDs()) > 0 {
+func (_u *MessageUpdate) check() error {
+	if _u.mutation.TopicCleared() && len(_u.mutation.TopicIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Message.topic"`)
 	}
 	return nil
 }
 
-func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := mu.check(); err != nil {
-		return n, err
+func (_u *MessageUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(message.Table, message.Columns, sqlgraph.NewFieldSpec(message.FieldID, field.TypeUUID))
-	if ps := mu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if mu.mutation.AttributesCleared() {
+	if _u.mutation.AttributesCleared() {
 		_spec.ClearField(message.FieldAttributes, field.TypeJSON)
 	}
-	if mu.mutation.OrderKeyCleared() {
+	if _u.mutation.OrderKeyCleared() {
 		_spec.ClearField(message.FieldOrderKey, field.TypeString)
 	}
-	if mu.mutation.DeliveriesCleared() {
+	if _u.mutation.DeliveriesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -162,7 +162,7 @@ func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mu.mutation.RemovedDeliveriesIDs(); len(nodes) > 0 && !mu.mutation.DeliveriesCleared() {
+	if nodes := _u.mutation.RemovedDeliveriesIDs(); len(nodes) > 0 && !_u.mutation.DeliveriesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -178,7 +178,7 @@ func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mu.mutation.DeliveriesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.DeliveriesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -194,7 +194,7 @@ func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if mu.mutation.TopicCleared() {
+	if _u.mutation.TopicCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -207,7 +207,7 @@ func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mu.mutation.TopicIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.TopicIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -223,7 +223,7 @@ func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, mu.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{message.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -231,8 +231,8 @@ func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	mu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // MessageUpdateOne is the builder for updating a single Message entity.
@@ -244,92 +244,92 @@ type MessageUpdateOne struct {
 }
 
 // SetTopicID sets the "topicID" field.
-func (muo *MessageUpdateOne) SetTopicID(u uuid.UUID) *MessageUpdateOne {
-	muo.mutation.SetTopicID(u)
-	return muo
+func (_u *MessageUpdateOne) SetTopicID(v uuid.UUID) *MessageUpdateOne {
+	_u.mutation.SetTopicID(v)
+	return _u
 }
 
 // SetNillableTopicID sets the "topicID" field if the given value is not nil.
-func (muo *MessageUpdateOne) SetNillableTopicID(u *uuid.UUID) *MessageUpdateOne {
-	if u != nil {
-		muo.SetTopicID(*u)
+func (_u *MessageUpdateOne) SetNillableTopicID(v *uuid.UUID) *MessageUpdateOne {
+	if v != nil {
+		_u.SetTopicID(*v)
 	}
-	return muo
+	return _u
 }
 
 // AddDeliveryIDs adds the "deliveries" edge to the Delivery entity by IDs.
-func (muo *MessageUpdateOne) AddDeliveryIDs(ids ...uuid.UUID) *MessageUpdateOne {
-	muo.mutation.AddDeliveryIDs(ids...)
-	return muo
+func (_u *MessageUpdateOne) AddDeliveryIDs(ids ...uuid.UUID) *MessageUpdateOne {
+	_u.mutation.AddDeliveryIDs(ids...)
+	return _u
 }
 
 // AddDeliveries adds the "deliveries" edges to the Delivery entity.
-func (muo *MessageUpdateOne) AddDeliveries(d ...*Delivery) *MessageUpdateOne {
-	ids := make([]uuid.UUID, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_u *MessageUpdateOne) AddDeliveries(v ...*Delivery) *MessageUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return muo.AddDeliveryIDs(ids...)
+	return _u.AddDeliveryIDs(ids...)
 }
 
 // SetTopic sets the "topic" edge to the Topic entity.
-func (muo *MessageUpdateOne) SetTopic(t *Topic) *MessageUpdateOne {
-	return muo.SetTopicID(t.ID)
+func (_u *MessageUpdateOne) SetTopic(v *Topic) *MessageUpdateOne {
+	return _u.SetTopicID(v.ID)
 }
 
 // Mutation returns the MessageMutation object of the builder.
-func (muo *MessageUpdateOne) Mutation() *MessageMutation {
-	return muo.mutation
+func (_u *MessageUpdateOne) Mutation() *MessageMutation {
+	return _u.mutation
 }
 
 // ClearDeliveries clears all "deliveries" edges to the Delivery entity.
-func (muo *MessageUpdateOne) ClearDeliveries() *MessageUpdateOne {
-	muo.mutation.ClearDeliveries()
-	return muo
+func (_u *MessageUpdateOne) ClearDeliveries() *MessageUpdateOne {
+	_u.mutation.ClearDeliveries()
+	return _u
 }
 
 // RemoveDeliveryIDs removes the "deliveries" edge to Delivery entities by IDs.
-func (muo *MessageUpdateOne) RemoveDeliveryIDs(ids ...uuid.UUID) *MessageUpdateOne {
-	muo.mutation.RemoveDeliveryIDs(ids...)
-	return muo
+func (_u *MessageUpdateOne) RemoveDeliveryIDs(ids ...uuid.UUID) *MessageUpdateOne {
+	_u.mutation.RemoveDeliveryIDs(ids...)
+	return _u
 }
 
 // RemoveDeliveries removes "deliveries" edges to Delivery entities.
-func (muo *MessageUpdateOne) RemoveDeliveries(d ...*Delivery) *MessageUpdateOne {
-	ids := make([]uuid.UUID, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_u *MessageUpdateOne) RemoveDeliveries(v ...*Delivery) *MessageUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return muo.RemoveDeliveryIDs(ids...)
+	return _u.RemoveDeliveryIDs(ids...)
 }
 
 // ClearTopic clears the "topic" edge to the Topic entity.
-func (muo *MessageUpdateOne) ClearTopic() *MessageUpdateOne {
-	muo.mutation.ClearTopic()
-	return muo
+func (_u *MessageUpdateOne) ClearTopic() *MessageUpdateOne {
+	_u.mutation.ClearTopic()
+	return _u
 }
 
 // Where appends a list predicates to the MessageUpdate builder.
-func (muo *MessageUpdateOne) Where(ps ...predicate.Message) *MessageUpdateOne {
-	muo.mutation.Where(ps...)
-	return muo
+func (_u *MessageUpdateOne) Where(ps ...predicate.Message) *MessageUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (muo *MessageUpdateOne) Select(field string, fields ...string) *MessageUpdateOne {
-	muo.fields = append([]string{field}, fields...)
-	return muo
+func (_u *MessageUpdateOne) Select(field string, fields ...string) *MessageUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Message entity.
-func (muo *MessageUpdateOne) Save(ctx context.Context) (*Message, error) {
-	return withHooks(ctx, muo.sqlSave, muo.mutation, muo.hooks)
+func (_u *MessageUpdateOne) Save(ctx context.Context) (*Message, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (muo *MessageUpdateOne) SaveX(ctx context.Context) *Message {
-	node, err := muo.Save(ctx)
+func (_u *MessageUpdateOne) SaveX(ctx context.Context) *Message {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -337,37 +337,37 @@ func (muo *MessageUpdateOne) SaveX(ctx context.Context) *Message {
 }
 
 // Exec executes the query on the entity.
-func (muo *MessageUpdateOne) Exec(ctx context.Context) error {
-	_, err := muo.Save(ctx)
+func (_u *MessageUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (muo *MessageUpdateOne) ExecX(ctx context.Context) {
-	if err := muo.Exec(ctx); err != nil {
+func (_u *MessageUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (muo *MessageUpdateOne) check() error {
-	if muo.mutation.TopicCleared() && len(muo.mutation.TopicIDs()) > 0 {
+func (_u *MessageUpdateOne) check() error {
+	if _u.mutation.TopicCleared() && len(_u.mutation.TopicIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Message.topic"`)
 	}
 	return nil
 }
 
-func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (_node *Message, err error) {
-	if err := muo.check(); err != nil {
+func (_u *MessageUpdateOne) sqlSave(ctx context.Context) (_node *Message, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(message.Table, message.Columns, sqlgraph.NewFieldSpec(message.FieldID, field.TypeUUID))
-	id, ok := muo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Message.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := muo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, message.FieldID)
 		for _, f := range fields {
@@ -379,20 +379,20 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (_node *Message, err e
 			}
 		}
 	}
-	if ps := muo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if muo.mutation.AttributesCleared() {
+	if _u.mutation.AttributesCleared() {
 		_spec.ClearField(message.FieldAttributes, field.TypeJSON)
 	}
-	if muo.mutation.OrderKeyCleared() {
+	if _u.mutation.OrderKeyCleared() {
 		_spec.ClearField(message.FieldOrderKey, field.TypeString)
 	}
-	if muo.mutation.DeliveriesCleared() {
+	if _u.mutation.DeliveriesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -405,7 +405,7 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (_node *Message, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := muo.mutation.RemovedDeliveriesIDs(); len(nodes) > 0 && !muo.mutation.DeliveriesCleared() {
+	if nodes := _u.mutation.RemovedDeliveriesIDs(); len(nodes) > 0 && !_u.mutation.DeliveriesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -421,7 +421,7 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (_node *Message, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := muo.mutation.DeliveriesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.DeliveriesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -437,7 +437,7 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (_node *Message, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if muo.mutation.TopicCleared() {
+	if _u.mutation.TopicCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -450,7 +450,7 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (_node *Message, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := muo.mutation.TopicIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.TopicIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -466,10 +466,10 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (_node *Message, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &Message{config: muo.config}
+	_node = &Message{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, muo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{message.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -477,6 +477,6 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (_node *Message, err e
 		}
 		return nil, err
 	}
-	muo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

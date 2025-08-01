@@ -82,7 +82,7 @@ func (*Snapshot) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Snapshot fields.
-func (s *Snapshot) assignValues(columns []string, values []any) error {
+func (_m *Snapshot) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -92,37 +92,37 @@ func (s *Snapshot) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				s.ID = *value
+				_m.ID = *value
 			}
 		case snapshot.FieldTopicID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field topicID", values[i])
 			} else if value != nil {
-				s.TopicID = *value
+				_m.TopicID = *value
 			}
 		case snapshot.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				s.Name = value.String
+				_m.Name = value.String
 			}
 		case snapshot.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field createdAt", values[i])
 			} else if value.Valid {
-				s.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case snapshot.FieldExpiresAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field expiresAt", values[i])
 			} else if value.Valid {
-				s.ExpiresAt = value.Time
+				_m.ExpiresAt = value.Time
 			}
 		case snapshot.FieldLabels:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field labels", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &s.Labels); err != nil {
+				if err := json.Unmarshal(*value, &_m.Labels); err != nil {
 					return fmt.Errorf("unmarshal field labels: %w", err)
 				}
 			}
@@ -130,18 +130,18 @@ func (s *Snapshot) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field ackedMessagesBefore", values[i])
 			} else if value.Valid {
-				s.AckedMessagesBefore = value.Time
+				_m.AckedMessagesBefore = value.Time
 			}
 		case snapshot.FieldAckedMessageIDs:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field ackedMessageIDs", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &s.AckedMessageIDs); err != nil {
+				if err := json.Unmarshal(*value, &_m.AckedMessageIDs); err != nil {
 					return fmt.Errorf("unmarshal field ackedMessageIDs: %w", err)
 				}
 			}
 		default:
-			s.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -149,58 +149,58 @@ func (s *Snapshot) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Snapshot.
 // This includes values selected through modifiers, order, etc.
-func (s *Snapshot) Value(name string) (ent.Value, error) {
-	return s.selectValues.Get(name)
+func (_m *Snapshot) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryTopic queries the "topic" edge of the Snapshot entity.
-func (s *Snapshot) QueryTopic() *TopicQuery {
-	return NewSnapshotClient(s.config).QueryTopic(s)
+func (_m *Snapshot) QueryTopic() *TopicQuery {
+	return NewSnapshotClient(_m.config).QueryTopic(_m)
 }
 
 // Update returns a builder for updating this Snapshot.
 // Note that you need to call Snapshot.Unwrap() before calling this method if this Snapshot
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (s *Snapshot) Update() *SnapshotUpdateOne {
-	return NewSnapshotClient(s.config).UpdateOne(s)
+func (_m *Snapshot) Update() *SnapshotUpdateOne {
+	return NewSnapshotClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Snapshot entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (s *Snapshot) Unwrap() *Snapshot {
-	_tx, ok := s.config.driver.(*txDriver)
+func (_m *Snapshot) Unwrap() *Snapshot {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Snapshot is not a transactional entity")
 	}
-	s.config.driver = _tx.drv
-	return s
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (s *Snapshot) String() string {
+func (_m *Snapshot) String() string {
 	var builder strings.Builder
 	builder.WriteString("Snapshot(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", s.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("topicID=")
-	builder.WriteString(fmt.Sprintf("%v", s.TopicID))
+	builder.WriteString(fmt.Sprintf("%v", _m.TopicID))
 	builder.WriteString(", ")
 	builder.WriteString("name=")
-	builder.WriteString(s.Name)
+	builder.WriteString(_m.Name)
 	builder.WriteString(", ")
 	builder.WriteString("createdAt=")
-	builder.WriteString(s.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("expiresAt=")
-	builder.WriteString(s.ExpiresAt.Format(time.ANSIC))
+	builder.WriteString(_m.ExpiresAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("labels=")
-	builder.WriteString(fmt.Sprintf("%v", s.Labels))
+	builder.WriteString(fmt.Sprintf("%v", _m.Labels))
 	builder.WriteString(", ")
 	builder.WriteString("ackedMessagesBefore=")
-	builder.WriteString(s.AckedMessagesBefore.Format(time.ANSIC))
+	builder.WriteString(_m.AckedMessagesBefore.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("ackedMessageIDs=")
-	builder.WriteString(fmt.Sprintf("%v", s.AckedMessageIDs))
+	builder.WriteString(fmt.Sprintf("%v", _m.AckedMessageIDs))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -26,148 +26,148 @@ type TopicUpdate struct {
 }
 
 // Where appends a list predicates to the TopicUpdate builder.
-func (tu *TopicUpdate) Where(ps ...predicate.Topic) *TopicUpdate {
-	tu.mutation.Where(ps...)
-	return tu
+func (_u *TopicUpdate) Where(ps ...predicate.Topic) *TopicUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetLive sets the "live" field.
-func (tu *TopicUpdate) SetLive(b bool) *TopicUpdate {
-	tu.mutation.SetLive(b)
-	return tu
+func (_u *TopicUpdate) SetLive(v bool) *TopicUpdate {
+	_u.mutation.SetLive(v)
+	return _u
 }
 
 // SetNillableLive sets the "live" field if the given value is not nil.
-func (tu *TopicUpdate) SetNillableLive(b *bool) *TopicUpdate {
-	if b != nil {
-		tu.SetLive(*b)
+func (_u *TopicUpdate) SetNillableLive(v *bool) *TopicUpdate {
+	if v != nil {
+		_u.SetLive(*v)
 	}
-	return tu
+	return _u
 }
 
 // ClearLive clears the value of the "live" field.
-func (tu *TopicUpdate) ClearLive() *TopicUpdate {
-	tu.mutation.ClearLive()
-	return tu
+func (_u *TopicUpdate) ClearLive() *TopicUpdate {
+	_u.mutation.ClearLive()
+	return _u
 }
 
 // SetDeletedAt sets the "deletedAt" field.
-func (tu *TopicUpdate) SetDeletedAt(t time.Time) *TopicUpdate {
-	tu.mutation.SetDeletedAt(t)
-	return tu
+func (_u *TopicUpdate) SetDeletedAt(v time.Time) *TopicUpdate {
+	_u.mutation.SetDeletedAt(v)
+	return _u
 }
 
 // SetNillableDeletedAt sets the "deletedAt" field if the given value is not nil.
-func (tu *TopicUpdate) SetNillableDeletedAt(t *time.Time) *TopicUpdate {
-	if t != nil {
-		tu.SetDeletedAt(*t)
+func (_u *TopicUpdate) SetNillableDeletedAt(v *time.Time) *TopicUpdate {
+	if v != nil {
+		_u.SetDeletedAt(*v)
 	}
-	return tu
+	return _u
 }
 
 // ClearDeletedAt clears the value of the "deletedAt" field.
-func (tu *TopicUpdate) ClearDeletedAt() *TopicUpdate {
-	tu.mutation.ClearDeletedAt()
-	return tu
+func (_u *TopicUpdate) ClearDeletedAt() *TopicUpdate {
+	_u.mutation.ClearDeletedAt()
+	return _u
 }
 
 // SetLabels sets the "labels" field.
-func (tu *TopicUpdate) SetLabels(m map[string]string) *TopicUpdate {
-	tu.mutation.SetLabels(m)
-	return tu
+func (_u *TopicUpdate) SetLabels(v map[string]string) *TopicUpdate {
+	_u.mutation.SetLabels(v)
+	return _u
 }
 
 // ClearLabels clears the value of the "labels" field.
-func (tu *TopicUpdate) ClearLabels() *TopicUpdate {
-	tu.mutation.ClearLabels()
-	return tu
+func (_u *TopicUpdate) ClearLabels() *TopicUpdate {
+	_u.mutation.ClearLabels()
+	return _u
 }
 
 // AddSubscriptionIDs adds the "subscriptions" edge to the Subscription entity by IDs.
-func (tu *TopicUpdate) AddSubscriptionIDs(ids ...uuid.UUID) *TopicUpdate {
-	tu.mutation.AddSubscriptionIDs(ids...)
-	return tu
+func (_u *TopicUpdate) AddSubscriptionIDs(ids ...uuid.UUID) *TopicUpdate {
+	_u.mutation.AddSubscriptionIDs(ids...)
+	return _u
 }
 
 // AddSubscriptions adds the "subscriptions" edges to the Subscription entity.
-func (tu *TopicUpdate) AddSubscriptions(s ...*Subscription) *TopicUpdate {
-	ids := make([]uuid.UUID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+func (_u *TopicUpdate) AddSubscriptions(v ...*Subscription) *TopicUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tu.AddSubscriptionIDs(ids...)
+	return _u.AddSubscriptionIDs(ids...)
 }
 
 // AddMessageIDs adds the "messages" edge to the Message entity by IDs.
-func (tu *TopicUpdate) AddMessageIDs(ids ...uuid.UUID) *TopicUpdate {
-	tu.mutation.AddMessageIDs(ids...)
-	return tu
+func (_u *TopicUpdate) AddMessageIDs(ids ...uuid.UUID) *TopicUpdate {
+	_u.mutation.AddMessageIDs(ids...)
+	return _u
 }
 
 // AddMessages adds the "messages" edges to the Message entity.
-func (tu *TopicUpdate) AddMessages(m ...*Message) *TopicUpdate {
-	ids := make([]uuid.UUID, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_u *TopicUpdate) AddMessages(v ...*Message) *TopicUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tu.AddMessageIDs(ids...)
+	return _u.AddMessageIDs(ids...)
 }
 
 // Mutation returns the TopicMutation object of the builder.
-func (tu *TopicUpdate) Mutation() *TopicMutation {
-	return tu.mutation
+func (_u *TopicUpdate) Mutation() *TopicMutation {
+	return _u.mutation
 }
 
 // ClearSubscriptions clears all "subscriptions" edges to the Subscription entity.
-func (tu *TopicUpdate) ClearSubscriptions() *TopicUpdate {
-	tu.mutation.ClearSubscriptions()
-	return tu
+func (_u *TopicUpdate) ClearSubscriptions() *TopicUpdate {
+	_u.mutation.ClearSubscriptions()
+	return _u
 }
 
 // RemoveSubscriptionIDs removes the "subscriptions" edge to Subscription entities by IDs.
-func (tu *TopicUpdate) RemoveSubscriptionIDs(ids ...uuid.UUID) *TopicUpdate {
-	tu.mutation.RemoveSubscriptionIDs(ids...)
-	return tu
+func (_u *TopicUpdate) RemoveSubscriptionIDs(ids ...uuid.UUID) *TopicUpdate {
+	_u.mutation.RemoveSubscriptionIDs(ids...)
+	return _u
 }
 
 // RemoveSubscriptions removes "subscriptions" edges to Subscription entities.
-func (tu *TopicUpdate) RemoveSubscriptions(s ...*Subscription) *TopicUpdate {
-	ids := make([]uuid.UUID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+func (_u *TopicUpdate) RemoveSubscriptions(v ...*Subscription) *TopicUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tu.RemoveSubscriptionIDs(ids...)
+	return _u.RemoveSubscriptionIDs(ids...)
 }
 
 // ClearMessages clears all "messages" edges to the Message entity.
-func (tu *TopicUpdate) ClearMessages() *TopicUpdate {
-	tu.mutation.ClearMessages()
-	return tu
+func (_u *TopicUpdate) ClearMessages() *TopicUpdate {
+	_u.mutation.ClearMessages()
+	return _u
 }
 
 // RemoveMessageIDs removes the "messages" edge to Message entities by IDs.
-func (tu *TopicUpdate) RemoveMessageIDs(ids ...uuid.UUID) *TopicUpdate {
-	tu.mutation.RemoveMessageIDs(ids...)
-	return tu
+func (_u *TopicUpdate) RemoveMessageIDs(ids ...uuid.UUID) *TopicUpdate {
+	_u.mutation.RemoveMessageIDs(ids...)
+	return _u
 }
 
 // RemoveMessages removes "messages" edges to Message entities.
-func (tu *TopicUpdate) RemoveMessages(m ...*Message) *TopicUpdate {
-	ids := make([]uuid.UUID, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_u *TopicUpdate) RemoveMessages(v ...*Message) *TopicUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tu.RemoveMessageIDs(ids...)
+	return _u.RemoveMessageIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (tu *TopicUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, tu.sqlSave, tu.mutation, tu.hooks)
+func (_u *TopicUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (tu *TopicUpdate) SaveX(ctx context.Context) int {
-	affected, err := tu.Save(ctx)
+func (_u *TopicUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -175,46 +175,46 @@ func (tu *TopicUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (tu *TopicUpdate) Exec(ctx context.Context) error {
-	_, err := tu.Save(ctx)
+func (_u *TopicUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (tu *TopicUpdate) ExecX(ctx context.Context) {
-	if err := tu.Exec(ctx); err != nil {
+func (_u *TopicUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
-func (tu *TopicUpdate) sqlSave(ctx context.Context) (n int, err error) {
+func (_u *TopicUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	_spec := sqlgraph.NewUpdateSpec(topic.Table, topic.Columns, sqlgraph.NewFieldSpec(topic.FieldID, field.TypeUUID))
-	if ps := tu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := tu.mutation.Live(); ok {
+	if value, ok := _u.mutation.Live(); ok {
 		_spec.SetField(topic.FieldLive, field.TypeBool, value)
 	}
-	if tu.mutation.LiveCleared() {
+	if _u.mutation.LiveCleared() {
 		_spec.ClearField(topic.FieldLive, field.TypeBool)
 	}
-	if value, ok := tu.mutation.DeletedAt(); ok {
+	if value, ok := _u.mutation.DeletedAt(); ok {
 		_spec.SetField(topic.FieldDeletedAt, field.TypeTime, value)
 	}
-	if tu.mutation.DeletedAtCleared() {
+	if _u.mutation.DeletedAtCleared() {
 		_spec.ClearField(topic.FieldDeletedAt, field.TypeTime)
 	}
-	if value, ok := tu.mutation.Labels(); ok {
+	if value, ok := _u.mutation.Labels(); ok {
 		_spec.SetField(topic.FieldLabels, field.TypeJSON, value)
 	}
-	if tu.mutation.LabelsCleared() {
+	if _u.mutation.LabelsCleared() {
 		_spec.ClearField(topic.FieldLabels, field.TypeJSON)
 	}
-	if tu.mutation.SubscriptionsCleared() {
+	if _u.mutation.SubscriptionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -227,7 +227,7 @@ func (tu *TopicUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.RemovedSubscriptionsIDs(); len(nodes) > 0 && !tu.mutation.SubscriptionsCleared() {
+	if nodes := _u.mutation.RemovedSubscriptionsIDs(); len(nodes) > 0 && !_u.mutation.SubscriptionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -243,7 +243,7 @@ func (tu *TopicUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.SubscriptionsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.SubscriptionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -259,7 +259,7 @@ func (tu *TopicUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tu.mutation.MessagesCleared() {
+	if _u.mutation.MessagesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -272,7 +272,7 @@ func (tu *TopicUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.RemovedMessagesIDs(); len(nodes) > 0 && !tu.mutation.MessagesCleared() {
+	if nodes := _u.mutation.RemovedMessagesIDs(); len(nodes) > 0 && !_u.mutation.MessagesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -288,7 +288,7 @@ func (tu *TopicUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.MessagesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.MessagesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -304,7 +304,7 @@ func (tu *TopicUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, tu.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{topic.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -312,8 +312,8 @@ func (tu *TopicUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	tu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // TopicUpdateOne is the builder for updating a single Topic entity.
@@ -325,155 +325,155 @@ type TopicUpdateOne struct {
 }
 
 // SetLive sets the "live" field.
-func (tuo *TopicUpdateOne) SetLive(b bool) *TopicUpdateOne {
-	tuo.mutation.SetLive(b)
-	return tuo
+func (_u *TopicUpdateOne) SetLive(v bool) *TopicUpdateOne {
+	_u.mutation.SetLive(v)
+	return _u
 }
 
 // SetNillableLive sets the "live" field if the given value is not nil.
-func (tuo *TopicUpdateOne) SetNillableLive(b *bool) *TopicUpdateOne {
-	if b != nil {
-		tuo.SetLive(*b)
+func (_u *TopicUpdateOne) SetNillableLive(v *bool) *TopicUpdateOne {
+	if v != nil {
+		_u.SetLive(*v)
 	}
-	return tuo
+	return _u
 }
 
 // ClearLive clears the value of the "live" field.
-func (tuo *TopicUpdateOne) ClearLive() *TopicUpdateOne {
-	tuo.mutation.ClearLive()
-	return tuo
+func (_u *TopicUpdateOne) ClearLive() *TopicUpdateOne {
+	_u.mutation.ClearLive()
+	return _u
 }
 
 // SetDeletedAt sets the "deletedAt" field.
-func (tuo *TopicUpdateOne) SetDeletedAt(t time.Time) *TopicUpdateOne {
-	tuo.mutation.SetDeletedAt(t)
-	return tuo
+func (_u *TopicUpdateOne) SetDeletedAt(v time.Time) *TopicUpdateOne {
+	_u.mutation.SetDeletedAt(v)
+	return _u
 }
 
 // SetNillableDeletedAt sets the "deletedAt" field if the given value is not nil.
-func (tuo *TopicUpdateOne) SetNillableDeletedAt(t *time.Time) *TopicUpdateOne {
-	if t != nil {
-		tuo.SetDeletedAt(*t)
+func (_u *TopicUpdateOne) SetNillableDeletedAt(v *time.Time) *TopicUpdateOne {
+	if v != nil {
+		_u.SetDeletedAt(*v)
 	}
-	return tuo
+	return _u
 }
 
 // ClearDeletedAt clears the value of the "deletedAt" field.
-func (tuo *TopicUpdateOne) ClearDeletedAt() *TopicUpdateOne {
-	tuo.mutation.ClearDeletedAt()
-	return tuo
+func (_u *TopicUpdateOne) ClearDeletedAt() *TopicUpdateOne {
+	_u.mutation.ClearDeletedAt()
+	return _u
 }
 
 // SetLabels sets the "labels" field.
-func (tuo *TopicUpdateOne) SetLabels(m map[string]string) *TopicUpdateOne {
-	tuo.mutation.SetLabels(m)
-	return tuo
+func (_u *TopicUpdateOne) SetLabels(v map[string]string) *TopicUpdateOne {
+	_u.mutation.SetLabels(v)
+	return _u
 }
 
 // ClearLabels clears the value of the "labels" field.
-func (tuo *TopicUpdateOne) ClearLabels() *TopicUpdateOne {
-	tuo.mutation.ClearLabels()
-	return tuo
+func (_u *TopicUpdateOne) ClearLabels() *TopicUpdateOne {
+	_u.mutation.ClearLabels()
+	return _u
 }
 
 // AddSubscriptionIDs adds the "subscriptions" edge to the Subscription entity by IDs.
-func (tuo *TopicUpdateOne) AddSubscriptionIDs(ids ...uuid.UUID) *TopicUpdateOne {
-	tuo.mutation.AddSubscriptionIDs(ids...)
-	return tuo
+func (_u *TopicUpdateOne) AddSubscriptionIDs(ids ...uuid.UUID) *TopicUpdateOne {
+	_u.mutation.AddSubscriptionIDs(ids...)
+	return _u
 }
 
 // AddSubscriptions adds the "subscriptions" edges to the Subscription entity.
-func (tuo *TopicUpdateOne) AddSubscriptions(s ...*Subscription) *TopicUpdateOne {
-	ids := make([]uuid.UUID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+func (_u *TopicUpdateOne) AddSubscriptions(v ...*Subscription) *TopicUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tuo.AddSubscriptionIDs(ids...)
+	return _u.AddSubscriptionIDs(ids...)
 }
 
 // AddMessageIDs adds the "messages" edge to the Message entity by IDs.
-func (tuo *TopicUpdateOne) AddMessageIDs(ids ...uuid.UUID) *TopicUpdateOne {
-	tuo.mutation.AddMessageIDs(ids...)
-	return tuo
+func (_u *TopicUpdateOne) AddMessageIDs(ids ...uuid.UUID) *TopicUpdateOne {
+	_u.mutation.AddMessageIDs(ids...)
+	return _u
 }
 
 // AddMessages adds the "messages" edges to the Message entity.
-func (tuo *TopicUpdateOne) AddMessages(m ...*Message) *TopicUpdateOne {
-	ids := make([]uuid.UUID, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_u *TopicUpdateOne) AddMessages(v ...*Message) *TopicUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tuo.AddMessageIDs(ids...)
+	return _u.AddMessageIDs(ids...)
 }
 
 // Mutation returns the TopicMutation object of the builder.
-func (tuo *TopicUpdateOne) Mutation() *TopicMutation {
-	return tuo.mutation
+func (_u *TopicUpdateOne) Mutation() *TopicMutation {
+	return _u.mutation
 }
 
 // ClearSubscriptions clears all "subscriptions" edges to the Subscription entity.
-func (tuo *TopicUpdateOne) ClearSubscriptions() *TopicUpdateOne {
-	tuo.mutation.ClearSubscriptions()
-	return tuo
+func (_u *TopicUpdateOne) ClearSubscriptions() *TopicUpdateOne {
+	_u.mutation.ClearSubscriptions()
+	return _u
 }
 
 // RemoveSubscriptionIDs removes the "subscriptions" edge to Subscription entities by IDs.
-func (tuo *TopicUpdateOne) RemoveSubscriptionIDs(ids ...uuid.UUID) *TopicUpdateOne {
-	tuo.mutation.RemoveSubscriptionIDs(ids...)
-	return tuo
+func (_u *TopicUpdateOne) RemoveSubscriptionIDs(ids ...uuid.UUID) *TopicUpdateOne {
+	_u.mutation.RemoveSubscriptionIDs(ids...)
+	return _u
 }
 
 // RemoveSubscriptions removes "subscriptions" edges to Subscription entities.
-func (tuo *TopicUpdateOne) RemoveSubscriptions(s ...*Subscription) *TopicUpdateOne {
-	ids := make([]uuid.UUID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+func (_u *TopicUpdateOne) RemoveSubscriptions(v ...*Subscription) *TopicUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tuo.RemoveSubscriptionIDs(ids...)
+	return _u.RemoveSubscriptionIDs(ids...)
 }
 
 // ClearMessages clears all "messages" edges to the Message entity.
-func (tuo *TopicUpdateOne) ClearMessages() *TopicUpdateOne {
-	tuo.mutation.ClearMessages()
-	return tuo
+func (_u *TopicUpdateOne) ClearMessages() *TopicUpdateOne {
+	_u.mutation.ClearMessages()
+	return _u
 }
 
 // RemoveMessageIDs removes the "messages" edge to Message entities by IDs.
-func (tuo *TopicUpdateOne) RemoveMessageIDs(ids ...uuid.UUID) *TopicUpdateOne {
-	tuo.mutation.RemoveMessageIDs(ids...)
-	return tuo
+func (_u *TopicUpdateOne) RemoveMessageIDs(ids ...uuid.UUID) *TopicUpdateOne {
+	_u.mutation.RemoveMessageIDs(ids...)
+	return _u
 }
 
 // RemoveMessages removes "messages" edges to Message entities.
-func (tuo *TopicUpdateOne) RemoveMessages(m ...*Message) *TopicUpdateOne {
-	ids := make([]uuid.UUID, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_u *TopicUpdateOne) RemoveMessages(v ...*Message) *TopicUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tuo.RemoveMessageIDs(ids...)
+	return _u.RemoveMessageIDs(ids...)
 }
 
 // Where appends a list predicates to the TopicUpdate builder.
-func (tuo *TopicUpdateOne) Where(ps ...predicate.Topic) *TopicUpdateOne {
-	tuo.mutation.Where(ps...)
-	return tuo
+func (_u *TopicUpdateOne) Where(ps ...predicate.Topic) *TopicUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (tuo *TopicUpdateOne) Select(field string, fields ...string) *TopicUpdateOne {
-	tuo.fields = append([]string{field}, fields...)
-	return tuo
+func (_u *TopicUpdateOne) Select(field string, fields ...string) *TopicUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Topic entity.
-func (tuo *TopicUpdateOne) Save(ctx context.Context) (*Topic, error) {
-	return withHooks(ctx, tuo.sqlSave, tuo.mutation, tuo.hooks)
+func (_u *TopicUpdateOne) Save(ctx context.Context) (*Topic, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (tuo *TopicUpdateOne) SaveX(ctx context.Context) *Topic {
-	node, err := tuo.Save(ctx)
+func (_u *TopicUpdateOne) SaveX(ctx context.Context) *Topic {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -481,26 +481,26 @@ func (tuo *TopicUpdateOne) SaveX(ctx context.Context) *Topic {
 }
 
 // Exec executes the query on the entity.
-func (tuo *TopicUpdateOne) Exec(ctx context.Context) error {
-	_, err := tuo.Save(ctx)
+func (_u *TopicUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (tuo *TopicUpdateOne) ExecX(ctx context.Context) {
-	if err := tuo.Exec(ctx); err != nil {
+func (_u *TopicUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
-func (tuo *TopicUpdateOne) sqlSave(ctx context.Context) (_node *Topic, err error) {
+func (_u *TopicUpdateOne) sqlSave(ctx context.Context) (_node *Topic, err error) {
 	_spec := sqlgraph.NewUpdateSpec(topic.Table, topic.Columns, sqlgraph.NewFieldSpec(topic.FieldID, field.TypeUUID))
-	id, ok := tuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Topic.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := tuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, topic.FieldID)
 		for _, f := range fields {
@@ -512,32 +512,32 @@ func (tuo *TopicUpdateOne) sqlSave(ctx context.Context) (_node *Topic, err error
 			}
 		}
 	}
-	if ps := tuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := tuo.mutation.Live(); ok {
+	if value, ok := _u.mutation.Live(); ok {
 		_spec.SetField(topic.FieldLive, field.TypeBool, value)
 	}
-	if tuo.mutation.LiveCleared() {
+	if _u.mutation.LiveCleared() {
 		_spec.ClearField(topic.FieldLive, field.TypeBool)
 	}
-	if value, ok := tuo.mutation.DeletedAt(); ok {
+	if value, ok := _u.mutation.DeletedAt(); ok {
 		_spec.SetField(topic.FieldDeletedAt, field.TypeTime, value)
 	}
-	if tuo.mutation.DeletedAtCleared() {
+	if _u.mutation.DeletedAtCleared() {
 		_spec.ClearField(topic.FieldDeletedAt, field.TypeTime)
 	}
-	if value, ok := tuo.mutation.Labels(); ok {
+	if value, ok := _u.mutation.Labels(); ok {
 		_spec.SetField(topic.FieldLabels, field.TypeJSON, value)
 	}
-	if tuo.mutation.LabelsCleared() {
+	if _u.mutation.LabelsCleared() {
 		_spec.ClearField(topic.FieldLabels, field.TypeJSON)
 	}
-	if tuo.mutation.SubscriptionsCleared() {
+	if _u.mutation.SubscriptionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -550,7 +550,7 @@ func (tuo *TopicUpdateOne) sqlSave(ctx context.Context) (_node *Topic, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.RemovedSubscriptionsIDs(); len(nodes) > 0 && !tuo.mutation.SubscriptionsCleared() {
+	if nodes := _u.mutation.RemovedSubscriptionsIDs(); len(nodes) > 0 && !_u.mutation.SubscriptionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -566,7 +566,7 @@ func (tuo *TopicUpdateOne) sqlSave(ctx context.Context) (_node *Topic, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.SubscriptionsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.SubscriptionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -582,7 +582,7 @@ func (tuo *TopicUpdateOne) sqlSave(ctx context.Context) (_node *Topic, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tuo.mutation.MessagesCleared() {
+	if _u.mutation.MessagesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -595,7 +595,7 @@ func (tuo *TopicUpdateOne) sqlSave(ctx context.Context) (_node *Topic, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.RemovedMessagesIDs(); len(nodes) > 0 && !tuo.mutation.MessagesCleared() {
+	if nodes := _u.mutation.RemovedMessagesIDs(); len(nodes) > 0 && !_u.mutation.MessagesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -611,7 +611,7 @@ func (tuo *TopicUpdateOne) sqlSave(ctx context.Context) (_node *Topic, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.MessagesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.MessagesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -627,10 +627,10 @@ func (tuo *TopicUpdateOne) sqlSave(ctx context.Context) (_node *Topic, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &Topic{config: tuo.config}
+	_node = &Topic{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, tuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{topic.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -638,6 +638,6 @@ func (tuo *TopicUpdateOne) sqlSave(ctx context.Context) (_node *Topic, err error
 		}
 		return nil, err
 	}
-	tuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

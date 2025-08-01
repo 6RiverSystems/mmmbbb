@@ -26,107 +26,107 @@ type SnapshotUpdate struct {
 }
 
 // Where appends a list predicates to the SnapshotUpdate builder.
-func (su *SnapshotUpdate) Where(ps ...predicate.Snapshot) *SnapshotUpdate {
-	su.mutation.Where(ps...)
-	return su
+func (_u *SnapshotUpdate) Where(ps ...predicate.Snapshot) *SnapshotUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetTopicID sets the "topicID" field.
-func (su *SnapshotUpdate) SetTopicID(u uuid.UUID) *SnapshotUpdate {
-	su.mutation.SetTopicID(u)
-	return su
+func (_u *SnapshotUpdate) SetTopicID(v uuid.UUID) *SnapshotUpdate {
+	_u.mutation.SetTopicID(v)
+	return _u
 }
 
 // SetNillableTopicID sets the "topicID" field if the given value is not nil.
-func (su *SnapshotUpdate) SetNillableTopicID(u *uuid.UUID) *SnapshotUpdate {
-	if u != nil {
-		su.SetTopicID(*u)
+func (_u *SnapshotUpdate) SetNillableTopicID(v *uuid.UUID) *SnapshotUpdate {
+	if v != nil {
+		_u.SetTopicID(*v)
 	}
-	return su
+	return _u
 }
 
 // SetExpiresAt sets the "expiresAt" field.
-func (su *SnapshotUpdate) SetExpiresAt(t time.Time) *SnapshotUpdate {
-	su.mutation.SetExpiresAt(t)
-	return su
+func (_u *SnapshotUpdate) SetExpiresAt(v time.Time) *SnapshotUpdate {
+	_u.mutation.SetExpiresAt(v)
+	return _u
 }
 
 // SetNillableExpiresAt sets the "expiresAt" field if the given value is not nil.
-func (su *SnapshotUpdate) SetNillableExpiresAt(t *time.Time) *SnapshotUpdate {
-	if t != nil {
-		su.SetExpiresAt(*t)
+func (_u *SnapshotUpdate) SetNillableExpiresAt(v *time.Time) *SnapshotUpdate {
+	if v != nil {
+		_u.SetExpiresAt(*v)
 	}
-	return su
+	return _u
 }
 
 // SetLabels sets the "labels" field.
-func (su *SnapshotUpdate) SetLabels(m map[string]string) *SnapshotUpdate {
-	su.mutation.SetLabels(m)
-	return su
+func (_u *SnapshotUpdate) SetLabels(v map[string]string) *SnapshotUpdate {
+	_u.mutation.SetLabels(v)
+	return _u
 }
 
 // ClearLabels clears the value of the "labels" field.
-func (su *SnapshotUpdate) ClearLabels() *SnapshotUpdate {
-	su.mutation.ClearLabels()
-	return su
+func (_u *SnapshotUpdate) ClearLabels() *SnapshotUpdate {
+	_u.mutation.ClearLabels()
+	return _u
 }
 
 // SetAckedMessagesBefore sets the "ackedMessagesBefore" field.
-func (su *SnapshotUpdate) SetAckedMessagesBefore(t time.Time) *SnapshotUpdate {
-	su.mutation.SetAckedMessagesBefore(t)
-	return su
+func (_u *SnapshotUpdate) SetAckedMessagesBefore(v time.Time) *SnapshotUpdate {
+	_u.mutation.SetAckedMessagesBefore(v)
+	return _u
 }
 
 // SetNillableAckedMessagesBefore sets the "ackedMessagesBefore" field if the given value is not nil.
-func (su *SnapshotUpdate) SetNillableAckedMessagesBefore(t *time.Time) *SnapshotUpdate {
-	if t != nil {
-		su.SetAckedMessagesBefore(*t)
+func (_u *SnapshotUpdate) SetNillableAckedMessagesBefore(v *time.Time) *SnapshotUpdate {
+	if v != nil {
+		_u.SetAckedMessagesBefore(*v)
 	}
-	return su
+	return _u
 }
 
 // SetAckedMessageIDs sets the "ackedMessageIDs" field.
-func (su *SnapshotUpdate) SetAckedMessageIDs(u []uuid.UUID) *SnapshotUpdate {
-	su.mutation.SetAckedMessageIDs(u)
-	return su
+func (_u *SnapshotUpdate) SetAckedMessageIDs(v []uuid.UUID) *SnapshotUpdate {
+	_u.mutation.SetAckedMessageIDs(v)
+	return _u
 }
 
-// AppendAckedMessageIDs appends u to the "ackedMessageIDs" field.
-func (su *SnapshotUpdate) AppendAckedMessageIDs(u []uuid.UUID) *SnapshotUpdate {
-	su.mutation.AppendAckedMessageIDs(u)
-	return su
+// AppendAckedMessageIDs appends value to the "ackedMessageIDs" field.
+func (_u *SnapshotUpdate) AppendAckedMessageIDs(v []uuid.UUID) *SnapshotUpdate {
+	_u.mutation.AppendAckedMessageIDs(v)
+	return _u
 }
 
 // ClearAckedMessageIDs clears the value of the "ackedMessageIDs" field.
-func (su *SnapshotUpdate) ClearAckedMessageIDs() *SnapshotUpdate {
-	su.mutation.ClearAckedMessageIDs()
-	return su
+func (_u *SnapshotUpdate) ClearAckedMessageIDs() *SnapshotUpdate {
+	_u.mutation.ClearAckedMessageIDs()
+	return _u
 }
 
 // SetTopic sets the "topic" edge to the Topic entity.
-func (su *SnapshotUpdate) SetTopic(t *Topic) *SnapshotUpdate {
-	return su.SetTopicID(t.ID)
+func (_u *SnapshotUpdate) SetTopic(v *Topic) *SnapshotUpdate {
+	return _u.SetTopicID(v.ID)
 }
 
 // Mutation returns the SnapshotMutation object of the builder.
-func (su *SnapshotUpdate) Mutation() *SnapshotMutation {
-	return su.mutation
+func (_u *SnapshotUpdate) Mutation() *SnapshotMutation {
+	return _u.mutation
 }
 
 // ClearTopic clears the "topic" edge to the Topic entity.
-func (su *SnapshotUpdate) ClearTopic() *SnapshotUpdate {
-	su.mutation.ClearTopic()
-	return su
+func (_u *SnapshotUpdate) ClearTopic() *SnapshotUpdate {
+	_u.mutation.ClearTopic()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (su *SnapshotUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, su.sqlSave, su.mutation, su.hooks)
+func (_u *SnapshotUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (su *SnapshotUpdate) SaveX(ctx context.Context) int {
-	affected, err := su.Save(ctx)
+func (_u *SnapshotUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -134,62 +134,62 @@ func (su *SnapshotUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (su *SnapshotUpdate) Exec(ctx context.Context) error {
-	_, err := su.Save(ctx)
+func (_u *SnapshotUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (su *SnapshotUpdate) ExecX(ctx context.Context) {
-	if err := su.Exec(ctx); err != nil {
+func (_u *SnapshotUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (su *SnapshotUpdate) check() error {
-	if su.mutation.TopicCleared() && len(su.mutation.TopicIDs()) > 0 {
+func (_u *SnapshotUpdate) check() error {
+	if _u.mutation.TopicCleared() && len(_u.mutation.TopicIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Snapshot.topic"`)
 	}
 	return nil
 }
 
-func (su *SnapshotUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := su.check(); err != nil {
-		return n, err
+func (_u *SnapshotUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(snapshot.Table, snapshot.Columns, sqlgraph.NewFieldSpec(snapshot.FieldID, field.TypeUUID))
-	if ps := su.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := su.mutation.ExpiresAt(); ok {
+	if value, ok := _u.mutation.ExpiresAt(); ok {
 		_spec.SetField(snapshot.FieldExpiresAt, field.TypeTime, value)
 	}
-	if value, ok := su.mutation.Labels(); ok {
+	if value, ok := _u.mutation.Labels(); ok {
 		_spec.SetField(snapshot.FieldLabels, field.TypeJSON, value)
 	}
-	if su.mutation.LabelsCleared() {
+	if _u.mutation.LabelsCleared() {
 		_spec.ClearField(snapshot.FieldLabels, field.TypeJSON)
 	}
-	if value, ok := su.mutation.AckedMessagesBefore(); ok {
+	if value, ok := _u.mutation.AckedMessagesBefore(); ok {
 		_spec.SetField(snapshot.FieldAckedMessagesBefore, field.TypeTime, value)
 	}
-	if value, ok := su.mutation.AckedMessageIDs(); ok {
+	if value, ok := _u.mutation.AckedMessageIDs(); ok {
 		_spec.SetField(snapshot.FieldAckedMessageIDs, field.TypeJSON, value)
 	}
-	if value, ok := su.mutation.AppendedAckedMessageIDs(); ok {
+	if value, ok := _u.mutation.AppendedAckedMessageIDs(); ok {
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, snapshot.FieldAckedMessageIDs, value)
 		})
 	}
-	if su.mutation.AckedMessageIDsCleared() {
+	if _u.mutation.AckedMessageIDsCleared() {
 		_spec.ClearField(snapshot.FieldAckedMessageIDs, field.TypeJSON)
 	}
-	if su.mutation.TopicCleared() {
+	if _u.mutation.TopicCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -202,7 +202,7 @@ func (su *SnapshotUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := su.mutation.TopicIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.TopicIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -218,7 +218,7 @@ func (su *SnapshotUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, su.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{snapshot.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -226,8 +226,8 @@ func (su *SnapshotUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	su.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // SnapshotUpdateOne is the builder for updating a single Snapshot entity.
@@ -239,114 +239,114 @@ type SnapshotUpdateOne struct {
 }
 
 // SetTopicID sets the "topicID" field.
-func (suo *SnapshotUpdateOne) SetTopicID(u uuid.UUID) *SnapshotUpdateOne {
-	suo.mutation.SetTopicID(u)
-	return suo
+func (_u *SnapshotUpdateOne) SetTopicID(v uuid.UUID) *SnapshotUpdateOne {
+	_u.mutation.SetTopicID(v)
+	return _u
 }
 
 // SetNillableTopicID sets the "topicID" field if the given value is not nil.
-func (suo *SnapshotUpdateOne) SetNillableTopicID(u *uuid.UUID) *SnapshotUpdateOne {
-	if u != nil {
-		suo.SetTopicID(*u)
+func (_u *SnapshotUpdateOne) SetNillableTopicID(v *uuid.UUID) *SnapshotUpdateOne {
+	if v != nil {
+		_u.SetTopicID(*v)
 	}
-	return suo
+	return _u
 }
 
 // SetExpiresAt sets the "expiresAt" field.
-func (suo *SnapshotUpdateOne) SetExpiresAt(t time.Time) *SnapshotUpdateOne {
-	suo.mutation.SetExpiresAt(t)
-	return suo
+func (_u *SnapshotUpdateOne) SetExpiresAt(v time.Time) *SnapshotUpdateOne {
+	_u.mutation.SetExpiresAt(v)
+	return _u
 }
 
 // SetNillableExpiresAt sets the "expiresAt" field if the given value is not nil.
-func (suo *SnapshotUpdateOne) SetNillableExpiresAt(t *time.Time) *SnapshotUpdateOne {
-	if t != nil {
-		suo.SetExpiresAt(*t)
+func (_u *SnapshotUpdateOne) SetNillableExpiresAt(v *time.Time) *SnapshotUpdateOne {
+	if v != nil {
+		_u.SetExpiresAt(*v)
 	}
-	return suo
+	return _u
 }
 
 // SetLabels sets the "labels" field.
-func (suo *SnapshotUpdateOne) SetLabels(m map[string]string) *SnapshotUpdateOne {
-	suo.mutation.SetLabels(m)
-	return suo
+func (_u *SnapshotUpdateOne) SetLabels(v map[string]string) *SnapshotUpdateOne {
+	_u.mutation.SetLabels(v)
+	return _u
 }
 
 // ClearLabels clears the value of the "labels" field.
-func (suo *SnapshotUpdateOne) ClearLabels() *SnapshotUpdateOne {
-	suo.mutation.ClearLabels()
-	return suo
+func (_u *SnapshotUpdateOne) ClearLabels() *SnapshotUpdateOne {
+	_u.mutation.ClearLabels()
+	return _u
 }
 
 // SetAckedMessagesBefore sets the "ackedMessagesBefore" field.
-func (suo *SnapshotUpdateOne) SetAckedMessagesBefore(t time.Time) *SnapshotUpdateOne {
-	suo.mutation.SetAckedMessagesBefore(t)
-	return suo
+func (_u *SnapshotUpdateOne) SetAckedMessagesBefore(v time.Time) *SnapshotUpdateOne {
+	_u.mutation.SetAckedMessagesBefore(v)
+	return _u
 }
 
 // SetNillableAckedMessagesBefore sets the "ackedMessagesBefore" field if the given value is not nil.
-func (suo *SnapshotUpdateOne) SetNillableAckedMessagesBefore(t *time.Time) *SnapshotUpdateOne {
-	if t != nil {
-		suo.SetAckedMessagesBefore(*t)
+func (_u *SnapshotUpdateOne) SetNillableAckedMessagesBefore(v *time.Time) *SnapshotUpdateOne {
+	if v != nil {
+		_u.SetAckedMessagesBefore(*v)
 	}
-	return suo
+	return _u
 }
 
 // SetAckedMessageIDs sets the "ackedMessageIDs" field.
-func (suo *SnapshotUpdateOne) SetAckedMessageIDs(u []uuid.UUID) *SnapshotUpdateOne {
-	suo.mutation.SetAckedMessageIDs(u)
-	return suo
+func (_u *SnapshotUpdateOne) SetAckedMessageIDs(v []uuid.UUID) *SnapshotUpdateOne {
+	_u.mutation.SetAckedMessageIDs(v)
+	return _u
 }
 
-// AppendAckedMessageIDs appends u to the "ackedMessageIDs" field.
-func (suo *SnapshotUpdateOne) AppendAckedMessageIDs(u []uuid.UUID) *SnapshotUpdateOne {
-	suo.mutation.AppendAckedMessageIDs(u)
-	return suo
+// AppendAckedMessageIDs appends value to the "ackedMessageIDs" field.
+func (_u *SnapshotUpdateOne) AppendAckedMessageIDs(v []uuid.UUID) *SnapshotUpdateOne {
+	_u.mutation.AppendAckedMessageIDs(v)
+	return _u
 }
 
 // ClearAckedMessageIDs clears the value of the "ackedMessageIDs" field.
-func (suo *SnapshotUpdateOne) ClearAckedMessageIDs() *SnapshotUpdateOne {
-	suo.mutation.ClearAckedMessageIDs()
-	return suo
+func (_u *SnapshotUpdateOne) ClearAckedMessageIDs() *SnapshotUpdateOne {
+	_u.mutation.ClearAckedMessageIDs()
+	return _u
 }
 
 // SetTopic sets the "topic" edge to the Topic entity.
-func (suo *SnapshotUpdateOne) SetTopic(t *Topic) *SnapshotUpdateOne {
-	return suo.SetTopicID(t.ID)
+func (_u *SnapshotUpdateOne) SetTopic(v *Topic) *SnapshotUpdateOne {
+	return _u.SetTopicID(v.ID)
 }
 
 // Mutation returns the SnapshotMutation object of the builder.
-func (suo *SnapshotUpdateOne) Mutation() *SnapshotMutation {
-	return suo.mutation
+func (_u *SnapshotUpdateOne) Mutation() *SnapshotMutation {
+	return _u.mutation
 }
 
 // ClearTopic clears the "topic" edge to the Topic entity.
-func (suo *SnapshotUpdateOne) ClearTopic() *SnapshotUpdateOne {
-	suo.mutation.ClearTopic()
-	return suo
+func (_u *SnapshotUpdateOne) ClearTopic() *SnapshotUpdateOne {
+	_u.mutation.ClearTopic()
+	return _u
 }
 
 // Where appends a list predicates to the SnapshotUpdate builder.
-func (suo *SnapshotUpdateOne) Where(ps ...predicate.Snapshot) *SnapshotUpdateOne {
-	suo.mutation.Where(ps...)
-	return suo
+func (_u *SnapshotUpdateOne) Where(ps ...predicate.Snapshot) *SnapshotUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (suo *SnapshotUpdateOne) Select(field string, fields ...string) *SnapshotUpdateOne {
-	suo.fields = append([]string{field}, fields...)
-	return suo
+func (_u *SnapshotUpdateOne) Select(field string, fields ...string) *SnapshotUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Snapshot entity.
-func (suo *SnapshotUpdateOne) Save(ctx context.Context) (*Snapshot, error) {
-	return withHooks(ctx, suo.sqlSave, suo.mutation, suo.hooks)
+func (_u *SnapshotUpdateOne) Save(ctx context.Context) (*Snapshot, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (suo *SnapshotUpdateOne) SaveX(ctx context.Context) *Snapshot {
-	node, err := suo.Save(ctx)
+func (_u *SnapshotUpdateOne) SaveX(ctx context.Context) *Snapshot {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -354,37 +354,37 @@ func (suo *SnapshotUpdateOne) SaveX(ctx context.Context) *Snapshot {
 }
 
 // Exec executes the query on the entity.
-func (suo *SnapshotUpdateOne) Exec(ctx context.Context) error {
-	_, err := suo.Save(ctx)
+func (_u *SnapshotUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (suo *SnapshotUpdateOne) ExecX(ctx context.Context) {
-	if err := suo.Exec(ctx); err != nil {
+func (_u *SnapshotUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (suo *SnapshotUpdateOne) check() error {
-	if suo.mutation.TopicCleared() && len(suo.mutation.TopicIDs()) > 0 {
+func (_u *SnapshotUpdateOne) check() error {
+	if _u.mutation.TopicCleared() && len(_u.mutation.TopicIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Snapshot.topic"`)
 	}
 	return nil
 }
 
-func (suo *SnapshotUpdateOne) sqlSave(ctx context.Context) (_node *Snapshot, err error) {
-	if err := suo.check(); err != nil {
+func (_u *SnapshotUpdateOne) sqlSave(ctx context.Context) (_node *Snapshot, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(snapshot.Table, snapshot.Columns, sqlgraph.NewFieldSpec(snapshot.FieldID, field.TypeUUID))
-	id, ok := suo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Snapshot.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := suo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, snapshot.FieldID)
 		for _, f := range fields {
@@ -396,37 +396,37 @@ func (suo *SnapshotUpdateOne) sqlSave(ctx context.Context) (_node *Snapshot, err
 			}
 		}
 	}
-	if ps := suo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := suo.mutation.ExpiresAt(); ok {
+	if value, ok := _u.mutation.ExpiresAt(); ok {
 		_spec.SetField(snapshot.FieldExpiresAt, field.TypeTime, value)
 	}
-	if value, ok := suo.mutation.Labels(); ok {
+	if value, ok := _u.mutation.Labels(); ok {
 		_spec.SetField(snapshot.FieldLabels, field.TypeJSON, value)
 	}
-	if suo.mutation.LabelsCleared() {
+	if _u.mutation.LabelsCleared() {
 		_spec.ClearField(snapshot.FieldLabels, field.TypeJSON)
 	}
-	if value, ok := suo.mutation.AckedMessagesBefore(); ok {
+	if value, ok := _u.mutation.AckedMessagesBefore(); ok {
 		_spec.SetField(snapshot.FieldAckedMessagesBefore, field.TypeTime, value)
 	}
-	if value, ok := suo.mutation.AckedMessageIDs(); ok {
+	if value, ok := _u.mutation.AckedMessageIDs(); ok {
 		_spec.SetField(snapshot.FieldAckedMessageIDs, field.TypeJSON, value)
 	}
-	if value, ok := suo.mutation.AppendedAckedMessageIDs(); ok {
+	if value, ok := _u.mutation.AppendedAckedMessageIDs(); ok {
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, snapshot.FieldAckedMessageIDs, value)
 		})
 	}
-	if suo.mutation.AckedMessageIDsCleared() {
+	if _u.mutation.AckedMessageIDsCleared() {
 		_spec.ClearField(snapshot.FieldAckedMessageIDs, field.TypeJSON)
 	}
-	if suo.mutation.TopicCleared() {
+	if _u.mutation.TopicCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -439,7 +439,7 @@ func (suo *SnapshotUpdateOne) sqlSave(ctx context.Context) (_node *Snapshot, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := suo.mutation.TopicIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.TopicIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -455,10 +455,10 @@ func (suo *SnapshotUpdateOne) sqlSave(ctx context.Context) (_node *Snapshot, err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &Snapshot{config: suo.config}
+	_node = &Snapshot{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, suo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{snapshot.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -466,6 +466,6 @@ func (suo *SnapshotUpdateOne) sqlSave(ctx context.Context) (_node *Snapshot, err
 		}
 		return nil, err
 	}
-	suo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

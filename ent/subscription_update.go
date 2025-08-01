@@ -27,335 +27,335 @@ type SubscriptionUpdate struct {
 }
 
 // Where appends a list predicates to the SubscriptionUpdate builder.
-func (su *SubscriptionUpdate) Where(ps ...predicate.Subscription) *SubscriptionUpdate {
-	su.mutation.Where(ps...)
-	return su
+func (_u *SubscriptionUpdate) Where(ps ...predicate.Subscription) *SubscriptionUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetTopicID sets the "topicID" field.
-func (su *SubscriptionUpdate) SetTopicID(u uuid.UUID) *SubscriptionUpdate {
-	su.mutation.SetTopicID(u)
-	return su
+func (_u *SubscriptionUpdate) SetTopicID(v uuid.UUID) *SubscriptionUpdate {
+	_u.mutation.SetTopicID(v)
+	return _u
 }
 
 // SetNillableTopicID sets the "topicID" field if the given value is not nil.
-func (su *SubscriptionUpdate) SetNillableTopicID(u *uuid.UUID) *SubscriptionUpdate {
-	if u != nil {
-		su.SetTopicID(*u)
+func (_u *SubscriptionUpdate) SetNillableTopicID(v *uuid.UUID) *SubscriptionUpdate {
+	if v != nil {
+		_u.SetTopicID(*v)
 	}
-	return su
+	return _u
 }
 
 // SetExpiresAt sets the "expiresAt" field.
-func (su *SubscriptionUpdate) SetExpiresAt(t time.Time) *SubscriptionUpdate {
-	su.mutation.SetExpiresAt(t)
-	return su
+func (_u *SubscriptionUpdate) SetExpiresAt(v time.Time) *SubscriptionUpdate {
+	_u.mutation.SetExpiresAt(v)
+	return _u
 }
 
 // SetNillableExpiresAt sets the "expiresAt" field if the given value is not nil.
-func (su *SubscriptionUpdate) SetNillableExpiresAt(t *time.Time) *SubscriptionUpdate {
-	if t != nil {
-		su.SetExpiresAt(*t)
+func (_u *SubscriptionUpdate) SetNillableExpiresAt(v *time.Time) *SubscriptionUpdate {
+	if v != nil {
+		_u.SetExpiresAt(*v)
 	}
-	return su
+	return _u
 }
 
 // SetLive sets the "live" field.
-func (su *SubscriptionUpdate) SetLive(b bool) *SubscriptionUpdate {
-	su.mutation.SetLive(b)
-	return su
+func (_u *SubscriptionUpdate) SetLive(v bool) *SubscriptionUpdate {
+	_u.mutation.SetLive(v)
+	return _u
 }
 
 // SetNillableLive sets the "live" field if the given value is not nil.
-func (su *SubscriptionUpdate) SetNillableLive(b *bool) *SubscriptionUpdate {
-	if b != nil {
-		su.SetLive(*b)
+func (_u *SubscriptionUpdate) SetNillableLive(v *bool) *SubscriptionUpdate {
+	if v != nil {
+		_u.SetLive(*v)
 	}
-	return su
+	return _u
 }
 
 // ClearLive clears the value of the "live" field.
-func (su *SubscriptionUpdate) ClearLive() *SubscriptionUpdate {
-	su.mutation.ClearLive()
-	return su
+func (_u *SubscriptionUpdate) ClearLive() *SubscriptionUpdate {
+	_u.mutation.ClearLive()
+	return _u
 }
 
 // SetDeletedAt sets the "deletedAt" field.
-func (su *SubscriptionUpdate) SetDeletedAt(t time.Time) *SubscriptionUpdate {
-	su.mutation.SetDeletedAt(t)
-	return su
+func (_u *SubscriptionUpdate) SetDeletedAt(v time.Time) *SubscriptionUpdate {
+	_u.mutation.SetDeletedAt(v)
+	return _u
 }
 
 // SetNillableDeletedAt sets the "deletedAt" field if the given value is not nil.
-func (su *SubscriptionUpdate) SetNillableDeletedAt(t *time.Time) *SubscriptionUpdate {
-	if t != nil {
-		su.SetDeletedAt(*t)
+func (_u *SubscriptionUpdate) SetNillableDeletedAt(v *time.Time) *SubscriptionUpdate {
+	if v != nil {
+		_u.SetDeletedAt(*v)
 	}
-	return su
+	return _u
 }
 
 // ClearDeletedAt clears the value of the "deletedAt" field.
-func (su *SubscriptionUpdate) ClearDeletedAt() *SubscriptionUpdate {
-	su.mutation.ClearDeletedAt()
-	return su
+func (_u *SubscriptionUpdate) ClearDeletedAt() *SubscriptionUpdate {
+	_u.mutation.ClearDeletedAt()
+	return _u
 }
 
 // SetTTL sets the "ttl" field.
-func (su *SubscriptionUpdate) SetTTL(s sqltypes.Interval) *SubscriptionUpdate {
-	su.mutation.SetTTL(s)
-	return su
+func (_u *SubscriptionUpdate) SetTTL(v sqltypes.Interval) *SubscriptionUpdate {
+	_u.mutation.SetTTL(v)
+	return _u
 }
 
 // SetNillableTTL sets the "ttl" field if the given value is not nil.
-func (su *SubscriptionUpdate) SetNillableTTL(s *sqltypes.Interval) *SubscriptionUpdate {
-	if s != nil {
-		su.SetTTL(*s)
+func (_u *SubscriptionUpdate) SetNillableTTL(v *sqltypes.Interval) *SubscriptionUpdate {
+	if v != nil {
+		_u.SetTTL(*v)
 	}
-	return su
+	return _u
 }
 
 // SetMessageTTL sets the "messageTTL" field.
-func (su *SubscriptionUpdate) SetMessageTTL(s sqltypes.Interval) *SubscriptionUpdate {
-	su.mutation.SetMessageTTL(s)
-	return su
+func (_u *SubscriptionUpdate) SetMessageTTL(v sqltypes.Interval) *SubscriptionUpdate {
+	_u.mutation.SetMessageTTL(v)
+	return _u
 }
 
 // SetNillableMessageTTL sets the "messageTTL" field if the given value is not nil.
-func (su *SubscriptionUpdate) SetNillableMessageTTL(s *sqltypes.Interval) *SubscriptionUpdate {
-	if s != nil {
-		su.SetMessageTTL(*s)
+func (_u *SubscriptionUpdate) SetNillableMessageTTL(v *sqltypes.Interval) *SubscriptionUpdate {
+	if v != nil {
+		_u.SetMessageTTL(*v)
 	}
-	return su
+	return _u
 }
 
 // SetOrderedDelivery sets the "orderedDelivery" field.
-func (su *SubscriptionUpdate) SetOrderedDelivery(b bool) *SubscriptionUpdate {
-	su.mutation.SetOrderedDelivery(b)
-	return su
+func (_u *SubscriptionUpdate) SetOrderedDelivery(v bool) *SubscriptionUpdate {
+	_u.mutation.SetOrderedDelivery(v)
+	return _u
 }
 
 // SetNillableOrderedDelivery sets the "orderedDelivery" field if the given value is not nil.
-func (su *SubscriptionUpdate) SetNillableOrderedDelivery(b *bool) *SubscriptionUpdate {
-	if b != nil {
-		su.SetOrderedDelivery(*b)
+func (_u *SubscriptionUpdate) SetNillableOrderedDelivery(v *bool) *SubscriptionUpdate {
+	if v != nil {
+		_u.SetOrderedDelivery(*v)
 	}
-	return su
+	return _u
 }
 
 // ClearOrderedDelivery clears the value of the "orderedDelivery" field.
-func (su *SubscriptionUpdate) ClearOrderedDelivery() *SubscriptionUpdate {
-	su.mutation.ClearOrderedDelivery()
-	return su
+func (_u *SubscriptionUpdate) ClearOrderedDelivery() *SubscriptionUpdate {
+	_u.mutation.ClearOrderedDelivery()
+	return _u
 }
 
 // SetLabels sets the "labels" field.
-func (su *SubscriptionUpdate) SetLabels(m map[string]string) *SubscriptionUpdate {
-	su.mutation.SetLabels(m)
-	return su
+func (_u *SubscriptionUpdate) SetLabels(v map[string]string) *SubscriptionUpdate {
+	_u.mutation.SetLabels(v)
+	return _u
 }
 
 // ClearLabels clears the value of the "labels" field.
-func (su *SubscriptionUpdate) ClearLabels() *SubscriptionUpdate {
-	su.mutation.ClearLabels()
-	return su
+func (_u *SubscriptionUpdate) ClearLabels() *SubscriptionUpdate {
+	_u.mutation.ClearLabels()
+	return _u
 }
 
 // SetMinBackoff sets the "minBackoff" field.
-func (su *SubscriptionUpdate) SetMinBackoff(s *sqltypes.Interval) *SubscriptionUpdate {
-	su.mutation.SetMinBackoff(s)
-	return su
+func (_u *SubscriptionUpdate) SetMinBackoff(v *sqltypes.Interval) *SubscriptionUpdate {
+	_u.mutation.SetMinBackoff(v)
+	return _u
 }
 
 // ClearMinBackoff clears the value of the "minBackoff" field.
-func (su *SubscriptionUpdate) ClearMinBackoff() *SubscriptionUpdate {
-	su.mutation.ClearMinBackoff()
-	return su
+func (_u *SubscriptionUpdate) ClearMinBackoff() *SubscriptionUpdate {
+	_u.mutation.ClearMinBackoff()
+	return _u
 }
 
 // SetMaxBackoff sets the "maxBackoff" field.
-func (su *SubscriptionUpdate) SetMaxBackoff(s *sqltypes.Interval) *SubscriptionUpdate {
-	su.mutation.SetMaxBackoff(s)
-	return su
+func (_u *SubscriptionUpdate) SetMaxBackoff(v *sqltypes.Interval) *SubscriptionUpdate {
+	_u.mutation.SetMaxBackoff(v)
+	return _u
 }
 
 // ClearMaxBackoff clears the value of the "maxBackoff" field.
-func (su *SubscriptionUpdate) ClearMaxBackoff() *SubscriptionUpdate {
-	su.mutation.ClearMaxBackoff()
-	return su
+func (_u *SubscriptionUpdate) ClearMaxBackoff() *SubscriptionUpdate {
+	_u.mutation.ClearMaxBackoff()
+	return _u
 }
 
 // SetPushEndpoint sets the "pushEndpoint" field.
-func (su *SubscriptionUpdate) SetPushEndpoint(s string) *SubscriptionUpdate {
-	su.mutation.SetPushEndpoint(s)
-	return su
+func (_u *SubscriptionUpdate) SetPushEndpoint(v string) *SubscriptionUpdate {
+	_u.mutation.SetPushEndpoint(v)
+	return _u
 }
 
 // SetNillablePushEndpoint sets the "pushEndpoint" field if the given value is not nil.
-func (su *SubscriptionUpdate) SetNillablePushEndpoint(s *string) *SubscriptionUpdate {
-	if s != nil {
-		su.SetPushEndpoint(*s)
+func (_u *SubscriptionUpdate) SetNillablePushEndpoint(v *string) *SubscriptionUpdate {
+	if v != nil {
+		_u.SetPushEndpoint(*v)
 	}
-	return su
+	return _u
 }
 
 // ClearPushEndpoint clears the value of the "pushEndpoint" field.
-func (su *SubscriptionUpdate) ClearPushEndpoint() *SubscriptionUpdate {
-	su.mutation.ClearPushEndpoint()
-	return su
+func (_u *SubscriptionUpdate) ClearPushEndpoint() *SubscriptionUpdate {
+	_u.mutation.ClearPushEndpoint()
+	return _u
 }
 
 // SetMessageFilter sets the "messageFilter" field.
-func (su *SubscriptionUpdate) SetMessageFilter(s string) *SubscriptionUpdate {
-	su.mutation.SetMessageFilter(s)
-	return su
+func (_u *SubscriptionUpdate) SetMessageFilter(v string) *SubscriptionUpdate {
+	_u.mutation.SetMessageFilter(v)
+	return _u
 }
 
 // SetNillableMessageFilter sets the "messageFilter" field if the given value is not nil.
-func (su *SubscriptionUpdate) SetNillableMessageFilter(s *string) *SubscriptionUpdate {
-	if s != nil {
-		su.SetMessageFilter(*s)
+func (_u *SubscriptionUpdate) SetNillableMessageFilter(v *string) *SubscriptionUpdate {
+	if v != nil {
+		_u.SetMessageFilter(*v)
 	}
-	return su
+	return _u
 }
 
 // ClearMessageFilter clears the value of the "messageFilter" field.
-func (su *SubscriptionUpdate) ClearMessageFilter() *SubscriptionUpdate {
-	su.mutation.ClearMessageFilter()
-	return su
+func (_u *SubscriptionUpdate) ClearMessageFilter() *SubscriptionUpdate {
+	_u.mutation.ClearMessageFilter()
+	return _u
 }
 
 // SetMaxDeliveryAttempts sets the "maxDeliveryAttempts" field.
-func (su *SubscriptionUpdate) SetMaxDeliveryAttempts(i int32) *SubscriptionUpdate {
-	su.mutation.ResetMaxDeliveryAttempts()
-	su.mutation.SetMaxDeliveryAttempts(i)
-	return su
+func (_u *SubscriptionUpdate) SetMaxDeliveryAttempts(v int32) *SubscriptionUpdate {
+	_u.mutation.ResetMaxDeliveryAttempts()
+	_u.mutation.SetMaxDeliveryAttempts(v)
+	return _u
 }
 
 // SetNillableMaxDeliveryAttempts sets the "maxDeliveryAttempts" field if the given value is not nil.
-func (su *SubscriptionUpdate) SetNillableMaxDeliveryAttempts(i *int32) *SubscriptionUpdate {
-	if i != nil {
-		su.SetMaxDeliveryAttempts(*i)
+func (_u *SubscriptionUpdate) SetNillableMaxDeliveryAttempts(v *int32) *SubscriptionUpdate {
+	if v != nil {
+		_u.SetMaxDeliveryAttempts(*v)
 	}
-	return su
+	return _u
 }
 
-// AddMaxDeliveryAttempts adds i to the "maxDeliveryAttempts" field.
-func (su *SubscriptionUpdate) AddMaxDeliveryAttempts(i int32) *SubscriptionUpdate {
-	su.mutation.AddMaxDeliveryAttempts(i)
-	return su
+// AddMaxDeliveryAttempts adds value to the "maxDeliveryAttempts" field.
+func (_u *SubscriptionUpdate) AddMaxDeliveryAttempts(v int32) *SubscriptionUpdate {
+	_u.mutation.AddMaxDeliveryAttempts(v)
+	return _u
 }
 
 // ClearMaxDeliveryAttempts clears the value of the "maxDeliveryAttempts" field.
-func (su *SubscriptionUpdate) ClearMaxDeliveryAttempts() *SubscriptionUpdate {
-	su.mutation.ClearMaxDeliveryAttempts()
-	return su
+func (_u *SubscriptionUpdate) ClearMaxDeliveryAttempts() *SubscriptionUpdate {
+	_u.mutation.ClearMaxDeliveryAttempts()
+	return _u
 }
 
 // SetDeadLetterTopicID sets the "deadLetterTopicID" field.
-func (su *SubscriptionUpdate) SetDeadLetterTopicID(u uuid.UUID) *SubscriptionUpdate {
-	su.mutation.SetDeadLetterTopicID(u)
-	return su
+func (_u *SubscriptionUpdate) SetDeadLetterTopicID(v uuid.UUID) *SubscriptionUpdate {
+	_u.mutation.SetDeadLetterTopicID(v)
+	return _u
 }
 
 // SetNillableDeadLetterTopicID sets the "deadLetterTopicID" field if the given value is not nil.
-func (su *SubscriptionUpdate) SetNillableDeadLetterTopicID(u *uuid.UUID) *SubscriptionUpdate {
-	if u != nil {
-		su.SetDeadLetterTopicID(*u)
+func (_u *SubscriptionUpdate) SetNillableDeadLetterTopicID(v *uuid.UUID) *SubscriptionUpdate {
+	if v != nil {
+		_u.SetDeadLetterTopicID(*v)
 	}
-	return su
+	return _u
 }
 
 // ClearDeadLetterTopicID clears the value of the "deadLetterTopicID" field.
-func (su *SubscriptionUpdate) ClearDeadLetterTopicID() *SubscriptionUpdate {
-	su.mutation.ClearDeadLetterTopicID()
-	return su
+func (_u *SubscriptionUpdate) ClearDeadLetterTopicID() *SubscriptionUpdate {
+	_u.mutation.ClearDeadLetterTopicID()
+	return _u
 }
 
 // SetDeliveryDelay sets the "deliveryDelay" field.
-func (su *SubscriptionUpdate) SetDeliveryDelay(s sqltypes.Interval) *SubscriptionUpdate {
-	su.mutation.SetDeliveryDelay(s)
-	return su
+func (_u *SubscriptionUpdate) SetDeliveryDelay(v sqltypes.Interval) *SubscriptionUpdate {
+	_u.mutation.SetDeliveryDelay(v)
+	return _u
 }
 
 // SetNillableDeliveryDelay sets the "deliveryDelay" field if the given value is not nil.
-func (su *SubscriptionUpdate) SetNillableDeliveryDelay(s *sqltypes.Interval) *SubscriptionUpdate {
-	if s != nil {
-		su.SetDeliveryDelay(*s)
+func (_u *SubscriptionUpdate) SetNillableDeliveryDelay(v *sqltypes.Interval) *SubscriptionUpdate {
+	if v != nil {
+		_u.SetDeliveryDelay(*v)
 	}
-	return su
+	return _u
 }
 
 // SetTopic sets the "topic" edge to the Topic entity.
-func (su *SubscriptionUpdate) SetTopic(t *Topic) *SubscriptionUpdate {
-	return su.SetTopicID(t.ID)
+func (_u *SubscriptionUpdate) SetTopic(v *Topic) *SubscriptionUpdate {
+	return _u.SetTopicID(v.ID)
 }
 
 // AddDeliveryIDs adds the "deliveries" edge to the Delivery entity by IDs.
-func (su *SubscriptionUpdate) AddDeliveryIDs(ids ...uuid.UUID) *SubscriptionUpdate {
-	su.mutation.AddDeliveryIDs(ids...)
-	return su
+func (_u *SubscriptionUpdate) AddDeliveryIDs(ids ...uuid.UUID) *SubscriptionUpdate {
+	_u.mutation.AddDeliveryIDs(ids...)
+	return _u
 }
 
 // AddDeliveries adds the "deliveries" edges to the Delivery entity.
-func (su *SubscriptionUpdate) AddDeliveries(d ...*Delivery) *SubscriptionUpdate {
-	ids := make([]uuid.UUID, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_u *SubscriptionUpdate) AddDeliveries(v ...*Delivery) *SubscriptionUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return su.AddDeliveryIDs(ids...)
+	return _u.AddDeliveryIDs(ids...)
 }
 
 // SetDeadLetterTopic sets the "deadLetterTopic" edge to the Topic entity.
-func (su *SubscriptionUpdate) SetDeadLetterTopic(t *Topic) *SubscriptionUpdate {
-	return su.SetDeadLetterTopicID(t.ID)
+func (_u *SubscriptionUpdate) SetDeadLetterTopic(v *Topic) *SubscriptionUpdate {
+	return _u.SetDeadLetterTopicID(v.ID)
 }
 
 // Mutation returns the SubscriptionMutation object of the builder.
-func (su *SubscriptionUpdate) Mutation() *SubscriptionMutation {
-	return su.mutation
+func (_u *SubscriptionUpdate) Mutation() *SubscriptionMutation {
+	return _u.mutation
 }
 
 // ClearTopic clears the "topic" edge to the Topic entity.
-func (su *SubscriptionUpdate) ClearTopic() *SubscriptionUpdate {
-	su.mutation.ClearTopic()
-	return su
+func (_u *SubscriptionUpdate) ClearTopic() *SubscriptionUpdate {
+	_u.mutation.ClearTopic()
+	return _u
 }
 
 // ClearDeliveries clears all "deliveries" edges to the Delivery entity.
-func (su *SubscriptionUpdate) ClearDeliveries() *SubscriptionUpdate {
-	su.mutation.ClearDeliveries()
-	return su
+func (_u *SubscriptionUpdate) ClearDeliveries() *SubscriptionUpdate {
+	_u.mutation.ClearDeliveries()
+	return _u
 }
 
 // RemoveDeliveryIDs removes the "deliveries" edge to Delivery entities by IDs.
-func (su *SubscriptionUpdate) RemoveDeliveryIDs(ids ...uuid.UUID) *SubscriptionUpdate {
-	su.mutation.RemoveDeliveryIDs(ids...)
-	return su
+func (_u *SubscriptionUpdate) RemoveDeliveryIDs(ids ...uuid.UUID) *SubscriptionUpdate {
+	_u.mutation.RemoveDeliveryIDs(ids...)
+	return _u
 }
 
 // RemoveDeliveries removes "deliveries" edges to Delivery entities.
-func (su *SubscriptionUpdate) RemoveDeliveries(d ...*Delivery) *SubscriptionUpdate {
-	ids := make([]uuid.UUID, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_u *SubscriptionUpdate) RemoveDeliveries(v ...*Delivery) *SubscriptionUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return su.RemoveDeliveryIDs(ids...)
+	return _u.RemoveDeliveryIDs(ids...)
 }
 
 // ClearDeadLetterTopic clears the "deadLetterTopic" edge to the Topic entity.
-func (su *SubscriptionUpdate) ClearDeadLetterTopic() *SubscriptionUpdate {
-	su.mutation.ClearDeadLetterTopic()
-	return su
+func (_u *SubscriptionUpdate) ClearDeadLetterTopic() *SubscriptionUpdate {
+	_u.mutation.ClearDeadLetterTopic()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (su *SubscriptionUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, su.sqlSave, su.mutation, su.hooks)
+func (_u *SubscriptionUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (su *SubscriptionUpdate) SaveX(ctx context.Context) int {
-	affected, err := su.Save(ctx)
+func (_u *SubscriptionUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -363,108 +363,108 @@ func (su *SubscriptionUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (su *SubscriptionUpdate) Exec(ctx context.Context) error {
-	_, err := su.Save(ctx)
+func (_u *SubscriptionUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (su *SubscriptionUpdate) ExecX(ctx context.Context) {
-	if err := su.Exec(ctx); err != nil {
+func (_u *SubscriptionUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (su *SubscriptionUpdate) check() error {
-	if su.mutation.TopicCleared() && len(su.mutation.TopicIDs()) > 0 {
+func (_u *SubscriptionUpdate) check() error {
+	if _u.mutation.TopicCleared() && len(_u.mutation.TopicIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Subscription.topic"`)
 	}
 	return nil
 }
 
-func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := su.check(); err != nil {
-		return n, err
+func (_u *SubscriptionUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(subscription.Table, subscription.Columns, sqlgraph.NewFieldSpec(subscription.FieldID, field.TypeUUID))
-	if ps := su.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := su.mutation.ExpiresAt(); ok {
+	if value, ok := _u.mutation.ExpiresAt(); ok {
 		_spec.SetField(subscription.FieldExpiresAt, field.TypeTime, value)
 	}
-	if value, ok := su.mutation.Live(); ok {
+	if value, ok := _u.mutation.Live(); ok {
 		_spec.SetField(subscription.FieldLive, field.TypeBool, value)
 	}
-	if su.mutation.LiveCleared() {
+	if _u.mutation.LiveCleared() {
 		_spec.ClearField(subscription.FieldLive, field.TypeBool)
 	}
-	if value, ok := su.mutation.DeletedAt(); ok {
+	if value, ok := _u.mutation.DeletedAt(); ok {
 		_spec.SetField(subscription.FieldDeletedAt, field.TypeTime, value)
 	}
-	if su.mutation.DeletedAtCleared() {
+	if _u.mutation.DeletedAtCleared() {
 		_spec.ClearField(subscription.FieldDeletedAt, field.TypeTime)
 	}
-	if value, ok := su.mutation.TTL(); ok {
+	if value, ok := _u.mutation.TTL(); ok {
 		_spec.SetField(subscription.FieldTTL, field.TypeString, value)
 	}
-	if value, ok := su.mutation.MessageTTL(); ok {
+	if value, ok := _u.mutation.MessageTTL(); ok {
 		_spec.SetField(subscription.FieldMessageTTL, field.TypeString, value)
 	}
-	if value, ok := su.mutation.OrderedDelivery(); ok {
+	if value, ok := _u.mutation.OrderedDelivery(); ok {
 		_spec.SetField(subscription.FieldOrderedDelivery, field.TypeBool, value)
 	}
-	if su.mutation.OrderedDeliveryCleared() {
+	if _u.mutation.OrderedDeliveryCleared() {
 		_spec.ClearField(subscription.FieldOrderedDelivery, field.TypeBool)
 	}
-	if value, ok := su.mutation.Labels(); ok {
+	if value, ok := _u.mutation.Labels(); ok {
 		_spec.SetField(subscription.FieldLabels, field.TypeJSON, value)
 	}
-	if su.mutation.LabelsCleared() {
+	if _u.mutation.LabelsCleared() {
 		_spec.ClearField(subscription.FieldLabels, field.TypeJSON)
 	}
-	if value, ok := su.mutation.MinBackoff(); ok {
+	if value, ok := _u.mutation.MinBackoff(); ok {
 		_spec.SetField(subscription.FieldMinBackoff, field.TypeString, value)
 	}
-	if su.mutation.MinBackoffCleared() {
+	if _u.mutation.MinBackoffCleared() {
 		_spec.ClearField(subscription.FieldMinBackoff, field.TypeString)
 	}
-	if value, ok := su.mutation.MaxBackoff(); ok {
+	if value, ok := _u.mutation.MaxBackoff(); ok {
 		_spec.SetField(subscription.FieldMaxBackoff, field.TypeString, value)
 	}
-	if su.mutation.MaxBackoffCleared() {
+	if _u.mutation.MaxBackoffCleared() {
 		_spec.ClearField(subscription.FieldMaxBackoff, field.TypeString)
 	}
-	if value, ok := su.mutation.PushEndpoint(); ok {
+	if value, ok := _u.mutation.PushEndpoint(); ok {
 		_spec.SetField(subscription.FieldPushEndpoint, field.TypeString, value)
 	}
-	if su.mutation.PushEndpointCleared() {
+	if _u.mutation.PushEndpointCleared() {
 		_spec.ClearField(subscription.FieldPushEndpoint, field.TypeString)
 	}
-	if value, ok := su.mutation.MessageFilter(); ok {
+	if value, ok := _u.mutation.MessageFilter(); ok {
 		_spec.SetField(subscription.FieldMessageFilter, field.TypeString, value)
 	}
-	if su.mutation.MessageFilterCleared() {
+	if _u.mutation.MessageFilterCleared() {
 		_spec.ClearField(subscription.FieldMessageFilter, field.TypeString)
 	}
-	if value, ok := su.mutation.MaxDeliveryAttempts(); ok {
+	if value, ok := _u.mutation.MaxDeliveryAttempts(); ok {
 		_spec.SetField(subscription.FieldMaxDeliveryAttempts, field.TypeInt32, value)
 	}
-	if value, ok := su.mutation.AddedMaxDeliveryAttempts(); ok {
+	if value, ok := _u.mutation.AddedMaxDeliveryAttempts(); ok {
 		_spec.AddField(subscription.FieldMaxDeliveryAttempts, field.TypeInt32, value)
 	}
-	if su.mutation.MaxDeliveryAttemptsCleared() {
+	if _u.mutation.MaxDeliveryAttemptsCleared() {
 		_spec.ClearField(subscription.FieldMaxDeliveryAttempts, field.TypeInt32)
 	}
-	if value, ok := su.mutation.DeliveryDelay(); ok {
+	if value, ok := _u.mutation.DeliveryDelay(); ok {
 		_spec.SetField(subscription.FieldDeliveryDelay, field.TypeOther, value)
 	}
-	if su.mutation.TopicCleared() {
+	if _u.mutation.TopicCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -477,7 +477,7 @@ func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := su.mutation.TopicIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.TopicIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -493,7 +493,7 @@ func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if su.mutation.DeliveriesCleared() {
+	if _u.mutation.DeliveriesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -506,7 +506,7 @@ func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := su.mutation.RemovedDeliveriesIDs(); len(nodes) > 0 && !su.mutation.DeliveriesCleared() {
+	if nodes := _u.mutation.RemovedDeliveriesIDs(); len(nodes) > 0 && !_u.mutation.DeliveriesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -522,7 +522,7 @@ func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := su.mutation.DeliveriesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.DeliveriesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -538,7 +538,7 @@ func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if su.mutation.DeadLetterTopicCleared() {
+	if _u.mutation.DeadLetterTopicCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -551,7 +551,7 @@ func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := su.mutation.DeadLetterTopicIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.DeadLetterTopicIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -567,7 +567,7 @@ func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, su.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{subscription.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -575,8 +575,8 @@ func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	su.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // SubscriptionUpdateOne is the builder for updating a single Subscription entity.
@@ -588,342 +588,342 @@ type SubscriptionUpdateOne struct {
 }
 
 // SetTopicID sets the "topicID" field.
-func (suo *SubscriptionUpdateOne) SetTopicID(u uuid.UUID) *SubscriptionUpdateOne {
-	suo.mutation.SetTopicID(u)
-	return suo
+func (_u *SubscriptionUpdateOne) SetTopicID(v uuid.UUID) *SubscriptionUpdateOne {
+	_u.mutation.SetTopicID(v)
+	return _u
 }
 
 // SetNillableTopicID sets the "topicID" field if the given value is not nil.
-func (suo *SubscriptionUpdateOne) SetNillableTopicID(u *uuid.UUID) *SubscriptionUpdateOne {
-	if u != nil {
-		suo.SetTopicID(*u)
+func (_u *SubscriptionUpdateOne) SetNillableTopicID(v *uuid.UUID) *SubscriptionUpdateOne {
+	if v != nil {
+		_u.SetTopicID(*v)
 	}
-	return suo
+	return _u
 }
 
 // SetExpiresAt sets the "expiresAt" field.
-func (suo *SubscriptionUpdateOne) SetExpiresAt(t time.Time) *SubscriptionUpdateOne {
-	suo.mutation.SetExpiresAt(t)
-	return suo
+func (_u *SubscriptionUpdateOne) SetExpiresAt(v time.Time) *SubscriptionUpdateOne {
+	_u.mutation.SetExpiresAt(v)
+	return _u
 }
 
 // SetNillableExpiresAt sets the "expiresAt" field if the given value is not nil.
-func (suo *SubscriptionUpdateOne) SetNillableExpiresAt(t *time.Time) *SubscriptionUpdateOne {
-	if t != nil {
-		suo.SetExpiresAt(*t)
+func (_u *SubscriptionUpdateOne) SetNillableExpiresAt(v *time.Time) *SubscriptionUpdateOne {
+	if v != nil {
+		_u.SetExpiresAt(*v)
 	}
-	return suo
+	return _u
 }
 
 // SetLive sets the "live" field.
-func (suo *SubscriptionUpdateOne) SetLive(b bool) *SubscriptionUpdateOne {
-	suo.mutation.SetLive(b)
-	return suo
+func (_u *SubscriptionUpdateOne) SetLive(v bool) *SubscriptionUpdateOne {
+	_u.mutation.SetLive(v)
+	return _u
 }
 
 // SetNillableLive sets the "live" field if the given value is not nil.
-func (suo *SubscriptionUpdateOne) SetNillableLive(b *bool) *SubscriptionUpdateOne {
-	if b != nil {
-		suo.SetLive(*b)
+func (_u *SubscriptionUpdateOne) SetNillableLive(v *bool) *SubscriptionUpdateOne {
+	if v != nil {
+		_u.SetLive(*v)
 	}
-	return suo
+	return _u
 }
 
 // ClearLive clears the value of the "live" field.
-func (suo *SubscriptionUpdateOne) ClearLive() *SubscriptionUpdateOne {
-	suo.mutation.ClearLive()
-	return suo
+func (_u *SubscriptionUpdateOne) ClearLive() *SubscriptionUpdateOne {
+	_u.mutation.ClearLive()
+	return _u
 }
 
 // SetDeletedAt sets the "deletedAt" field.
-func (suo *SubscriptionUpdateOne) SetDeletedAt(t time.Time) *SubscriptionUpdateOne {
-	suo.mutation.SetDeletedAt(t)
-	return suo
+func (_u *SubscriptionUpdateOne) SetDeletedAt(v time.Time) *SubscriptionUpdateOne {
+	_u.mutation.SetDeletedAt(v)
+	return _u
 }
 
 // SetNillableDeletedAt sets the "deletedAt" field if the given value is not nil.
-func (suo *SubscriptionUpdateOne) SetNillableDeletedAt(t *time.Time) *SubscriptionUpdateOne {
-	if t != nil {
-		suo.SetDeletedAt(*t)
+func (_u *SubscriptionUpdateOne) SetNillableDeletedAt(v *time.Time) *SubscriptionUpdateOne {
+	if v != nil {
+		_u.SetDeletedAt(*v)
 	}
-	return suo
+	return _u
 }
 
 // ClearDeletedAt clears the value of the "deletedAt" field.
-func (suo *SubscriptionUpdateOne) ClearDeletedAt() *SubscriptionUpdateOne {
-	suo.mutation.ClearDeletedAt()
-	return suo
+func (_u *SubscriptionUpdateOne) ClearDeletedAt() *SubscriptionUpdateOne {
+	_u.mutation.ClearDeletedAt()
+	return _u
 }
 
 // SetTTL sets the "ttl" field.
-func (suo *SubscriptionUpdateOne) SetTTL(s sqltypes.Interval) *SubscriptionUpdateOne {
-	suo.mutation.SetTTL(s)
-	return suo
+func (_u *SubscriptionUpdateOne) SetTTL(v sqltypes.Interval) *SubscriptionUpdateOne {
+	_u.mutation.SetTTL(v)
+	return _u
 }
 
 // SetNillableTTL sets the "ttl" field if the given value is not nil.
-func (suo *SubscriptionUpdateOne) SetNillableTTL(s *sqltypes.Interval) *SubscriptionUpdateOne {
-	if s != nil {
-		suo.SetTTL(*s)
+func (_u *SubscriptionUpdateOne) SetNillableTTL(v *sqltypes.Interval) *SubscriptionUpdateOne {
+	if v != nil {
+		_u.SetTTL(*v)
 	}
-	return suo
+	return _u
 }
 
 // SetMessageTTL sets the "messageTTL" field.
-func (suo *SubscriptionUpdateOne) SetMessageTTL(s sqltypes.Interval) *SubscriptionUpdateOne {
-	suo.mutation.SetMessageTTL(s)
-	return suo
+func (_u *SubscriptionUpdateOne) SetMessageTTL(v sqltypes.Interval) *SubscriptionUpdateOne {
+	_u.mutation.SetMessageTTL(v)
+	return _u
 }
 
 // SetNillableMessageTTL sets the "messageTTL" field if the given value is not nil.
-func (suo *SubscriptionUpdateOne) SetNillableMessageTTL(s *sqltypes.Interval) *SubscriptionUpdateOne {
-	if s != nil {
-		suo.SetMessageTTL(*s)
+func (_u *SubscriptionUpdateOne) SetNillableMessageTTL(v *sqltypes.Interval) *SubscriptionUpdateOne {
+	if v != nil {
+		_u.SetMessageTTL(*v)
 	}
-	return suo
+	return _u
 }
 
 // SetOrderedDelivery sets the "orderedDelivery" field.
-func (suo *SubscriptionUpdateOne) SetOrderedDelivery(b bool) *SubscriptionUpdateOne {
-	suo.mutation.SetOrderedDelivery(b)
-	return suo
+func (_u *SubscriptionUpdateOne) SetOrderedDelivery(v bool) *SubscriptionUpdateOne {
+	_u.mutation.SetOrderedDelivery(v)
+	return _u
 }
 
 // SetNillableOrderedDelivery sets the "orderedDelivery" field if the given value is not nil.
-func (suo *SubscriptionUpdateOne) SetNillableOrderedDelivery(b *bool) *SubscriptionUpdateOne {
-	if b != nil {
-		suo.SetOrderedDelivery(*b)
+func (_u *SubscriptionUpdateOne) SetNillableOrderedDelivery(v *bool) *SubscriptionUpdateOne {
+	if v != nil {
+		_u.SetOrderedDelivery(*v)
 	}
-	return suo
+	return _u
 }
 
 // ClearOrderedDelivery clears the value of the "orderedDelivery" field.
-func (suo *SubscriptionUpdateOne) ClearOrderedDelivery() *SubscriptionUpdateOne {
-	suo.mutation.ClearOrderedDelivery()
-	return suo
+func (_u *SubscriptionUpdateOne) ClearOrderedDelivery() *SubscriptionUpdateOne {
+	_u.mutation.ClearOrderedDelivery()
+	return _u
 }
 
 // SetLabels sets the "labels" field.
-func (suo *SubscriptionUpdateOne) SetLabels(m map[string]string) *SubscriptionUpdateOne {
-	suo.mutation.SetLabels(m)
-	return suo
+func (_u *SubscriptionUpdateOne) SetLabels(v map[string]string) *SubscriptionUpdateOne {
+	_u.mutation.SetLabels(v)
+	return _u
 }
 
 // ClearLabels clears the value of the "labels" field.
-func (suo *SubscriptionUpdateOne) ClearLabels() *SubscriptionUpdateOne {
-	suo.mutation.ClearLabels()
-	return suo
+func (_u *SubscriptionUpdateOne) ClearLabels() *SubscriptionUpdateOne {
+	_u.mutation.ClearLabels()
+	return _u
 }
 
 // SetMinBackoff sets the "minBackoff" field.
-func (suo *SubscriptionUpdateOne) SetMinBackoff(s *sqltypes.Interval) *SubscriptionUpdateOne {
-	suo.mutation.SetMinBackoff(s)
-	return suo
+func (_u *SubscriptionUpdateOne) SetMinBackoff(v *sqltypes.Interval) *SubscriptionUpdateOne {
+	_u.mutation.SetMinBackoff(v)
+	return _u
 }
 
 // ClearMinBackoff clears the value of the "minBackoff" field.
-func (suo *SubscriptionUpdateOne) ClearMinBackoff() *SubscriptionUpdateOne {
-	suo.mutation.ClearMinBackoff()
-	return suo
+func (_u *SubscriptionUpdateOne) ClearMinBackoff() *SubscriptionUpdateOne {
+	_u.mutation.ClearMinBackoff()
+	return _u
 }
 
 // SetMaxBackoff sets the "maxBackoff" field.
-func (suo *SubscriptionUpdateOne) SetMaxBackoff(s *sqltypes.Interval) *SubscriptionUpdateOne {
-	suo.mutation.SetMaxBackoff(s)
-	return suo
+func (_u *SubscriptionUpdateOne) SetMaxBackoff(v *sqltypes.Interval) *SubscriptionUpdateOne {
+	_u.mutation.SetMaxBackoff(v)
+	return _u
 }
 
 // ClearMaxBackoff clears the value of the "maxBackoff" field.
-func (suo *SubscriptionUpdateOne) ClearMaxBackoff() *SubscriptionUpdateOne {
-	suo.mutation.ClearMaxBackoff()
-	return suo
+func (_u *SubscriptionUpdateOne) ClearMaxBackoff() *SubscriptionUpdateOne {
+	_u.mutation.ClearMaxBackoff()
+	return _u
 }
 
 // SetPushEndpoint sets the "pushEndpoint" field.
-func (suo *SubscriptionUpdateOne) SetPushEndpoint(s string) *SubscriptionUpdateOne {
-	suo.mutation.SetPushEndpoint(s)
-	return suo
+func (_u *SubscriptionUpdateOne) SetPushEndpoint(v string) *SubscriptionUpdateOne {
+	_u.mutation.SetPushEndpoint(v)
+	return _u
 }
 
 // SetNillablePushEndpoint sets the "pushEndpoint" field if the given value is not nil.
-func (suo *SubscriptionUpdateOne) SetNillablePushEndpoint(s *string) *SubscriptionUpdateOne {
-	if s != nil {
-		suo.SetPushEndpoint(*s)
+func (_u *SubscriptionUpdateOne) SetNillablePushEndpoint(v *string) *SubscriptionUpdateOne {
+	if v != nil {
+		_u.SetPushEndpoint(*v)
 	}
-	return suo
+	return _u
 }
 
 // ClearPushEndpoint clears the value of the "pushEndpoint" field.
-func (suo *SubscriptionUpdateOne) ClearPushEndpoint() *SubscriptionUpdateOne {
-	suo.mutation.ClearPushEndpoint()
-	return suo
+func (_u *SubscriptionUpdateOne) ClearPushEndpoint() *SubscriptionUpdateOne {
+	_u.mutation.ClearPushEndpoint()
+	return _u
 }
 
 // SetMessageFilter sets the "messageFilter" field.
-func (suo *SubscriptionUpdateOne) SetMessageFilter(s string) *SubscriptionUpdateOne {
-	suo.mutation.SetMessageFilter(s)
-	return suo
+func (_u *SubscriptionUpdateOne) SetMessageFilter(v string) *SubscriptionUpdateOne {
+	_u.mutation.SetMessageFilter(v)
+	return _u
 }
 
 // SetNillableMessageFilter sets the "messageFilter" field if the given value is not nil.
-func (suo *SubscriptionUpdateOne) SetNillableMessageFilter(s *string) *SubscriptionUpdateOne {
-	if s != nil {
-		suo.SetMessageFilter(*s)
+func (_u *SubscriptionUpdateOne) SetNillableMessageFilter(v *string) *SubscriptionUpdateOne {
+	if v != nil {
+		_u.SetMessageFilter(*v)
 	}
-	return suo
+	return _u
 }
 
 // ClearMessageFilter clears the value of the "messageFilter" field.
-func (suo *SubscriptionUpdateOne) ClearMessageFilter() *SubscriptionUpdateOne {
-	suo.mutation.ClearMessageFilter()
-	return suo
+func (_u *SubscriptionUpdateOne) ClearMessageFilter() *SubscriptionUpdateOne {
+	_u.mutation.ClearMessageFilter()
+	return _u
 }
 
 // SetMaxDeliveryAttempts sets the "maxDeliveryAttempts" field.
-func (suo *SubscriptionUpdateOne) SetMaxDeliveryAttempts(i int32) *SubscriptionUpdateOne {
-	suo.mutation.ResetMaxDeliveryAttempts()
-	suo.mutation.SetMaxDeliveryAttempts(i)
-	return suo
+func (_u *SubscriptionUpdateOne) SetMaxDeliveryAttempts(v int32) *SubscriptionUpdateOne {
+	_u.mutation.ResetMaxDeliveryAttempts()
+	_u.mutation.SetMaxDeliveryAttempts(v)
+	return _u
 }
 
 // SetNillableMaxDeliveryAttempts sets the "maxDeliveryAttempts" field if the given value is not nil.
-func (suo *SubscriptionUpdateOne) SetNillableMaxDeliveryAttempts(i *int32) *SubscriptionUpdateOne {
-	if i != nil {
-		suo.SetMaxDeliveryAttempts(*i)
+func (_u *SubscriptionUpdateOne) SetNillableMaxDeliveryAttempts(v *int32) *SubscriptionUpdateOne {
+	if v != nil {
+		_u.SetMaxDeliveryAttempts(*v)
 	}
-	return suo
+	return _u
 }
 
-// AddMaxDeliveryAttempts adds i to the "maxDeliveryAttempts" field.
-func (suo *SubscriptionUpdateOne) AddMaxDeliveryAttempts(i int32) *SubscriptionUpdateOne {
-	suo.mutation.AddMaxDeliveryAttempts(i)
-	return suo
+// AddMaxDeliveryAttempts adds value to the "maxDeliveryAttempts" field.
+func (_u *SubscriptionUpdateOne) AddMaxDeliveryAttempts(v int32) *SubscriptionUpdateOne {
+	_u.mutation.AddMaxDeliveryAttempts(v)
+	return _u
 }
 
 // ClearMaxDeliveryAttempts clears the value of the "maxDeliveryAttempts" field.
-func (suo *SubscriptionUpdateOne) ClearMaxDeliveryAttempts() *SubscriptionUpdateOne {
-	suo.mutation.ClearMaxDeliveryAttempts()
-	return suo
+func (_u *SubscriptionUpdateOne) ClearMaxDeliveryAttempts() *SubscriptionUpdateOne {
+	_u.mutation.ClearMaxDeliveryAttempts()
+	return _u
 }
 
 // SetDeadLetterTopicID sets the "deadLetterTopicID" field.
-func (suo *SubscriptionUpdateOne) SetDeadLetterTopicID(u uuid.UUID) *SubscriptionUpdateOne {
-	suo.mutation.SetDeadLetterTopicID(u)
-	return suo
+func (_u *SubscriptionUpdateOne) SetDeadLetterTopicID(v uuid.UUID) *SubscriptionUpdateOne {
+	_u.mutation.SetDeadLetterTopicID(v)
+	return _u
 }
 
 // SetNillableDeadLetterTopicID sets the "deadLetterTopicID" field if the given value is not nil.
-func (suo *SubscriptionUpdateOne) SetNillableDeadLetterTopicID(u *uuid.UUID) *SubscriptionUpdateOne {
-	if u != nil {
-		suo.SetDeadLetterTopicID(*u)
+func (_u *SubscriptionUpdateOne) SetNillableDeadLetterTopicID(v *uuid.UUID) *SubscriptionUpdateOne {
+	if v != nil {
+		_u.SetDeadLetterTopicID(*v)
 	}
-	return suo
+	return _u
 }
 
 // ClearDeadLetterTopicID clears the value of the "deadLetterTopicID" field.
-func (suo *SubscriptionUpdateOne) ClearDeadLetterTopicID() *SubscriptionUpdateOne {
-	suo.mutation.ClearDeadLetterTopicID()
-	return suo
+func (_u *SubscriptionUpdateOne) ClearDeadLetterTopicID() *SubscriptionUpdateOne {
+	_u.mutation.ClearDeadLetterTopicID()
+	return _u
 }
 
 // SetDeliveryDelay sets the "deliveryDelay" field.
-func (suo *SubscriptionUpdateOne) SetDeliveryDelay(s sqltypes.Interval) *SubscriptionUpdateOne {
-	suo.mutation.SetDeliveryDelay(s)
-	return suo
+func (_u *SubscriptionUpdateOne) SetDeliveryDelay(v sqltypes.Interval) *SubscriptionUpdateOne {
+	_u.mutation.SetDeliveryDelay(v)
+	return _u
 }
 
 // SetNillableDeliveryDelay sets the "deliveryDelay" field if the given value is not nil.
-func (suo *SubscriptionUpdateOne) SetNillableDeliveryDelay(s *sqltypes.Interval) *SubscriptionUpdateOne {
-	if s != nil {
-		suo.SetDeliveryDelay(*s)
+func (_u *SubscriptionUpdateOne) SetNillableDeliveryDelay(v *sqltypes.Interval) *SubscriptionUpdateOne {
+	if v != nil {
+		_u.SetDeliveryDelay(*v)
 	}
-	return suo
+	return _u
 }
 
 // SetTopic sets the "topic" edge to the Topic entity.
-func (suo *SubscriptionUpdateOne) SetTopic(t *Topic) *SubscriptionUpdateOne {
-	return suo.SetTopicID(t.ID)
+func (_u *SubscriptionUpdateOne) SetTopic(v *Topic) *SubscriptionUpdateOne {
+	return _u.SetTopicID(v.ID)
 }
 
 // AddDeliveryIDs adds the "deliveries" edge to the Delivery entity by IDs.
-func (suo *SubscriptionUpdateOne) AddDeliveryIDs(ids ...uuid.UUID) *SubscriptionUpdateOne {
-	suo.mutation.AddDeliveryIDs(ids...)
-	return suo
+func (_u *SubscriptionUpdateOne) AddDeliveryIDs(ids ...uuid.UUID) *SubscriptionUpdateOne {
+	_u.mutation.AddDeliveryIDs(ids...)
+	return _u
 }
 
 // AddDeliveries adds the "deliveries" edges to the Delivery entity.
-func (suo *SubscriptionUpdateOne) AddDeliveries(d ...*Delivery) *SubscriptionUpdateOne {
-	ids := make([]uuid.UUID, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_u *SubscriptionUpdateOne) AddDeliveries(v ...*Delivery) *SubscriptionUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return suo.AddDeliveryIDs(ids...)
+	return _u.AddDeliveryIDs(ids...)
 }
 
 // SetDeadLetterTopic sets the "deadLetterTopic" edge to the Topic entity.
-func (suo *SubscriptionUpdateOne) SetDeadLetterTopic(t *Topic) *SubscriptionUpdateOne {
-	return suo.SetDeadLetterTopicID(t.ID)
+func (_u *SubscriptionUpdateOne) SetDeadLetterTopic(v *Topic) *SubscriptionUpdateOne {
+	return _u.SetDeadLetterTopicID(v.ID)
 }
 
 // Mutation returns the SubscriptionMutation object of the builder.
-func (suo *SubscriptionUpdateOne) Mutation() *SubscriptionMutation {
-	return suo.mutation
+func (_u *SubscriptionUpdateOne) Mutation() *SubscriptionMutation {
+	return _u.mutation
 }
 
 // ClearTopic clears the "topic" edge to the Topic entity.
-func (suo *SubscriptionUpdateOne) ClearTopic() *SubscriptionUpdateOne {
-	suo.mutation.ClearTopic()
-	return suo
+func (_u *SubscriptionUpdateOne) ClearTopic() *SubscriptionUpdateOne {
+	_u.mutation.ClearTopic()
+	return _u
 }
 
 // ClearDeliveries clears all "deliveries" edges to the Delivery entity.
-func (suo *SubscriptionUpdateOne) ClearDeliveries() *SubscriptionUpdateOne {
-	suo.mutation.ClearDeliveries()
-	return suo
+func (_u *SubscriptionUpdateOne) ClearDeliveries() *SubscriptionUpdateOne {
+	_u.mutation.ClearDeliveries()
+	return _u
 }
 
 // RemoveDeliveryIDs removes the "deliveries" edge to Delivery entities by IDs.
-func (suo *SubscriptionUpdateOne) RemoveDeliveryIDs(ids ...uuid.UUID) *SubscriptionUpdateOne {
-	suo.mutation.RemoveDeliveryIDs(ids...)
-	return suo
+func (_u *SubscriptionUpdateOne) RemoveDeliveryIDs(ids ...uuid.UUID) *SubscriptionUpdateOne {
+	_u.mutation.RemoveDeliveryIDs(ids...)
+	return _u
 }
 
 // RemoveDeliveries removes "deliveries" edges to Delivery entities.
-func (suo *SubscriptionUpdateOne) RemoveDeliveries(d ...*Delivery) *SubscriptionUpdateOne {
-	ids := make([]uuid.UUID, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_u *SubscriptionUpdateOne) RemoveDeliveries(v ...*Delivery) *SubscriptionUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return suo.RemoveDeliveryIDs(ids...)
+	return _u.RemoveDeliveryIDs(ids...)
 }
 
 // ClearDeadLetterTopic clears the "deadLetterTopic" edge to the Topic entity.
-func (suo *SubscriptionUpdateOne) ClearDeadLetterTopic() *SubscriptionUpdateOne {
-	suo.mutation.ClearDeadLetterTopic()
-	return suo
+func (_u *SubscriptionUpdateOne) ClearDeadLetterTopic() *SubscriptionUpdateOne {
+	_u.mutation.ClearDeadLetterTopic()
+	return _u
 }
 
 // Where appends a list predicates to the SubscriptionUpdate builder.
-func (suo *SubscriptionUpdateOne) Where(ps ...predicate.Subscription) *SubscriptionUpdateOne {
-	suo.mutation.Where(ps...)
-	return suo
+func (_u *SubscriptionUpdateOne) Where(ps ...predicate.Subscription) *SubscriptionUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (suo *SubscriptionUpdateOne) Select(field string, fields ...string) *SubscriptionUpdateOne {
-	suo.fields = append([]string{field}, fields...)
-	return suo
+func (_u *SubscriptionUpdateOne) Select(field string, fields ...string) *SubscriptionUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Subscription entity.
-func (suo *SubscriptionUpdateOne) Save(ctx context.Context) (*Subscription, error) {
-	return withHooks(ctx, suo.sqlSave, suo.mutation, suo.hooks)
+func (_u *SubscriptionUpdateOne) Save(ctx context.Context) (*Subscription, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (suo *SubscriptionUpdateOne) SaveX(ctx context.Context) *Subscription {
-	node, err := suo.Save(ctx)
+func (_u *SubscriptionUpdateOne) SaveX(ctx context.Context) *Subscription {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -931,37 +931,37 @@ func (suo *SubscriptionUpdateOne) SaveX(ctx context.Context) *Subscription {
 }
 
 // Exec executes the query on the entity.
-func (suo *SubscriptionUpdateOne) Exec(ctx context.Context) error {
-	_, err := suo.Save(ctx)
+func (_u *SubscriptionUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (suo *SubscriptionUpdateOne) ExecX(ctx context.Context) {
-	if err := suo.Exec(ctx); err != nil {
+func (_u *SubscriptionUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (suo *SubscriptionUpdateOne) check() error {
-	if suo.mutation.TopicCleared() && len(suo.mutation.TopicIDs()) > 0 {
+func (_u *SubscriptionUpdateOne) check() error {
+	if _u.mutation.TopicCleared() && len(_u.mutation.TopicIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Subscription.topic"`)
 	}
 	return nil
 }
 
-func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscription, err error) {
-	if err := suo.check(); err != nil {
+func (_u *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscription, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(subscription.Table, subscription.Columns, sqlgraph.NewFieldSpec(subscription.FieldID, field.TypeUUID))
-	id, ok := suo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Subscription.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := suo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, subscription.FieldID)
 		for _, f := range fields {
@@ -973,83 +973,83 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 			}
 		}
 	}
-	if ps := suo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := suo.mutation.ExpiresAt(); ok {
+	if value, ok := _u.mutation.ExpiresAt(); ok {
 		_spec.SetField(subscription.FieldExpiresAt, field.TypeTime, value)
 	}
-	if value, ok := suo.mutation.Live(); ok {
+	if value, ok := _u.mutation.Live(); ok {
 		_spec.SetField(subscription.FieldLive, field.TypeBool, value)
 	}
-	if suo.mutation.LiveCleared() {
+	if _u.mutation.LiveCleared() {
 		_spec.ClearField(subscription.FieldLive, field.TypeBool)
 	}
-	if value, ok := suo.mutation.DeletedAt(); ok {
+	if value, ok := _u.mutation.DeletedAt(); ok {
 		_spec.SetField(subscription.FieldDeletedAt, field.TypeTime, value)
 	}
-	if suo.mutation.DeletedAtCleared() {
+	if _u.mutation.DeletedAtCleared() {
 		_spec.ClearField(subscription.FieldDeletedAt, field.TypeTime)
 	}
-	if value, ok := suo.mutation.TTL(); ok {
+	if value, ok := _u.mutation.TTL(); ok {
 		_spec.SetField(subscription.FieldTTL, field.TypeString, value)
 	}
-	if value, ok := suo.mutation.MessageTTL(); ok {
+	if value, ok := _u.mutation.MessageTTL(); ok {
 		_spec.SetField(subscription.FieldMessageTTL, field.TypeString, value)
 	}
-	if value, ok := suo.mutation.OrderedDelivery(); ok {
+	if value, ok := _u.mutation.OrderedDelivery(); ok {
 		_spec.SetField(subscription.FieldOrderedDelivery, field.TypeBool, value)
 	}
-	if suo.mutation.OrderedDeliveryCleared() {
+	if _u.mutation.OrderedDeliveryCleared() {
 		_spec.ClearField(subscription.FieldOrderedDelivery, field.TypeBool)
 	}
-	if value, ok := suo.mutation.Labels(); ok {
+	if value, ok := _u.mutation.Labels(); ok {
 		_spec.SetField(subscription.FieldLabels, field.TypeJSON, value)
 	}
-	if suo.mutation.LabelsCleared() {
+	if _u.mutation.LabelsCleared() {
 		_spec.ClearField(subscription.FieldLabels, field.TypeJSON)
 	}
-	if value, ok := suo.mutation.MinBackoff(); ok {
+	if value, ok := _u.mutation.MinBackoff(); ok {
 		_spec.SetField(subscription.FieldMinBackoff, field.TypeString, value)
 	}
-	if suo.mutation.MinBackoffCleared() {
+	if _u.mutation.MinBackoffCleared() {
 		_spec.ClearField(subscription.FieldMinBackoff, field.TypeString)
 	}
-	if value, ok := suo.mutation.MaxBackoff(); ok {
+	if value, ok := _u.mutation.MaxBackoff(); ok {
 		_spec.SetField(subscription.FieldMaxBackoff, field.TypeString, value)
 	}
-	if suo.mutation.MaxBackoffCleared() {
+	if _u.mutation.MaxBackoffCleared() {
 		_spec.ClearField(subscription.FieldMaxBackoff, field.TypeString)
 	}
-	if value, ok := suo.mutation.PushEndpoint(); ok {
+	if value, ok := _u.mutation.PushEndpoint(); ok {
 		_spec.SetField(subscription.FieldPushEndpoint, field.TypeString, value)
 	}
-	if suo.mutation.PushEndpointCleared() {
+	if _u.mutation.PushEndpointCleared() {
 		_spec.ClearField(subscription.FieldPushEndpoint, field.TypeString)
 	}
-	if value, ok := suo.mutation.MessageFilter(); ok {
+	if value, ok := _u.mutation.MessageFilter(); ok {
 		_spec.SetField(subscription.FieldMessageFilter, field.TypeString, value)
 	}
-	if suo.mutation.MessageFilterCleared() {
+	if _u.mutation.MessageFilterCleared() {
 		_spec.ClearField(subscription.FieldMessageFilter, field.TypeString)
 	}
-	if value, ok := suo.mutation.MaxDeliveryAttempts(); ok {
+	if value, ok := _u.mutation.MaxDeliveryAttempts(); ok {
 		_spec.SetField(subscription.FieldMaxDeliveryAttempts, field.TypeInt32, value)
 	}
-	if value, ok := suo.mutation.AddedMaxDeliveryAttempts(); ok {
+	if value, ok := _u.mutation.AddedMaxDeliveryAttempts(); ok {
 		_spec.AddField(subscription.FieldMaxDeliveryAttempts, field.TypeInt32, value)
 	}
-	if suo.mutation.MaxDeliveryAttemptsCleared() {
+	if _u.mutation.MaxDeliveryAttemptsCleared() {
 		_spec.ClearField(subscription.FieldMaxDeliveryAttempts, field.TypeInt32)
 	}
-	if value, ok := suo.mutation.DeliveryDelay(); ok {
+	if value, ok := _u.mutation.DeliveryDelay(); ok {
 		_spec.SetField(subscription.FieldDeliveryDelay, field.TypeOther, value)
 	}
-	if suo.mutation.TopicCleared() {
+	if _u.mutation.TopicCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -1062,7 +1062,7 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := suo.mutation.TopicIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.TopicIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -1078,7 +1078,7 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if suo.mutation.DeliveriesCleared() {
+	if _u.mutation.DeliveriesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -1091,7 +1091,7 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := suo.mutation.RemovedDeliveriesIDs(); len(nodes) > 0 && !suo.mutation.DeliveriesCleared() {
+	if nodes := _u.mutation.RemovedDeliveriesIDs(); len(nodes) > 0 && !_u.mutation.DeliveriesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -1107,7 +1107,7 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := suo.mutation.DeliveriesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.DeliveriesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -1123,7 +1123,7 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if suo.mutation.DeadLetterTopicCleared() {
+	if _u.mutation.DeadLetterTopicCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -1136,7 +1136,7 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := suo.mutation.DeadLetterTopicIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.DeadLetterTopicIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -1152,10 +1152,10 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &Subscription{config: suo.config}
+	_node = &Subscription{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, suo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{subscription.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -1163,6 +1163,6 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 		}
 		return nil, err
 	}
-	suo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

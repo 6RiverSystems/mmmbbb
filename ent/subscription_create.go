@@ -28,234 +28,234 @@ type SubscriptionCreate struct {
 }
 
 // SetTopicID sets the "topicID" field.
-func (sc *SubscriptionCreate) SetTopicID(u uuid.UUID) *SubscriptionCreate {
-	sc.mutation.SetTopicID(u)
-	return sc
+func (_c *SubscriptionCreate) SetTopicID(v uuid.UUID) *SubscriptionCreate {
+	_c.mutation.SetTopicID(v)
+	return _c
 }
 
 // SetName sets the "name" field.
-func (sc *SubscriptionCreate) SetName(s string) *SubscriptionCreate {
-	sc.mutation.SetName(s)
-	return sc
+func (_c *SubscriptionCreate) SetName(v string) *SubscriptionCreate {
+	_c.mutation.SetName(v)
+	return _c
 }
 
 // SetCreatedAt sets the "createdAt" field.
-func (sc *SubscriptionCreate) SetCreatedAt(t time.Time) *SubscriptionCreate {
-	sc.mutation.SetCreatedAt(t)
-	return sc
+func (_c *SubscriptionCreate) SetCreatedAt(v time.Time) *SubscriptionCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
-func (sc *SubscriptionCreate) SetNillableCreatedAt(t *time.Time) *SubscriptionCreate {
-	if t != nil {
-		sc.SetCreatedAt(*t)
+func (_c *SubscriptionCreate) SetNillableCreatedAt(v *time.Time) *SubscriptionCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return sc
+	return _c
 }
 
 // SetExpiresAt sets the "expiresAt" field.
-func (sc *SubscriptionCreate) SetExpiresAt(t time.Time) *SubscriptionCreate {
-	sc.mutation.SetExpiresAt(t)
-	return sc
+func (_c *SubscriptionCreate) SetExpiresAt(v time.Time) *SubscriptionCreate {
+	_c.mutation.SetExpiresAt(v)
+	return _c
 }
 
 // SetLive sets the "live" field.
-func (sc *SubscriptionCreate) SetLive(b bool) *SubscriptionCreate {
-	sc.mutation.SetLive(b)
-	return sc
+func (_c *SubscriptionCreate) SetLive(v bool) *SubscriptionCreate {
+	_c.mutation.SetLive(v)
+	return _c
 }
 
 // SetNillableLive sets the "live" field if the given value is not nil.
-func (sc *SubscriptionCreate) SetNillableLive(b *bool) *SubscriptionCreate {
-	if b != nil {
-		sc.SetLive(*b)
+func (_c *SubscriptionCreate) SetNillableLive(v *bool) *SubscriptionCreate {
+	if v != nil {
+		_c.SetLive(*v)
 	}
-	return sc
+	return _c
 }
 
 // SetDeletedAt sets the "deletedAt" field.
-func (sc *SubscriptionCreate) SetDeletedAt(t time.Time) *SubscriptionCreate {
-	sc.mutation.SetDeletedAt(t)
-	return sc
+func (_c *SubscriptionCreate) SetDeletedAt(v time.Time) *SubscriptionCreate {
+	_c.mutation.SetDeletedAt(v)
+	return _c
 }
 
 // SetNillableDeletedAt sets the "deletedAt" field if the given value is not nil.
-func (sc *SubscriptionCreate) SetNillableDeletedAt(t *time.Time) *SubscriptionCreate {
-	if t != nil {
-		sc.SetDeletedAt(*t)
+func (_c *SubscriptionCreate) SetNillableDeletedAt(v *time.Time) *SubscriptionCreate {
+	if v != nil {
+		_c.SetDeletedAt(*v)
 	}
-	return sc
+	return _c
 }
 
 // SetTTL sets the "ttl" field.
-func (sc *SubscriptionCreate) SetTTL(s sqltypes.Interval) *SubscriptionCreate {
-	sc.mutation.SetTTL(s)
-	return sc
+func (_c *SubscriptionCreate) SetTTL(v sqltypes.Interval) *SubscriptionCreate {
+	_c.mutation.SetTTL(v)
+	return _c
 }
 
 // SetMessageTTL sets the "messageTTL" field.
-func (sc *SubscriptionCreate) SetMessageTTL(s sqltypes.Interval) *SubscriptionCreate {
-	sc.mutation.SetMessageTTL(s)
-	return sc
+func (_c *SubscriptionCreate) SetMessageTTL(v sqltypes.Interval) *SubscriptionCreate {
+	_c.mutation.SetMessageTTL(v)
+	return _c
 }
 
 // SetOrderedDelivery sets the "orderedDelivery" field.
-func (sc *SubscriptionCreate) SetOrderedDelivery(b bool) *SubscriptionCreate {
-	sc.mutation.SetOrderedDelivery(b)
-	return sc
+func (_c *SubscriptionCreate) SetOrderedDelivery(v bool) *SubscriptionCreate {
+	_c.mutation.SetOrderedDelivery(v)
+	return _c
 }
 
 // SetNillableOrderedDelivery sets the "orderedDelivery" field if the given value is not nil.
-func (sc *SubscriptionCreate) SetNillableOrderedDelivery(b *bool) *SubscriptionCreate {
-	if b != nil {
-		sc.SetOrderedDelivery(*b)
+func (_c *SubscriptionCreate) SetNillableOrderedDelivery(v *bool) *SubscriptionCreate {
+	if v != nil {
+		_c.SetOrderedDelivery(*v)
 	}
-	return sc
+	return _c
 }
 
 // SetLabels sets the "labels" field.
-func (sc *SubscriptionCreate) SetLabels(m map[string]string) *SubscriptionCreate {
-	sc.mutation.SetLabels(m)
-	return sc
+func (_c *SubscriptionCreate) SetLabels(v map[string]string) *SubscriptionCreate {
+	_c.mutation.SetLabels(v)
+	return _c
 }
 
 // SetMinBackoff sets the "minBackoff" field.
-func (sc *SubscriptionCreate) SetMinBackoff(s *sqltypes.Interval) *SubscriptionCreate {
-	sc.mutation.SetMinBackoff(s)
-	return sc
+func (_c *SubscriptionCreate) SetMinBackoff(v *sqltypes.Interval) *SubscriptionCreate {
+	_c.mutation.SetMinBackoff(v)
+	return _c
 }
 
 // SetMaxBackoff sets the "maxBackoff" field.
-func (sc *SubscriptionCreate) SetMaxBackoff(s *sqltypes.Interval) *SubscriptionCreate {
-	sc.mutation.SetMaxBackoff(s)
-	return sc
+func (_c *SubscriptionCreate) SetMaxBackoff(v *sqltypes.Interval) *SubscriptionCreate {
+	_c.mutation.SetMaxBackoff(v)
+	return _c
 }
 
 // SetPushEndpoint sets the "pushEndpoint" field.
-func (sc *SubscriptionCreate) SetPushEndpoint(s string) *SubscriptionCreate {
-	sc.mutation.SetPushEndpoint(s)
-	return sc
+func (_c *SubscriptionCreate) SetPushEndpoint(v string) *SubscriptionCreate {
+	_c.mutation.SetPushEndpoint(v)
+	return _c
 }
 
 // SetNillablePushEndpoint sets the "pushEndpoint" field if the given value is not nil.
-func (sc *SubscriptionCreate) SetNillablePushEndpoint(s *string) *SubscriptionCreate {
-	if s != nil {
-		sc.SetPushEndpoint(*s)
+func (_c *SubscriptionCreate) SetNillablePushEndpoint(v *string) *SubscriptionCreate {
+	if v != nil {
+		_c.SetPushEndpoint(*v)
 	}
-	return sc
+	return _c
 }
 
 // SetMessageFilter sets the "messageFilter" field.
-func (sc *SubscriptionCreate) SetMessageFilter(s string) *SubscriptionCreate {
-	sc.mutation.SetMessageFilter(s)
-	return sc
+func (_c *SubscriptionCreate) SetMessageFilter(v string) *SubscriptionCreate {
+	_c.mutation.SetMessageFilter(v)
+	return _c
 }
 
 // SetNillableMessageFilter sets the "messageFilter" field if the given value is not nil.
-func (sc *SubscriptionCreate) SetNillableMessageFilter(s *string) *SubscriptionCreate {
-	if s != nil {
-		sc.SetMessageFilter(*s)
+func (_c *SubscriptionCreate) SetNillableMessageFilter(v *string) *SubscriptionCreate {
+	if v != nil {
+		_c.SetMessageFilter(*v)
 	}
-	return sc
+	return _c
 }
 
 // SetMaxDeliveryAttempts sets the "maxDeliveryAttempts" field.
-func (sc *SubscriptionCreate) SetMaxDeliveryAttempts(i int32) *SubscriptionCreate {
-	sc.mutation.SetMaxDeliveryAttempts(i)
-	return sc
+func (_c *SubscriptionCreate) SetMaxDeliveryAttempts(v int32) *SubscriptionCreate {
+	_c.mutation.SetMaxDeliveryAttempts(v)
+	return _c
 }
 
 // SetNillableMaxDeliveryAttempts sets the "maxDeliveryAttempts" field if the given value is not nil.
-func (sc *SubscriptionCreate) SetNillableMaxDeliveryAttempts(i *int32) *SubscriptionCreate {
-	if i != nil {
-		sc.SetMaxDeliveryAttempts(*i)
+func (_c *SubscriptionCreate) SetNillableMaxDeliveryAttempts(v *int32) *SubscriptionCreate {
+	if v != nil {
+		_c.SetMaxDeliveryAttempts(*v)
 	}
-	return sc
+	return _c
 }
 
 // SetDeadLetterTopicID sets the "deadLetterTopicID" field.
-func (sc *SubscriptionCreate) SetDeadLetterTopicID(u uuid.UUID) *SubscriptionCreate {
-	sc.mutation.SetDeadLetterTopicID(u)
-	return sc
+func (_c *SubscriptionCreate) SetDeadLetterTopicID(v uuid.UUID) *SubscriptionCreate {
+	_c.mutation.SetDeadLetterTopicID(v)
+	return _c
 }
 
 // SetNillableDeadLetterTopicID sets the "deadLetterTopicID" field if the given value is not nil.
-func (sc *SubscriptionCreate) SetNillableDeadLetterTopicID(u *uuid.UUID) *SubscriptionCreate {
-	if u != nil {
-		sc.SetDeadLetterTopicID(*u)
+func (_c *SubscriptionCreate) SetNillableDeadLetterTopicID(v *uuid.UUID) *SubscriptionCreate {
+	if v != nil {
+		_c.SetDeadLetterTopicID(*v)
 	}
-	return sc
+	return _c
 }
 
 // SetDeliveryDelay sets the "deliveryDelay" field.
-func (sc *SubscriptionCreate) SetDeliveryDelay(s sqltypes.Interval) *SubscriptionCreate {
-	sc.mutation.SetDeliveryDelay(s)
-	return sc
+func (_c *SubscriptionCreate) SetDeliveryDelay(v sqltypes.Interval) *SubscriptionCreate {
+	_c.mutation.SetDeliveryDelay(v)
+	return _c
 }
 
 // SetNillableDeliveryDelay sets the "deliveryDelay" field if the given value is not nil.
-func (sc *SubscriptionCreate) SetNillableDeliveryDelay(s *sqltypes.Interval) *SubscriptionCreate {
-	if s != nil {
-		sc.SetDeliveryDelay(*s)
+func (_c *SubscriptionCreate) SetNillableDeliveryDelay(v *sqltypes.Interval) *SubscriptionCreate {
+	if v != nil {
+		_c.SetDeliveryDelay(*v)
 	}
-	return sc
+	return _c
 }
 
 // SetID sets the "id" field.
-func (sc *SubscriptionCreate) SetID(u uuid.UUID) *SubscriptionCreate {
-	sc.mutation.SetID(u)
-	return sc
+func (_c *SubscriptionCreate) SetID(v uuid.UUID) *SubscriptionCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (sc *SubscriptionCreate) SetNillableID(u *uuid.UUID) *SubscriptionCreate {
-	if u != nil {
-		sc.SetID(*u)
+func (_c *SubscriptionCreate) SetNillableID(v *uuid.UUID) *SubscriptionCreate {
+	if v != nil {
+		_c.SetID(*v)
 	}
-	return sc
+	return _c
 }
 
 // SetTopic sets the "topic" edge to the Topic entity.
-func (sc *SubscriptionCreate) SetTopic(t *Topic) *SubscriptionCreate {
-	return sc.SetTopicID(t.ID)
+func (_c *SubscriptionCreate) SetTopic(v *Topic) *SubscriptionCreate {
+	return _c.SetTopicID(v.ID)
 }
 
 // AddDeliveryIDs adds the "deliveries" edge to the Delivery entity by IDs.
-func (sc *SubscriptionCreate) AddDeliveryIDs(ids ...uuid.UUID) *SubscriptionCreate {
-	sc.mutation.AddDeliveryIDs(ids...)
-	return sc
+func (_c *SubscriptionCreate) AddDeliveryIDs(ids ...uuid.UUID) *SubscriptionCreate {
+	_c.mutation.AddDeliveryIDs(ids...)
+	return _c
 }
 
 // AddDeliveries adds the "deliveries" edges to the Delivery entity.
-func (sc *SubscriptionCreate) AddDeliveries(d ...*Delivery) *SubscriptionCreate {
-	ids := make([]uuid.UUID, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_c *SubscriptionCreate) AddDeliveries(v ...*Delivery) *SubscriptionCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return sc.AddDeliveryIDs(ids...)
+	return _c.AddDeliveryIDs(ids...)
 }
 
 // SetDeadLetterTopic sets the "deadLetterTopic" edge to the Topic entity.
-func (sc *SubscriptionCreate) SetDeadLetterTopic(t *Topic) *SubscriptionCreate {
-	return sc.SetDeadLetterTopicID(t.ID)
+func (_c *SubscriptionCreate) SetDeadLetterTopic(v *Topic) *SubscriptionCreate {
+	return _c.SetDeadLetterTopicID(v.ID)
 }
 
 // Mutation returns the SubscriptionMutation object of the builder.
-func (sc *SubscriptionCreate) Mutation() *SubscriptionMutation {
-	return sc.mutation
+func (_c *SubscriptionCreate) Mutation() *SubscriptionMutation {
+	return _c.mutation
 }
 
 // Save creates the Subscription in the database.
-func (sc *SubscriptionCreate) Save(ctx context.Context) (*Subscription, error) {
-	if err := sc.defaults(); err != nil {
+func (_c *SubscriptionCreate) Save(ctx context.Context) (*Subscription, error) {
+	if err := _c.defaults(); err != nil {
 		return nil, err
 	}
-	return withHooks(ctx, sc.sqlSave, sc.mutation, sc.hooks)
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (sc *SubscriptionCreate) SaveX(ctx context.Context) *Subscription {
-	v, err := sc.Save(ctx)
+func (_c *SubscriptionCreate) SaveX(ctx context.Context) *Subscription {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -263,89 +263,89 @@ func (sc *SubscriptionCreate) SaveX(ctx context.Context) *Subscription {
 }
 
 // Exec executes the query.
-func (sc *SubscriptionCreate) Exec(ctx context.Context) error {
-	_, err := sc.Save(ctx)
+func (_c *SubscriptionCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (sc *SubscriptionCreate) ExecX(ctx context.Context) {
-	if err := sc.Exec(ctx); err != nil {
+func (_c *SubscriptionCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (sc *SubscriptionCreate) defaults() error {
-	if _, ok := sc.mutation.CreatedAt(); !ok {
+func (_c *SubscriptionCreate) defaults() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		if subscription.DefaultCreatedAt == nil {
 			return fmt.Errorf("ent: uninitialized subscription.DefaultCreatedAt (forgotten import ent/runtime?)")
 		}
 		v := subscription.DefaultCreatedAt()
-		sc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
-	if _, ok := sc.mutation.Live(); !ok {
+	if _, ok := _c.mutation.Live(); !ok {
 		v := subscription.DefaultLive
-		sc.mutation.SetLive(v)
+		_c.mutation.SetLive(v)
 	}
-	if _, ok := sc.mutation.OrderedDelivery(); !ok {
+	if _, ok := _c.mutation.OrderedDelivery(); !ok {
 		v := subscription.DefaultOrderedDelivery
-		sc.mutation.SetOrderedDelivery(v)
+		_c.mutation.SetOrderedDelivery(v)
 	}
-	if _, ok := sc.mutation.DeliveryDelay(); !ok {
+	if _, ok := _c.mutation.DeliveryDelay(); !ok {
 		v := subscription.DefaultDeliveryDelay
-		sc.mutation.SetDeliveryDelay(v)
+		_c.mutation.SetDeliveryDelay(v)
 	}
-	if _, ok := sc.mutation.ID(); !ok {
+	if _, ok := _c.mutation.ID(); !ok {
 		if subscription.DefaultID == nil {
 			return fmt.Errorf("ent: uninitialized subscription.DefaultID (forgotten import ent/runtime?)")
 		}
 		v := subscription.DefaultID()
-		sc.mutation.SetID(v)
+		_c.mutation.SetID(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (sc *SubscriptionCreate) check() error {
-	if _, ok := sc.mutation.TopicID(); !ok {
+func (_c *SubscriptionCreate) check() error {
+	if _, ok := _c.mutation.TopicID(); !ok {
 		return &ValidationError{Name: "topicID", err: errors.New(`ent: missing required field "Subscription.topicID"`)}
 	}
-	if _, ok := sc.mutation.Name(); !ok {
+	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Subscription.name"`)}
 	}
-	if v, ok := sc.mutation.Name(); ok {
+	if v, ok := _c.mutation.Name(); ok {
 		if err := subscription.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Subscription.name": %w`, err)}
 		}
 	}
-	if _, ok := sc.mutation.CreatedAt(); !ok {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "Subscription.createdAt"`)}
 	}
-	if _, ok := sc.mutation.ExpiresAt(); !ok {
+	if _, ok := _c.mutation.ExpiresAt(); !ok {
 		return &ValidationError{Name: "expiresAt", err: errors.New(`ent: missing required field "Subscription.expiresAt"`)}
 	}
-	if _, ok := sc.mutation.TTL(); !ok {
+	if _, ok := _c.mutation.TTL(); !ok {
 		return &ValidationError{Name: "ttl", err: errors.New(`ent: missing required field "Subscription.ttl"`)}
 	}
-	if _, ok := sc.mutation.MessageTTL(); !ok {
+	if _, ok := _c.mutation.MessageTTL(); !ok {
 		return &ValidationError{Name: "messageTTL", err: errors.New(`ent: missing required field "Subscription.messageTTL"`)}
 	}
-	if _, ok := sc.mutation.DeliveryDelay(); !ok {
+	if _, ok := _c.mutation.DeliveryDelay(); !ok {
 		return &ValidationError{Name: "deliveryDelay", err: errors.New(`ent: missing required field "Subscription.deliveryDelay"`)}
 	}
-	if len(sc.mutation.TopicIDs()) == 0 {
+	if len(_c.mutation.TopicIDs()) == 0 {
 		return &ValidationError{Name: "topic", err: errors.New(`ent: missing required edge "Subscription.topic"`)}
 	}
 	return nil
 }
 
-func (sc *SubscriptionCreate) sqlSave(ctx context.Context) (*Subscription, error) {
-	if err := sc.check(); err != nil {
+func (_c *SubscriptionCreate) sqlSave(ctx context.Context) (*Subscription, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := sc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, sc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -358,82 +358,82 @@ func (sc *SubscriptionCreate) sqlSave(ctx context.Context) (*Subscription, error
 			return nil, err
 		}
 	}
-	sc.mutation.id = &_node.ID
-	sc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (sc *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec) {
+func (_c *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Subscription{config: sc.config}
+		_node = &Subscription{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(subscription.Table, sqlgraph.NewFieldSpec(subscription.FieldID, field.TypeUUID))
 	)
-	_spec.OnConflict = sc.conflict
-	if id, ok := sc.mutation.ID(); ok {
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := sc.mutation.Name(); ok {
+	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(subscription.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := sc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(subscription.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := sc.mutation.ExpiresAt(); ok {
+	if value, ok := _c.mutation.ExpiresAt(); ok {
 		_spec.SetField(subscription.FieldExpiresAt, field.TypeTime, value)
 		_node.ExpiresAt = value
 	}
-	if value, ok := sc.mutation.Live(); ok {
+	if value, ok := _c.mutation.Live(); ok {
 		_spec.SetField(subscription.FieldLive, field.TypeBool, value)
 		_node.Live = &value
 	}
-	if value, ok := sc.mutation.DeletedAt(); ok {
+	if value, ok := _c.mutation.DeletedAt(); ok {
 		_spec.SetField(subscription.FieldDeletedAt, field.TypeTime, value)
 		_node.DeletedAt = &value
 	}
-	if value, ok := sc.mutation.TTL(); ok {
+	if value, ok := _c.mutation.TTL(); ok {
 		_spec.SetField(subscription.FieldTTL, field.TypeString, value)
 		_node.TTL = value
 	}
-	if value, ok := sc.mutation.MessageTTL(); ok {
+	if value, ok := _c.mutation.MessageTTL(); ok {
 		_spec.SetField(subscription.FieldMessageTTL, field.TypeString, value)
 		_node.MessageTTL = value
 	}
-	if value, ok := sc.mutation.OrderedDelivery(); ok {
+	if value, ok := _c.mutation.OrderedDelivery(); ok {
 		_spec.SetField(subscription.FieldOrderedDelivery, field.TypeBool, value)
 		_node.OrderedDelivery = value
 	}
-	if value, ok := sc.mutation.Labels(); ok {
+	if value, ok := _c.mutation.Labels(); ok {
 		_spec.SetField(subscription.FieldLabels, field.TypeJSON, value)
 		_node.Labels = value
 	}
-	if value, ok := sc.mutation.MinBackoff(); ok {
+	if value, ok := _c.mutation.MinBackoff(); ok {
 		_spec.SetField(subscription.FieldMinBackoff, field.TypeString, value)
 		_node.MinBackoff = value
 	}
-	if value, ok := sc.mutation.MaxBackoff(); ok {
+	if value, ok := _c.mutation.MaxBackoff(); ok {
 		_spec.SetField(subscription.FieldMaxBackoff, field.TypeString, value)
 		_node.MaxBackoff = value
 	}
-	if value, ok := sc.mutation.PushEndpoint(); ok {
+	if value, ok := _c.mutation.PushEndpoint(); ok {
 		_spec.SetField(subscription.FieldPushEndpoint, field.TypeString, value)
 		_node.PushEndpoint = &value
 	}
-	if value, ok := sc.mutation.MessageFilter(); ok {
+	if value, ok := _c.mutation.MessageFilter(); ok {
 		_spec.SetField(subscription.FieldMessageFilter, field.TypeString, value)
 		_node.MessageFilter = &value
 	}
-	if value, ok := sc.mutation.MaxDeliveryAttempts(); ok {
+	if value, ok := _c.mutation.MaxDeliveryAttempts(); ok {
 		_spec.SetField(subscription.FieldMaxDeliveryAttempts, field.TypeInt32, value)
 		_node.MaxDeliveryAttempts = &value
 	}
-	if value, ok := sc.mutation.DeliveryDelay(); ok {
+	if value, ok := _c.mutation.DeliveryDelay(); ok {
 		_spec.SetField(subscription.FieldDeliveryDelay, field.TypeOther, value)
 		_node.DeliveryDelay = value
 	}
-	if nodes := sc.mutation.TopicIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.TopicIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -450,7 +450,7 @@ func (sc *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec)
 		_node.TopicID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := sc.mutation.DeliveriesIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.DeliveriesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -466,7 +466,7 @@ func (sc *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec)
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := sc.mutation.DeadLetterTopicIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.DeadLetterTopicIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -502,10 +502,10 @@ func (sc *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec)
 //			SetTopicID(v+v).
 //		}).
 //		Exec(ctx)
-func (sc *SubscriptionCreate) OnConflict(opts ...sql.ConflictOption) *SubscriptionUpsertOne {
-	sc.conflict = opts
+func (_c *SubscriptionCreate) OnConflict(opts ...sql.ConflictOption) *SubscriptionUpsertOne {
+	_c.conflict = opts
 	return &SubscriptionUpsertOne{
-		create: sc,
+		create: _c,
 	}
 }
 
@@ -515,10 +515,10 @@ func (sc *SubscriptionCreate) OnConflict(opts ...sql.ConflictOption) *Subscripti
 //	client.Subscription.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (sc *SubscriptionCreate) OnConflictColumns(columns ...string) *SubscriptionUpsertOne {
-	sc.conflict = append(sc.conflict, sql.ConflictColumns(columns...))
+func (_c *SubscriptionCreate) OnConflictColumns(columns ...string) *SubscriptionUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &SubscriptionUpsertOne{
-		create: sc,
+		create: _c,
 	}
 }
 
@@ -1169,16 +1169,16 @@ type SubscriptionCreateBulk struct {
 }
 
 // Save creates the Subscription entities in the database.
-func (scb *SubscriptionCreateBulk) Save(ctx context.Context) ([]*Subscription, error) {
-	if scb.err != nil {
-		return nil, scb.err
+func (_c *SubscriptionCreateBulk) Save(ctx context.Context) ([]*Subscription, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(scb.builders))
-	nodes := make([]*Subscription, len(scb.builders))
-	mutators := make([]Mutator, len(scb.builders))
-	for i := range scb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*Subscription, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := scb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*SubscriptionMutation)
@@ -1192,12 +1192,12 @@ func (scb *SubscriptionCreateBulk) Save(ctx context.Context) ([]*Subscription, e
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, scb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = scb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, scb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -1217,7 +1217,7 @@ func (scb *SubscriptionCreateBulk) Save(ctx context.Context) ([]*Subscription, e
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, scb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -1225,8 +1225,8 @@ func (scb *SubscriptionCreateBulk) Save(ctx context.Context) ([]*Subscription, e
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (scb *SubscriptionCreateBulk) SaveX(ctx context.Context) []*Subscription {
-	v, err := scb.Save(ctx)
+func (_c *SubscriptionCreateBulk) SaveX(ctx context.Context) []*Subscription {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -1234,14 +1234,14 @@ func (scb *SubscriptionCreateBulk) SaveX(ctx context.Context) []*Subscription {
 }
 
 // Exec executes the query.
-func (scb *SubscriptionCreateBulk) Exec(ctx context.Context) error {
-	_, err := scb.Save(ctx)
+func (_c *SubscriptionCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (scb *SubscriptionCreateBulk) ExecX(ctx context.Context) {
-	if err := scb.Exec(ctx); err != nil {
+func (_c *SubscriptionCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -1261,10 +1261,10 @@ func (scb *SubscriptionCreateBulk) ExecX(ctx context.Context) {
 //			SetTopicID(v+v).
 //		}).
 //		Exec(ctx)
-func (scb *SubscriptionCreateBulk) OnConflict(opts ...sql.ConflictOption) *SubscriptionUpsertBulk {
-	scb.conflict = opts
+func (_c *SubscriptionCreateBulk) OnConflict(opts ...sql.ConflictOption) *SubscriptionUpsertBulk {
+	_c.conflict = opts
 	return &SubscriptionUpsertBulk{
-		create: scb,
+		create: _c,
 	}
 }
 
@@ -1274,10 +1274,10 @@ func (scb *SubscriptionCreateBulk) OnConflict(opts ...sql.ConflictOption) *Subsc
 //	client.Subscription.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (scb *SubscriptionCreateBulk) OnConflictColumns(columns ...string) *SubscriptionUpsertBulk {
-	scb.conflict = append(scb.conflict, sql.ConflictColumns(columns...))
+func (_c *SubscriptionCreateBulk) OnConflictColumns(columns ...string) *SubscriptionUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &SubscriptionUpsertBulk{
-		create: scb,
+		create: _c,
 	}
 }
 

@@ -36,44 +36,44 @@ type MessageQuery struct {
 }
 
 // Where adds a new predicate for the MessageQuery builder.
-func (mq *MessageQuery) Where(ps ...predicate.Message) *MessageQuery {
-	mq.predicates = append(mq.predicates, ps...)
-	return mq
+func (_q *MessageQuery) Where(ps ...predicate.Message) *MessageQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (mq *MessageQuery) Limit(limit int) *MessageQuery {
-	mq.ctx.Limit = &limit
-	return mq
+func (_q *MessageQuery) Limit(limit int) *MessageQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (mq *MessageQuery) Offset(offset int) *MessageQuery {
-	mq.ctx.Offset = &offset
-	return mq
+func (_q *MessageQuery) Offset(offset int) *MessageQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (mq *MessageQuery) Unique(unique bool) *MessageQuery {
-	mq.ctx.Unique = &unique
-	return mq
+func (_q *MessageQuery) Unique(unique bool) *MessageQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (mq *MessageQuery) Order(o ...message.OrderOption) *MessageQuery {
-	mq.order = append(mq.order, o...)
-	return mq
+func (_q *MessageQuery) Order(o ...message.OrderOption) *MessageQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // QueryDeliveries chains the current query on the "deliveries" edge.
-func (mq *MessageQuery) QueryDeliveries() *DeliveryQuery {
-	query := (&DeliveryClient{config: mq.config}).Query()
+func (_q *MessageQuery) QueryDeliveries() *DeliveryQuery {
+	query := (&DeliveryClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := mq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := mq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -82,20 +82,20 @@ func (mq *MessageQuery) QueryDeliveries() *DeliveryQuery {
 			sqlgraph.To(delivery.Table, delivery.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, message.DeliveriesTable, message.DeliveriesColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryTopic chains the current query on the "topic" edge.
-func (mq *MessageQuery) QueryTopic() *TopicQuery {
-	query := (&TopicClient{config: mq.config}).Query()
+func (_q *MessageQuery) QueryTopic() *TopicQuery {
+	query := (&TopicClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := mq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := mq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -104,7 +104,7 @@ func (mq *MessageQuery) QueryTopic() *TopicQuery {
 			sqlgraph.To(topic.Table, topic.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, message.TopicTable, message.TopicColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
@@ -112,8 +112,8 @@ func (mq *MessageQuery) QueryTopic() *TopicQuery {
 
 // First returns the first Message entity from the query.
 // Returns a *NotFoundError when no Message was found.
-func (mq *MessageQuery) First(ctx context.Context) (*Message, error) {
-	nodes, err := mq.Limit(1).All(setContextOp(ctx, mq.ctx, ent.OpQueryFirst))
+func (_q *MessageQuery) First(ctx context.Context) (*Message, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -124,8 +124,8 @@ func (mq *MessageQuery) First(ctx context.Context) (*Message, error) {
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (mq *MessageQuery) FirstX(ctx context.Context) *Message {
-	node, err := mq.First(ctx)
+func (_q *MessageQuery) FirstX(ctx context.Context) *Message {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -134,9 +134,9 @@ func (mq *MessageQuery) FirstX(ctx context.Context) *Message {
 
 // FirstID returns the first Message ID from the query.
 // Returns a *NotFoundError when no Message ID was found.
-func (mq *MessageQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+func (_q *MessageQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
 	var ids []uuid.UUID
-	if ids, err = mq.Limit(1).IDs(setContextOp(ctx, mq.ctx, ent.OpQueryFirstID)); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -147,8 +147,8 @@ func (mq *MessageQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (mq *MessageQuery) FirstIDX(ctx context.Context) uuid.UUID {
-	id, err := mq.FirstID(ctx)
+func (_q *MessageQuery) FirstIDX(ctx context.Context) uuid.UUID {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -158,8 +158,8 @@ func (mq *MessageQuery) FirstIDX(ctx context.Context) uuid.UUID {
 // Only returns a single Message entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one Message entity is found.
 // Returns a *NotFoundError when no Message entities are found.
-func (mq *MessageQuery) Only(ctx context.Context) (*Message, error) {
-	nodes, err := mq.Limit(2).All(setContextOp(ctx, mq.ctx, ent.OpQueryOnly))
+func (_q *MessageQuery) Only(ctx context.Context) (*Message, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -174,8 +174,8 @@ func (mq *MessageQuery) Only(ctx context.Context) (*Message, error) {
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (mq *MessageQuery) OnlyX(ctx context.Context) *Message {
-	node, err := mq.Only(ctx)
+func (_q *MessageQuery) OnlyX(ctx context.Context) *Message {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -185,9 +185,9 @@ func (mq *MessageQuery) OnlyX(ctx context.Context) *Message {
 // OnlyID is like Only, but returns the only Message ID in the query.
 // Returns a *NotSingularError when more than one Message ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (mq *MessageQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+func (_q *MessageQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
 	var ids []uuid.UUID
-	if ids, err = mq.Limit(2).IDs(setContextOp(ctx, mq.ctx, ent.OpQueryOnlyID)); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -202,8 +202,8 @@ func (mq *MessageQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (mq *MessageQuery) OnlyIDX(ctx context.Context) uuid.UUID {
-	id, err := mq.OnlyID(ctx)
+func (_q *MessageQuery) OnlyIDX(ctx context.Context) uuid.UUID {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -211,18 +211,18 @@ func (mq *MessageQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 }
 
 // All executes the query and returns a list of Messages.
-func (mq *MessageQuery) All(ctx context.Context) ([]*Message, error) {
-	ctx = setContextOp(ctx, mq.ctx, ent.OpQueryAll)
-	if err := mq.prepareQuery(ctx); err != nil {
+func (_q *MessageQuery) All(ctx context.Context) ([]*Message, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*Message, *MessageQuery]()
-	return withInterceptors[[]*Message](ctx, mq, qr, mq.inters)
+	return withInterceptors[[]*Message](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (mq *MessageQuery) AllX(ctx context.Context) []*Message {
-	nodes, err := mq.All(ctx)
+func (_q *MessageQuery) AllX(ctx context.Context) []*Message {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -230,20 +230,20 @@ func (mq *MessageQuery) AllX(ctx context.Context) []*Message {
 }
 
 // IDs executes the query and returns a list of Message IDs.
-func (mq *MessageQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
-	if mq.ctx.Unique == nil && mq.path != nil {
-		mq.Unique(true)
+func (_q *MessageQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, mq.ctx, ent.OpQueryIDs)
-	if err = mq.Select(message.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(message.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (mq *MessageQuery) IDsX(ctx context.Context) []uuid.UUID {
-	ids, err := mq.IDs(ctx)
+func (_q *MessageQuery) IDsX(ctx context.Context) []uuid.UUID {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -251,17 +251,17 @@ func (mq *MessageQuery) IDsX(ctx context.Context) []uuid.UUID {
 }
 
 // Count returns the count of the given query.
-func (mq *MessageQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, mq.ctx, ent.OpQueryCount)
-	if err := mq.prepareQuery(ctx); err != nil {
+func (_q *MessageQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, mq, querierCount[*MessageQuery](), mq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*MessageQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (mq *MessageQuery) CountX(ctx context.Context) int {
-	count, err := mq.Count(ctx)
+func (_q *MessageQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -269,9 +269,9 @@ func (mq *MessageQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (mq *MessageQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, mq.ctx, ent.OpQueryExist)
-	switch _, err := mq.FirstID(ctx); {
+func (_q *MessageQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -282,8 +282,8 @@ func (mq *MessageQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (mq *MessageQuery) ExistX(ctx context.Context) bool {
-	exist, err := mq.Exist(ctx)
+func (_q *MessageQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -292,44 +292,44 @@ func (mq *MessageQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the MessageQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (mq *MessageQuery) Clone() *MessageQuery {
-	if mq == nil {
+func (_q *MessageQuery) Clone() *MessageQuery {
+	if _q == nil {
 		return nil
 	}
 	return &MessageQuery{
-		config:         mq.config,
-		ctx:            mq.ctx.Clone(),
-		order:          append([]message.OrderOption{}, mq.order...),
-		inters:         append([]Interceptor{}, mq.inters...),
-		predicates:     append([]predicate.Message{}, mq.predicates...),
-		withDeliveries: mq.withDeliveries.Clone(),
-		withTopic:      mq.withTopic.Clone(),
+		config:         _q.config,
+		ctx:            _q.ctx.Clone(),
+		order:          append([]message.OrderOption{}, _q.order...),
+		inters:         append([]Interceptor{}, _q.inters...),
+		predicates:     append([]predicate.Message{}, _q.predicates...),
+		withDeliveries: _q.withDeliveries.Clone(),
+		withTopic:      _q.withTopic.Clone(),
 		// clone intermediate query.
-		sql:  mq.sql.Clone(),
-		path: mq.path,
+		sql:  _q.sql.Clone(),
+		path: _q.path,
 	}
 }
 
 // WithDeliveries tells the query-builder to eager-load the nodes that are connected to
 // the "deliveries" edge. The optional arguments are used to configure the query builder of the edge.
-func (mq *MessageQuery) WithDeliveries(opts ...func(*DeliveryQuery)) *MessageQuery {
-	query := (&DeliveryClient{config: mq.config}).Query()
+func (_q *MessageQuery) WithDeliveries(opts ...func(*DeliveryQuery)) *MessageQuery {
+	query := (&DeliveryClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	mq.withDeliveries = query
-	return mq
+	_q.withDeliveries = query
+	return _q
 }
 
 // WithTopic tells the query-builder to eager-load the nodes that are connected to
 // the "topic" edge. The optional arguments are used to configure the query builder of the edge.
-func (mq *MessageQuery) WithTopic(opts ...func(*TopicQuery)) *MessageQuery {
-	query := (&TopicClient{config: mq.config}).Query()
+func (_q *MessageQuery) WithTopic(opts ...func(*TopicQuery)) *MessageQuery {
+	query := (&TopicClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	mq.withTopic = query
-	return mq
+	_q.withTopic = query
+	return _q
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -346,10 +346,10 @@ func (mq *MessageQuery) WithTopic(opts ...func(*TopicQuery)) *MessageQuery {
 //		GroupBy(message.FieldTopicID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (mq *MessageQuery) GroupBy(field string, fields ...string) *MessageGroupBy {
-	mq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &MessageGroupBy{build: mq}
-	grbuild.flds = &mq.ctx.Fields
+func (_q *MessageQuery) GroupBy(field string, fields ...string) *MessageGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &MessageGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = message.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -367,84 +367,84 @@ func (mq *MessageQuery) GroupBy(field string, fields ...string) *MessageGroupBy 
 //	client.Message.Query().
 //		Select(message.FieldTopicID).
 //		Scan(ctx, &v)
-func (mq *MessageQuery) Select(fields ...string) *MessageSelect {
-	mq.ctx.Fields = append(mq.ctx.Fields, fields...)
-	sbuild := &MessageSelect{MessageQuery: mq}
+func (_q *MessageQuery) Select(fields ...string) *MessageSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &MessageSelect{MessageQuery: _q}
 	sbuild.label = message.Label
-	sbuild.flds, sbuild.scan = &mq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a MessageSelect configured with the given aggregations.
-func (mq *MessageQuery) Aggregate(fns ...AggregateFunc) *MessageSelect {
-	return mq.Select().Aggregate(fns...)
+func (_q *MessageQuery) Aggregate(fns ...AggregateFunc) *MessageSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (mq *MessageQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range mq.inters {
+func (_q *MessageQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, mq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range mq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !message.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if mq.path != nil {
-		prev, err := mq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		mq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (mq *MessageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Message, error) {
+func (_q *MessageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Message, error) {
 	var (
 		nodes       = []*Message{}
-		_spec       = mq.querySpec()
+		_spec       = _q.querySpec()
 		loadedTypes = [2]bool{
-			mq.withDeliveries != nil,
-			mq.withTopic != nil,
+			_q.withDeliveries != nil,
+			_q.withTopic != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Message).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &Message{config: mq.config}
+		node := &Message{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
-	if len(mq.modifiers) > 0 {
-		_spec.Modifiers = mq.modifiers
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, mq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := mq.withDeliveries; query != nil {
-		if err := mq.loadDeliveries(ctx, query, nodes,
+	if query := _q.withDeliveries; query != nil {
+		if err := _q.loadDeliveries(ctx, query, nodes,
 			func(n *Message) { n.Edges.Deliveries = []*Delivery{} },
 			func(n *Message, e *Delivery) { n.Edges.Deliveries = append(n.Edges.Deliveries, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := mq.withTopic; query != nil {
-		if err := mq.loadTopic(ctx, query, nodes, nil,
+	if query := _q.withTopic; query != nil {
+		if err := _q.loadTopic(ctx, query, nodes, nil,
 			func(n *Message, e *Topic) { n.Edges.Topic = e }); err != nil {
 			return nil, err
 		}
@@ -452,7 +452,7 @@ func (mq *MessageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Mess
 	return nodes, nil
 }
 
-func (mq *MessageQuery) loadDeliveries(ctx context.Context, query *DeliveryQuery, nodes []*Message, init func(*Message), assign func(*Message, *Delivery)) error {
+func (_q *MessageQuery) loadDeliveries(ctx context.Context, query *DeliveryQuery, nodes []*Message, init func(*Message), assign func(*Message, *Delivery)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[uuid.UUID]*Message)
 	for i := range nodes {
@@ -482,7 +482,7 @@ func (mq *MessageQuery) loadDeliveries(ctx context.Context, query *DeliveryQuery
 	}
 	return nil
 }
-func (mq *MessageQuery) loadTopic(ctx context.Context, query *TopicQuery, nodes []*Message, init func(*Message), assign func(*Message, *Topic)) error {
+func (_q *MessageQuery) loadTopic(ctx context.Context, query *TopicQuery, nodes []*Message, init func(*Message), assign func(*Message, *Topic)) error {
 	ids := make([]uuid.UUID, 0, len(nodes))
 	nodeids := make(map[uuid.UUID][]*Message)
 	for i := range nodes {
@@ -512,27 +512,27 @@ func (mq *MessageQuery) loadTopic(ctx context.Context, query *TopicQuery, nodes 
 	return nil
 }
 
-func (mq *MessageQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := mq.querySpec()
-	if len(mq.modifiers) > 0 {
-		_spec.Modifiers = mq.modifiers
+func (_q *MessageQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
-	_spec.Node.Columns = mq.ctx.Fields
-	if len(mq.ctx.Fields) > 0 {
-		_spec.Unique = mq.ctx.Unique != nil && *mq.ctx.Unique
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, mq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (mq *MessageQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *MessageQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(message.Table, message.Columns, sqlgraph.NewFieldSpec(message.FieldID, field.TypeUUID))
-	_spec.From = mq.sql
-	if unique := mq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if mq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := mq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, message.FieldID)
 		for i := range fields {
@@ -540,24 +540,24 @@ func (mq *MessageQuery) querySpec() *sqlgraph.QuerySpec {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
-		if mq.withTopic != nil {
+		if _q.withTopic != nil {
 			_spec.Node.AddColumnOnce(message.FieldTopicID)
 		}
 	}
-	if ps := mq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := mq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := mq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := mq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -567,36 +567,36 @@ func (mq *MessageQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (mq *MessageQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(mq.driver.Dialect())
+func (_q *MessageQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(message.Table)
-	columns := mq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = message.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if mq.sql != nil {
-		selector = mq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if mq.ctx.Unique != nil && *mq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	for _, m := range mq.modifiers {
+	for _, m := range _q.modifiers {
 		m(selector)
 	}
-	for _, p := range mq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range mq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := mq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := mq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -605,27 +605,27 @@ func (mq *MessageQuery) sqlQuery(ctx context.Context) *sql.Selector {
 // ForUpdate locks the selected rows against concurrent updates, and prevent them from being
 // updated, deleted or "selected ... for update" by other sessions, until the transaction is
 // either committed or rolled-back.
-func (mq *MessageQuery) ForUpdate(opts ...sql.LockOption) *MessageQuery {
-	if mq.driver.Dialect() == dialect.Postgres {
-		mq.Unique(false)
+func (_q *MessageQuery) ForUpdate(opts ...sql.LockOption) *MessageQuery {
+	if _q.driver.Dialect() == dialect.Postgres {
+		_q.Unique(false)
 	}
-	mq.modifiers = append(mq.modifiers, func(s *sql.Selector) {
+	_q.modifiers = append(_q.modifiers, func(s *sql.Selector) {
 		s.ForUpdate(opts...)
 	})
-	return mq
+	return _q
 }
 
 // ForShare behaves similarly to ForUpdate, except that it acquires a shared mode lock
 // on any rows that are read. Other sessions can read the rows, but cannot modify them
 // until your transaction commits.
-func (mq *MessageQuery) ForShare(opts ...sql.LockOption) *MessageQuery {
-	if mq.driver.Dialect() == dialect.Postgres {
-		mq.Unique(false)
+func (_q *MessageQuery) ForShare(opts ...sql.LockOption) *MessageQuery {
+	if _q.driver.Dialect() == dialect.Postgres {
+		_q.Unique(false)
 	}
-	mq.modifiers = append(mq.modifiers, func(s *sql.Selector) {
+	_q.modifiers = append(_q.modifiers, func(s *sql.Selector) {
 		s.ForShare(opts...)
 	})
-	return mq
+	return _q
 }
 
 // MessageGroupBy is the group-by builder for Message entities.
@@ -635,41 +635,41 @@ type MessageGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (mgb *MessageGroupBy) Aggregate(fns ...AggregateFunc) *MessageGroupBy {
-	mgb.fns = append(mgb.fns, fns...)
-	return mgb
+func (_g *MessageGroupBy) Aggregate(fns ...AggregateFunc) *MessageGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (mgb *MessageGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, mgb.build.ctx, ent.OpQueryGroupBy)
-	if err := mgb.build.prepareQuery(ctx); err != nil {
+func (_g *MessageGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*MessageQuery, *MessageGroupBy](ctx, mgb.build, mgb, mgb.build.inters, v)
+	return scanWithInterceptors[*MessageQuery, *MessageGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (mgb *MessageGroupBy) sqlScan(ctx context.Context, root *MessageQuery, v any) error {
+func (_g *MessageGroupBy) sqlScan(ctx context.Context, root *MessageQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(mgb.fns))
-	for _, fn := range mgb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*mgb.flds)+len(mgb.fns))
-		for _, f := range *mgb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*mgb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := mgb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -683,27 +683,27 @@ type MessageSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (ms *MessageSelect) Aggregate(fns ...AggregateFunc) *MessageSelect {
-	ms.fns = append(ms.fns, fns...)
-	return ms
+func (_s *MessageSelect) Aggregate(fns ...AggregateFunc) *MessageSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (ms *MessageSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, ms.ctx, ent.OpQuerySelect)
-	if err := ms.prepareQuery(ctx); err != nil {
+func (_s *MessageSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*MessageQuery, *MessageSelect](ctx, ms.MessageQuery, ms, ms.inters, v)
+	return scanWithInterceptors[*MessageQuery, *MessageSelect](ctx, _s.MessageQuery, _s, _s.inters, v)
 }
 
-func (ms *MessageSelect) sqlScan(ctx context.Context, root *MessageQuery, v any) error {
+func (_s *MessageSelect) sqlScan(ctx context.Context, root *MessageQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(ms.fns))
-	for _, fn := range ms.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*ms.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -711,7 +711,7 @@ func (ms *MessageSelect) sqlScan(ctx context.Context, root *MessageQuery, v any)
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := ms.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
