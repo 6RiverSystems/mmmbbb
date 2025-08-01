@@ -223,7 +223,9 @@ func TestGrpcCompat(t *testing.T) {
 					for i, t := range tt.topics {
 						expected[i] = t.String() // Name
 					}
-					ti := psc.TopicAdminClient.ListTopics(ctx, nil)
+					ti := psc.TopicAdminClient.ListTopics(ctx, &pubsubpb.ListTopicsRequest{
+						Project: "projects/" + psc.Project(),
+					})
 					var actual []string
 					for topic, err := ti.Next(); ; topic, err = ti.Next() {
 						if err == iterator.Done {
@@ -267,7 +269,7 @@ func TestGrpcCompat(t *testing.T) {
 					var actual []string
 					for sub, err := si.Next(); ; sub, err = si.Next() {
 						if err == iterator.Done {
-							assert.Nil(t, sub)
+							assert.Empty(t, sub)
 							break
 						}
 						assert.NoError(t, err)
@@ -313,7 +315,9 @@ func TestGrpcCompat(t *testing.T) {
 					for i, s := range tt.subs {
 						expected[i] = s.String() // Name
 					}
-					si := psc.SubscriptionAdminClient.ListSubscriptions(ctx, nil)
+					si := psc.SubscriptionAdminClient.ListSubscriptions(ctx, &pubsubpb.ListSubscriptionsRequest{
+						Project: "projects/" + psc.Project(),
+					})
 					var actual []string
 					for sub, err := si.Next(); ; sub, err = si.Next() {
 						if err == iterator.Done {
@@ -345,7 +349,7 @@ func TestGrpcCompat(t *testing.T) {
 					require.NoError(t, err)
 					assert.Empty(t, cfg.KmsKeyName)
 					assert.Empty(t, cfg.Labels)
-					assert.Empty(t, cfg.MessageStoragePolicy.AllowedPersistenceRegions)
+					assert.Empty(t, cfg.MessageStoragePolicy.GetAllowedPersistenceRegions())
 
 					cfg, err = tac.UpdateTopic(ctx, &pubsubpb.UpdateTopicRequest{
 						Topic: &pubsubpb.Topic{
@@ -361,7 +365,7 @@ func TestGrpcCompat(t *testing.T) {
 					require.NoError(t, err)
 					assert.Empty(t, cfg.KmsKeyName)
 					assert.Equal(t, map[string]string{"forTest": t.Name()}, cfg.Labels)
-					assert.Empty(t, cfg.MessageStoragePolicy.AllowedPersistenceRegions)
+					assert.Empty(t, cfg.MessageStoragePolicy.GetAllowedPersistenceRegions())
 
 					_, err = tac.GetTopic(ctx, &pubsubpb.GetTopicRequest{Topic: tName})
 					require.NoError(t, err)
@@ -436,7 +440,7 @@ func TestGrpcCompat(t *testing.T) {
 					assert.Nil(t, cfg.DeadLetterPolicy)
 					assert.False(t, cfg.Detached)
 					assert.False(t, cfg.EnableMessageOrdering)
-					assert.Equal(t, 42*time.Hour, cfg.ExpirationPolicy)
+					assert.Equal(t, 42*time.Hour, cfg.ExpirationPolicy.GetTtl().AsDuration())
 					assert.Empty(t, cfg.Filter)
 					assert.Equal(t, map[string]string{"forTest": t.Name()}, cfg.Labels)
 					assert.Zero(t, cfg.PushConfig)

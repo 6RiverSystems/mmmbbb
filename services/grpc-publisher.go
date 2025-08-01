@@ -23,6 +23,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"strings"
 
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
@@ -53,6 +54,9 @@ func (s *publisherServer) ListTopics(
 	var pageSize int32 = 100
 	if req.PageSize > 0 && req.PageSize < pageSize {
 		pageSize = req.PageSize
+	}
+	if !strings.HasPrefix(req.Project, "projects/") {
+		return nil, status.Error(codes.InvalidArgument, "Invalid project ID, must start with 'projects/'")
 	}
 
 	var resp *pubsubpb.ListTopicsResponse

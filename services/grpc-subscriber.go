@@ -23,6 +23,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"strings"
 	"sync"
 	"time"
 
@@ -353,6 +354,9 @@ func (s *subscriberServer) ListSubscriptions(
 	var pageSize int32 = 100
 	if req.PageSize > 0 && req.PageSize < pageSize {
 		pageSize = req.PageSize
+	}
+	if !strings.HasPrefix(req.Project, "projects/") {
+		return nil, status.Error(codes.InvalidArgument, "Invalid project ID, must start with 'projects/'")
 	}
 
 	var resp *pubsubpb.ListSubscriptionsResponse
