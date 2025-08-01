@@ -29,12 +29,16 @@ import (
 	"sync/atomic"
 	"time"
 
-	"cloud.google.com/go/pubsub" //nolint:staticcheck // https://github.com/6RiverSystems/mmmbbb/issues/521
+	"cloud.google.com/go/pubsub/v2"
 	"github.com/google/uuid"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/option"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/protobuf/types/known/durationpb"
+
+	"go.6river.tech/mmmbbb/grpc/pubsubpb"
+	"go.6river.tech/mmmbbb/internal"
 )
 
 func main() {
@@ -61,22 +65,30 @@ func main() {
 	} else {
 		os.Setenv("PUBSUB_EMULATOR_HOST", "localhost:8802")
 	}
-	psc, err := pubsub.NewClient(ctx, "go-compat-stress", pscOpts...)
+	const projectID = "go-compat-stress"
+	psc, err := pubsub.NewClient(ctx, projectID, pscOpts...)
 	panicIf(err)
-	id := "go-stress-" + uuid.NewString()
-	t, err := psc.CreateTopic(ctx, id)
+	_id := "go-stress-" + uuid.NewString()
+	tac := psc.TopicAdminClient
+	tm, err := tac.CreateTopic(ctx, &pubsubpb.Topic{Name: internal.PSTopicName(projectID, _id)})
 	panicIf(err)
+	defer func() { panicIf(tac.DeleteTopic(ctx, &pubsubpb.DeleteTopicRequest{Topic: tm.Name})) }()
+	t := psc.Publisher(tm.Name)
 	t.EnableMessageOrdering = orderSplit != 0
-	defer func() { panicIf(t.Delete(ctx)) }()
-	s, err := psc.CreateSubscription(ctx, id, pubsub.SubscriptionConfig{
-		Topic:                 t,
+	sac := psc.SubscriptionAdminClient
+	sm, err := sac.CreateSubscription(ctx, &pubsubpb.Subscription{
+		Name:                  internal.PSSubName(projectID, _id),
+		Topic:                 tm.Name,
 		EnableMessageOrdering: orderSplit != 0,
-		RetryPolicy: &pubsub.RetryPolicy{
-			MinimumBackoff: time.Second * 3 / 2,
+		RetryPolicy: &pubsubpb.RetryPolicy{
+			MinimumBackoff: durationpb.New(time.Second * 3 / 2),
 		},
 	})
 	panicIf(err)
-	defer func() { panicIf(s.Delete(ctx)) }()
+	defer func() {
+		panicIf(sac.DeleteSubscription(ctx, &pubsubpb.DeleteSubscriptionRequest{Subscription: sm.Name}))
+	}()
+	s := psc.Subscriber(sm.Name)
 	// configure the flow control same as our typical apps
 	s.ReceiveSettings.MaxOutstandingMessages = 20
 	// scaling up from the default of 10 can make it go faster if the emulator can

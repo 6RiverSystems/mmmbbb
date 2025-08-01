@@ -65,5 +65,5 @@ cp -avf \
 
 cp -avf "${td}/google/pubsub/v1/pubsub.swagger.json" "${td}/google/pubsub/v1/schema.swagger.json" .
 
-./gen-types.sh pubsubpb cloud.google.com/go/pubsub/apiv1/pubsubpb "${td}/google/pubsub/v1/pubsub.pb.go" pubsubpb/pubsub-types.go
-./gen-types.sh pubsubpb cloud.google.com/go/pubsub/apiv1/pubsubpb "${td}/google/pubsub/v1/schema.pb.go" pubsubpb/schema-types.go
+./gen-types.sh pubsubpb cloud.google.com/go/pubsub/v2/apiv1/pubsubpb "${td}/google/pubsub/v1/pubsub.pb.go" pubsubpb/pubsub-types.go
+./gen-types.sh pubsubpb cloud.google.com/go/pubsub/v2/apiv1/pubsubpb "${td}/google/pubsub/v1/schema.pb.go" pubsubpb/schema-types.go

@@ -47,6 +47,15 @@ func monitorPusher(ctx context.Context, pusher *actions.HttpPushStreamer) monito
 	return monitoredPusher{eg, egCtx, pusher, cancel}
 }
 
+type waitMonitorResult int
+
+const (
+	waitMonitorTimeout = iota
+	waitMonitorContextDone
+	waitMonitorNotified
+	waitMonitorEnded
+)
+
 func waitPusherMonitors(
 	ctx context.Context,
 	timeout time.Duration,

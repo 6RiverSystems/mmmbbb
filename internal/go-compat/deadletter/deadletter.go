@@ -30,9 +30,13 @@ import (
 	"sync/atomic"
 	"time"
 
-	"cloud.google.com/go/pubsub" //nolint:staticcheck // https://github.com/6RiverSystems/mmmbbb/issues/521
+	"cloud.google.com/go/pubsub/v2"
+	"cloud.google.com/go/pubsub/v2/apiv1/pubsubpb"
 	"github.com/google/uuid"
 	"golang.org/x/sync/errgroup"
+	"google.golang.org/protobuf/types/known/durationpb"
+
+	"go.6river.tech/mmmbbb/internal"
 )
 
 func main() {
@@ -46,33 +50,46 @@ func main() {
 	psc, err := pubsub.NewClient(ctx, projectID)
 	panicIf(err)
 	uniq := uuid.NewString()
-	primaryID := "go-deadletter-primary-" + uniq
-	deadletterID := "go-deadletter-dead-" + uniq
-	primaryTopic, err := psc.CreateTopic(ctx, primaryID)
+	tac := psc.TopicAdminClient
+	primaryTopicMeta, err := tac.CreateTopic(ctx, &pubsubpb.Topic{
+		Name: internal.PSTopicName(projectID, "go-deadletter-primary-"+uniq),
+	})
 	panicIf(err)
-	defer func() { panicIf(primaryTopic.Delete(ctx)) }()
-	deadletterTopic, err := psc.CreateTopic(ctx, deadletterID)
+	defer func() { panicIf(tac.DeleteTopic(ctx, &pubsubpb.DeleteTopicRequest{Topic: primaryTopicMeta.Name})) }()
+	deadletterTopicMeta, err := tac.CreateTopic(ctx, &pubsubpb.Topic{
+		Name: internal.PSTopicName(projectID, "go-deadletter-dead-"+uniq),
+	})
 	panicIf(err)
-	defer func() { panicIf(deadletterTopic.Delete(ctx)) }()
+	defer func() { panicIf(tac.DeleteTopic(ctx, &pubsubpb.DeleteTopicRequest{Topic: deadletterTopicMeta.Name})) }()
 
-	primarySub, err := psc.CreateSubscription(ctx, primaryID, pubsub.SubscriptionConfig{
-		Topic: primaryTopic,
-		RetryPolicy: &pubsub.RetryPolicy{
-			MinimumBackoff: time.Second * 3 / 2,
+	sac := psc.SubscriptionAdminClient
+	primarySubMeta, err := sac.CreateSubscription(ctx, &pubsubpb.Subscription{
+		Name:  internal.PSSubName(projectID, "go-deadletter-primary-"+uniq),
+		Topic: primaryTopicMeta.Name,
+		RetryPolicy: &pubsubpb.RetryPolicy{
+			MinimumBackoff: durationpb.New(time.Second * 3 / 2),
 		},
-		DeadLetterPolicy: &pubsub.DeadLetterPolicy{
-			DeadLetterTopic: deadletterTopic.String(),
+		DeadLetterPolicy: &pubsubpb.DeadLetterPolicy{
+			DeadLetterTopic: deadletterTopicMeta.String(),
 			// 5 is the minimum google allows, mmmbbb permits as low as 1
 			MaxDeliveryAttempts: 5,
 		},
 	})
 	panicIf(err)
-	defer func() { panicIf(primarySub.Delete(ctx)) }()
-	deadletterSub, err := psc.CreateSubscription(ctx, deadletterID, pubsub.SubscriptionConfig{
-		Topic: deadletterTopic,
+	defer func() {
+		panicIf(sac.DeleteSubscription(ctx, &pubsubpb.DeleteSubscriptionRequest{Subscription: primarySubMeta.Name}))
+	}()
+	deadletterSubMeta, err := sac.CreateSubscription(ctx, &pubsubpb.Subscription{
+		Name:  internal.PSSubName(projectID, "go-deadletter-dead-"+uniq),
+		Topic: deadletterTopicMeta.Name,
 	})
 	panicIf(err)
-	defer func() { panicIf(deadletterSub.Delete(ctx)) }()
+	defer func() {
+		panicIf(sac.DeleteSubscription(ctx, &pubsubpb.DeleteSubscriptionRequest{Subscription: deadletterSubMeta.Name}))
+	}()
+	primaryPublisher := psc.Publisher(primaryTopicMeta.Name)
+	primarySub := psc.Subscriber(primarySubMeta.Name)
+	deadletterSub := psc.Subscriber(deadletterSubMeta.Name)
 	primarySub.ReceiveSettings.MaxOutstandingMessages = 20
 	deadletterSub.ReceiveSettings.MaxOutstandingMessages = 20
 
@@ -126,7 +143,7 @@ func main() {
 			case <-egCtx.Done():
 				fmt.Printf("canceled after queueing %d messages\n", i)
 				return egCtx.Err()
-			case pubs <- primaryTopic.Publish(egCtx, &pubsub.Message{
+			case pubs <- primaryPublisher.Publish(egCtx, &pubsub.Message{
 				Data: payload,
 				Attributes: map[string]string{
 					"i": strconv.Itoa(i),
