@@ -755,9 +755,10 @@ func TestGrpcCompat(t *testing.T) {
 			steps: []testStep{
 				func(t *testing.T, ctx context.Context, client *ent.Client, tt *test, psc *pubsub.Client) {
 					subM, err := psc.SubscriptionAdminClient.CreateSubscription(ctx, &pubsubpb.Subscription{
-						Name:   internal.PSSubName(psc.Project(), safeID(t)),
-						Topic:  tt.topics[0].String(), // Name
-						Filter: "attributes:deliver",
+						Name:                  internal.PSSubName(psc.Project(), safeID(t)),
+						Topic:                 tt.topics[0].String(), // Name
+						Filter:                "attributes:deliver",
+						EnableMessageOrdering: true,
 					})
 					require.NoError(t, err)
 					sub := psc.Subscriber(subM.Name)
