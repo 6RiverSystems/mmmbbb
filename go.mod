@@ -3,8 +3,8 @@ module go.6river.tech/mmmbbb
 go 1.24.0
 
 require (
-	cloud.google.com/go/pubsub v1.49.0
-	entgo.io/ent v0.14.4
+	cloud.google.com/go/pubsub v1.50.0
+	entgo.io/ent v0.14.5
 	github.com/Depado/ginprom v1.8.1
 	github.com/alecthomas/participle/v2 v2.1.4
 	github.com/getkin/kin-openapi v0.132.0
@@ -21,31 +21,32 @@ require (
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/magefile/mage v1.15.0
-	github.com/mattn/go-sqlite3 v1.14.28
+	github.com/mattn/go-sqlite3 v1.14.30
 	github.com/ory/dockertest/v3 v3.12.0
-	github.com/prometheus/client_golang v1.22.0
+	github.com/prometheus/client_golang v1.23.0
 	github.com/rs/cors/wrapper/gin v0.0.0-20240830163046-1084d89a1692
 	github.com/rs/zerolog v1.34.0
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/fx v1.24.0
 	golang.org/x/sync v0.16.0
-	google.golang.org/api v0.241.0
-	google.golang.org/grpc v1.73.0
+	google.golang.org/api v0.243.0
+	google.golang.org/grpc v1.74.2
 	google.golang.org/protobuf v1.36.6
-	modernc.org/sqlite v1.38.0
+	modernc.org/sqlite v1.38.2
 )
 
 require (
 	al.essio.dev/pkg/shellescape v1.6.0 // indirect
 	ariga.io/atlas v0.35.0 // indirect
 	cel.dev/expr v0.24.0 // indirect
-	cloud.google.com/go v0.121.3 // indirect
-	cloud.google.com/go/auth v0.16.2 // indirect
+	cloud.google.com/go v0.121.4 // indirect
+	cloud.google.com/go/auth v0.16.3 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
 	cloud.google.com/go/compute/metadata v0.7.0 // indirect
 	cloud.google.com/go/iam v1.5.2 // indirect
 	cloud.google.com/go/longrunning v0.6.7 // indirect
 	cloud.google.com/go/monitoring v1.24.2 // indirect
+	cloud.google.com/go/pubsub/v2 v2.0.0 // indirect
 	cloud.google.com/go/spanner v1.83.0 // indirect
 	cloud.google.com/go/storage v1.55.0 // indirect
 	dario.cat/mergo v1.0.1 // indirect
@@ -203,8 +204,8 @@ require (
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
-	github.com/prometheus/common v0.63.0 // indirect
-	github.com/prometheus/procfs v0.15.1 // indirect
+	github.com/prometheus/common v0.65.0 // indirect
+	github.com/prometheus/procfs v0.16.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rs/cors v1.11.1 // indirect
@@ -277,7 +278,7 @@ require (
 	golang.org/x/tools v0.35.0 // indirect
 	golang.org/x/vuln v1.1.4 // indirect
 	google.golang.org/genproto v0.0.0-20250715232539-7130f93afb79 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20250715232539-7130f93afb79 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20250721164621-a45f3dfb1074 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250715232539-7130f93afb79 // indirect
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.5.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
@@ -285,7 +286,7 @@ require (
 	k8s.io/apimachinery v0.33.3 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	k8s.io/utils v0.0.0-20250604170112-4c0f3b243397 // indirect
-	modernc.org/libc v1.65.10 // indirect
+	modernc.org/libc v1.66.3 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 	sigs.k8s.io/kind v0.29.0 // indirect
