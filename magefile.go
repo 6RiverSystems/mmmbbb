@@ -463,9 +463,7 @@ func (Lint) GoLines(ctx context.Context) error {
 		}
 	}
 	for range runtime.GOMAXPROCS(0) {
-		wwg.Add(1)
-		go func() {
-			defer wwg.Done()
+		wwg.Go(func() {
 			chunk := make([]string, 0, chunkSize)
 			for f := range queue {
 				chunk = append(chunk, f)
@@ -477,18 +475,15 @@ func (Lint) GoLines(ctx context.Context) error {
 			if len(chunk) != 0 {
 				doChunk(chunk)
 			}
-		}()
+		})
 	}
 	var errs []error
-	ewg.Add(1)
-	go func() { defer ewg.Done(); wwg.Wait(); close(errCh) }()
-	ewg.Add(1)
-	go func() {
-		defer ewg.Done()
+	ewg.Go(func() { ; wwg.Wait(); close(errCh) })
+	ewg.Go(func() {
 		for err := range errCh {
 			errs = append(errs, err)
 		}
-	}()
+	})
 	walkErr := filepath.WalkDir(".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err

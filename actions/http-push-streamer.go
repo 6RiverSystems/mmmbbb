@@ -276,10 +276,7 @@ func (c *httpPushStreamConn) Send(ctx context.Context, del *SubscriptionMessageD
 	}
 	req.Header.Set("content-type", "application/json")
 
-	c.wg.Add(1)
-	go func() {
-		defer c.wg.Done()
-
+	c.wg.Go(func() {
 		start := time.Now()
 		resp, err := c.client.Do(req)
 		dur := time.Since(start)
@@ -360,7 +357,7 @@ func (c *httpPushStreamConn) Send(ctx context.Context, del *SubscriptionMessageD
 		case q <- del.ID:
 		case <-ctx.Done():
 		}
-	}()
+	})
 
 	return nil
 }

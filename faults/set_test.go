@@ -181,17 +181,15 @@ func TestSet_Check_Race(t *testing.T) {
 		s := NewSet(t.Name() + strconv.Itoa(n))
 		s.faults["op"] = []*Description{{"op", nil, onFault, 1, "grpc.NotFound"}}
 		wg := &sync.WaitGroup{}
-		wg.Add(concurrent)
 		// use a wee spinlock to get all the goroutines to wake up as close to the
 		// same time as possible
 		spin := int32(1)
 		for range concurrent {
-			go func() {
+			wg.Go(func() {
 				for atomic.LoadInt32(&spin) != 0 {
 				}
 				assert.Nil(t, s.Check("op", nil))
-				wg.Done()
-			}()
+			})
 		}
 		atomic.StoreInt32(&spin, 0)
 		wg.Wait()

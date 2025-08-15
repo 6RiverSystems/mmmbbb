@@ -546,6 +546,7 @@ func newPushReceiver(
 		BaseContext: func(net.Listener) context.Context { return ctx },
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			wg.Add(1)
+			defer wg.Done()
 			assert.Equal(t, http.MethodPost, r.Method)
 			body, err := io.ReadAll(r.Body)
 			assert.NoError(t, err)
@@ -563,7 +564,6 @@ func newPushReceiver(
 			case <-time.After(time.Second):
 				assert.Fail(t, "unable to deliver received message to receiver channel")
 			}
-			wg.Done()
 		}),
 	}
 
