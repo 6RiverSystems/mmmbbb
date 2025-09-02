@@ -369,10 +369,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1Schema",
-              "required": [
-                "schema"
-              ]
+              "$ref": "#/definitions/v1Schema"
             }
           },
           {
