@@ -13,8 +13,8 @@ importers:
         version: 5.2.0
     devDependencies:
       '@types/node':
-        specifier: ^24.6.1
-        version: 24.6.1
+        specifier: ^24.10.1
+        version: 24.10.1
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -110,8 +110,8 @@ packages:
     resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
     engines: {node: '>= 10'}
 
-  '@types/node@24.6.1':
-    resolution: {integrity: sha512-ljvjjs3DNXummeIaooB4cLBKg2U6SPI6Hjra/9rRIy7CpM0HpLtG9HptkMKAb4HYWy5S7HUvJEuWgr/y0U8SHw==}
+  '@types/node@24.10.1':
+    resolution: {integrity: sha512-GNWcUTRBgIRJD5zj+Tq0fKOJ5XZajIiBroOF0yvj2bSU1WvNdYS/dn9UxwsujGW4JX06dnHyjV2y9rRaybH0iQ==}
 
   abort-controller@3.0.0:
     resolution: {integrity: sha512-h8lQ8tacZYnR3vNQTgibj+tODHI5/+l06Au2Pcriv/Gmet0eaj4TwWH41sO9wnHDiQsEj19q0drzdWdeAHtweg==}
@@ -348,8 +348,8 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  undici-types@7.13.0:
-    resolution: {integrity: sha512-Ov2Rr9Sx+fRgagJ5AX0qvItZG/JKKoBRAVITs1zk7IqZGTJUwgUr7qoYBpWwakpWilTZFM98rG/AFRocu10iIQ==}
+  undici-types@7.16.0:
+    resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
 
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
@@ -466,9 +466,9 @@ snapshots:
 
   '@tootallnate/once@2.0.0': {}
 
-  '@types/node@24.6.1':
+  '@types/node@24.10.1':
     dependencies:
-      undici-types: 7.13.0
+      undici-types: 7.16.0
 
   abort-controller@3.0.0:
     dependencies:
@@ -686,7 +686,7 @@ snapshots:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
-      '@types/node': 24.6.1
+      '@types/node': 24.10.1
       long: 5.3.2
 
   readable-stream@3.6.2:
@@ -739,7 +739,7 @@ snapshots:
 
   typescript@5.9.3: {}
 
-  undici-types@7.13.0: {}
+  undici-types@7.16.0: {}
 
   util-deprecate@1.0.2: {}
 
