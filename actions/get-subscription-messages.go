@@ -360,7 +360,7 @@ func (a *GetSubscriptionMessages) nextAttempt(
 		return nil, err
 	}
 	nextExpires, err := a.buildDeliveryQuery(tx, sub).
-		Order(ent.Asc(delivery.FieldAttemptAt)).
+		Order(ent.Asc(delivery.FieldExpiresAt)).
 		First(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {

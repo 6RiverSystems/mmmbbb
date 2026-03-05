@@ -21,6 +21,7 @@ package actions
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -36,6 +37,21 @@ import (
 	"go.6river.tech/mmmbbb/logging"
 )
 
+var parsedFilterCache sync.Map // map[string]*filter.Filter
+
+func getCachedFilter(name, filterStr string) (*filter.Filter, error) {
+	if cached, ok := parsedFilterCache.Load(filterStr); ok {
+		return cached.(*filter.Filter), nil
+	}
+	f, err := filter.Parser.ParseString(name, filterStr)
+	if err != nil {
+		return nil, err
+	}
+	// concurrent stores of the same key are harmless
+	parsedFilterCache.Store(filterStr, f)
+	return f, nil
+}
+
 func deliverToSubscription(
 	ctx context.Context,
 	tx *ent.Tx,
@@ -45,8 +61,7 @@ func deliverToSubscription(
 	loggerName string,
 ) (*ent.DeliveryCreate, error) {
 	if s.MessageFilter != nil && *s.MessageFilter != "" {
-		// TODO: cache parsed filters
-		if f, err := filter.Parser.ParseString(s.Name, *s.MessageFilter); err != nil {
+		if f, err := getCachedFilter(s.Name, *s.MessageFilter); err != nil {
 			// filter errors should have been caught at subscription create/update.
 			// do not break delivery because one sub has a broken filter, assume the
 			// filter matches nothing and drop the message.

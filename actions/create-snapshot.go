@@ -138,29 +138,40 @@ func (a *CreateSnapshot) Execute(ctx context.Context, tx *ent.Tx) error {
 		create = create.SetAckedMessagesBefore(oldestUnAcked.PublishedAt)
 		// acked messages might have a completed delivery, or they might have no
 		// delivery at all, so we left join the topic messages to find both.
-		// TODO: this may return a LOT of data, paginate it
-		ackedIDs, err := tx.Message.Query().
-			Where(
-				message.TopicID(sub.TopicID),
-				message.PublishedAtGTE(oldestUnAcked.PublishedAt),
-				func(s *sql.Selector) {
-					t := sql.Table(delivery.Table).As("d")
-					s.LeftJoin(t).On(s.C(message.FieldID), t.C(delivery.FieldMessageID))
-					s.Where(sql.And(
-						// only care about deliveries for the same sub
-						sql.EQ(t.C(delivery.FieldSubscriptionID), sub.ID),
-						sql.Or(
-							// no delivery
-							sql.IsNull(t.C(delivery.FieldID)),
-							// completed delivery
-							sql.NotNull(t.C(delivery.FieldCompletedAt)),
-						),
-					))
-				},
-			).
-			IDs(ctx)
-		if err != nil {
-			return err
+		// Paginate to avoid loading an unbounded result set into memory.
+		const ackedIDsPageSize = 1000
+		var ackedIDs []uuid.UUID
+		for offset := 0; ; offset += ackedIDsPageSize {
+			page, err := tx.Message.Query().
+				Where(
+					message.TopicID(sub.TopicID),
+					message.PublishedAtGTE(oldestUnAcked.PublishedAt),
+					func(s *sql.Selector) {
+						t := sql.Table(delivery.Table).As("d")
+						s.LeftJoin(t).On(s.C(message.FieldID), t.C(delivery.FieldMessageID))
+						s.Where(sql.And(
+							// only care about deliveries for the same sub
+							sql.EQ(t.C(delivery.FieldSubscriptionID), sub.ID),
+							sql.Or(
+								// no delivery
+								sql.IsNull(t.C(delivery.FieldID)),
+								// completed delivery
+								sql.NotNull(t.C(delivery.FieldCompletedAt)),
+							),
+						))
+					},
+				).
+				Order(message.ByID()).
+				Limit(ackedIDsPageSize).
+				Offset(offset).
+				IDs(ctx)
+			if err != nil {
+				return err
+			}
+			ackedIDs = append(ackedIDs, page...)
+			if len(page) < ackedIDsPageSize {
+				break
+			}
 		}
 		create = create.SetAckedMessageIDs(ackedIDs)
 	}
