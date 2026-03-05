@@ -41,7 +41,7 @@
         "parameters": [
           {
             "name": "name_1",
-            "description": "Required. The name of the subscription. It must have the format\n`\"projects/{project}/subscriptions/{subscription}\"`. `{subscription}` must\nstart with a letter, and contain only letters (`[A-Za-z]`), numbers\n(`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),\nplus (`+`) or percent signs (`%`). It must be between 3 and 255 characters\nin length, and it must not start with `\"goog\"`.",
+            "description": "Required. Identifier. The name of the subscription. It must have the format\n`\"projects/{project}/subscriptions/{subscription}\"`. `{subscription}` must\nstart with a letter, and contain only letters (`[A-Za-z]`), numbers\n(`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),\nplus (`+`) or percent signs (`%`). It must be between 3 and 255 characters\nin length, and it must not start with `\"goog\"`.",
             "in": "path",
             "required": true,
             "type": "string",
@@ -123,7 +123,7 @@
         "parameters": [
           {
             "name": "name",
-            "description": "Required. The name of the topic. It must have the format\n`\"projects/{project}/topics/{topic}\"`. `{topic}` must start with a letter,\nand contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),\nunderscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent\nsigns (`%`). It must be between 3 and 255 characters in length, and it\nmust not start with `\"goog\"`.",
+            "description": "Required. Identifier. The name of the topic. It must have the format\n`\"projects/{project}/topics/{topic}\"`. `{topic}` must start with a letter,\nand contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),\nunderscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent\nsigns (`%`). It must be between 3 and 255 characters in length, and it\nmust not start with `\"goog\"`.",
             "in": "path",
             "required": true,
             "type": "string",
@@ -414,7 +414,7 @@
         "parameters": [
           {
             "name": "subscription.name",
-            "description": "Required. The name of the subscription. It must have the format\n`\"projects/{project}/subscriptions/{subscription}\"`. `{subscription}` must\nstart with a letter, and contain only letters (`[A-Za-z]`), numbers\n(`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),\nplus (`+`) or percent signs (`%`). It must be between 3 and 255 characters\nin length, and it must not start with `\"goog\"`.",
+            "description": "Required. Identifier. The name of the subscription. It must have the format\n`\"projects/{project}/subscriptions/{subscription}\"`. `{subscription}` must\nstart with a letter, and contain only letters (`[A-Za-z]`), numbers\n(`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),\nplus (`+`) or percent signs (`%`). It must be between 3 and 255 characters\nin length, and it must not start with `\"goog\"`.",
             "in": "path",
             "required": true,
             "type": "string",
@@ -763,7 +763,7 @@
         "parameters": [
           {
             "name": "topic.name",
-            "description": "Required. The name of the topic. It must have the format\n`\"projects/{project}/topics/{topic}\"`. `{topic}` must start with a letter,\nand contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),\nunderscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent\nsigns (`%`). It must be between 3 and 255 characters in length, and it\nmust not start with `\"goog\"`.",
+            "description": "Required. Identifier. The name of the topic. It must have the format\n`\"projects/{project}/topics/{topic}\"`. `{topic}` must start with a letter,\nand contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),\nunderscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent\nsigns (`%`). It must be between 3 and 255 characters in length, and it\nmust not start with `\"goog\"`.",
             "in": "path",
             "required": true,
             "type": "string",
@@ -987,6 +987,16 @@
     }
   },
   "definitions": {
+    "AIInferenceUnstructuredInference": {
+      "type": "object",
+      "properties": {
+        "parameters": {
+          "type": "object",
+          "description": "Optional. A parameters object to be included in each inference request.\nThe parameters object is combined with the data field of the Pub/Sub\nmessage to form the inference request."
+        }
+      },
+      "description": "Configuration for making inferences using arbitrary JSON payloads."
+    },
     "CloudStorageAvroFormat": {
       "type": "object",
       "description": "Configuration for reading Cloud Storage data in Avro binary format. The\nbytes of each object will be set to the `data` field of a Pub/Sub\nmessage."
@@ -1329,6 +1339,13 @@
             "$ref": "#/definitions/v1MessageTransform"
           },
           "description": "Optional. Transforms to be applied to messages published to the topic.\nTransforms are applied in the order specified."
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Optional. Input only. Immutable. Tag keys/values directly bound to this\nresource. For example:\n  \"123/environment\": \"production\",\n  \"123/costCenter\": \"marketing\"\nSee https://docs.cloud.google.com/pubsub/docs/tags for more information on\nusing tags with Pub/Sub resources."
         }
       },
       "description": "A topic resource."
@@ -1399,6 +1416,13 @@
                 "$ref": "#/definitions/v1MessageTransform"
               },
               "description": "Optional. Transforms to be applied to messages published to the topic.\nTransforms are applied in the order specified."
+            },
+            "tags": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "description": "Optional. Input only. Immutable. Tag keys/values directly bound to this\nresource. For example:\n  \"123/environment\": \"production\",\n  \"123/costCenter\": \"marketing\"\nSee https://docs.cloud.google.com/pubsub/docs/tags for more information on\nusing tags with Pub/Sub resources."
             }
           },
           "description": "Required. The updated topic object.",
@@ -1547,6 +1571,13 @@
             "type": "string"
           },
           "description": "Optional. See [Creating and managing\nlabels](https://cloud.google.com/pubsub/docs/labels)."
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Optional. Input only. Immutable. Tag keys/values directly bound to this\nresource. For example:\n  \"123/environment\": \"production\",\n  \"123/costCenter\": \"marketing\"\nSee https://docs.cloud.google.com/pubsub/docs/tags for more information on\nusing tags with Pub/Sub resources."
         }
       },
       "description": "Request for the `CreateSnapshot` method.",
@@ -1572,6 +1603,10 @@
         "cloudStorageConfig": {
           "$ref": "#/definitions/v1CloudStorageConfig",
           "description": "Optional. If delivery to Google Cloud Storage is used with this\nsubscription, this field is used to configure it."
+        },
+        "bigtableConfig": {
+          "$ref": "#/definitions/v1BigtableConfig",
+          "description": "Optional. If delivery to Bigtable is used with this subscription, this\nfield is used to configure it."
         },
         "ackDeadlineSeconds": {
           "type": "integer",
@@ -1634,7 +1669,7 @@
         },
         "analyticsHubSubscriptionInfo": {
           "$ref": "#/definitions/SubscriptionAnalyticsHubSubscriptionInfo",
-          "description": "Output only. Information about the associated Analytics Hub subscription.\nOnly set if the subscritpion is created by Analytics Hub.",
+          "description": "Output only. Information about the associated Analytics Hub subscription.\nOnly set if the subscription is created by Analytics Hub.",
           "readOnly": true
         },
         "messageTransforms": {
@@ -1644,6 +1679,13 @@
             "$ref": "#/definitions/v1MessageTransform"
           },
           "description": "Optional. Transforms to be applied to messages before they are delivered to\nsubscribers. Transforms are applied in the order specified."
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Optional. Input only. Immutable. Tag keys/values directly bound to this\nresource. For example:\n  \"123/environment\": \"production\",\n  \"123/costCenter\": \"marketing\"\nSee https://docs.cloud.google.com/pubsub/docs/tags for more information on\nusing tags with Pub/Sub resources."
         }
       },
       "description": "A subscription resource. If none of `push_config`, `bigquery_config`, or\n`cloud_storage_config` is set, then the subscriber will pull and ack messages\nusing API methods. At most one of these fields may be set.",
@@ -1778,6 +1820,10 @@
               "$ref": "#/definitions/v1CloudStorageConfig",
               "description": "Optional. If delivery to Google Cloud Storage is used with this\nsubscription, this field is used to configure it."
             },
+            "bigtableConfig": {
+              "$ref": "#/definitions/v1BigtableConfig",
+              "description": "Optional. If delivery to Bigtable is used with this subscription, this\nfield is used to configure it."
+            },
             "ackDeadlineSeconds": {
               "type": "integer",
               "format": "int32",
@@ -1839,7 +1885,7 @@
             },
             "analyticsHubSubscriptionInfo": {
               "$ref": "#/definitions/SubscriptionAnalyticsHubSubscriptionInfo",
-              "description": "Output only. Information about the associated Analytics Hub subscription.\nOnly set if the subscritpion is created by Analytics Hub.",
+              "description": "Output only. Information about the associated Analytics Hub subscription.\nOnly set if the subscription is created by Analytics Hub.",
               "readOnly": true
             },
             "messageTransforms": {
@@ -1849,6 +1895,13 @@
                 "$ref": "#/definitions/v1MessageTransform"
               },
               "description": "Optional. Transforms to be applied to messages before they are delivered to\nsubscribers. Transforms are applied in the order specified."
+            },
+            "tags": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "description": "Optional. Input only. Immutable. Tag keys/values directly bound to this\nresource. For example:\n  \"123/environment\": \"production\",\n  \"123/costCenter\": \"marketing\"\nSee https://docs.cloud.google.com/pubsub/docs/tags for more information on\nusing tags with Pub/Sub resources."
             }
           },
           "description": "Required. The updated subscription object.",
@@ -1889,6 +1942,14 @@
       },
       "additionalProperties": {}
     },
+    "protobufNullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\n The JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+    },
     "rpcStatus": {
       "type": "object",
       "properties": {
@@ -1907,6 +1968,27 @@
           }
         }
       }
+    },
+    "v1AIInference": {
+      "type": "object",
+      "properties": {
+        "endpoint": {
+          "type": "string",
+          "description": "Required. An endpoint to a Vertex AI model of the form\n`projects/{project}/locations/{location}/endpoints/{endpoint}` or\n`projects/{project}/locations/{location}/publishers/{publisher}/models/{model}`.\nVertex AI API requests will be sent to this endpoint."
+        },
+        "unstructuredInference": {
+          "$ref": "#/definitions/AIInferenceUnstructuredInference",
+          "description": "Optional. Requests and responses can be any arbitrary JSON object."
+        },
+        "serviceAccountEmail": {
+          "type": "string",
+          "description": "Optional. The service account to use to make prediction requests against\nendpoints. The resource creator or updater that specifies this field must\nhave `iam.serviceAccounts.actAs` permission on the service account. If not\nspecified, the Pub/Sub [service\nagent]({$universe.dns_names.final_documentation_domain}/iam/docs/service-agents),\nservice-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com, is used."
+        }
+      },
+      "description": "Configuration for making inference requests against Vertex AI models.",
+      "required": [
+        "endpoint"
+      ]
     },
     "v1BigQueryConfig": {
       "type": "object",
@@ -1951,10 +2033,53 @@
         "PERMISSION_DENIED",
         "NOT_FOUND",
         "SCHEMA_MISMATCH",
-        "IN_TRANSIT_LOCATION_RESTRICTION"
+        "IN_TRANSIT_LOCATION_RESTRICTION",
+        "VERTEX_AI_LOCATION_RESTRICTION"
       ],
       "default": "STATE_UNSPECIFIED",
-      "description": "Possible states for a BigQuery subscription.\n\n - STATE_UNSPECIFIED: Default value. This value is unused.\n - ACTIVE: The subscription can actively send messages to BigQuery\n - PERMISSION_DENIED: Cannot write to the BigQuery table because of permission denied errors.\nThis can happen if\n- Pub/Sub SA has not been granted the [appropriate BigQuery IAM\npermissions](https://cloud.google.com/pubsub/docs/create-subscription#assign_bigquery_service_account)\n- bigquery.googleapis.com API is not enabled for the project\n([instructions](https://cloud.google.com/service-usage/docs/enable-disable))\n - NOT_FOUND: Cannot write to the BigQuery table because it does not exist.\n - SCHEMA_MISMATCH: Cannot write to the BigQuery table due to a schema mismatch.\n - IN_TRANSIT_LOCATION_RESTRICTION: Cannot write to the destination because enforce_in_transit is set to true\nand the destination locations are not in the allowed regions."
+      "description": "Possible states for a BigQuery subscription.\n\n - STATE_UNSPECIFIED: Default value. This value is unused.\n - ACTIVE: The subscription can actively send messages to BigQuery\n - PERMISSION_DENIED: Cannot write to the BigQuery table because of permission denied errors.\nThis can happen if\n- Pub/Sub SA has not been granted the [appropriate BigQuery IAM\npermissions](https://cloud.google.com/pubsub/docs/create-subscription#assign_bigquery_service_account)\n- bigquery.googleapis.com API is not enabled for the project\n([instructions](https://cloud.google.com/service-usage/docs/enable-disable))\n - NOT_FOUND: Cannot write to the BigQuery table because it does not exist.\n - SCHEMA_MISMATCH: Cannot write to the BigQuery table due to a schema mismatch.\n - IN_TRANSIT_LOCATION_RESTRICTION: Cannot write to the destination because enforce_in_transit is set to true\nand the destination locations are not in the allowed regions.\n - VERTEX_AI_LOCATION_RESTRICTION: Cannot write to the BigQuery table because the table is not in the same\nlocation as where Vertex AI models used in `message_transform`s are\ndeployed."
+    },
+    "v1BigtableConfig": {
+      "type": "object",
+      "properties": {
+        "table": {
+          "type": "string",
+          "description": "Optional. The unique name of the table to write messages to.\n\nValues are of the form\n`projects/\u003cproject\u003e/instances/\u003cinstance\u003e/tables/\u003ctable\u003e`."
+        },
+        "appProfileId": {
+          "type": "string",
+          "description": "Optional. The app profile to use for the Bigtable writes. If not specified,\nthe \"default\" application profile will be used. The app profile must use\nsingle-cluster routing."
+        },
+        "serviceAccountEmail": {
+          "type": "string",
+          "description": "Optional. The service account to use to write to Bigtable. The subscription\ncreator or updater that specifies this field must have\n`iam.serviceAccounts.actAs` permission on the service account. If not\nspecified, the Pub/Sub [service\nagent](https://cloud.google.com/iam/docs/service-agents),\nservice-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com, is used."
+        },
+        "writeMetadata": {
+          "type": "boolean",
+          "description": "Optional. When true, write the subscription name, message_id, publish_time,\nattributes, and ordering_key to additional columns in the table under the\npubsub_metadata column family. The subscription name, message_id, and\npublish_time fields are put in their own columns while all other message\nproperties (other than data) are written to a JSON object in the attributes\ncolumn."
+        },
+        "state": {
+          "$ref": "#/definitions/v1BigtableConfigState",
+          "description": "Output only. An output-only field that indicates whether or not the\nsubscription can receive messages.",
+          "readOnly": true
+        }
+      },
+      "description": "Configuration for a Bigtable subscription. The Pub/Sub message will be\nwritten to a Bigtable row as follows:\n- row key: subscription name and message ID delimited by #.\n- columns: message bytes written to a single column family \"data\" with an\n  empty-string column qualifier.\n- cell timestamp: the message publish timestamp."
+    },
+    "v1BigtableConfigState": {
+      "type": "string",
+      "enum": [
+        "STATE_UNSPECIFIED",
+        "ACTIVE",
+        "NOT_FOUND",
+        "APP_PROFILE_MISCONFIGURED",
+        "PERMISSION_DENIED",
+        "SCHEMA_MISMATCH",
+        "IN_TRANSIT_LOCATION_RESTRICTION",
+        "VERTEX_AI_LOCATION_RESTRICTION"
+      ],
+      "default": "STATE_UNSPECIFIED",
+      "description": "Possible states for a Bigtable subscription.\nNote: more states could be added in the future. Please code accordingly.\n\n - STATE_UNSPECIFIED: Default value. This value is unused.\n - ACTIVE: The subscription can actively send messages to Bigtable.\n - NOT_FOUND: Cannot write to Bigtable because the instance, table, or app profile\ndoes not exist.\n - APP_PROFILE_MISCONFIGURED: Cannot write to Bigtable because the app profile is not configured for\nsingle-cluster routing.\n - PERMISSION_DENIED: Cannot write to Bigtable because of permission denied errors.\nThis can happen if:\n- The Pub/Sub service agent has not been granted the\n  [appropriate Bigtable IAM permission\n  bigtable.tables.mutateRows]({$universe.dns_names.final_documentation_domain}/bigtable/docs/access-control#permissions)\n- The bigtable.googleapis.com API is not enabled for the project\n  ([instructions]({$universe.dns_names.final_documentation_domain}/service-usage/docs/enable-disable))\n - SCHEMA_MISMATCH: Cannot write to Bigtable because of a missing column family (\"data\") or\nif there is no structured row key for the subscription name + message ID.\n - IN_TRANSIT_LOCATION_RESTRICTION: Cannot write to the destination because enforce_in_transit is set to true\nand the destination locations are not in the allowed regions.\n - VERTEX_AI_LOCATION_RESTRICTION: Cannot write to Bigtable because the table is not in the same location as\nwhere Vertex AI models used in `message_transform`s are deployed."
     },
     "v1CloudStorageConfig": {
       "type": "object",
@@ -2020,10 +2145,11 @@
         "PERMISSION_DENIED",
         "NOT_FOUND",
         "IN_TRANSIT_LOCATION_RESTRICTION",
-        "SCHEMA_MISMATCH"
+        "SCHEMA_MISMATCH",
+        "VERTEX_AI_LOCATION_RESTRICTION"
       ],
       "default": "STATE_UNSPECIFIED",
-      "description": "Possible states for a Cloud Storage subscription.\n\n - STATE_UNSPECIFIED: Default value. This value is unused.\n - ACTIVE: The subscription can actively send messages to Cloud Storage.\n - PERMISSION_DENIED: Cannot write to the Cloud Storage bucket because of permission denied\nerrors.\n - NOT_FOUND: Cannot write to the Cloud Storage bucket because it does not exist.\n - IN_TRANSIT_LOCATION_RESTRICTION: Cannot write to the destination because enforce_in_transit is set to true\nand the destination locations are not in the allowed regions.\n - SCHEMA_MISMATCH: Cannot write to the Cloud Storage bucket due to an incompatibility\nbetween the topic schema and subscription settings."
+      "description": "Possible states for a Cloud Storage subscription.\n\n - STATE_UNSPECIFIED: Default value. This value is unused.\n - ACTIVE: The subscription can actively send messages to Cloud Storage.\n - PERMISSION_DENIED: Cannot write to the Cloud Storage bucket because of permission denied\nerrors.\n - NOT_FOUND: Cannot write to the Cloud Storage bucket because it does not exist.\n - IN_TRANSIT_LOCATION_RESTRICTION: Cannot write to the destination because enforce_in_transit is set to true\nand the destination locations are not in the allowed regions.\n - SCHEMA_MISMATCH: Cannot write to the Cloud Storage bucket due to an incompatibility\nbetween the topic schema and subscription settings.\n - VERTEX_AI_LOCATION_RESTRICTION: Cannot write to the Cloud Storage bucket because the bucket is not in the\nsame location as where Vertex AI models used in `message_transform`s are\ndeployed."
     },
     "v1DeadLetterPolicy": {
       "type": "object",
@@ -2224,6 +2350,10 @@
         "javascriptUdf": {
           "$ref": "#/definitions/v1JavaScriptUDF",
           "description": "Optional. JavaScript User Defined Function. If multiple JavaScriptUDF's\nare specified on a resource, each must have a unique `function_name`."
+        },
+        "aiInference": {
+          "$ref": "#/definitions/v1AIInference",
+          "description": "Optional. AI Inference. Specifies the Vertex AI endpoint that inference\nrequests built from the Pub/Sub message data and provided parameters will\nbe sent to."
         },
         "enabled": {
           "type": "boolean",
@@ -2430,7 +2560,7 @@
             "type": "object",
             "$ref": "#/definitions/v1ReceivedMessage"
           },
-          "description": "Optional. Received Pub/Sub messages. This will not be empty."
+          "description": "Optional. Received Pub/Sub messages."
         },
         "acknowledgeConfirmation": {
           "$ref": "#/definitions/StreamingPullResponseAcknowledgeConfirmation",
@@ -2452,7 +2582,7 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "Required. The name of the subscription. It must have the format\n`\"projects/{project}/subscriptions/{subscription}\"`. `{subscription}` must\nstart with a letter, and contain only letters (`[A-Za-z]`), numbers\n(`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),\nplus (`+`) or percent signs (`%`). It must be between 3 and 255 characters\nin length, and it must not start with `\"goog\"`."
+          "description": "Required. Identifier. The name of the subscription. It must have the format\n`\"projects/{project}/subscriptions/{subscription}\"`. `{subscription}` must\nstart with a letter, and contain only letters (`[A-Za-z]`), numbers\n(`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),\nplus (`+`) or percent signs (`%`). It must be between 3 and 255 characters\nin length, and it must not start with `\"goog\"`."
         },
         "topic": {
           "type": "string",
@@ -2469,6 +2599,10 @@
         "cloudStorageConfig": {
           "$ref": "#/definitions/v1CloudStorageConfig",
           "description": "Optional. If delivery to Google Cloud Storage is used with this\nsubscription, this field is used to configure it."
+        },
+        "bigtableConfig": {
+          "$ref": "#/definitions/v1BigtableConfig",
+          "description": "Optional. If delivery to Bigtable is used with this subscription, this\nfield is used to configure it."
         },
         "ackDeadlineSeconds": {
           "type": "integer",
@@ -2531,7 +2665,7 @@
         },
         "analyticsHubSubscriptionInfo": {
           "$ref": "#/definitions/SubscriptionAnalyticsHubSubscriptionInfo",
-          "description": "Output only. Information about the associated Analytics Hub subscription.\nOnly set if the subscritpion is created by Analytics Hub.",
+          "description": "Output only. Information about the associated Analytics Hub subscription.\nOnly set if the subscription is created by Analytics Hub.",
           "readOnly": true
         },
         "messageTransforms": {
@@ -2541,6 +2675,13 @@
             "$ref": "#/definitions/v1MessageTransform"
           },
           "description": "Optional. Transforms to be applied to messages before they are delivered to\nsubscribers. Transforms are applied in the order specified."
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Optional. Input only. Immutable. Tag keys/values directly bound to this\nresource. For example:\n  \"123/environment\": \"production\",\n  \"123/costCenter\": \"marketing\"\nSee https://docs.cloud.google.com/pubsub/docs/tags for more information on\nusing tags with Pub/Sub resources."
         }
       },
       "description": "A subscription resource. If none of `push_config`, `bigquery_config`, or\n`cloud_storage_config` is set, then the subscriber will pull and ack messages\nusing API methods. At most one of these fields may be set.",
@@ -2564,7 +2705,7 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "Required. The name of the topic. It must have the format\n`\"projects/{project}/topics/{topic}\"`. `{topic}` must start with a letter,\nand contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),\nunderscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent\nsigns (`%`). It must be between 3 and 255 characters in length, and it\nmust not start with `\"goog\"`."
+          "description": "Required. Identifier. The name of the topic. It must have the format\n`\"projects/{project}/topics/{topic}\"`. `{topic}` must start with a letter,\nand contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),\nunderscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent\nsigns (`%`). It must be between 3 and 255 characters in length, and it\nmust not start with `\"goog\"`."
         },
         "labels": {
           "type": "object",
@@ -2609,6 +2750,13 @@
             "$ref": "#/definitions/v1MessageTransform"
           },
           "description": "Optional. Transforms to be applied to messages published to the topic.\nTransforms are applied in the order specified."
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Optional. Input only. Immutable. Tag keys/values directly bound to this\nresource. For example:\n  \"123/environment\": \"production\",\n  \"123/costCenter\": \"marketing\"\nSee https://docs.cloud.google.com/pubsub/docs/tags for more information on\nusing tags with Pub/Sub resources."
         }
       },
       "description": "A topic resource.",
