@@ -516,5 +516,5 @@ func NextDelayFor(sub *ent.Subscription, attempts int) (nominalDelay, fuzzedDela
 
 	nominalDelay = time.Duration(delay * float64(time.Second))
 	fuzzedDelay = nominalDelay + time.Duration(fuzzNanos)
-	return
+	return nominalDelay, fuzzedDelay
 }

@@ -40,7 +40,7 @@ func (c *Client) DoTx(
 ) (finalErr error) {
 	tx, finalErr := c.BeginTx(ctx, opts)
 	if finalErr != nil {
-		return
+		return finalErr
 	}
 	success := false
 	defer func() {
@@ -72,7 +72,7 @@ func (c *Client) DoTx(
 	if finalErr == nil {
 		success = true
 	}
-	return
+	return finalErr
 }
 
 // DoCtxTx is a wrapper for DoTx, for handlers that take the context argument.
