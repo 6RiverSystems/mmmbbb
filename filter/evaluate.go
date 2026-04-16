@@ -51,7 +51,7 @@ func (e *Condition) Nil() bool { return e == nil }
 func (e *Condition) Evaluate(attrs map[string]string) (result bool, err error) {
 	result, err = e.Term.Evaluate(attrs)
 	if err != nil {
-		return
+		return result, err
 	}
 	switch {
 	case e.And != nil:
@@ -63,7 +63,7 @@ func (e *Condition) Evaluate(attrs map[string]string) (result bool, err error) {
 			result, err = orTerms(attrs, e.Or)
 		}
 	}
-	return
+	return result, err
 }
 
 func (e *Term) Nil() bool { return e == nil }
@@ -122,10 +122,10 @@ func andTerms(attrs map[string]string, terms []*Term) (result bool, err error) {
 	}
 	for _, t := range terms {
 		if result, err = t.Evaluate(attrs); err != nil || !result {
-			return
+			return result, err
 		}
 	}
-	return
+	return result, err
 }
 
 func orTerms(attrs map[string]string, terms []*Term) (result bool, err error) {
@@ -134,8 +134,8 @@ func orTerms(attrs map[string]string, terms []*Term) (result bool, err error) {
 	}
 	for _, t := range terms {
 		if result, err = t.Evaluate(attrs); err != nil || result {
-			return
+			return result, err
 		}
 	}
-	return
+	return result, err
 }

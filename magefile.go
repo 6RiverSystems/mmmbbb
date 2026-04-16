@@ -158,7 +158,12 @@ func (Generate) OAS(ctx context.Context) error {
 }
 
 func (Generate) Version(ctx context.Context) error {
-	if dirty, err := target.Path("./version/version.go", "./version/write-version.sh", ".git/index", ".git/refs/tags"); err != nil {
+	if dirty, err := target.Path(
+		"./version/version.go",
+		"./version/write-version.sh",
+		".git/index",
+		".git/refs/tags",
+	); err != nil {
 		return err
 	} else if !dirty {
 		if dirty, err := target.Path("./version/version.go", ".version"); err != nil {
