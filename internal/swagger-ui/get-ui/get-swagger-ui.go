@@ -137,7 +137,11 @@ func main() {
 			if err = os.WriteFile(path.Join("ui", "swagger-initializer.orig.js"), fileData, 0o666); err != nil {
 				panic(err)
 			}
-			if err = os.WriteFile(path.Join("ui", "swagger-initializer.js"), []byte(customInitializerContent), 0o666); err != nil {
+			if err = os.WriteFile(
+				path.Join("ui", "swagger-initializer.js"),
+				[]byte(customInitializerContent),
+				0o666,
+			); err != nil {
 				panic(err)
 			}
 		}

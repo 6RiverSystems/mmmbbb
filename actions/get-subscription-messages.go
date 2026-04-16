@@ -360,7 +360,7 @@ func (a *GetSubscriptionMessages) nextAttempt(
 		return nil, err
 	}
 	nextExpires, err := a.buildDeliveryQuery(tx, sub).
-		Order(ent.Asc(delivery.FieldAttemptAt)).
+		Order(ent.Asc(delivery.FieldExpiresAt)).
 		First(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -516,5 +516,5 @@ func NextDelayFor(sub *ent.Subscription, attempts int) (nominalDelay, fuzzedDela
 
 	nominalDelay = time.Duration(delay * float64(time.Second))
 	fuzzedDelay = nominalDelay + time.Duration(fuzzNanos)
-	return
+	return nominalDelay, fuzzedDelay
 }

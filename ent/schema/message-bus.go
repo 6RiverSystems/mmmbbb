@@ -448,6 +448,8 @@ func (Delivery) Indexes() []ent.Index {
 		index.
 			Fields("subscriptionID", "attemptAt").
 			Annotations(entsql.IndexWhere("completed_at is null")),
+		// ordered delivery lookup: most recent non-expired delivery per subscription
+		index.Fields("subscriptionID", "publishedAt", "expiresAt"),
 	}
 }
 

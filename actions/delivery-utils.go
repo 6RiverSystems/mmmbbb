@@ -23,13 +23,11 @@ import (
 	"context"
 	"time"
 
-	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
 
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/delivery"
-	"go.6river.tech/mmmbbb/ent/message"
 	"go.6river.tech/mmmbbb/ent/subscription"
 	"go.6river.tech/mmmbbb/ent/topic"
 	"go.6river.tech/mmmbbb/filter"
@@ -79,20 +77,10 @@ func deliverToSubscription(
 		SetPublishedAt(now).
 		SetAttemptAt(now.Add(time.Duration(s.DeliveryDelay)))
 	if s.OrderedDelivery && m.OrderKey != nil && *m.OrderKey != "" {
-		// set the delivery NotBefore the most recent non-expired delivery
+		// set the delivery NotBefore the most recent non-expired delivery.
 		lastDelivery, err := tx.Subscription.QueryDeliveries(s).
 			Where(
 				delivery.ExpiresAtGT(now),
-				// delivery.HasMessageWith is much slower than a join here, because it
-				// uses an inefficient `in` subquery
-				func(s *sql.Selector) {
-					t := sql.Table(message.Table)
-					s.Join(t).On(s.C(delivery.MessageColumn), t.C(message.FieldID))
-					s.Where(sql.And(
-						// not necessary? maybe helps with indexes?
-						sql.EQ(t.C(message.TopicColumn), m.TopicID),
-					))
-				},
 			).
 			Order(ent.Desc(delivery.FieldPublishedAt)).
 			First(ctx)

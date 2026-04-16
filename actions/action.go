@@ -52,7 +52,7 @@ func (a *actionBase[P, R]) Results() (results R, ok bool) {
 	if a.results != nil {
 		results, ok = *a.results, true
 	}
-	return
+	return results, ok
 }
 
 // actionTimer is a variation on a prometheus.Timer, where it records the

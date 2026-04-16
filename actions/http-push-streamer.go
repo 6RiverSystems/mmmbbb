@@ -230,7 +230,7 @@ func (c *httpPushStreamConn) nowFailing(newValue bool) (isChanged bool) {
 		c.lastFail = time.Now()
 	}
 	c.mu.Unlock()
-	return
+	return isChanged
 }
 
 type PushMessage = pubsubv1.PubsubMessage
