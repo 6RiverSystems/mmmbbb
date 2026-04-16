@@ -146,16 +146,16 @@ func ParseDefault() (driverName, dialectName, dsn string, err error) {
 	} else {
 		return "", "", dsn, fmt.Errorf("unrecognized db url '%s'", dsn)
 	}
-	return
+	return driverName, dialectName, dsn, err
 }
 
 func OpenDefault() (db *sql.DB, driverName, dialectName string, err error) {
 	var dsn string
 	if driverName, dialectName, dsn, err = ParseDefault(); err != nil {
-		return
+		return db, driverName, dialectName, err
 	} else {
 		db, err = Open(driverName, dialectName, dsn)
-		return
+		return db, driverName, dialectName, err
 	}
 }
 
@@ -165,7 +165,7 @@ func Open(driverName, dialectName, dsn string) (db *sql.DB, err error) {
 		var cfg *pgx.ConnConfig
 		cfg, err = pgx.ParseConfig(dsn)
 		if err != nil {
-			return
+			return db, err
 		}
 		logger := logging.GetLogger("pgx/notice")
 		cfg.OnNotice = func(pc *pgconn.PgConn, n *pgconn.Notice) {
@@ -197,7 +197,7 @@ func Open(driverName, dialectName, dsn string) (db *sql.DB, err error) {
 	db.SetConnMaxIdleTime(maxIdleTime)
 	// don't think we need to use db.SetConnMaxLifetime()
 
-	return
+	return db, err
 }
 
 // WaitForDB repeatedly tries to connect to the default DB until it either

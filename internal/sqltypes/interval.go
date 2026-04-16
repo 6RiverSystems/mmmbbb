@@ -117,26 +117,26 @@ func ParsePostgreSQLInterval(s string) (result time.Duration, err error) {
 		if err != nil {
 			err = errors.New("unrecognized interval format")
 		}
-		return
+		return result, err
 	}
 	// FIXME: extract the SubexpIndex values to constants
 	if err = adjustDuration(&result, matches[pgIntervalRegexp.SubexpIndex("years")], year); err != nil {
-		return
+		return result, err
 	}
 	if err = adjustDuration(&result, matches[pgIntervalRegexp.SubexpIndex("months")], month); err != nil {
-		return
+		return result, err
 	}
 	if err = adjustDuration(&result, matches[pgIntervalRegexp.SubexpIndex("days")], day); err != nil {
-		return
+		return result, err
 	}
 	if err = adjustDuration(&result, matches[pgIntervalRegexp.SubexpIndex("hours")], time.Hour); err != nil {
-		return
+		return result, err
 	}
 	if err = adjustDuration(&result, matches[pgIntervalRegexp.SubexpIndex("minutes")], time.Minute); err != nil {
-		return
+		return result, err
 	}
 	if err = adjustDuration(&result, matches[pgIntervalRegexp.SubexpIndex("seconds")], time.Second); err != nil {
-		return
+		return result, err
 	}
 	// sub-seconds require more logic, as the scale depends on the length
 	subsecs := matches[pgIntervalRegexp.SubexpIndex("subseconds")]
@@ -145,18 +145,18 @@ func ParsePostgreSQLInterval(s string) (result time.Duration, err error) {
 		// tolerate up to what Go can represent on input
 		if len(subsecs) > 9 {
 			err = errors.New("cannot parse beyond nanosecond resolution")
-			return
+			return result, err
 		}
 		// len(subsecs) is in the range [1..9], so we know that
 		// int64(math.Pow10(...)) will be exactly correct, and evenly divide
 		// time.Second
 		subsecscale := time.Second / time.Duration(math.Pow10(len(subsecs)))
 		if err = adjustDuration(&result, subsecs, subsecscale); err != nil {
-			return
+			return result, err
 		}
 	}
 
-	return
+	return result, err
 }
 
 func adjustDuration(d *time.Duration, value string, scale time.Duration) error {

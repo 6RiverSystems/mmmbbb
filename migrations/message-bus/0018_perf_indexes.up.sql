@@ -19,5 +19,5 @@
 
 -- Index for ordered delivery lookup: find the most recent non-expired delivery
 -- for a subscription, ordered by published_at DESC.
-CREATE INDEX CONCURRENTLY IF NOT EXISTS delivery_sub_published_expires
+CREATE INDEX IF NOT EXISTS delivery_sub_published_expires
   ON deliveries (subscription_id, published_at DESC, expires_at);

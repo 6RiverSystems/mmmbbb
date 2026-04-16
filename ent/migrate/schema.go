@@ -86,6 +86,11 @@ var (
 					Where: "completed_at is null",
 				},
 			},
+			{
+				Name:    "delivery_subscription_id_published_at_expires_at",
+				Unique:  false,
+				Columns: []*schema.Column{DeliveriesColumns[8], DeliveriesColumns[1], DeliveriesColumns[6]},
+			},
 		},
 	}
 	// MessagesColumns holds the columns for the "messages" table.

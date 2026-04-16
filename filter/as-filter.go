@@ -38,7 +38,7 @@ type AsFilter interface {
 
 func (e *Condition) AsFilter(w Writer) (err error) {
 	if err = e.Term.AsFilter(w); err != nil {
-		return
+		return err
 	}
 	switch {
 	case e.And != nil:
@@ -46,7 +46,7 @@ func (e *Condition) AsFilter(w Writer) (err error) {
 	case e.Or != nil:
 		return appendTerms(w, OpOR, e.Or)
 	default:
-		return
+		return err
 	}
 }
 
