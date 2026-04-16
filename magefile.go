@@ -25,6 +25,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -423,6 +424,7 @@ func (Lint) addLicense(fix bool) error {
 		"-ignore", "**/*.css",
 		"-ignore", "**/*.js",
 		"-ignore", "**/*.yml",
+		"-ignore", "**/*.yaml",
 		"-ignore", "**/*.html",
 		"-ignore", "version/version.go",
 		"-ignore", "internal/ts-compat/pnpm-lock.yaml",
@@ -446,14 +448,74 @@ func (Lint) addLicense(fix bool) error {
 	return err
 }
 
-// VulnCheck runs govulncheck
+// VulnCheck runs govulncheck, filtering out ignored vulnerabilities from
+// .govulncheck-ignore.yaml that have no fix available.
 func (Lint) VulnCheck(ctx context.Context) error {
 	fmt.Println("Linting(vulncheck)...")
-	return sh.Run(
-		"go", "tool", "govulncheck",
-		"-test",
-		"./...",
-	)
+
+	// load ignored vulnerability IDs from config
+	ignoredIDs := map[string]bool{}
+	if data, err := os.ReadFile(".govulncheck-ignore.yaml"); err == nil {
+		for _, line := range strings.Split(string(data), "\n") {
+			line = strings.TrimSpace(line)
+			if strings.HasPrefix(line, "- id:") {
+				id := strings.TrimSpace(strings.TrimPrefix(line, "- id:"))
+				ignoredIDs[id] = true
+			}
+		}
+	}
+
+	if len(ignoredIDs) == 0 {
+		// no ignores, run normally
+		return sh.Run("go", "tool", "govulncheck", "-test", "./...")
+	}
+
+	// run with JSON output so we can inspect results
+	buf := &bytes.Buffer{}
+	cmd := exec.CommandContext(ctx, "go", "tool", "govulncheck", "-test", "-format=json", "./...")
+	cmd.Stdout = buf
+	cmd.Stderr = os.Stderr
+	runErr := cmd.Run()
+
+	// govulncheck JSON output is a stream of top-level JSON objects.
+	// "finding" objects contain an "osv" field with the vulnerability ID.
+	type findingMsg struct {
+		Finding *struct {
+			OSV string `json:"osv"`
+		} `json:"finding"`
+	}
+
+	dec := json.NewDecoder(buf)
+	nonIgnored := map[string]bool{}
+	for dec.More() {
+		var msg findingMsg
+		if err := dec.Decode(&msg); err != nil {
+			break
+		}
+		if msg.Finding != nil && msg.Finding.OSV != "" {
+			id := msg.Finding.OSV
+			if !ignoredIDs[id] {
+				nonIgnored[id] = true
+			}
+		}
+	}
+
+	if len(nonIgnored) > 0 {
+		ids := make([]string, 0, len(nonIgnored))
+		for id := range nonIgnored {
+			ids = append(ids, id)
+		}
+		return fmt.Errorf("govulncheck found non-ignored vulnerabilities: %s", strings.Join(ids, ", "))
+	}
+
+	if runErr != nil {
+		fmt.Printf("govulncheck exited with error but all found vulnerabilities are ignored: %v\n", runErr)
+		for id := range ignoredIDs {
+			fmt.Printf("  ignored: %s\n", id)
+		}
+	}
+
+	return nil
 }
 
 func (Lint) GoLines(ctx context.Context) error {

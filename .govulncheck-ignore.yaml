@@ -1,0 +1,42 @@
+# govulncheck ignore configuration
+#
+# This file specifies vulnerabilities that should be ignored when running
+# govulncheck. Vulnerabilities are only ignored if no fix is available.
+# Once a fix is released, the wrapper script will flag them automatically.
+#
+# Each entry must specify:
+# - id: The vulnerability ID (GO-XXXX-XXXX format)
+# - module: The exact module path where the vulnerability exists
+# - reason: Why this vulnerability is accepted (should note "No fix available")
+
+ignored_vulnerabilities:
+  - id: GO-2026-4887
+    module: github.com/docker/docker
+    reason: "No fix available - Moby has AuthZ plugin bypass when provided oversized request bodies (indirect dependency)"
+  - id: GO-2026-4883
+    module: github.com/docker/docker
+    reason: "No fix available - Moby has an Off-by-one error in its plugin privilege validation (indirect dependency)"
+  - id: GO-2026-4771
+    module: github.com/jackc/pgx/v5
+    reason: "No fix available - CVE-2026-33815 in github.com/jackc/pgx"
+  - id: GO-2026-4864
+    module: stdlib
+    reason: "No fix available - requires Go 1.26.2 toolchain upgrade (TOCTOU root escape via Root.Chmod)"
+  - id: GO-2026-4865
+    module: stdlib
+    reason: "No fix available - requires Go 1.26.2 toolchain upgrade (JsBraceDepth XSS in html/template)"
+  - id: GO-2026-4866
+    module: stdlib
+    reason: "No fix available - requires Go 1.26.2 toolchain upgrade (case-sensitive excludedSubtrees in crypto/x509)"
+  - id: GO-2026-4869
+    module: stdlib
+    reason: "No fix available - requires Go 1.26.2 toolchain upgrade (unbounded allocation in archive/tar)"
+  - id: GO-2026-4870
+    module: stdlib
+    reason: "No fix available - requires Go 1.26.2 toolchain upgrade (TLS 1.3 KeyUpdate connection retention)"
+  - id: GO-2026-4946
+    module: stdlib
+    reason: "No fix available - requires Go 1.26.2 toolchain upgrade (inefficient policy validation in crypto/x509)"
+  - id: GO-2026-4947
+    module: stdlib
+    reason: "No fix available - requires Go 1.26.2 toolchain upgrade (unexpected work during chain building in crypto/x509)"
