@@ -123,6 +123,11 @@ func (a *SeekSubscriptionToTime) Execute(ctx context.Context, tx *ent.Tx) error 
 	// so if we de-acked some, but acking might also wake a listener, if any of
 	// those were blocking later deliveries in an ordered subscription
 	if numAcked != 0 || numDeAcked != 0 {
+		if sub.OrderedDelivery {
+			if err := refreshBlocked(ctx, tx, sub.ID, now); err != nil {
+				return err
+			}
+		}
 		notifyPublish(tx, sub.ID)
 	}
 

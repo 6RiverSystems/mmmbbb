@@ -156,6 +156,11 @@ func (a *SeekSubscriptionToSnapshot) Execute(ctx context.Context, tx *ent.Tx) er
 	}
 
 	if numAcked != 0 || numDeAcked != 0 {
+		if sub.OrderedDelivery {
+			if err := refreshBlocked(ctx, tx, sub.ID, now); err != nil {
+				return err
+			}
+		}
 		notifyPublish(tx, sub.ID)
 	}
 

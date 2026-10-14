@@ -101,6 +101,11 @@ func NotBeforeID(v uuid.UUID) predicate.Delivery {
 	return predicate.Delivery(sql.FieldEQ(FieldNotBeforeID, v))
 }
 
+// Blocked applies equality check predicate on the "blocked" field. It's identical to BlockedEQ.
+func Blocked(v bool) predicate.Delivery {
+	return predicate.Delivery(sql.FieldEQ(FieldBlocked, v))
+}
+
 // MessageIDEQ applies the EQ predicate on the "messageID" field.
 func MessageIDEQ(v uuid.UUID) predicate.Delivery {
 	return predicate.Delivery(sql.FieldEQ(FieldMessageID, v))
@@ -429,6 +434,16 @@ func NotBeforeIDIsNil() predicate.Delivery {
 // NotBeforeIDNotNil applies the NotNil predicate on the "notBeforeID" field.
 func NotBeforeIDNotNil() predicate.Delivery {
 	return predicate.Delivery(sql.FieldNotNull(FieldNotBeforeID))
+}
+
+// BlockedEQ applies the EQ predicate on the "blocked" field.
+func BlockedEQ(v bool) predicate.Delivery {
+	return predicate.Delivery(sql.FieldEQ(FieldBlocked, v))
+}
+
+// BlockedNEQ applies the NEQ predicate on the "blocked" field.
+func BlockedNEQ(v bool) predicate.Delivery {
+	return predicate.Delivery(sql.FieldNEQ(FieldBlocked, v))
 }
 
 // HasMessage applies the HasEdge predicate on the "message" edge.

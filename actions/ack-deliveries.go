@@ -101,6 +101,10 @@ func (a *AckDeliveries) Execute(ctx context.Context, tx *ent.Tx) error {
 	if err != nil {
 		return err
 	}
+	// unblock deliveries in ordered subscriptions that were waiting on these
+	if err := unblockSuccessors(ctx, tx, a.params.ids...); err != nil {
+		return err
+	}
 
 	// subscribers awaiting a publish on an ordered subscription may also be
 	// awaiting a prior delivery ack, so wake them up. streaming subscribers may

@@ -414,6 +414,10 @@ func (Delivery) Fields() []ent.Field {
 		field.UUID("notBeforeID", uuid.UUID{}).
 			StorageKey("not_before_id").
 			Optional(),
+		field.Bool("blocked").
+			StorageKey("blocked").
+			Default(false).
+			Comment("True while the notBefore delivery is still pending (neither completed nor expired)"),
 	}
 }
 
@@ -448,6 +452,17 @@ func (Delivery) Indexes() []ent.Index {
 		index.
 			Fields("subscriptionID", "attemptAt").
 			Annotations(entsql.IndexWhere("completed_at is null")),
+		// supports finding ready deliveries in ordered subscriptions without
+		// scanning every blocked delivery
+		index.
+			Fields("subscriptionID", "attemptAt").
+			StorageKey("id_delivery_sub_attempt_unblocked").
+			Annotations(entsql.IndexWhere("completed_at is null and not blocked")),
+		// supports finding the predecessor delivery when publishing to ordered
+		// subscriptions
+		index.
+			Fields("subscriptionID", "publishedAt").
+			StorageKey("id_delivery_sub_published_at"),
 	}
 }
 

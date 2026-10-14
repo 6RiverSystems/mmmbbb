@@ -143,7 +143,7 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 					msg2,
 					1,
 					func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
-						return dc.SetNotBeforeID(del1.ID)
+						return dc.SetNotBeforeID(del1.ID).SetBlocked(true)
 					},
 				)
 			},
@@ -283,9 +283,12 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 					msg2,
 					1,
 					func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
-						return dc.SetNotBeforeID(del1.ID)
+						return dc.SetNotBeforeID(del1.ID).SetBlocked(true)
 					},
 				)
+				// successors of expired deliveries are unblocked when they are pruned
+				assert.NoError(t, client.DoCtxTx(ctx, nil,
+					NewPruneExpiredDeliveries(PruneCommonParams{MaxDelete: 100}).Execute))
 			},
 			GetSubscriptionMessagesParams{
 				// Name will be auto-filled
@@ -512,7 +515,7 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 					msg2,
 					1,
 					func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
-						return dc.SetNotBeforeID(del1.ID)
+						return dc.SetNotBeforeID(del1.ID).SetBlocked(true)
 					},
 				)
 			},
@@ -533,16 +536,7 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 				}
 				assert.NoError(
 					t,
-					client.DoCtxTx(ctx, nil, func(ctx context.Context, tx *ent.Tx) error {
-						if err := tx.Delivery.
-							UpdateOneID(xID(t, &ent.Delivery{}, 0)).
-							SetCompletedAt(time.Now()).
-							Exec(ctx); err != nil {
-							return err
-						}
-						notifyPublish(tx, xID(t, &ent.Subscription{}, 0))
-						return nil
-					}),
+					client.DoCtxTx(ctx, nil, NewAckDeliveries(xID(t, &ent.Delivery{}, 0)).Execute),
 				)
 			},
 			assert.NoError,
@@ -607,7 +601,7 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 					msg2,
 					1,
 					func(dc *ent.DeliveryCreate) *ent.DeliveryCreate {
-						return dc.SetNotBeforeID(del1.ID)
+						return dc.SetNotBeforeID(del1.ID).SetBlocked(true)
 					},
 				)
 			},
@@ -630,6 +624,10 @@ func TestGetSubscriptionMessages_Execute(t *testing.T) {
 						return nil
 					}),
 				)
+				// successors of expired deliveries are unblocked when they are pruned,
+				// which also wakes the subscription
+				assert.NoError(t, client.DoCtxTx(ctx, nil,
+					NewPruneExpiredDeliveries(PruneCommonParams{MaxDelete: 100}).Execute))
 			},
 			assert.NoError,
 			1,

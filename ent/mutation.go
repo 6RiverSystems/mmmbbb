@@ -51,6 +51,7 @@ type DeliveryMutation struct {
 	addattempts         *int
 	completedAt         *time.Time
 	expiresAt           *time.Time
+	blocked             *bool
 	clearedFields       map[string]struct{}
 	message             *uuid.UUID
 	clearedmessage      bool
@@ -553,6 +554,42 @@ func (m *DeliveryMutation) ResetNotBeforeID() {
 	delete(m.clearedFields, delivery.FieldNotBeforeID)
 }
 
+// SetBlocked sets the "blocked" field.
+func (m *DeliveryMutation) SetBlocked(b bool) {
+	m.blocked = &b
+}
+
+// Blocked returns the value of the "blocked" field in the mutation.
+func (m *DeliveryMutation) Blocked() (r bool, exists bool) {
+	v := m.blocked
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBlocked returns the old "blocked" field's value of the Delivery entity.
+// If the Delivery object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeliveryMutation) OldBlocked(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBlocked is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBlocked requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBlocked: %w", err)
+	}
+	return oldValue.Blocked, nil
+}
+
+// ResetBlocked resets all changes to the "blocked" field.
+func (m *DeliveryMutation) ResetBlocked() {
+	m.blocked = nil
+}
+
 // ClearMessage clears the "message" edge to the Message entity.
 func (m *DeliveryMutation) ClearMessage() {
 	m.clearedmessage = true
@@ -722,7 +759,7 @@ func (m *DeliveryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *DeliveryMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 10)
 	if m.message != nil {
 		fields = append(fields, delivery.FieldMessageID)
 	}
@@ -750,6 +787,9 @@ func (m *DeliveryMutation) Fields() []string {
 	if m.notBefore != nil {
 		fields = append(fields, delivery.FieldNotBeforeID)
 	}
+	if m.blocked != nil {
+		fields = append(fields, delivery.FieldBlocked)
+	}
 	return fields
 }
 
@@ -776,6 +816,8 @@ func (m *DeliveryMutation) Field(name string) (ent.Value, bool) {
 		return m.ExpiresAt()
 	case delivery.FieldNotBeforeID:
 		return m.NotBeforeID()
+	case delivery.FieldBlocked:
+		return m.Blocked()
 	}
 	return nil, false
 }
@@ -803,6 +845,8 @@ func (m *DeliveryMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldExpiresAt(ctx)
 	case delivery.FieldNotBeforeID:
 		return m.OldNotBeforeID(ctx)
+	case delivery.FieldBlocked:
+		return m.OldBlocked(ctx)
 	}
 	return nil, fmt.Errorf("unknown Delivery field %s", name)
 }
@@ -874,6 +918,13 @@ func (m *DeliveryMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetNotBeforeID(v)
+		return nil
+	case delivery.FieldBlocked:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBlocked(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Delivery field %s", name)
@@ -986,6 +1037,9 @@ func (m *DeliveryMutation) ResetField(name string) error {
 		return nil
 	case delivery.FieldNotBeforeID:
 		m.ResetNotBeforeID()
+		return nil
+	case delivery.FieldBlocked:
+		m.ResetBlocked()
 		return nil
 	}
 	return fmt.Errorf("unknown Delivery field %s", name)

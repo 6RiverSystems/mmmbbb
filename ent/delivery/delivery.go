@@ -33,6 +33,8 @@ const (
 	FieldExpiresAt = "expires_at"
 	// FieldNotBeforeID holds the string denoting the notbeforeid field in the database.
 	FieldNotBeforeID = "not_before_id"
+	// FieldBlocked holds the string denoting the blocked field in the database.
+	FieldBlocked = "blocked"
 	// EdgeMessage holds the string denoting the message edge name in mutations.
 	EdgeMessage = "message"
 	// EdgeSubscription holds the string denoting the subscription edge name in mutations.
@@ -79,6 +81,7 @@ var Columns = []string{
 	FieldCompletedAt,
 	FieldExpiresAt,
 	FieldNotBeforeID,
+	FieldBlocked,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -98,6 +101,8 @@ var (
 	DefaultAttemptAt func() time.Time
 	// DefaultAttempts holds the default value on creation for the "attempts" field.
 	DefaultAttempts int
+	// DefaultBlocked holds the default value on creation for the "blocked" field.
+	DefaultBlocked bool
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
@@ -153,6 +158,11 @@ func ByExpiresAt(opts ...sql.OrderTermOption) OrderOption {
 // ByNotBeforeID orders the results by the notBeforeID field.
 func ByNotBeforeID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldNotBeforeID, opts...).ToFunc()
+}
+
+// ByBlocked orders the results by the blocked field.
+func ByBlocked(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldBlocked, opts...).ToFunc()
 }
 
 // ByMessageField orders the results by message field.

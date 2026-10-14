@@ -18,6 +18,7 @@ var (
 		{Name: "attempts", Type: field.TypeInt, Default: 0, SchemaType: map[string]string{"postgres": "timestamptz"}},
 		{Name: "completed_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"postgres": "timestamptz"}},
 		{Name: "expires_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamptz"}},
+		{Name: "blocked", Type: field.TypeBool, Default: false},
 		{Name: "message_id", Type: field.TypeUUID},
 		{Name: "subscription_id", Type: field.TypeUUID},
 		{Name: "not_before_id", Type: field.TypeUUID, Nullable: true},
@@ -30,19 +31,19 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "deliveries_messages_message",
-				Columns:    []*schema.Column{DeliveriesColumns[7]},
+				Columns:    []*schema.Column{DeliveriesColumns[8]},
 				RefColumns: []*schema.Column{MessagesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "deliveries_subscriptions_subscription",
-				Columns:    []*schema.Column{DeliveriesColumns[8]},
+				Columns:    []*schema.Column{DeliveriesColumns[9]},
 				RefColumns: []*schema.Column{SubscriptionsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "deliveries_deliveries_nextReady",
-				Columns:    []*schema.Column{DeliveriesColumns[9]},
+				Columns:    []*schema.Column{DeliveriesColumns[10]},
 				RefColumns: []*schema.Column{DeliveriesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -66,25 +67,38 @@ var (
 			{
 				Name:    "delivery_not_before_id",
 				Unique:  false,
-				Columns: []*schema.Column{DeliveriesColumns[9]},
+				Columns: []*schema.Column{DeliveriesColumns[10]},
 			},
 			{
 				Name:    "delivery_subscription_id",
 				Unique:  false,
-				Columns: []*schema.Column{DeliveriesColumns[8]},
+				Columns: []*schema.Column{DeliveriesColumns[9]},
 			},
 			{
 				Name:    "delivery_message_id",
 				Unique:  false,
-				Columns: []*schema.Column{DeliveriesColumns[7]},
+				Columns: []*schema.Column{DeliveriesColumns[8]},
 			},
 			{
 				Name:    "delivery_subscription_id_attempt_at",
 				Unique:  false,
-				Columns: []*schema.Column{DeliveriesColumns[8], DeliveriesColumns[2]},
+				Columns: []*schema.Column{DeliveriesColumns[9], DeliveriesColumns[2]},
 				Annotation: &entsql.IndexAnnotation{
 					Where: "completed_at is null",
 				},
+			},
+			{
+				Name:    "id_delivery_sub_attempt_unblocked",
+				Unique:  false,
+				Columns: []*schema.Column{DeliveriesColumns[9], DeliveriesColumns[2]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "completed_at is null and not blocked",
+				},
+			},
+			{
+				Name:    "id_delivery_sub_published_at",
+				Unique:  false,
+				Columns: []*schema.Column{DeliveriesColumns[9], DeliveriesColumns[1]},
 			},
 		},
 	}

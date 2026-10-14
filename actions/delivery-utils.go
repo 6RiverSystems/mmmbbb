@@ -23,13 +23,13 @@ import (
 	"context"
 	"time"
 
+	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
 
 	"go.6river.tech/mmmbbb/ent"
 	"go.6river.tech/mmmbbb/ent/delivery"
-	"go.6river.tech/mmmbbb/ent/message"
 	"go.6river.tech/mmmbbb/ent/subscription"
 	"go.6river.tech/mmmbbb/ent/topic"
 	"go.6river.tech/mmmbbb/filter"
@@ -80,30 +80,78 @@ func deliverToSubscription(
 		SetAttemptAt(now.Add(time.Duration(s.DeliveryDelay)))
 	if s.OrderedDelivery && m.OrderKey != nil && *m.OrderKey != "" {
 		// set the delivery NotBefore the most recent non-expired delivery
-		lastDelivery, err := tx.Subscription.QueryDeliveries(s).
+		q := tx.Delivery.Query().
 			Where(
+				delivery.SubscriptionID(s.ID),
 				delivery.ExpiresAtGT(now),
-				// delivery.HasMessageWith is much slower than a join here, because it
-				// uses an inefficient `in` subquery
-				func(s *sql.Selector) {
-					t := sql.Table(message.Table)
-					s.Join(t).On(s.C(delivery.MessageColumn), t.C(message.FieldID))
-					s.Where(sql.And(
-						// not necessary? maybe helps with indexes?
-						sql.EQ(t.C(message.TopicColumn), m.TopicID),
-					))
-				},
 			).
-			Order(ent.Desc(delivery.FieldPublishedAt)).
-			First(ctx)
+			Order(ent.Desc(delivery.FieldPublishedAt))
+		if tx.Dialect() != dialect.SQLite {
+			// lock the predecessor so that a concurrent ack of it either sees this
+			// delivery when it unblocks successors, or we see it completed
+			q = q.ForUpdate(sql.WithLockTables(delivery.Table))
+		}
+		lastDelivery, err := q.First(ctx)
 		if err == nil {
-			createDelivery.SetNotBefore(lastDelivery)
+			createDelivery.
+				SetNotBefore(lastDelivery).
+				SetBlocked(lastDelivery.CompletedAt == nil)
 		} else if !ent.IsNotFound(err) {
 			return nil, err
 		}
 	}
 	notifyPublish(tx, s.ID)
 	return createDelivery, nil
+}
+
+// unblockSuccessors marks deliveries waiting on any of the given deliveries as
+// ready, for use when those deliveries are completed or expired.
+func unblockSuccessors(ctx context.Context, tx *ent.Tx, ids ...uuid.UUID) error {
+	if len(ids) == 0 {
+		return nil
+	}
+	return tx.Delivery.Update().
+		Where(
+			delivery.NotBeforeIDIn(ids...),
+			delivery.CompletedAtIsNil(),
+			delivery.Blocked(true),
+		).
+		SetBlocked(false).
+		Exec(ctx)
+}
+
+// refreshBlocked recomputes the blocked state of all pending deliveries in a
+// subscription, for use after bulk changes such as seeks.
+func refreshBlocked(ctx context.Context, tx *ent.Tx, subID uuid.UUID, now time.Time) error {
+	if err := tx.Delivery.Update().
+		Where(
+			delivery.SubscriptionID(subID),
+			delivery.CompletedAtIsNil(),
+			delivery.Blocked(true),
+			delivery.Or(
+				delivery.NotBeforeIDIsNil(),
+				delivery.HasNotBeforeWith(delivery.Or(
+					delivery.CompletedAtNotNil(),
+					delivery.ExpiresAtLTE(now),
+				)),
+			),
+		).
+		SetBlocked(false).
+		Exec(ctx); err != nil {
+		return err
+	}
+	return tx.Delivery.Update().
+		Where(
+			delivery.SubscriptionID(subID),
+			delivery.CompletedAtIsNil(),
+			delivery.Blocked(false),
+			delivery.HasNotBeforeWith(
+				delivery.CompletedAtIsNil(),
+				delivery.ExpiresAtGT(now),
+			),
+		).
+		SetBlocked(true).
+		Exec(ctx)
 }
 
 // SQL tags here need to match entities/queries used in this package
@@ -176,6 +224,9 @@ func deadLetterDelivery(
 	if err := tx.Delivery.UpdateOneID(data.DeliveryID).
 		SetCompletedAt(now).
 		Exec(ctx); err != nil {
+		return err
+	}
+	if err := unblockSuccessors(ctx, tx, data.DeliveryID); err != nil {
 		return err
 	}
 	deadLetterDeliveriesCounter.Inc()

@@ -33,6 +33,10 @@ func init() {
 	deliveryDescAttempts := deliveryFields[6].Descriptor()
 	// delivery.DefaultAttempts holds the default value on creation for the attempts field.
 	delivery.DefaultAttempts = deliveryDescAttempts.Default.(int)
+	// deliveryDescBlocked is the schema descriptor for blocked field.
+	deliveryDescBlocked := deliveryFields[10].Descriptor()
+	// delivery.DefaultBlocked holds the default value on creation for the blocked field.
+	delivery.DefaultBlocked = deliveryDescBlocked.Default.(bool)
 	// deliveryDescID is the schema descriptor for id field.
 	deliveryDescID := deliveryFields[0].Descriptor()
 	// delivery.DefaultID holds the default value on creation for the id field.

@@ -39,6 +39,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			delivery.FieldCompletedAt:     {Type: field.TypeTime, Column: delivery.FieldCompletedAt},
 			delivery.FieldExpiresAt:       {Type: field.TypeTime, Column: delivery.FieldExpiresAt},
 			delivery.FieldNotBeforeID:     {Type: field.TypeUUID, Column: delivery.FieldNotBeforeID},
+			delivery.FieldBlocked:         {Type: field.TypeBool, Column: delivery.FieldBlocked},
 		},
 	}
 	graph.Nodes[1] = &sqlgraph.Node{
@@ -363,6 +364,11 @@ func (f *DeliveryFilter) WhereExpiresAt(p entql.TimeP) {
 // WhereNotBeforeID applies the entql [16]byte predicate on the notBeforeID field.
 func (f *DeliveryFilter) WhereNotBeforeID(p entql.ValueP) {
 	f.Where(p.Field(delivery.FieldNotBeforeID))
+}
+
+// WhereBlocked applies the entql bool predicate on the blocked field.
+func (f *DeliveryFilter) WhereBlocked(p entql.BoolP) {
+	f.Where(p.Field(delivery.FieldBlocked))
 }
 
 // WhereHasMessage applies a predicate to check if query has an edge message.

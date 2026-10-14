@@ -182,6 +182,20 @@ func (_u *DeliveryUpdate) ClearNotBeforeID() *DeliveryUpdate {
 	return _u
 }
 
+// SetBlocked sets the "blocked" field.
+func (_u *DeliveryUpdate) SetBlocked(v bool) *DeliveryUpdate {
+	_u.mutation.SetBlocked(v)
+	return _u
+}
+
+// SetNillableBlocked sets the "blocked" field if the given value is not nil.
+func (_u *DeliveryUpdate) SetNillableBlocked(v *bool) *DeliveryUpdate {
+	if v != nil {
+		_u.SetBlocked(*v)
+	}
+	return _u
+}
+
 // SetMessage sets the "message" edge to the Message entity.
 func (_u *DeliveryUpdate) SetMessage(v *Message) *DeliveryUpdate {
 	return _u.SetMessageID(v.ID)
@@ -332,6 +346,9 @@ func (_u *DeliveryUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.ExpiresAt(); ok {
 		_spec.SetField(delivery.FieldExpiresAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.Blocked(); ok {
+		_spec.SetField(delivery.FieldBlocked, field.TypeBool, value)
 	}
 	if _u.mutation.MessageCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -636,6 +653,20 @@ func (_u *DeliveryUpdateOne) ClearNotBeforeID() *DeliveryUpdateOne {
 	return _u
 }
 
+// SetBlocked sets the "blocked" field.
+func (_u *DeliveryUpdateOne) SetBlocked(v bool) *DeliveryUpdateOne {
+	_u.mutation.SetBlocked(v)
+	return _u
+}
+
+// SetNillableBlocked sets the "blocked" field if the given value is not nil.
+func (_u *DeliveryUpdateOne) SetNillableBlocked(v *bool) *DeliveryUpdateOne {
+	if v != nil {
+		_u.SetBlocked(*v)
+	}
+	return _u
+}
+
 // SetMessage sets the "message" edge to the Message entity.
 func (_u *DeliveryUpdateOne) SetMessage(v *Message) *DeliveryUpdateOne {
 	return _u.SetMessageID(v.ID)
@@ -816,6 +847,9 @@ func (_u *DeliveryUpdateOne) sqlSave(ctx context.Context) (_node *Delivery, err 
 	}
 	if value, ok := _u.mutation.ExpiresAt(); ok {
 		_spec.SetField(delivery.FieldExpiresAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.Blocked(); ok {
+		_spec.SetField(delivery.FieldBlocked, field.TypeBool, value)
 	}
 	if _u.mutation.MessageCleared() {
 		edge := &sqlgraph.EdgeSpec{

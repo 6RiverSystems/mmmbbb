@@ -73,6 +73,10 @@ func (a *PruneExpiredDeliveries) Execute(ctx context.Context, tx *ent.Tx) error 
 		return err
 	}
 
+	if err := unblockSuccessors(ctx, tx, ids...); err != nil {
+		return err
+	}
+
 	del = tx.Delivery.Delete().Where(delivery.IDIn(ids...))
 
 	numDeleted, err := del.Exec(ctx)

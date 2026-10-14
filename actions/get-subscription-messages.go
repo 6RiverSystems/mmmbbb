@@ -312,25 +312,10 @@ func (a *GetSubscriptionMessages) buildDeliveryQuery(
 	now := time.Now()
 
 	predicates := make([]predicate.Delivery, 0, len(extraPredicates)+4)
-	// only add the in-order check if we need it, as this generates some complex
-	// and performance-impacting SQL. we have to do this as a custom-ish predicate
-	// to get the join predicate applied to the "root" selector
 	if sub.OrderedDelivery {
-		// check the delivery we're looking at either (a) has no "not before"
-		// predecessor delivery, or that predecessor is completed or expired.
-		predicates = append(predicates, func(s *sql.Selector) {
-			// do this as a left join instead of an "in" and a sub-select: left join
-			// requires reading at most one more row per candidate in this
-			// subscription (pending delivery), sub-select requires reading all the
-			// completed and expired deliveries _for all subscriptions_.
-			t := sql.Table(delivery.Table).As("dnb")
-			s.LeftJoin(t).On(s.C(delivery.NotBeforeColumn), t.C(delivery.FieldID))
-			s.Where(sql.Or(
-				sql.IsNull(s.C(delivery.NotBeforeColumn)),
-				sql.NotNull(t.C(delivery.FieldCompletedAt)),
-				sql.LTE(t.C(delivery.FieldExpiresAt), now),
-			))
-		})
+		// only deliveries whose "not before" predecessor is completed or expired
+		// are eligible, which we track in the blocked flag so this can use an index
+		predicates = append(predicates, delivery.Blocked(false))
 	}
 	predicates = append(predicates, extraPredicates...)
 	predicates = append(predicates,
@@ -343,8 +328,9 @@ func (a *GetSubscriptionMessages) buildDeliveryQuery(
 }
 
 // nextAttempt looks up the time at which the next eligible message will be
-// ready for an attempted delivery, or when the next outstanding message
-// expires, whichever is first, nor nil if there are no outstanding messages
+// ready for an attempted delivery, or nil if there are no outstanding messages.
+// Expiration of outstanding messages doesn't need a wakeup: expired messages are
+// never delivered, and pruning them wakes ordered subscriptions they may block.
 func (a *GetSubscriptionMessages) nextAttempt(
 	ctx context.Context,
 	tx *ent.Tx,
@@ -359,21 +345,7 @@ func (a *GetSubscriptionMessages) nextAttempt(
 		}
 		return nil, err
 	}
-	nextExpires, err := a.buildDeliveryQuery(tx, sub).
-		Order(ent.Asc(delivery.FieldAttemptAt)).
-		First(ctx)
-	if err != nil {
-		if ent.IsNotFound(err) {
-			return nil, nil
-		}
-		return nil, err
-	}
-	next := nextAttempt.AttemptAt
-	if nextExpires.ExpiresAt.Before(next) {
-		next = nextExpires.ExpiresAt
-	}
-
-	return &next, nil
+	return &nextAttempt.AttemptAt, nil
 }
 
 func (a *GetSubscriptionMessages) applyResults(

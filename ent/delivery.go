@@ -38,6 +38,8 @@ type Delivery struct {
 	ExpiresAt time.Time `json:"expiresAt,omitempty"`
 	// NotBeforeID holds the value of the "notBeforeID" field.
 	NotBeforeID uuid.UUID `json:"notBeforeID,omitempty"`
+	// True while the notBefore delivery is still pending (neither completed nor expired)
+	Blocked bool `json:"blocked,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the DeliveryQuery when eager-loading is set.
 	Edges        DeliveryEdges `json:"-"`
@@ -106,6 +108,8 @@ func (*Delivery) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case delivery.FieldBlocked:
+			values[i] = new(sql.NullBool)
 		case delivery.FieldAttempts:
 			values[i] = new(sql.NullInt64)
 		case delivery.FieldPublishedAt, delivery.FieldAttemptAt, delivery.FieldLastAttemptedAt, delivery.FieldCompletedAt, delivery.FieldExpiresAt:
@@ -188,6 +192,12 @@ func (_m *Delivery) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field notBeforeID", values[i])
 			} else if value != nil {
 				_m.NotBeforeID = *value
+			}
+		case delivery.FieldBlocked:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field blocked", values[i])
+			} else if value.Valid {
+				_m.Blocked = value.Bool
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -275,6 +285,9 @@ func (_m *Delivery) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("notBeforeID=")
 	builder.WriteString(fmt.Sprintf("%v", _m.NotBeforeID))
+	builder.WriteString(", ")
+	builder.WriteString("blocked=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Blocked))
 	builder.WriteByte(')')
 	return builder.String()
 }

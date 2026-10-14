@@ -128,6 +128,20 @@ func (_c *DeliveryCreate) SetNillableNotBeforeID(v *uuid.UUID) *DeliveryCreate {
 	return _c
 }
 
+// SetBlocked sets the "blocked" field.
+func (_c *DeliveryCreate) SetBlocked(v bool) *DeliveryCreate {
+	_c.mutation.SetBlocked(v)
+	return _c
+}
+
+// SetNillableBlocked sets the "blocked" field if the given value is not nil.
+func (_c *DeliveryCreate) SetNillableBlocked(v *bool) *DeliveryCreate {
+	if v != nil {
+		_c.SetBlocked(*v)
+	}
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *DeliveryCreate) SetID(v uuid.UUID) *DeliveryCreate {
 	_c.mutation.SetID(v)
@@ -219,6 +233,10 @@ func (_c *DeliveryCreate) defaults() {
 		v := delivery.DefaultAttempts
 		_c.mutation.SetAttempts(v)
 	}
+	if _, ok := _c.mutation.Blocked(); !ok {
+		v := delivery.DefaultBlocked
+		_c.mutation.SetBlocked(v)
+	}
 	if _, ok := _c.mutation.ID(); !ok {
 		v := delivery.DefaultID()
 		_c.mutation.SetID(v)
@@ -244,6 +262,9 @@ func (_c *DeliveryCreate) check() error {
 	}
 	if _, ok := _c.mutation.ExpiresAt(); !ok {
 		return &ValidationError{Name: "expiresAt", err: errors.New(`ent: missing required field "Delivery.expiresAt"`)}
+	}
+	if _, ok := _c.mutation.Blocked(); !ok {
+		return &ValidationError{Name: "blocked", err: errors.New(`ent: missing required field "Delivery.blocked"`)}
 	}
 	if len(_c.mutation.MessageIDs()) == 0 {
 		return &ValidationError{Name: "message", err: errors.New(`ent: missing required edge "Delivery.message"`)}
@@ -310,6 +331,10 @@ func (_c *DeliveryCreate) createSpec() (*Delivery, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.ExpiresAt(); ok {
 		_spec.SetField(delivery.FieldExpiresAt, field.TypeTime, value)
 		_node.ExpiresAt = value
+	}
+	if value, ok := _c.mutation.Blocked(); ok {
+		_spec.SetField(delivery.FieldBlocked, field.TypeBool, value)
+		_node.Blocked = value
 	}
 	if nodes := _c.mutation.MessageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -562,6 +587,18 @@ func (u *DeliveryUpsert) ClearNotBeforeID() *DeliveryUpsert {
 	return u
 }
 
+// SetBlocked sets the "blocked" field.
+func (u *DeliveryUpsert) SetBlocked(v bool) *DeliveryUpsert {
+	u.Set(delivery.FieldBlocked, v)
+	return u
+}
+
+// UpdateBlocked sets the "blocked" field to the value that was provided on create.
+func (u *DeliveryUpsert) UpdateBlocked() *DeliveryUpsert {
+	u.SetExcluded(delivery.FieldBlocked)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -761,6 +798,20 @@ func (u *DeliveryUpsertOne) UpdateNotBeforeID() *DeliveryUpsertOne {
 func (u *DeliveryUpsertOne) ClearNotBeforeID() *DeliveryUpsertOne {
 	return u.Update(func(s *DeliveryUpsert) {
 		s.ClearNotBeforeID()
+	})
+}
+
+// SetBlocked sets the "blocked" field.
+func (u *DeliveryUpsertOne) SetBlocked(v bool) *DeliveryUpsertOne {
+	return u.Update(func(s *DeliveryUpsert) {
+		s.SetBlocked(v)
+	})
+}
+
+// UpdateBlocked sets the "blocked" field to the value that was provided on create.
+func (u *DeliveryUpsertOne) UpdateBlocked() *DeliveryUpsertOne {
+	return u.Update(func(s *DeliveryUpsert) {
+		s.UpdateBlocked()
 	})
 }
 
@@ -1130,6 +1181,20 @@ func (u *DeliveryUpsertBulk) UpdateNotBeforeID() *DeliveryUpsertBulk {
 func (u *DeliveryUpsertBulk) ClearNotBeforeID() *DeliveryUpsertBulk {
 	return u.Update(func(s *DeliveryUpsert) {
 		s.ClearNotBeforeID()
+	})
+}
+
+// SetBlocked sets the "blocked" field.
+func (u *DeliveryUpsertBulk) SetBlocked(v bool) *DeliveryUpsertBulk {
+	return u.Update(func(s *DeliveryUpsert) {
+		s.SetBlocked(v)
+	})
+}
+
+// UpdateBlocked sets the "blocked" field to the value that was provided on create.
+func (u *DeliveryUpsertBulk) UpdateBlocked() *DeliveryUpsertBulk {
+	return u.Update(func(s *DeliveryUpsert) {
+		s.UpdateBlocked()
 	})
 }
 

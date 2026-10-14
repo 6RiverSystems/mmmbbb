@@ -350,7 +350,9 @@ func (s *publisherServer) Publish(
 	}
 
 	var resp *pubsubpb.PublishResponse
-	err := s.client.DoTx(ctx, nil, func(tx *ent.Tx) error {
+	// locking predecessor deliveries for ordered subscriptions can deadlock with
+	// concurrent acks, so retry on that
+	err := s.client.DoCtxTxRetry(ctx, nil, func(ctx context.Context, tx *ent.Tx) error {
 		t, err := tx.Topic.Query().
 			Where(
 				topic.Name(req.Topic),
@@ -381,17 +383,18 @@ func (s *publisherServer) Publish(
 			})
 			err := action.Execute(ctx, tx)
 			if err != nil {
-				// no expected logic errors here, only db weirdness
-				return grpc.AsStatusError(err)
+				// no expected logic errors here, only db weirdness. leave it unwrapped
+				// so the retry check can see db error codes
+				return err
 			}
 			results, _ := action.Results()
 			resp.MessageIds[i] = results.ID.String()
 		}
 
 		return nil
-	})
+	}, postgres.RetryOnErrorCode(postgres.DeadlockDetected))
 	if err != nil {
-		return nil, err
+		return nil, grpc.AsStatusError(err)
 	}
 	return resp, nil
 }
