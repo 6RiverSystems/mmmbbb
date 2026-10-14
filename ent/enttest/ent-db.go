@@ -34,8 +34,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/ory/dockertest/v3"
-	"github.com/ory/dockertest/v3/docker"
+	"github.com/moby/moby/api/types/container"
+	"github.com/ory/dockertest/v4"
 	"github.com/stretchr/testify/require"
 	_ "modernc.org/sqlite"
 
@@ -52,29 +52,27 @@ func StartDockertest(t testing.TB) string {
 		t.Skip("dockertest setup is not short, skipping test")
 	}
 	t.Log("using dockertest to create postgresql 14 db")
-	pool, err := dockertest.NewPool("")
-	require.NoError(t, err)
-	require.NoError(t, pool.Client.PingWithContext(t.Context()))
-	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
-		Repository: "postgres",
-		Tag:        "14-alpine",
-		Env: []string{
+	// pool cleanup removes the container when the test finishes
+	pool := dockertest.NewPoolT(t, "")
+	resource := pool.RunT(t, "postgres",
+		dockertest.WithTag("14-alpine"),
+		dockertest.WithEnv([]string{
 			"POSTGRES_USER=mmmbbb",
 			"POSTGRES_PASSWORD=mmmbbb",
 			"POSTGRES_DB=test",
-		},
-	}, func(hc *docker.HostConfig) {
-		// set AutoRemove to true so that stopped container goes away by itself
-		hc.AutoRemove = true
-		hc.RestartPolicy = docker.RestartPolicy{Name: "no"}
-	})
-	require.NoError(t, err)
-	t.Cleanup(func() { resource.Close() })
+		}),
+		// each caller gets a fresh database, don't share containers
+		dockertest.WithoutReuse(),
+		dockertest.WithHostConfig(func(hc *container.HostConfig) {
+			// set AutoRemove to true so that stopped container goes away by itself
+			hc.AutoRemove = true
+			hc.RestartPolicy = container.RestartPolicy{Name: container.RestartPolicyDisabled}
+		}),
+	)
 	hostAndPort := resource.GetHostPort("5432/tcp")
 	dbUrl := fmt.Sprintf("postgres://mmmbbb:mmmbbb@%s/test?sslmode=disable", hostAndPort)
 	// wait for the db server to be ready
-	pool.MaxWait = 30 * time.Second
-	require.NoError(t, pool.Retry(func() error {
+	require.NoError(t, pool.Retry(t.Context(), 30*time.Second, func() error {
 		if db, err := dbSql.Open("pgx", dbUrl); err != nil {
 			t.Log("DB not ready yet")
 			return err

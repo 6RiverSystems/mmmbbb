@@ -14,7 +14,7 @@ jobs:
       cgo:
         type: string
     docker:
-      - image: cimg/go:1.25
+      - image: cimg/go:1.26
       - image: cimg/postgres:<< parameters.pgver >>
         environment:
           POSTGRES_USER: circle
@@ -140,7 +140,7 @@ jobs:
 
   publish-docker-multiarch:
     docker:
-      - image: cimg/go:1.25
+      - image: cimg/go:1.26
     resource_class: large
     environment:
       GOPRIVATE: "go.6river.tech/*,github.com/6RiverSystems/*"

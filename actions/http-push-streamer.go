@@ -314,11 +314,11 @@ func (c *httpPushStreamConn) Send(ctx context.Context, del *SubscriptionMessageD
 				if respBodyErr != nil {
 					evt = c.logger.Error().
 						Err(respBodyErr)
-					msg = ("failed to read push subscription's response on ACK")
+					msg = "failed to read push subscription's response on ACK"
 				} else {
 					evt = c.logger.Trace().
 						Str("response", string(respBody))
-					msg = ("successful push")
+					msg = "successful push"
 				}
 				evt.
 					Int("code", resp.StatusCode).

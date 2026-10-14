@@ -237,10 +237,10 @@ func (app *app) setupDB(ctx context.Context, drv *sql.Driver) (client *ent.Clien
 
 	client = ent.NewClient(opts...)
 
-	app.ginMiddleware = append(app.ginMiddleware, (func(engine *gin.Engine) error {
+	app.ginMiddleware = append(app.ginMiddleware, func(engine *gin.Engine) error {
 		engine.Use(middleware.WithEntClient(client, middleware.EntKey(db.GetDefaultDbName())))
 		return nil
-	}))
+	})
 	// Setup db prometheus metrics
 	prometheus.DefaultRegisterer.MustRegister(
 		collectors.NewDBStatsCollector(drv.DB(), db.GetDefaultDbName()),

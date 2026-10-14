@@ -188,7 +188,7 @@ func TestSeekSubscriptionToTime_Execute(t *testing.T) {
 					return nil
 				}),
 			)
-			if tt.expectPublishNotify != (uuid.Nil) {
+			if tt.expectPublishNotify != uuid.Nil {
 				assertClosed(t, pubNotify)
 			} else {
 				assertOpenEmpty(t, pubNotify)

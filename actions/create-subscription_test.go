@@ -168,7 +168,8 @@ func TestCreateSubscription_Execute(t *testing.T) {
 					t,
 					`invalid.*filter.*unexpected token.*attribute`,
 					err.Error(),
-					i...)
+					i...,
+				)
 			},
 			nil,
 		},
