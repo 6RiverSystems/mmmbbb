@@ -559,6 +559,25 @@
         }
       }
     },
+    "v1CompiledProtoSchema": {
+      "type": "object",
+      "properties": {
+        "rootMessage": {
+          "type": "string",
+          "description": "Required. The name of the root message type in the schema."
+        },
+        "compiledBytes": {
+          "type": "string",
+          "format": "byte",
+          "description": "Required. The compiled FileDescriptorSet binary."
+        }
+      },
+      "description": "Configuration specific to compiled Protocol Buffer schemas.",
+      "required": [
+        "rootMessage",
+        "compiledBytes"
+      ]
+    },
     "v1Encoding": {
       "type": "string",
       "enum": [
@@ -619,6 +638,10 @@
         "definition": {
           "type": "string",
           "description": "The definition of the schema. This should contain a string representing\nthe full definition of the schema that is a valid schema definition of\nthe type specified in `type`."
+        },
+        "compiledProtoSchema": {
+          "$ref": "#/definitions/v1CompiledProtoSchema",
+          "description": "Optional. Configuration for a schema provided as a pre-compiled Protocol\nBuffer FileDescriptorSet. The `type` field above must be set to\nPROTOCOL_BUFFER."
         },
         "revisionId": {
           "type": "string",
